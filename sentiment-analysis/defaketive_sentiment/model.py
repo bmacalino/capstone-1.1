@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover - exercised only in an incomplete instal
     SentimentIntensityAnalyzer = None
 
 
-MODEL_VERSION = "defaketive-vader-seed-0.1.1"
+MODEL_VERSION = "defaketive-vader-seed-0.1.2"
 LEXICON_DIR = Path(__file__).with_name("lexicons")
 
 FILIPINO_NEGATORS = {
@@ -155,7 +155,18 @@ class DefaketiveSentimentModel:
     def normalize(text: Any) -> str:
         value = unicodedata.normalize("NFKC", str(text or ""))
         value = value.replace("’", "'").replace("`", "'")
+        # Marketplace translations occasionally use a hyphen where a space is
+        # expected (for example, "poor-quality"). VADER keeps that as one
+        # unknown token, so normalize word-joining hyphens before matching.
+        value = re.sub(r"(?<=\w)[‐‑‒–—-](?=\w)", " ", value)
         value = re.sub(r"\s+", " ", value).strip().casefold()
+        # Temu review translations sometimes confuse a capital I with a lower
+        # case L. VADER treats the standalone token "l" as positive slang.
+        value = re.sub(
+            r"(?<!\w)l(?=\s+(?:am|bought|can|could|did|do|have|ordered|received|was|will|would)\b)",
+            "i",
+            value,
+        )
         parts = []
         for part in re.split(r"(\W+)", value):
             parts.append(SPELLING_NORMALIZATION.get(part, part))
@@ -265,7 +276,16 @@ class DefaketiveSentimentModel:
                 )
         return matches
 
-    def analyze(self, text: Any) -> dict[str, Any]:
+    @staticmethod
+    def _rating_value(rating: Any) -> float | None:
+        """Return a marketplace star rating when it is usable as context."""
+        try:
+            value = float(rating)
+        except (TypeError, ValueError):
+            return None
+        return value if 1 <= value <= 5 else None
+
+    def analyze(self, text: Any, rating: Any = None) -> dict[str, Any]:
         normalized = self.normalize(text)
         if not normalized:
             return {
@@ -273,6 +293,7 @@ class DefaketiveSentimentModel:
                 "label": "neutral",
                 "scores": {"neg": 0.0, "neu": 1.0, "pos": 0.0, "compound": 0.0},
                 "sentiment_evidence": [],
+                "label_adjustment": None,
                 "risk": {"detected": False, "score": 0.0, "categories": [], "evidence": []},
             }
 
@@ -285,15 +306,46 @@ class DefaketiveSentimentModel:
         else:
             label = "neutral"
 
+        sentiment_evidence = self._sentiment_evidence(normalized)
         risk_evidence = self._risk_evidence(normalized)
         active_risks = [item for item in risk_evidence if not item["negated"]]
         max_severity = max((item["severity"] for item in active_risks), default=0)
+
+        # Text remains the primary signal, but a one- or two-star rating is a
+        # useful tie-breaker for terse complaints that VADER cannot understand
+        # ("won't charge", "volume goes down"). It can also resolve a false
+        # positive when strong negative text/risk evidence is present alongside
+        # incidental positive words such as "lucky", "free", or "appreciate".
+        # Clearly positive low-star text is left positive instead of blindly
+        # copying the rating into the sentiment label.
+        rating_value = self._rating_value(rating)
+        active_strong_negative = any(
+            not item["negated"] and item["valence"] <= -1.5
+            for item in sentiment_evidence
+        )
+        label_adjustment = None
+        if rating_value is not None and rating_value <= 2:
+            if label == "neutral":
+                label = "negative"
+                label_adjustment = {
+                    "source": "rating_context",
+                    "rating": rating_value,
+                    "reason": "low_rating_neutral_text",
+                }
+            elif label == "positive" and (active_strong_negative or active_risks):
+                label = "negative"
+                label_adjustment = {
+                    "source": "rating_context",
+                    "rating": rating_value,
+                    "reason": "low_rating_with_negative_evidence",
+                }
 
         return {
             "model_version": MODEL_VERSION,
             "label": label,
             "scores": scores,
-            "sentiment_evidence": self._sentiment_evidence(normalized),
+            "sentiment_evidence": sentiment_evidence,
+            "label_adjustment": label_adjustment,
             "risk": {
                 "detected": bool(active_risks),
                 "score": round(max_severity / 3, 4),

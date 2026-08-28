@@ -46,7 +46,7 @@ def analyze_product_json(data: Any, model: DefaketiveSentimentModel) -> Any:
             if fingerprint and duplicate_of is None:
                 seen[fingerprint] = index
 
-            analysis = model.analyze(text)
+            analysis = model.analyze(text, rating=comment.get("rating"))
             comment["sentiment_analysis"] = analysis
             comment["is_duplicate"] = duplicate_of is not None
             comment["duplicate_of"] = duplicate_of
@@ -67,7 +67,7 @@ def analyze_csv_rows(
     output = []
     for index, row in enumerate(rows):
         text = _review_text(row, text_column)
-        analysis = model.analyze(text)
+        analysis = model.analyze(text, rating=row.get("rating") or row.get("stars"))
         fingerprint = model.fingerprint(text)
         duplicate_of = seen.get(fingerprint) if fingerprint else None
         if fingerprint and duplicate_of is None:

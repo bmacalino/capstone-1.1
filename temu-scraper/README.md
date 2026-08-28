@@ -39,6 +39,9 @@ Scrape up to five products and 100 written reviews per product:
 python -m src.temu_scraper "laptop stand" --num 5 --pages 2 --review-limit 100
 ```
 
+The default review limit is 100 per product. Use `--review-limit` to request a
+higher or lower value; Temu may expose fewer written reviews than requested.
+
 Only keep products with at least 4.0 stars and 100 displayed reviews:
 
 ```powershell
@@ -75,10 +78,26 @@ reached. Temu may display a larger total than it makes available in the current
 browser session. In that case, the product receives `review_collection_warning`
 instead of the scraper claiming that the collection is complete.
 
-The scraper attempts Temu's visible rating filters from 1-star through 5-star,
-so low-rated feedback is collected first. If the rendered Temu layout does not
-expose identifiable star controls, it falls back to the normal review feed and
-sorts the saved comments from the lowest extracted rating to the highest.
+When a product initially shows only a review preview, the scraper opens Temu's
+`See all reviews` control before loading additional batches. It selects the
+review sort menu's exact `Lowest rating` option first, then scrolls the review
+modal's internal scrollbar until the requested limit or Temu's exposed end is
+reached. Review cards are
+identified through their accessible star, avatar, date, and text markup rather
+than Temu's generated CSS class names. It also merges written reviews from
+Temu's own review Fetch/XHR responses when Chrome makes those responses
+available, preferring the structured review ID and translated text while
+deduplicating the corresponding rendered card. Rating-only cards count toward
+end-of-list detection but are omitted from `comments` unless `--include-empty`
+is used. A redirect away from the product during review loading is checkpointed
+as retryable instead of being treated as a completed collection.
+
+If Temu does not expose the exact `Lowest rating` sort, both limited and
+all-review modes fall back to its visible rating filters from 1-star through
+5-star. If neither control is identifiable, the scraper uses the normal review
+feed and sorts saved comments from the lowest extracted rating to the highest.
+For captured Fetch/XHR reviews, `reviewLang.translateComment` is preferred over
+the original-language comment whenever Temu supplies it.
 
 Review progress is saved atomically every five loaded batches. Run the same
 command and output path after an interruption to resume with saved comments;
@@ -101,6 +120,7 @@ include:
   "total_rating": 1200,
   "comments": [
     {
+      "comment_id": "2641578380257808",
       "rating": 2,
       "content": "Sira agad after two days"
     }
@@ -108,11 +128,18 @@ include:
 }
 ```
 
-Products with no written feedback are saved with `comments: []`,
-`review_status: "no_reviews"`, and checkpoint stop reason `no_reviews`. A
-missing review widget on a product that reports existing reviews is recorded
-separately as `review_widget_missing` so layout/login failures are not mistaken
-for genuinely empty products.
+For data minimization, saved review objects contain only `comment_id`, `rating`,
+and `content`, and records without a structured comment ID are rejected.
+Reviewer names, dates, profile details, variations, seller responses, and
+helpful-vote counts are not written to the result file.
+
+Products are saved with `review_status: "no_reviews"` only when the rendered
+page explicitly displays a zero-review message. A missing review widget, blank
+product metadata, or an empty unrecognized layout is recorded as the retryable
+`review_widget_missing` state so layout/login failures are not mistaken for
+genuinely empty products. Older incomplete `no_reviews` checkpoints are
+automatically retried. A temporary missing-widget response also preserves any
+written comments that were saved by an earlier successful batch.
 
 Analyze the output with:
 

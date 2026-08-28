@@ -14,6 +14,12 @@ Each review receives:
 - product-risk categories and matched evidence;
 - an independent severity-based risk score.
 
+For scraped JSON and CSV data, a one- or two-star marketplace rating is used
+only as a guarded tie-breaker: neutral text becomes negative, and a positive
+VADER score is changed only when strong negative or active risk evidence is
+also present. Clearly positive text remains positive even when its marketplace
+rating is unexpectedly low. Any correction is recorded in `label_adjustment`.
+
 Risk detection is separate from sentiment. A neutral sentence such as “The
 battery stopped working after one week” still receives a performance/durability
 warning even if its general emotional language is weak.

@@ -3,6 +3,8 @@ from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
+from dashboard_utils import sentiment_model_version
+
 
 APP_PATH = Path(__file__).resolve().parents[1] / "app.py"
 
@@ -23,6 +25,7 @@ def sample_products(count=6):
                         "rating": 5,
                         "content": "Good product",
                         "sentiment_analysis": {
+                            "model_version": sentiment_model_version(),
                             "label": "positive",
                             "risk": {"detected": False, "evidence": []},
                         },
@@ -31,6 +34,7 @@ def sample_products(count=6):
                 "sentiment_summary": {
                     "review_count": 1,
                     "risk_score": 10,
+                    "risk_score_scale": "percent",
                     "keyword_failure_rate": 0,
                     "sentiment_counts": {"positive": 1, "neutral": 0, "negative": 0},
                     "sentiment_ratios": {"positive": 1, "neutral": 0, "negative": 0},

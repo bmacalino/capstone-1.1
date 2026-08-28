@@ -2,6 +2,7 @@ import json
 import unittest
 
 from dashboard_utils import (
+    analysis_is_current,
     cached_product_matches,
     csv_bytes,
     detect_marketplace,
@@ -25,11 +26,28 @@ from dashboard_utils import (
     risk_level,
     risk_score_percent,
     search_slug,
+    sentiment_model_version,
     weighted_risk_breakdown,
 )
 
 
 class TestDashboardUtils(unittest.TestCase):
+    def test_analysis_version_check_rejects_stale_saved_results(self):
+        product = {
+            "comments": [
+                {
+                    "content": "Sira agad",
+                    "sentiment_analysis": {"model_version": "old-model"},
+                }
+            ],
+            "sentiment_summary": {"risk_score_scale": "percent"},
+        }
+        self.assertFalse(analysis_is_current([product]))
+        product["comments"][0]["sentiment_analysis"]["model_version"] = (
+            sentiment_model_version()
+        )
+        self.assertTrue(analysis_is_current([product]))
+
     def test_cached_product_matching_uses_names_and_normalized_links(self):
         products = [
             {"name": "Raspberry Pi Pico 2 Board", "link": "https://shopee.ph/sample-i.1.2?tracking=1", "sentiment_summary": {"risk_score": 20}},

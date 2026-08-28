@@ -9,6 +9,7 @@ fallbacks. It never substitutes sample data when extraction fails.
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime
 import json
 import logging
@@ -31,10 +32,16 @@ except ModuleNotFoundError:  # pragma: no cover
     sys.modules["distutils"] = _distutils
 
 import undetected_chromedriver as uc
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    StaleElementReferenceException,
+    TimeoutException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from tqdm import tqdm
+
+DEFAULT_REVIEW_LIMIT = 100
 
 
 class SafeChrome(uc.Chrome):
@@ -50,6 +57,7 @@ class SafeChrome(uc.Chrome):
 class TemuScraper:
     """Scrape public Temu product metadata and written customer reviews."""
 
+    REVIEW_EXTRACTOR_VERSION = 9
     BASE_URL = "https://www.temu.com"
     MARKET_HOME = "https://www.temu.com/ph-en/"
     PRODUCT_LINK_SELECTORS = (
@@ -59,6 +67,7 @@ class TemuScraper:
         '[data-goods-id] a[href]',
     )
     REVIEW_ROOT_SELECTORS = (
+        '#reviewContent',
         '[data-testid*="review" i]',
         '[data-uniqid*="review" i]',
         'section[id*="review" i]',
@@ -69,7 +78,7 @@ class TemuScraper:
         self,
         keyword: str = "",
         max_products: int = 10,
-        review_limit: int = 30,
+        review_limit: int = DEFAULT_REVIEW_LIMIT,
         pages: int = 1,
         product_urls: list[str] | None = None,
         all_reviews: bool = False,
@@ -78,6 +87,7 @@ class TemuScraper:
         min_reviews: int = 0,
         include_empty: bool = False,
         chrome_user_data_dir: str | None = None,
+        cookies_file: str | None = None,
         output: str | None = None,
         pause_for_verification: bool = True,
         verification_timeout: int = 0,
@@ -101,6 +111,14 @@ class TemuScraper:
         self.review_limit = max(0, review_limit)
         self.pages = max(1, pages)
         self.product_urls = normalized_urls
+        self.product_navigation_urls = {}
+        for raw_url in raw_urls:
+            canonical_url = self._normalize_product_url(raw_url)
+            if canonical_url:
+                self.product_navigation_urls.setdefault(
+                    canonical_url,
+                    self._product_navigation_url(raw_url, canonical_url),
+                )
         self.all_reviews = all_reviews
         self.max_review_batches = max(1, max_review_batches)
         self.min_rating = float(min_rating)
@@ -113,8 +131,11 @@ class TemuScraper:
         self.pagination_timeout = max(1.0, pagination_timeout)
         self.checkpoint_every = max(1, checkpoint_every)
         self._last_pagination_stop_reason = ""
-        self.cookies_file = "cookies_temu_ph.dat"
+        self.cookies_file = cookies_file or "cookies_temu_ph.dat"
         self._cookies_loaded = False
+        self._network_reviews_by_product: dict[str, list[dict[str, Any]]] = {}
+        self._review_request_context: dict[str, tuple[str, str]] = {}
+        self._performance_logging_available = True
 
         slug_source = self.keyword or "products"
         slug = re.sub(r"[^a-z0-9_]+", "_", slug_source.casefold()).strip("_")
@@ -124,6 +145,20 @@ class TemuScraper:
         self.options = uc.ChromeOptions()
         self._configure_options()
         self._load_existing_data()
+
+    @staticmethod
+    def _product_navigation_url(raw_url, canonical_url):
+        """Keep a localized Temu product path while discarding tracking data."""
+        try:
+            parts = urlsplit(str(raw_url or "").strip())
+        except ValueError:
+            return canonical_url
+        host = (parts.hostname or "").casefold()
+        if host in {"temu.com", "www.temu.com", "m.temu.com"} and re.search(
+            r"-g-\d+\.html$", parts.path, re.I
+        ):
+            return urlunsplit(("https", "www.temu.com", parts.path, "", ""))
+        return canonical_url
 
     def _setup_logging(self):
         os.makedirs("logs", exist_ok=True)
@@ -153,6 +188,7 @@ class TemuScraper:
         self.options.add_argument("--no-default-browser-check")
         self.options.add_argument("--disable-default-apps")
         self.options.add_argument("--disable-search-engine-choice-screen")
+        self.options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     @staticmethod
     def _detect_chrome_major():
@@ -267,6 +303,32 @@ class TemuScraper:
         return re.sub(r"\s+", " ", value.replace("\u00a0", " ")).strip()
 
     @classmethod
+    def _normalize_product_name(cls, value):
+        name = cls._clean_text(value)
+        return re.sub(r"\s*(?:\||-|–)\s*Temu(?:\s+Philippines)?.*$", "", name, flags=re.I).strip()
+
+    @classmethod
+    def _price_from_page_source(cls, page_source):
+        """Read Temu's structured price fallback when no semantic DOM price exists."""
+        source = str(page_source or "")
+        for field in (
+            "minToMaxPriceStr",
+            "minOnSalePriceStr",
+            "normalPriceStr",
+        ):
+            match = re.search(rf'"{field}"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', source)
+            if not match:
+                continue
+            try:
+                value = json.loads(f'"{match.group(1)}"')
+            except json.JSONDecodeError:
+                value = match.group(1)
+            value = cls._clean_text(value)
+            if len(value) < 80 and re.search(r"\d", value):
+                return value
+        return ""
+
+    @classmethod
     def _first_text(cls, root, selectors):
         for selector in selectors:
             try:
@@ -352,12 +414,314 @@ class TemuScraper:
             logging.warning("Could not load Temu cookies: %s", exc)
             return False
 
+    @staticmethod
+    def _network_field(record, names):
+        normalized = {
+            re.sub(r"[^a-z0-9]", "", str(key).casefold()): value
+            for key, value in record.items()
+        }
+        for name in names:
+            value = normalized.get(re.sub(r"[^a-z0-9]", "", name.casefold()))
+            if value not in (None, "", [], {}):
+                return value
+        return ""
+
+    @classmethod
+    def _network_review_time(cls, value):
+        """Convert Temu epoch timestamps to the same readable date used by the DOM."""
+        cleaned = cls._clean_text(value)
+        if not re.fullmatch(r"\d{10,13}", cleaned):
+            return cleaned
+        try:
+            timestamp = int(cleaned)
+            if timestamp >= 10_000_000_000:
+                timestamp /= 1000
+            parsed = datetime.datetime.fromtimestamp(
+                timestamp, tz=datetime.timezone.utc
+            )
+        except (OSError, OverflowError, ValueError):
+            return cleaned
+        return f"on {parsed.strftime('%b')} {parsed.day}, {parsed.year}"
+
+    @classmethod
+    def _network_record_product_ids(cls, record):
+        ids = set()
+        for key, value in record.items():
+            normalized = re.sub(r"[^a-z0-9]", "", str(key).casefold())
+            if normalized not in {"goodsid", "itemid", "productid"}:
+                continue
+            match = re.search(r"\d{6,}", str(value or ""))
+            if match:
+                ids.add(match.group(0))
+        return ids
+
+    @classmethod
+    def _review_from_network_record(cls, record, expected_goods_id=""):
+        """Normalize one JSON review object without accepting product cards."""
+        if not isinstance(record, dict):
+            return None
+        normalized_keys = {
+            re.sub(r"[^a-z0-9]", "", str(key).casefold()) for key in record
+        }
+        explicit_review_content_keys = {
+            "commentcontent",
+            "reviewcontent",
+            "reviewtext",
+            "comment",
+        }
+        review_metadata_keys = {
+            "commentid",
+            "reviewid",
+            "reviewtime",
+            "createtime",
+            "createdat",
+            "username",
+            "nickname",
+            "author",
+        }
+        has_explicit_review_content = bool(
+            normalized_keys & explicit_review_content_keys
+        )
+        has_contextual_review_content = (
+            "content" in normalized_keys
+            and bool(normalized_keys & review_metadata_keys)
+        )
+        if not has_explicit_review_content and not has_contextual_review_content:
+            return None
+        record_ids = cls._network_record_product_ids(record)
+        if expected_goods_id and record_ids and expected_goods_id not in record_ids:
+            return None
+
+        content = cls._network_field(
+            record,
+            (
+                "comment_content",
+                "commentContent",
+                "review_content",
+                "reviewContent",
+                "review_text",
+                "reviewText",
+                "comment",
+                "content",
+            ),
+        )
+        review_language = cls._network_field(record, ("review_lang", "reviewLang"))
+        if isinstance(review_language, dict):
+            content = cls._network_field(
+                review_language,
+                ("translate_comment", "translateComment", "translated_comment"),
+            ) or content
+        rating_value = cls._network_field(
+            record,
+            (
+                "star_rating",
+                "starRating",
+                "goods_score",
+                "goodsScore",
+                "rating",
+                "stars",
+                "star",
+                "score",
+            ),
+        )
+        rating = cls._individual_review_rating(cls._parse_rating(rating_value))
+        content = cls._written_review_content(content)
+        if not rating or not content:
+            return None
+
+        author = cls._network_field(
+            record,
+            (
+                "user_name",
+                "userName",
+                "username",
+                "nickname",
+                "nick_name",
+                "author",
+                "name",
+                "user_info",
+                "userInfo",
+                "user",
+            ),
+        )
+        if isinstance(author, dict):
+            author = cls._network_field(author, ("name", "nickname", "username"))
+        review_time = cls._network_field(
+            record,
+            (
+                "review_time",
+                "reviewTime",
+                "create_time",
+                "createTime",
+                "created_at",
+                "createdAt",
+                "concat_time_lang",
+                "concatTimeLang",
+                "date",
+                "time",
+            ),
+        )
+        variation = cls._network_field(
+            record,
+            ("variation", "sku_info", "skuInfo", "spec", "product_spec"),
+        )
+        if isinstance(variation, (dict, list)):
+            variation = json.dumps(variation, ensure_ascii=False, sort_keys=True)
+        helpful = cls._network_field(
+            record,
+            ("helpful_count", "helpfulCount", "like_count", "likeCount", "likes"),
+        )
+        comment_id = cls._network_field(
+            record,
+            ("comment_id", "commentId", "review_id", "reviewId", "id"),
+        )
+        seller_response = cls._network_field(
+            record,
+            ("seller_response", "sellerResponse", "reply", "response"),
+        )
+        if isinstance(seller_response, (dict, list)):
+            seller_response = json.dumps(
+                seller_response, ensure_ascii=False, sort_keys=True
+            )
+        return {
+            "comment_id": cls._clean_text(comment_id),
+            "author": cls._clean_text(author),
+            "rating": rating,
+            "time": cls._network_review_time(review_time),
+            "content": content,
+            "variation": cls._clean_text(variation),
+            "seller_respond": cls._clean_text(seller_response),
+            "like_count": cls._parse_compact_number(helpful),
+            "extraction_source": "network",
+        }
+
+    @classmethod
+    def _reviews_from_network_payload(cls, payload, expected_goods_id=""):
+        reviews = []
+        stack = [payload]
+        while stack:
+            item = stack.pop()
+            if isinstance(item, dict):
+                review = cls._review_from_network_record(item, expected_goods_id)
+                if review:
+                    reviews.append(review)
+                stack.extend(reversed(tuple(item.values())))
+            elif isinstance(item, list):
+                stack.extend(reversed(item))
+        return cls._deduplicate_reviews(reviews)
+
+    def _drain_performance_logs(self):
+        if not self._performance_logging_available or not self.driver:
+            return []
+        try:
+            return self.driver.get_log("performance") or []
+        except Exception as exc:
+            self._performance_logging_available = False
+            logging.warning("Chrome performance logging is unavailable: %s", exc)
+            return []
+
+    def _reset_product_network_capture(self, product):
+        goods_id = str(product.get("goods_id") or "")
+        self._network_reviews_by_product[goods_id] = []
+        self._review_request_context = {}
+        self._drain_performance_logs()
+
+    def _capture_review_network(self, product):
+        """Collect valid reviews from Temu's own browser Fetch/XHR responses."""
+        goods_id = str(product.get("goods_id") or "")
+        if not goods_id:
+            return []
+        captured = list(self._network_reviews_by_product.get(goods_id, []))
+        for entry in self._drain_performance_logs():
+            try:
+                message = json.loads(entry.get("message", "{}"))["message"]
+                method = message.get("method")
+                if method == "Network.requestWillBeSent":
+                    params = message.get("params", {})
+                    request = params.get("request", {})
+                    request_url = str(request.get("url") or "")
+                    if re.search(r"review|comment", request_url, re.I):
+                        self._review_request_context[params.get("requestId", "")] = (
+                            request_url,
+                            str(request.get("postData") or ""),
+                        )
+                    continue
+                if method != "Network.responseReceived":
+                    continue
+                params = message.get("params", {})
+                if params.get("type") not in {"Fetch", "XHR"}:
+                    continue
+                response = params.get("response", {})
+                response_url = str(response.get("url") or "")
+                if not re.search(r"review|comment", response_url, re.I):
+                    continue
+                request_url, post_data = self._review_request_context.get(
+                    params.get("requestId", ""), (response_url, "")
+                )
+                request_goods_ids = set(
+                    re.findall(
+                        r"(?i)(?:goods|item|product)(?:_|%5f)?id\D{0,12}(\d{6,})",
+                        f"{request_url} {post_data}",
+                    )
+                )
+                if request_goods_ids and goods_id not in request_goods_ids:
+                    continue
+                body_result = self.driver.execute_cdp_cmd(
+                    "Network.getResponseBody",
+                    {"requestId": params["requestId"]},
+                )
+                raw_body = body_result.get("body", "")
+                if body_result.get("base64Encoded"):
+                    raw_body = base64.b64decode(raw_body).decode(
+                        "utf-8", errors="replace"
+                    )
+                payload = json.loads(raw_body)
+                response_reviews = self._reviews_from_network_payload(
+                    payload, expected_goods_id=goods_id
+                )
+                if response_reviews:
+                    logging.info(
+                        "Captured %s valid Temu review(s) from %s",
+                        len(response_reviews),
+                        urlsplit(response_url).path,
+                    )
+                    captured.extend(response_reviews)
+            except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+                continue
+            except Exception:
+                continue
+        captured = self._deduplicate_reviews(captured)
+        self._network_reviews_by_product[goods_id] = captured
+        return list(captured)
+
     def _load_existing_data(self):
         if not os.path.exists(self.out_file):
             return
         try:
             with open(self.out_file, "r", encoding="utf-8") as file:
                 records = json.load(file)
+            for item in records:
+                if not isinstance(item, dict):
+                    continue
+                item["name"] = self._normalize_product_name(item.get("name"))
+                item["description"] = self._clean_text(item.get("description"))
+                comments = self._reviews_for_output(item.get("comments", []))
+                item["comments"] = comments
+                checkpoint = item.get("review_checkpoint")
+                if isinstance(checkpoint, dict):
+                    checkpoint["collected_reviews"] = len(comments)
+                if comments:
+                    item.pop("no_reviews_confirmed", None)
+                    item.pop("no_reviews_evidence", None)
+                    if item.get("review_collection_warning") == "This product has no written reviews":
+                        item.pop("review_collection_warning", None)
+                    total = int(item.get("total_rating", 0) or 0)
+                    stop_reason = (item.get("review_checkpoint") or {}).get("stop_reason")
+                    if total > len(comments) and stop_reason == "no_additional_reviews":
+                        item["review_collection_warning"] = (
+                            f"Temu displayed {total} ratings but exposed only "
+                            f"{len(comments)} unique written review(s) in this browser session"
+                        )
             self.output_data = {
                 item["link"]: item
                 for item in records
@@ -369,8 +733,17 @@ class TemuScraper:
     def _periodic_save(self):
         output_path = Path(self.out_file)
         temporary_path = output_path.with_name(f"{output_path.name}.tmp")
+        records = list(self.output_data.values())
+        for item in records:
+            if isinstance(item, dict):
+                item["comments"] = self._reviews_for_output(
+                    item.get("comments", [])
+                )
+                checkpoint = item.get("review_checkpoint")
+                if isinstance(checkpoint, dict):
+                    checkpoint["collected_reviews"] = len(item["comments"])
         with temporary_path.open("w", encoding="utf-8") as file:
-            json.dump(list(self.output_data.values()), file, ensure_ascii=False, indent=2)
+            json.dump(records, file, ensure_ascii=False, indent=2)
         os.replace(temporary_path, output_path)
         logging.info("Saved %s product(s) to %s", len(self.output_data), self.out_file)
 
@@ -390,6 +763,58 @@ class TemuScraper:
             unique.append(review)
         return unique
 
+    def _reviews_for_output(self, reviews):
+        """Keep only the non-identifying review fields required by DeFaketive."""
+        minimized = []
+        for review in self._deduplicate_reviews(reviews):
+            if not isinstance(review, dict):
+                continue
+            comment_id = self._clean_text(review.get("comment_id"))
+            rating = self._individual_review_rating(review.get("rating"))
+            content = self._written_review_content(review.get("content"))
+            if not comment_id or not rating or (not content and not self.include_empty):
+                continue
+            minimized.append(
+                {
+                    "comment_id": comment_id,
+                    "rating": rating,
+                    "content": content,
+                }
+            )
+        return self._deduplicate_reviews(minimized)
+
+    @classmethod
+    def _reviews_probably_match(cls, left, right):
+        """Match DOM and network forms of a review, including translated text."""
+        left_rating = cls._individual_review_rating(left.get("rating"))
+        right_rating = cls._individual_review_rating(right.get("rating"))
+        if not left_rating or left_rating != right_rating:
+            return False
+        left_content = cls._clean_text(left.get("content")).casefold()
+        right_content = cls._clean_text(right.get("content")).casefold()
+        if left_content and left_content == right_content:
+            return True
+        left_time = cls._network_review_time(left.get("time")).casefold()
+        right_time = cls._network_review_time(right.get("time")).casefold()
+        if not left_time or left_time != right_time:
+            return False
+        left_author = cls._clean_text(left.get("author")).casefold()
+        right_author = cls._clean_text(right.get("author")).casefold()
+        return not left_author or not right_author or left_author == right_author
+
+    @classmethod
+    def _merge_review_sources(cls, dom_reviews, network_reviews):
+        """Prefer structured network reviews and append only unmatched DOM cards."""
+        network = cls._deduplicate_reviews(network_reviews)
+        if not network:
+            return cls._deduplicate_reviews(dom_reviews)
+        merged = list(network)
+        for review in cls._deduplicate_reviews(dom_reviews):
+            if any(cls._reviews_probably_match(review, item) for item in network):
+                continue
+            merged.append(review)
+        return cls._deduplicate_reviews(merged)
+
     @staticmethod
     def _review_matches_source_filter(review, source_filter):
         recorded_filter = review.get("source_rating_filter")
@@ -406,7 +831,8 @@ class TemuScraper:
         )
 
     def _checkpoint_reviews(self, product, reviews, batch_number, stop_reason="", context=None):
-        product["comments"] = self._deduplicate_reviews(reviews)
+        product["comments"] = self._reviews_for_output(reviews)
+        product["review_extractor_version"] = self.REVIEW_EXTRACTOR_VERSION
         previous = product.get("review_checkpoint", {})
         product["review_checkpoint"] = {
             "context": context or ("all" if self.all_reviews else "limited"),
@@ -419,10 +845,30 @@ class TemuScraper:
             self.output_data[product["link"]] = product
         self._periodic_save()
 
-    def _record_no_reviews(self, product):
+    @classmethod
+    def _explicit_no_review_evidence(cls, body_text):
+        """Return the rendered zero-review message, if Temu shows one explicitly."""
+        text = cls._clean_text(body_text).casefold()
+        patterns = (
+            r"\b0\s*(?:customer\s+)?reviews?\b",
+            r"\bno\s+(?:customer\s+|written\s+)?reviews?(?:\s+yet)?\b",
+            r"\bno\s+ratings?(?:\s+yet)?\b",
+            r"\bbe\s+the\s+first\s+to\s+(?:write\s+a\s+)?review\b",
+        )
+        for pattern in patterns:
+            match = re.search(pattern, text, re.I)
+            if match:
+                return match.group(0)
+        return ""
+
+    def _record_no_reviews(self, product, evidence):
+        if not str(evidence or "").strip():
+            raise ValueError("Explicit Temu zero-review evidence is required")
         product["comments"] = []
         product["review_status"] = "no_reviews"
         product["review_collection_warning"] = "This product has no written reviews"
+        product["no_reviews_confirmed"] = True
+        product["no_reviews_evidence"] = self._clean_text(evidence)
         logging.info("No written Temu reviews found for %s", product.get("link"))
         self._checkpoint_reviews(
             product,
@@ -430,6 +876,60 @@ class TemuScraper:
             batch_number=0,
             stop_reason="no_reviews",
             context="all",
+        )
+
+    def _record_review_widget_missing(self, product, warning):
+        """Save an incomplete, retryable result without claiming zero reviews."""
+        product.pop("no_reviews_confirmed", None)
+        product.pop("no_reviews_evidence", None)
+        product["comments"] = self._reviews_for_output(
+            product.get("comments", [])
+        )
+        product["review_status"] = "review_widget_missing"
+        product["review_collection_warning"] = warning
+        logging.warning(
+            "Temu review extraction is incomplete for %s: %s",
+            product.get("link"),
+            warning,
+        )
+        self._checkpoint_reviews(
+            product,
+            product["comments"],
+            batch_number=0,
+            stop_reason="review_widget_missing",
+            context="all" if self.all_reviews else "limited",
+        )
+
+    def _existing_result_complete(self, product):
+        """Return whether a checkpoint is both terminal and a usable product result."""
+        if not self._clean_text(product.get("name")):
+            return False
+        try:
+            extractor_version = int(product.get("review_extractor_version", 0) or 0)
+        except (TypeError, ValueError):
+            extractor_version = 0
+        if extractor_version < self.REVIEW_EXTRACTOR_VERSION:
+            return False
+        expected = product.get("total_rating", 0) if self.all_reviews else self.review_limit
+        comments = self._deduplicate_reviews(product.get("comments", []))
+        checkpoint = product.get("review_checkpoint", {})
+        context = checkpoint.get("context")
+        stop_reason = checkpoint.get("stop_reason")
+        terminal_stop = context in {"all", "limited"} and stop_reason in {
+            "target_reached",
+            "next_button_disabled",
+            "no_additional_reviews",
+            "all_rendered_reviews_scanned",
+        }
+        confirmed_empty = (
+            context in {"all", "limited"}
+            and stop_reason == "no_reviews"
+            and product.get("review_status") == "no_reviews"
+            and product.get("no_reviews_confirmed") is True
+            and bool(self._clean_text(product.get("no_reviews_evidence")))
+        )
+        return terminal_stop or confirmed_empty or (
+            expected > 0 and len(comments) >= expected
         )
 
     def _verification_detected(self):
@@ -703,6 +1203,58 @@ class TemuScraper:
         ]
         return max(visible, key=lambda item: len(item.text), default=None)
 
+    def _expand_review_widget(self, root):
+        """Open Temu's full review list when the product page shows a preview."""
+        try:
+            old_count = self._review_card_count(root)
+            candidates = root.find_elements(
+                By.CSS_SELECTOR, 'button, [role="button"], a'
+            )
+        except Exception:
+            return root
+        pattern = re.compile(r"^(?:see|view)\s+all\s+reviews?$", re.I)
+        for candidate in candidates:
+            try:
+                label = self._clean_text(
+                    " ".join(
+                        filter(
+                            None,
+                            (
+                                candidate.text,
+                                candidate.get_attribute("aria-label"),
+                                candidate.get_attribute("title"),
+                            ),
+                        )
+                    )
+                )
+                if not candidate.is_displayed() or not pattern.fullmatch(label):
+                    continue
+                self.driver.execute_script(
+                    "arguments[0].scrollIntoView({block:'center'})", candidate
+                )
+                try:
+                    candidate.click()
+                except Exception:
+                    self.driver.execute_script("arguments[0].click()", candidate)
+
+                def expanded(_driver):
+                    active = self._review_root()
+                    if not active:
+                        return False
+                    if active != root or self._review_card_count(active) > old_count:
+                        return active
+                    return False
+
+                try:
+                    return WebDriverWait(
+                        self.driver, min(self.pagination_timeout, 10)
+                    ).until(expanded)
+                except TimeoutException:
+                    return self._review_root() or root
+            except Exception:
+                continue
+        return root
+
     def _open_review_section(self):
         review_text_xpath = (
             "//*[self::button or self::a or @role='button']["
@@ -711,12 +1263,19 @@ class TemuScraper:
             "contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', "
             "'abcdefghijklmnopqrstuvwxyz'), 'customer reviews')]"
         )
-        for _ in range(50):
+        completed_passes = 0
+        for _ in range(80):
+            if self._verification_detected():
+                logging.info(
+                    "Temu verification appeared while opening the review section"
+                )
+                if self._check_verification():
+                    return None
             root = self._review_root()
             if root:
                 self.driver.execute_script("arguments[0].scrollIntoView({block:'center'})", root)
                 time.sleep(1)
-                return root
+                return self._expand_review_widget(root)
             buttons = [
                 item
                 for item in self.driver.find_elements(By.XPATH, review_text_xpath)
@@ -733,10 +1292,30 @@ class TemuScraper:
                 root = self._review_root()
                 if root:
                     return root
-            self.driver.execute_script(
-                "window.scrollBy(0, Math.max(700, Math.floor(window.innerHeight * 0.85)))"
+            metrics = self.driver.execute_script(
+                """
+                return {
+                  y: window.scrollY,
+                  viewport: window.innerHeight,
+                  height: document.documentElement.scrollHeight
+                };
+                """
+            ) or {}
+            at_bottom = (
+                float(metrics.get("y", 0)) + float(metrics.get("viewport", 0))
+                >= float(metrics.get("height", 0)) - 10
             )
-            time.sleep(0.35)
+            if at_bottom:
+                if completed_passes >= 1:
+                    break
+                completed_passes += 1
+                self.driver.execute_script("window.scrollTo(0, 0)")
+                time.sleep(2)
+                continue
+            self.driver.execute_script(
+                "window.scrollBy(0, Math.max(500, Math.floor(window.innerHeight * 0.7)))"
+            )
+            time.sleep(0.75)
         return None
 
     @staticmethod
@@ -755,12 +1334,19 @@ class TemuScraper:
           if (found.length) { items = found; break; }
         }
         if (!items.length) {
-          const stars = Array.from(root.querySelectorAll('[aria-label*="star" i], [aria-label*="out of 5" i]'));
+          const stars = Array.from(root.querySelectorAll('[aria-label*="star" i]')).filter(star => {
+            const label = (star.getAttribute('aria-label') || '').trim();
+            return /^(?:rated\s+)?[1-5](?:\.0)?\s*(?:out of (?:five|5)\s*)?stars?$/i.test(label);
+          });
           for (const star of stars) {
             let node = star;
-            for (let depth = 0; node && depth < 7; depth++, node = node.parentElement) {
+            for (let depth = 0; node && depth < 12; depth++, node = node.parentElement) {
               const text = (node.innerText || '').trim();
-              if (text.length >= 20 && text.length <= 2500) {
+              const avatar = node.querySelector(
+                '[aria-label="avatar" i], img[alt="avatar" i]'
+              );
+              const datedText = node.querySelector('[role="text"][aria-label*=" on " i], time');
+              if (avatar && datedText && text.length >= 10 && text.length <= 5000) {
                 items.push(node);
                 break;
               }
@@ -787,29 +1373,60 @@ class TemuScraper:
             '[itemprop="reviewBody"]'
           ]);
           if (!content) {
+            const sections = Array.from(item.querySelectorAll('section'))
+              .map(section => (section.innerText || section.textContent || '').trim())
+              .filter(text =>
+                text.length >= 2 &&
+                !/^(?:all\s+)?reviews?\s+are\s+from\s+verified\s+purchases?$/i.test(text) &&
+                !/^(?:on\s+)?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4}$/i.test(text) &&
+                !/^(?:purchased|size|color|style|model|type)\s*:/i.test(text)
+              )
+              .sort((a, b) => b.length - a.length);
+            content = sections[0] || '';
+          }
+          if (!content) {
             const candidates = lines.filter(line =>
               line.length >= 5 &&
               !/^\d(?:\.\d)?\s*(?:out of 5|stars?)?$/i.test(line) &&
-              !/^(helpful|report|verified purchase|size:|color:|style:)/i.test(line) &&
+              !/^(helpful|report|verified purchase|purchased:|size:|color:|style:)/i.test(line) &&
               !/^\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}$/.test(line)
             );
             content = candidates.sort((a, b) => b.length - a.length)[0] || '';
           }
-          const author = firstText(item, [
+          let author = firstText(item, [
             '[data-testid*="author" i]', '[data-testid*="user" i]',
             '[data-uniqid*="author" i]', '[data-uniqid*="user" i]',
             '[itemprop="author"]'
           ]);
+          if (!author) {
+            const authorLink = Array.from(item.querySelectorAll('[role="link"], a')).find(node => {
+              const text = (node.innerText || node.textContent || '').trim();
+              const label = (node.getAttribute('aria-label') || '').trim();
+              return text.length >= 1 && text.length <= 80 &&
+                !/^(?:helpful|report|see more|show more|view more)$/i.test(text) &&
+                !/\bstars?\b/i.test(label) &&
+                !/\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b/i.test(text);
+            });
+            author = (authorLink && (authorLink.innerText || authorLink.textContent) || '').trim();
+          }
           const timeNode = item.querySelector('time');
           let reviewTime = (timeNode && (timeNode.getAttribute('datetime') || timeNode.innerText)) ||
             firstText(item, ['[data-testid*="date" i]', '[data-uniqid*="date" i]']);
+          if (!reviewTime) {
+            const datedNode = Array.from(item.querySelectorAll('[role="text"][aria-label]')).find(node =>
+              /\bon\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b/i.test(node.getAttribute('aria-label') || '')
+            );
+            const datedLabel = (datedNode && datedNode.getAttribute('aria-label') || '').trim();
+            const datedMatch = datedLabel.match(/\bon\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b/i);
+            reviewTime = datedMatch ? datedMatch[0] : datedLabel;
+          }
           if (!reviewTime) {
             reviewTime = lines.find(line =>
               /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b/i.test(line) ||
               /\b\d{4}[\/-]\d{1,2}[\/-]\d{1,2}\b/.test(line)
             ) || '';
           }
-          const variation = lines.find(line => /^(?:size|color|style|model|type)\s*:/i.test(line)) || '';
+          const variation = lines.find(line => /^(?:purchased|size|color|style|model|type)\s*:/i.test(line)) || '';
           const helpful = firstText(item, [
             '[data-testid*="helpful" i]', '[data-uniqid*="helpful" i]',
             'button[aria-label*="helpful" i]'
@@ -827,20 +1444,63 @@ class TemuScraper:
         });
         """
 
+    @staticmethod
+    def _individual_review_rating(value):
+        try:
+            rating = float(value)
+        except (TypeError, ValueError):
+            return 0
+        return int(rating) if rating.is_integer() and 1 <= rating <= 5 else 0
+
+    @classmethod
+    def _written_review_content(cls, content, review_time=""):
+        content = cls._clean_text(content)
+        review_time = cls._clean_text(review_time)
+        if not content:
+            return ""
+        if re.fullmatch(
+            r"(?:all\s+)?reviews?\s+are\s+from\s+verified\s+purchases?",
+            content,
+            re.I,
+        ):
+            return ""
+        if re.fullmatch(r"purchased\s*:\s*.+", content, re.I):
+            return ""
+        if review_time and content.casefold() == review_time.casefold():
+            return ""
+        if re.fullmatch(
+            r"(?:on\s+)?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*"
+            r"\s+\d{1,2},?\s+\d{4}",
+            content,
+            re.I,
+        ):
+            return ""
+        return content
+
     def _reviews_from_current_view(self, root):
         records = self.driver.execute_script(self._review_javascript(), root) or []
         reviews = []
         for item in records:
-            content = self._clean_text(item.get("content"))
+            author = self._clean_text(item.get("author"))
+            review_time = self._clean_text(item.get("time"))
+            content = self._written_review_content(item.get("content"), review_time)
+            if author and content.casefold() == author.casefold():
+                content = ""
+            rating = self._individual_review_rating(
+                self._parse_rating(item.get("rating_label"))
+            )
+            # Aggregate rating headers and date-only containers are not
+            # individual written reviews.
+            if not rating:
+                continue
             if not content and not self.include_empty:
                 continue
-            rating = self._parse_rating(item.get("rating_label"))
             reviews.append(
                 {
                     "comment_id": self._clean_text(item.get("comment_id")),
-                    "author": self._clean_text(item.get("author")),
-                    "rating": int(rating) if rating.is_integer() else rating,
-                    "time": self._clean_text(item.get("time")),
+                    "author": author,
+                    "rating": rating,
+                    "time": review_time,
                     "content": content,
                     "variation": self._clean_text(item.get("variation")),
                     "seller_respond": "",
@@ -855,6 +1515,139 @@ class TemuScraper:
             str(item.get("comment_id") or f"{item['author']}:{item['time']}:{item['content']}")
             for item in reviews[-3:]
         )
+
+    def _review_card_count(self, root):
+        """Count rendered review cards, including cards without written text."""
+        records = self.driver.execute_script(self._review_javascript(), root) or []
+        return len(records)
+
+    @staticmethod
+    def _review_scroll_javascript():
+        """Scroll Temu's nearest review-modal scroller to its current end."""
+        return """
+            const root = arguments[0];
+            if (!root) return false;
+            const stars = Array.from(root.querySelectorAll('[aria-label*="star" i]')).filter(node =>
+              /^(?:rated\s+)?[1-5](?:\.0)?\s*(?:out of (?:five|5)\s*)?stars?$/i.test((node.getAttribute('aria-label') || '').trim())
+            );
+            const last = stars[stars.length - 1] || root.lastElementChild || root;
+            let node = last;
+            let scroller = null;
+            while (node && node !== document.body) {
+              const style = window.getComputedStyle(node);
+              const canScroll = node.scrollHeight > node.clientHeight + 2;
+              const scrollsVertically = /^(?:auto|scroll|overlay)$/.test(style.overflowY);
+              if (canScroll && scrollsVertically) {
+                scroller = node;
+                break;
+              }
+              node = node.parentElement;
+            }
+            if (last && last.scrollIntoView) last.scrollIntoView({block: 'end'});
+            if (scroller) {
+              scroller.scrollTop = scroller.scrollHeight;
+              scroller.dispatchEvent(new Event('scroll', {bubbles: true}));
+              return true;
+            }
+            if (root.scrollHeight > root.clientHeight + 2) {
+              root.scrollTop = root.scrollHeight;
+              root.dispatchEvent(new Event('scroll', {bubbles: true}));
+              return true;
+            }
+            const bottom = root.getBoundingClientRect().bottom;
+            window.scrollBy(0, Math.max(300, Math.min(window.innerHeight, bottom)));
+            return false;
+        """
+
+    def _click_lowest_rating_sort(self, root, product=None):
+        """Select Temu's exact Lowest rating review-sort option."""
+        selector = 'button, [role="button"], [role="option"]'
+
+        def label_for(element):
+            return next(
+                (
+                    value
+                    for value in (
+                        self._clean_text(element.text),
+                        self._clean_text(element.get_attribute("aria-label")),
+                        self._clean_text(element.get_attribute("title")),
+                    )
+                    if value
+                ),
+                "",
+            )
+
+        def visible_exact(label):
+            for scope in (root, self.driver):
+                try:
+                    candidates = scope.find_elements(By.CSS_SELECTOR, selector)
+                except Exception:
+                    continue
+                for candidate in candidates:
+                    try:
+                        if candidate.is_displayed() and label_for(
+                            candidate
+                        ).casefold() == label.casefold():
+                            return candidate
+                    except StaleElementReferenceException:
+                        continue
+            return None
+
+        option = visible_exact("Lowest rating")
+        if option is None:
+            trigger = None
+            for scope in (root, self.driver):
+                try:
+                    candidates = scope.find_elements(By.CSS_SELECTOR, selector)
+                except Exception:
+                    continue
+                for candidate in candidates:
+                    try:
+                        label = label_for(candidate).casefold()
+                        if candidate.is_displayed() and (
+                            label == "recommended"
+                            or label == "recommended more selections"
+                            or label == "sort by"
+                        ):
+                            trigger = candidate
+                            break
+                    except StaleElementReferenceException:
+                        continue
+                if trigger is not None:
+                    break
+            if trigger is None:
+                return False
+            try:
+                self.driver.execute_script(
+                    "arguments[0].scrollIntoView({block:'center'})", trigger
+                )
+                try:
+                    trigger.click()
+                except Exception:
+                    self.driver.execute_script("arguments[0].click()", trigger)
+                option = WebDriverWait(
+                    self.driver, min(self.pagination_timeout, 5)
+                ).until(lambda _driver: visible_exact("Lowest rating") or False)
+            except (StaleElementReferenceException, TimeoutException):
+                return False
+        if product:
+            # Discard the initial Recommended response. The next captured review
+            # response must be the one triggered by Lowest rating.
+            self._reset_product_network_capture(product)
+        try:
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView({block:'center'})", option
+            )
+            try:
+                option.click()
+            except Exception:
+                self.driver.execute_script("arguments[0].click()", option)
+            time.sleep(1.5)
+            logging.info("Selected Temu review sort: Lowest rating")
+            return True
+        except Exception as exc:
+            logging.warning("Could not select Temu Lowest rating sort: %s", exc)
+            return False
 
     def _click_rating_filter(self, root, rating):
         previous_signature = self._review_signature(root)
@@ -905,19 +1698,22 @@ class TemuScraper:
         return False
 
     def _advance_reviews(self, root, previous_signature):
-        pattern = re.compile(r"^(?:next|load more|show more|more reviews)(?:\s+reviews?)?$", re.I)
+        pattern = re.compile(
+            r"^(?:next(?:\s+(?:page|reviews?))?|(?:load|show|view)\s+more\s+reviews?|more\s+reviews?)$",
+            re.I,
+        )
         self._last_pagination_stop_reason = ""
         for attempt in range(1, self.pagination_retries + 1):
             if self._review_signature(root) != previous_signature:
                 return True
-            candidates = []
-            for scope in (root, self.driver):
-                try:
-                    candidates.extend(
-                        scope.find_elements(By.CSS_SELECTOR, 'button, [role="button"], a')
-                    )
-                except Exception:
-                    continue
+            # Keep pagination inside the review widget. Temu also has
+            # unrelated product-description "See more" controls.
+            try:
+                candidates = root.find_elements(
+                    By.CSS_SELECTOR, 'button, [role="button"], a'
+                )
+            except Exception:
+                candidates = []
             button_to_click = None
             disabled_button_seen = False
             for button in candidates:
@@ -957,16 +1753,13 @@ class TemuScraper:
                     self._last_pagination_stop_reason = "next_button_disabled"
                 else:
                     self.driver.execute_script(
-                        """
-                        const root = arguments[0];
-                        if (root && root.scrollHeight > root.clientHeight) root.scrollTop = root.scrollHeight;
-                        else window.scrollBy(0, Math.floor(window.innerHeight * 0.9));
-                        """,
+                        self._review_scroll_javascript(),
                         root,
                     )
                     self._last_pagination_stop_reason = "no_additional_reviews"
                 WebDriverWait(self.driver, self.pagination_timeout).until(
-                    lambda _: self._review_signature(root) != previous_signature
+                    lambda _: self._review_signature(self._review_root() or root)
+                    != previous_signature
                 )
                 return True
             except TimeoutException:
@@ -984,6 +1777,19 @@ class TemuScraper:
         if self._last_pagination_stop_reason != "next_button_disabled":
             self._save_debug_artifacts("review_pagination_failure")
         return False
+
+    def _on_requested_product_page(self, product):
+        if not product or not self.driver or not hasattr(self.driver, "current_url"):
+            return True
+        current_url = self.driver.current_url
+        if isinstance(current_url, bytes):
+            current_url = current_url.decode("utf-8", errors="replace")
+        return self._normalize_product_url(current_url) == product.get("link")
+
+    @staticmethod
+    def _review_collection_was_redirected(product):
+        checkpoint = product.get("review_checkpoint") or {}
+        return checkpoint.get("stop_reason") == "product_redirected_during_reviews"
 
     def _collect_reviews(self, root, product=None, max_reviews=None, source_filter=None):
         target = (
@@ -1036,7 +1842,52 @@ class TemuScraper:
         description = "Collecting all exposed Temu reviews" if target is None else "Collecting Temu reviews"
         with tqdm(total=target, initial=len(collected), desc=description) as progress:
             for batch_number in range(1, self.max_review_batches + 1):
-                view_reviews = self._reviews_from_current_view(root)
+                root = self._review_root() or root
+                if not self._on_requested_product_page(product):
+                    stop_reason = "product_redirected_during_reviews"
+                    self._save_debug_artifacts("review_product_redirect")
+                    break
+                dom_reviews = self._reviews_from_current_view(root)
+                network_reviews = []
+                if product:
+                    network_reviews = self._capture_review_network(product)
+                    if source_filter is not None:
+                        network_reviews = [
+                            review
+                            for review in network_reviews
+                            if self._review_matches_source_filter(
+                                review, source_filter
+                            )
+                        ]
+                    view_reviews = self._merge_review_sources(
+                        dom_reviews, network_reviews
+                    )
+                else:
+                    view_reviews = dom_reviews
+                if source_filter is not None:
+                    view_reviews = [
+                        review
+                        for review in view_reviews
+                        if self._review_matches_source_filter(review, source_filter)
+                    ]
+                if network_reviews:
+                    previous_count = len(collected)
+                    collected = self._merge_review_sources(
+                        collected, network_reviews
+                    )
+                    progress.update(len(collected) - previous_count)
+                    seen = {
+                        review.get("comment_id")
+                        or (
+                            review.get("author", ""),
+                            review.get("time", ""),
+                            review.get("content", ""),
+                            review.get("rating", 0),
+                        )
+                        for review in collected
+                    }
+                    if target is not None and len(collected) >= target:
+                        stop_reason = "target_reached"
                 if not view_reviews:
                     stop_reason = "empty_review_batch"
                     self._save_debug_artifacts("reviews")
@@ -1058,6 +1909,16 @@ class TemuScraper:
                     if target is not None and len(collected) >= target:
                         stop_reason = "target_reached"
                         break
+                displayed_total = int(product.get("total_rating", 0) or 0) if product else 0
+                rendered_card_count = (
+                    self._review_card_count(root) if displayed_total > 0 else 0
+                )
+                if (
+                    not stop_reason
+                    and displayed_total > 0
+                    and rendered_card_count >= displayed_total
+                ):
+                    stop_reason = "all_rendered_reviews_scanned"
                 if product and batch_number % self.checkpoint_every == 0:
                     checkpoint_reviews = (
                         collected
@@ -1074,7 +1935,7 @@ class TemuScraper:
                         batch_number,
                         context=str(source_filter) if source_filter is not None else None,
                     )
-                if stop_reason == "target_reached":
+                if stop_reason:
                     break
                 signature = self._review_signature(root)
                 if not signature:
@@ -1082,8 +1943,14 @@ class TemuScraper:
                     self._save_debug_artifacts("review_pagination_failure")
                     break
                 if not self._advance_reviews(root, signature):
-                    stop_reason = self._last_pagination_stop_reason or "page_transition_failed"
+                    stop_reason = (
+                        "product_redirected_during_reviews"
+                        if not self._on_requested_product_page(product)
+                        else self._last_pagination_stop_reason
+                        or "page_transition_failed"
+                    )
                     break
+                root = self._review_root() or root
             else:
                 stop_reason = "max_review_batches_reached"
         if stop_reason and stop_reason != "target_reached":
@@ -1112,83 +1979,8 @@ class TemuScraper:
             )
         return collected
 
-    def _scrape_details(self, product):
-        if self._safe_get(product["link"]):
-            self._save_debug_artifacts("blocked_product")
-            raise RuntimeError("Temu required login or verification before showing the product")
-        if self._normalize_product_url(self.driver.current_url) != product["link"]:
-            self._save_debug_artifacts("unexpected_product_redirect")
-            raise RuntimeError("Temu redirected away from the requested product page")
-        self._dismiss_popups()
-        self._apply_json_ld(product, self._json_ld_product())
-
-        product["name"] = self._first_text(
-            self.driver,
-            ('h1', '[itemprop="name"]', '[data-uniqid*="goods_name" i]'),
-        ) or product.get("name", "")
-        price = self._first_text(
-            self.driver,
-            (
-                '[itemprop="price"]',
-                '[data-uniqid*="price" i]',
-                '[aria-label*="price" i]',
-            ),
-        )
-        if price and len(price) < 80:
-            product["price"] = price
-        rating_label = self._first_attribute(
-            self.driver,
-            ('[aria-label*="out of 5" i]', '[itemprop="ratingValue"]'),
-            "aria-label",
-        ) or self._first_attribute(self.driver, ('[itemprop="ratingValue"]',), "content")
-        product["rating"] = self._parse_rating(rating_label) or product.get("rating", 0.0)
-        product["description"] = product.get("description") or self._first_attribute(
-            self.driver, ('meta[name="description"]', 'meta[property="og:description"]'), "content"
-        )
-        product["img"] = product.get("img") or self._first_attribute(
-            self.driver,
-            ('meta[property="og:image"]', '[itemprop="image"]', 'img[src*="kwcdn.com"]'),
-            "content",
-        ) or self._first_attribute(self.driver, ('img[src*="kwcdn.com"]',), "src")
-
-        body_text = self._clean_text(self.driver.find_element(By.TAG_NAME, "body").text)
-        if not product.get("total_rating"):
-            count_match = re.search(r"([\d,.]+\s*[kmb]?\+?)\s*(?:customer\s+)?reviews?", body_text, re.I)
-            if count_match:
-                product["total_rating"] = self._parse_compact_number(count_match.group(1))
-        if not product.get("sold_count"):
-            sold_match = re.search(r"([\d,.]+\s*[kmb]?\+?)\s*(?:sold|bought)", body_text, re.I)
-            if sold_match:
-                product["sold_count"] = self._parse_compact_number(sold_match.group(1))
-
-        root = self._open_review_section()
-        if root is None:
-            if product.get("total_rating", 0) == 0:
-                self._record_no_reviews(product)
-            else:
-                logging.warning("Temu review section not found for %s", product["link"])
-                self._save_debug_artifacts("reviews")
-                product["comments"] = []
-                product["review_status"] = "review_widget_missing"
-                product["review_collection_warning"] = (
-                    "No review section was identified in the rendered page"
-                )
-            return
-        if product.get("total_rating", 0) == 0 and not self._reviews_from_current_view(root):
-            self._record_no_reviews(product)
-            return
-        product["review_status"] = "collecting"
-        if not self.all_reviews:
-            # Keep the marketplace's rendered order for representative limited
-            # samples instead of intentionally front-loading low-star reviews.
-            product["comments"] = self._deduplicate_reviews(
-                self._collect_reviews(root, product=product, max_reviews=self.review_limit)
-            )[: self.review_limit]
-            if product["comments"]:
-                product["review_status"] = "complete"
-            else:
-                self._record_no_reviews(product)
-            return
+    def _collect_rating_filtered_reviews(self, root, product):
+        """Collect visible rating groups from the lowest star value upward."""
         reviews = []
         applied_filters = []
         for star in range(1, 6):
@@ -1207,30 +1999,260 @@ class TemuScraper:
                 max_reviews=remaining,
                 source_filter=star,
             )
+            if self._review_collection_was_redirected(product):
+                return reviews, applied_filters, True
             applied_filters.append(star)
             reviews.extend(star_reviews)
-        if applied_filters:
+        return reviews, applied_filters, False
+
+    def _scrape_details(self, product):
+        # A layout/login failure saved by an older version may carry a false
+        # terminal no_reviews claim. This attempt must establish it again.
+        try:
+            stored_extractor_version = int(
+                product.get("review_extractor_version", 0) or 0
+            )
+        except (TypeError, ValueError):
+            stored_extractor_version = 0
+        revalidating_legacy_result = (
+            stored_extractor_version < self.REVIEW_EXTRACTOR_VERSION
+        )
+        if revalidating_legacy_result:
+            # Revalidate old snapshots, but retain already verified comments
+            # if Temu temporarily omits the widget during this retry.
+            product.pop("review_checkpoint", None)
+        product["review_extractor_version"] = self.REVIEW_EXTRACTOR_VERSION
+        product.pop("no_reviews_confirmed", None)
+        product.pop("no_reviews_evidence", None)
+        product.pop("review_collection_warning", None)
+        product.pop("review_filter_warning", None)
+        product.pop("applied_rating_filters", None)
+        product.pop("review_sort", None)
+        product.pop("sentiment_summary", None)
+        cleaned_existing_comments = [
+            review
+            for review in product.get("comments", [])
+            if isinstance(review, dict)
+            and self._individual_review_rating(review.get("rating"))
+            and (
+                self._written_review_content(
+                    review.get("content"), review.get("time")
+                )
+                or self.include_empty
+            )
+        ]
+        legacy_comments = (
+            cleaned_existing_comments if revalidating_legacy_result else []
+        )
+        product["comments"] = (
+            [] if revalidating_legacy_result else cleaned_existing_comments
+        )
+        navigation_url = self.product_navigation_urls.get(
+            product["link"], product["link"]
+        )
+        self._reset_product_network_capture(product)
+        if self._safe_get(navigation_url):
+            self._save_debug_artifacts("blocked_product")
+            raise RuntimeError("Temu required login or verification before showing the product")
+        if self._normalize_product_url(self.driver.current_url) != product["link"]:
+            self._save_debug_artifacts("unexpected_product_redirect")
+            raise RuntimeError("Temu redirected away from the requested product page")
+        self._dismiss_popups()
+        self._apply_json_ld(product, self._json_ld_product())
+
+        page_title = self._normalize_product_name(getattr(self.driver, "title", ""))
+        product["name"] = self._normalize_product_name(
+            self._first_text(
+                self.driver,
+                ('h1', '[itemprop="name"]', '[data-uniqid*="goods_name" i]'),
+            )
+            or self._first_attribute(
+                self.driver,
+                ('meta[property="og:title"]', 'meta[name="twitter:title"]'),
+                "content",
+            )
+            or product.get("name", "")
+            or page_title
+        )
+        price = self._first_text(
+            self.driver,
+            (
+                '[itemprop="price"]',
+                '[data-uniqid*="price" i]',
+                '[aria-label*="price" i]',
+            ),
+        ) or self._first_attribute(
+            self.driver,
+            (
+                'meta[property="product:price:amount"]',
+                'meta[property="og:price:amount"]',
+                'meta[itemprop="price"]',
+            ),
+            "content",
+        ) or self._price_from_page_source(getattr(self.driver, "page_source", ""))
+        if price and len(price) < 80:
+            product["price"] = price
+        rating_label = self._first_attribute(
+            self.driver,
+            ('[aria-label*="out of 5" i]', '[itemprop="ratingValue"]'),
+            "aria-label",
+        ) or self._first_attribute(self.driver, ('[itemprop="ratingValue"]',), "content")
+        product["rating"] = self._parse_rating(rating_label) or product.get("rating", 0.0)
+        product["description"] = self._clean_text(
+            product.get("description")
+            or self._first_attribute(
+                self.driver,
+                ('meta[name="description"]', 'meta[property="og:description"]'),
+                "content",
+            )
+        )
+        product["img"] = product.get("img") or self._first_attribute(
+            self.driver,
+            ('meta[property="og:image"]', '[itemprop="image"]', 'img[src*="kwcdn.com"]'),
+            "content",
+        ) or self._first_attribute(self.driver, ('img[src*="kwcdn.com"]',), "src")
+
+        body_text = self._clean_text(self.driver.find_element(By.TAG_NAME, "body").text)
+        if not product.get("total_rating"):
+            count_match = re.search(r"([\d,.]+\s*[kmb]?\+?)\s*(?:customer\s+)?reviews?", body_text, re.I)
+            if count_match:
+                product["total_rating"] = self._parse_compact_number(count_match.group(1))
+        if not product.get("sold_count"):
+            sold_match = re.search(r"([\d,.]+\s*[kmb]?\+?)\s*(?:sold|bought)", body_text, re.I)
+            if sold_match:
+                product["sold_count"] = self._parse_compact_number(sold_match.group(1))
+
+        zero_review_evidence = self._explicit_no_review_evidence(body_text)
+        root = self._open_review_section()
+        if root is None:
+            if zero_review_evidence:
+                self._record_no_reviews(product, zero_review_evidence)
+            else:
+                self._save_debug_artifacts("reviews")
+                if legacy_comments:
+                    product["comments"] = legacy_comments
+                self._record_review_widget_missing(
+                    product,
+                    "No review section was identified and Temu did not explicitly display zero reviews",
+                )
+            return
+        if not product.get("rating"):
+            rating_labels = []
+            try:
+                rating_labels = [
+                    element.get_attribute("aria-label")
+                    for element in root.find_elements(
+                        By.CSS_SELECTOR,
+                        '[aria-label*="out of 5" i], [aria-label*="star" i]',
+                    )
+                ]
+            except Exception:
+                pass
+            rating_values = [
+                self._parse_rating(label) for label in rating_labels if label
+            ]
+            aggregate = next(
+                (value for value in rating_values if 0 < value <= 5 and not value.is_integer()),
+                0.0,
+            )
+            if aggregate:
+                product["rating"] = aggregate
+        if not product.get("total_rating"):
+            root_text = self._clean_text(getattr(root, "text", ""))
+            count_match = re.search(
+                r"([\d,.]+\s*[kmb]?\+?)\s*(?:customer\s+)?reviews?",
+                root_text,
+                re.I,
+            )
+            if count_match:
+                product["total_rating"] = self._parse_compact_number(count_match.group(1))
+        product["review_status"] = "collecting"
+        lowest_sort_applied = self._click_lowest_rating_sort(root, product)
+        if lowest_sort_applied:
+            product["review_sort"] = "lowest_rating"
+            active_root = self._review_root() or root
+            reviews = self._collect_reviews(active_root, product=product)
+            applied_filters = []
+            review_collection_redirected = self._review_collection_was_redirected(
+                product
+            )
+        else:
+            reviews, applied_filters, review_collection_redirected = (
+                self._collect_rating_filtered_reviews(root, product)
+            )
+        if review_collection_redirected:
+            if len(legacy_comments) > len(product.get("comments", [])):
+                product["comments"] = legacy_comments
+            self._record_review_widget_missing(
+                product,
+                "Temu redirected away from the product while reviews were loading",
+            )
+            return
+        if lowest_sort_applied:
+            product["comments"] = self._reviews_for_output(
+                self._order_reviews_low_to_high(reviews)
+            )
+            if not self.all_reviews:
+                product["comments"] = product["comments"][: self.review_limit]
+        elif applied_filters:
             product["applied_rating_filters"] = applied_filters
-            product["comments"] = self._order_reviews_low_to_high(reviews)
+            product["comments"] = self._reviews_for_output(
+                self._order_reviews_low_to_high(reviews)
+            )
             if not self.all_reviews:
                 product["comments"] = product["comments"][: self.review_limit]
         else:
             product["review_filter_warning"] = (
-                "Temu did not expose identifiable star filters; reviews were "
-                "collected in rendered order and sorted by extracted rating"
+                "Temu did not expose the Lowest rating sort or identifiable "
+                "star filters; reviews were collected in rendered order and "
+                "sorted by extracted rating"
             )
-            product["comments"] = self._order_reviews_low_to_high(
-                self._collect_reviews(root, product=product)
+            product["comments"] = self._reviews_for_output(
+                self._order_reviews_low_to_high(
+                    self._collect_reviews(root, product=product)
+                )
             )
+            review_collection_redirected = self._review_collection_was_redirected(
+                product
+            )
+        if review_collection_redirected:
+            if len(legacy_comments) > len(product.get("comments", [])):
+                product["comments"] = legacy_comments
+            self._record_review_widget_missing(
+                product,
+                "Temu redirected away from the product while reviews were loading",
+            )
+            return
         if product["comments"]:
             product["review_status"] = "complete"
+            product["total_rating"] = max(
+                int(product.get("total_rating", 0)), len(product["comments"])
+            )
+        elif zero_review_evidence:
+            self._record_no_reviews(product, zero_review_evidence)
+            return
         else:
-            self._record_no_reviews(product)
+            if legacy_comments:
+                product["comments"] = legacy_comments
+            self._record_review_widget_missing(
+                product,
+                "Temu exposed no written review cards and did not explicitly display zero reviews",
+            )
+            return
         total = product.get("total_rating", 0)
-        if self.all_reviews and total and len(product["comments"]) < total:
+        requested_reviews = None if self.all_reviews else self.review_limit
+        collection_shortfall = (
+            total
+            and len(product["comments"]) < total
+            and (
+                requested_reviews is None
+                or len(product["comments"]) < requested_reviews
+            )
+        )
+        if collection_shortfall:
             product["review_collection_warning"] = (
-                f"Temu displayed {total} reviews but exposed only "
-                f"{len(product['comments'])} unique written reviews in this browser session"
+                f"Temu displayed {total} ratings but exposed only "
+                f"{len(product['comments'])} unique written review(s) in this browser session"
             )
 
     def _qualifies(self, product):
@@ -1248,6 +2270,14 @@ class TemuScraper:
                 kwargs["driver_executable_path"] = cached
         logging.info("Starting Chrome for Temu Philippines")
         self.driver = SafeChrome(**kwargs)
+        try:
+            self.driver.execute_cdp_cmd("Network.enable", {})
+        except Exception as exc:
+            self._performance_logging_available = False
+            logging.warning(
+                "Chrome network capture is unavailable; using rendered reviews only: %s",
+                exc,
+            )
         self.driver.maximize_window()
         successful_details = 0
         try:
@@ -1264,18 +2294,7 @@ class TemuScraper:
                 existing = self.output_data.get(link)
                 if existing:
                     expected = existing.get("total_rating", 0) if self.all_reviews else self.review_limit
-                    checkpoint = existing.get("review_checkpoint", {})
-                    stop_reason = checkpoint.get("stop_reason")
-                    reached_end = checkpoint.get("context") in {"all", "limited"} and stop_reason in {
-                        "target_reached",
-                        "next_button_disabled",
-                        "no_additional_reviews",
-                        "no_reviews",
-                    }
-                    complete = reached_end or (
-                        expected > 0 and len(existing.get("comments", [])) >= expected
-                    )
-                    if complete:
+                    if self._existing_result_complete(existing):
                         successful_details += 1
                         continue
                     logging.info(
@@ -1322,7 +2341,13 @@ def build_parser():
     parser = argparse.ArgumentParser(description="Scrape Temu Philippines products and reviews")
     parser.add_argument("keyword", nargs="?", default="", help="Temu search keyword")
     parser.add_argument("-n", "--num", type=int, default=10, help="Maximum products")
-    parser.add_argument("-r", "--review-limit", type=int, default=30, help="Written reviews per product")
+    parser.add_argument(
+        "-r",
+        "--review-limit",
+        type=int,
+        default=DEFAULT_REVIEW_LIMIT,
+        help=f"Written reviews per product (default: {DEFAULT_REVIEW_LIMIT})",
+    )
     parser.add_argument("--all-reviews", action="store_true", help="Collect until Temu exposes no more reviews")
     parser.add_argument("--max-review-batches", type=int, default=100, help="Safety cap for all-review loading")
     parser.add_argument("--pages", type=int, default=1, help="Search-result scroll batches")
@@ -1331,6 +2356,7 @@ def build_parser():
     parser.add_argument("--min-reviews", type=int, default=0, help="Minimum displayed review count")
     parser.add_argument("--include-empty", action="store_true", help="Include ratings with no written comment")
     parser.add_argument("--chrome-user-data-dir", help="Optional Chrome user-data directory")
+    parser.add_argument("--cookies-file", help="Optional Temu session-cookie file")
     parser.add_argument("-o", "--output", help="Output JSON file")
     parser.add_argument("--no-verification-pause", action="store_true", help="Do not prompt on verification pages")
     parser.add_argument("--verification-timeout", type=int, default=0, help="Seconds to wait for unattended verification")
@@ -1354,6 +2380,7 @@ def main():
         min_reviews=args.min_reviews,
         include_empty=args.include_empty,
         chrome_user_data_dir=args.chrome_user_data_dir,
+        cookies_file=args.cookies_file,
         output=args.output,
         pause_for_verification=not args.no_verification_pause,
         verification_timeout=args.verification_timeout,

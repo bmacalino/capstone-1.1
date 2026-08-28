@@ -79,6 +79,64 @@ class TestDefaketiveSentimentModel(unittest.TestCase):
         self.assertEqual(result["label"], "neutral")
         self.assertEqual(result["scores"]["neu"], 1.0)
 
+    def test_safety_complaint_is_not_misclassified_by_incidental_praise(self):
+        result = self.model.analyze(
+            "The case was on fire. Very lucky it did not burn the house down."
+        )
+        self.assertEqual(result["label"], "negative")
+        self.assertTrue(result["risk"]["detected"])
+        self.assertIn("safety", result["risk"]["categories"])
+
+    def test_low_rating_resolves_positive_vader_words_in_negative_review(self):
+        result = self.model.analyze(
+            "I am disappointed. The wires are exposed, but I would appreciate a refund.",
+            rating=1,
+        )
+        self.assertEqual(result["label"], "negative")
+        self.assertEqual(
+            result["label_adjustment"]["reason"],
+            "low_rating_with_negative_evidence",
+        )
+
+    def test_low_rating_resolves_unrecognized_terse_complaint(self):
+        result = self.model.analyze("The volume automatically goes down.", rating=1)
+        self.assertEqual(result["label"], "negative")
+        self.assertEqual(
+            result["label_adjustment"]["reason"], "low_rating_neutral_text"
+        )
+
+    def test_battery_drain_outweighs_free_item_wording(self):
+        result = self.model.analyze(
+            "Claimed from a free items deal, but the battery is draining 40% in two hours."
+        )
+        self.assertEqual(result["label"], "negative")
+        self.assertTrue(result["risk"]["detected"])
+        self.assertIn("performance", result["risk"]["categories"])
+
+    def test_low_rating_does_not_override_clearly_positive_text(self):
+        result = self.model.analyze("Great, the battery lasts a long time", rating=1)
+        self.assertEqual(result["label"], "positive")
+        self.assertIsNone(result["label_adjustment"])
+
+    def test_hyphenated_poor_quality_is_negative(self):
+        result = self.model.analyze("Poor-quality item")
+        self.assertEqual(result["label"], "negative")
+
+    def test_product_json_passes_rating_context_to_model(self):
+        data = [
+            {
+                "name": "Test gadget",
+                "comments": [
+                    {"content": "The volume automatically goes down.", "rating": 1}
+                ],
+            }
+        ]
+        analyzed = analyze_product_json(data, self.model)
+        self.assertEqual(
+            analyzed[0]["comments"][0]["sentiment_analysis"]["label"],
+            "negative",
+        )
+
     def test_product_json_marks_duplicates_and_aggregates_unique_reviews(self):
         data = [
             {

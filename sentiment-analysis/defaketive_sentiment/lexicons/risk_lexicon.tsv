@@ -2,9 +2,12 @@
 # Severity: 1=minor concern, 2=material failure, 3=critical/fraud/safety concern.
 ayaw gumana	performance	3	tl
 basag	defect	3	tl
+battery draining	performance	2	en
+battery is draining	performance	2	en
 bilis masira	durability	3	taglish
 bloated battery	safety	3	en
 broke after	durability	2	en
+broken	defect	3	en
 burning smell	safety	3	en
 cheap material	quality	2	en
 cheaply made	quality	2	en
@@ -51,10 +54,12 @@ nasira	durability	3	tl
 nasusunog	safety	3	tl
 no power	performance	3	en
 no sound	performance	2	en
+not charging	performance	3	en
 not original	counterfeit	3	en
 not working	performance	3	en
 overheat	safety	3	en
 overheating	safety	3	en
+on fire	safety	3	en
 palpak	quality	2	tl
 peke	counterfeit	3	tl
 poor quality	quality	2	en
@@ -71,3 +76,5 @@ substandard	quality	2	en
 sumabog	safety	3	tl
 umiinit	safety	2	tl
 walang tunog	performance	2	tl
+won't charge	performance	3	en
+won't turn on	performance	3	en

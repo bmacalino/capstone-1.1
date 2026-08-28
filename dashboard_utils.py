@@ -661,6 +661,34 @@ def review_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def sentiment_model_version() -> str:
+    sentiment_root = ROOT / "sentiment-analysis"
+    if str(sentiment_root) not in sys.path:
+        sys.path.insert(0, str(sentiment_root))
+    from defaketive_sentiment.model import MODEL_VERSION
+
+    return MODEL_VERSION
+
+
+def analysis_is_current(products: list[dict[str, Any]]) -> bool:
+    """Return whether every saved analysis uses the active model version."""
+    if not products:
+        return False
+    expected_version = sentiment_model_version()
+    for product in products:
+        if not isinstance(product, dict):
+            return False
+        if not (product.get("sentiment_summary") or {}).get("risk_score_scale"):
+            return False
+        for review in product.get("comments") or []:
+            if not isinstance(review, dict):
+                continue
+            analysis = review.get("sentiment_analysis") or {}
+            if analysis.get("model_version") != expected_version:
+                return False
+    return True
+
+
 def analyze_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     sentiment_root = ROOT / "sentiment-analysis"
     if str(sentiment_root) not in sys.path:

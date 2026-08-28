@@ -23,6 +23,7 @@ import streamlit as st
 
 from dashboard_utils import (
     ROOT,
+    analysis_is_current,
     analyze_products,
     cached_product_matches,
     csv_bytes,
@@ -408,10 +409,7 @@ def metric_card(label: str, value: str, note: str = "") -> None:
 def analyzed_file(path: str, modified: float) -> list[dict[str, Any]]:
     del modified
     products = load_products(path)
-    if products and all(
-        (product.get("sentiment_summary") or {}).get("risk_score_scale")
-        for product in products
-    ):
+    if analysis_is_current(products):
         return products
     return analyze_products(products)
 
@@ -419,6 +417,9 @@ def analyzed_file(path: str, modified: float) -> list[dict[str, Any]]:
 def get_products() -> list[dict[str, Any]]:
     uploaded = st.session_state.get("uploaded_products")
     if uploaded is not None:
+        if not analysis_is_current(uploaded):
+            uploaded = analyze_products(uploaded)
+            st.session_state.uploaded_products = uploaded
         return uploaded
     files = result_files()
     if not files:
