@@ -1,6 +1,7 @@
 undetected-chromedriver
 selenium
 tqdm
+Flask>=3.0,<4
 streamlit>=1.44,<2
 pandas>=2.2,<3
 plotly>=5.24,<7

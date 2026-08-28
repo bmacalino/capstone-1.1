@@ -96,18 +96,25 @@ Sentiment analysis is maintained as the independent
 CLI against this scraper's JSON output. This keeps data collection and review
 analysis independent.
 
-## DeFaketive dashboard
+## DeFaketive web app
 
-The responsive Streamlit dashboard adds shopper search/results/product-risk
-views plus administrator overview, scraper, lexicon, database, and model
-evaluation screens. It can analyze the most recent scraper JSON automatically,
-accept an uploaded scraper JSON, or launch a live scrape through the supported connectors.
+The responsive HTML, CSS, and JavaScript web app adds shopper search/results/
+product-risk views plus administrator overview, scraper, lexicon, database, and
+model-evaluation screens. A small Flask server keeps the existing Python
+scrapers, SQLite storage, and explainable Taglish sentiment analysis available
+through browser-friendly endpoints. It can analyze the most recent scraper JSON
+automatically, accept an uploaded scraper JSON, or launch a live scrape through
+the supported connectors.
 
 ```powershell
 pip install -r requirements.txt
 python -m nltk.downloader vader_lexicon
-streamlit run app.py
+python webapp.py
 ```
+
+Open `http://127.0.0.1:5000` in a browser. The original Streamlit prototype
+remains in `app.py` during the transition and can still be started with
+`streamlit run app.py`.
 
 Live analysis shows the three processing stages (scraping, sentiment analysis,
 and risk computation). Shopee may still open Chrome for login or captcha
