@@ -8,7 +8,6 @@ version, and validate every entry without changing the scoring code.
 from __future__ import annotations
 
 import csv
-import math
 import re
 import unicodedata
 from collections import Counter
@@ -394,11 +393,3 @@ class DefaketiveSentimentModel:
             "risk_score_scale": "percent",
             "risk_categories": dict(sorted(category_counts.items())),
         }
-
-
-def rmse(predictions: Iterable[float], expected: Iterable[float]) -> float:
-    """Evaluation helper for future human-rated valence validation."""
-    pairs = list(zip(predictions, expected))
-    if not pairs:
-        return 0.0
-    return math.sqrt(sum((predicted - actual) ** 2 for predicted, actual in pairs) / len(pairs))

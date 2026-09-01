@@ -508,21 +508,6 @@ def product_risk_level(product: dict[str, Any]) -> str:
     return risk_level(summary.get("risk_score"), summary.get("risk_score_scale"))
 
 
-def rank_alternatives(product: dict[str, Any], products: list[dict[str, Any]], limit: int = 3) -> list[dict[str, Any]]:
-    """Rank other analyzed products, preferring a matching category when present."""
-    candidates = [item for item in products if item.get("link") != product.get("link") and item.get("sentiment_summary")]
-    category = str(product.get("category") or "").strip().casefold()
-    return sorted(
-        candidates,
-        key=lambda item: (
-            bool(category and str(item.get("category") or "").strip().casefold() == category),
-            product_reliability(item),
-            int((item.get("sentiment_summary") or {}).get("review_count") or 0),
-        ),
-        reverse=True,
-    )[:limit]
-
-
 def risk_keyword_counts(product: dict[str, Any]) -> dict[str, int]:
     """Count unique sampled reviews containing each active risk term."""
     counts: Counter[str] = Counter()

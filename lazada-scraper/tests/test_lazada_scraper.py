@@ -1,5 +1,6 @@
 import unittest
 import pickle
+from unittest.mock import patch
 from selenium.common.exceptions import StaleElementReferenceException
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -31,7 +32,59 @@ class TestLazadaScraper(unittest.TestCase):
             "lazada_ph_laptop_stand_discovery.json",
         )
         self.assertIn("--no-first-run", self.scraper.options.arguments)
+        self.assertIn("--disable-quic", self.scraper.options.arguments)
         self.assertIn("--disable-search-engine-choice-screen", self.scraper.options.arguments)
+
+    def test_safe_get_retries_chrome_network_error_page(self):
+        error_page = '<div id="main-frame-error">ERR_QUIC_PROTOCOL_ERROR</div>'
+
+        class Driver:
+            def __init__(self):
+                self.calls = 0
+                self.page_source = ""
+
+            def get(self, _url):
+                self.calls += 1
+                self.page_source = error_page if self.calls == 1 else "<main>Products</main>"
+
+            def execute_script(self, _script):
+                return "complete"
+
+        driver = Driver()
+        self.scraper.driver = driver
+        checks = []
+        self.scraper._check_verification = lambda: checks.append(True)
+
+        with patch("src.lazada_scraper.time.sleep"):
+            self.scraper._safe_get("https://www.lazada.com.ph/catalog/?q=earphones")
+
+        self.assertEqual(driver.calls, 2)
+        self.assertEqual(checks, [True])
+
+    def test_safe_get_reports_persistent_chrome_network_error(self):
+        class Driver:
+            page_source = '<div id="sub-frame-error-details">ERR_QUIC_PROTOCOL_ERROR</div>'
+
+            def __init__(self):
+                self.calls = 0
+
+            def get(self, _url):
+                self.calls += 1
+
+            def execute_script(self, _script):
+                return "complete"
+
+        driver = Driver()
+        self.scraper.driver = driver
+        saved = []
+        self.scraper._save_debug_artifacts = saved.append
+
+        with patch("src.lazada_scraper.time.sleep"):
+            with self.assertRaisesRegex(RuntimeError, "ERR_QUIC_PROTOCOL_ERROR"):
+                self.scraper._safe_get("https://www.lazada.com.ph/catalog/?q=earphones")
+
+        self.assertEqual(driver.calls, 3)
+        self.assertEqual(saved, ["network_error"])
 
     def test_product_image_prefers_current_v2_gallery(self):
         class Element:
@@ -404,6 +457,47 @@ class TestLazadaScraper(unittest.TestCase):
             [review["comment_id"] for review in ordered],
             ["low", "middle", "high"],
         )
+
+    def test_default_review_limit_fills_from_lowest_rating_upward(self):
+        product = {"comments": []}
+        clicked = []
+        requested = []
+        available = {
+            1: [
+                {"comment_id": "one-a", "rating": 1},
+                {"comment_id": "one-b", "rating": 1},
+            ],
+            2: [
+                {"comment_id": "two-a", "rating": 2},
+                {"comment_id": "two-b", "rating": 2},
+                {"comment_id": "two-c", "rating": 2},
+            ],
+        }
+        self.scraper._click_rating_filter = lambda star: clicked.append(star) or True
+
+        def collect(limit, product=None, source_filter=None):
+            requested.append((source_filter, limit))
+            return available.get(source_filter, [])[:limit]
+
+        self.scraper._collect_reviews = collect
+        reviews = self.scraper._collect_reviews_lowest_first(product, 5)
+
+        self.assertEqual(clicked, [1, 2])
+        self.assertEqual(requested, [(1, 5), (2, 3)])
+        self.assertEqual([review["rating"] for review in reviews], [1, 1, 2, 2, 2])
+        self.assertEqual(product["applied_rating_filters"], [1, 2])
+
+    def test_lowest_first_discards_mismatched_filter_results(self):
+        product = {"comments": []}
+        self.scraper._click_rating_filter = lambda _star: True
+        self.scraper._collect_reviews = lambda *_args, **_kwargs: [
+            {"comment_id": "wrong", "rating": 5}
+        ]
+
+        reviews = self.scraper._collect_reviews_lowest_first(product, 3)
+
+        self.assertEqual(reviews, [])
+        self.assertIn("mismatched results were discarded", product["review_filter_warning"])
 
     def test_supports_current_iweb_review_pagination(self):
         self.assertEqual(

@@ -19,7 +19,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from urllib.parse import parse_qs, parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
+from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 
 # Python 3.12+ compatibility for undetected-chromedriver 3.x.
 try:  # pragma: no cover - host-version dependent
@@ -34,6 +34,7 @@ from selenium.common.exceptions import (
     NoSuchElementException,
     StaleElementReferenceException,
     TimeoutException,
+    WebDriverException,
 )
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -70,12 +71,6 @@ class LazadaScraper:
         '.mod-reviews',
         '[data-qa-locator="product-review"]',
         '[data-spm="product_review"]',
-    )
-    REVIEW_ITEM_SELECTORS = (
-        '#module_product_review .item',
-        '.mod-reviews .item',
-        '[data-qa-locator="review-item"]',
-        '.review-item',
     )
     REVIEW_NEXT_SELECTORS = (
         '.iweb-pagination-next button',
@@ -190,6 +185,9 @@ class LazadaScraper:
             self.options.add_argument("--disable-gpu")
         self.options.add_argument("--no-sandbox")
         self.options.add_argument("--disable-dev-shm-usage")
+        # Lazada occasionally fails in Chrome with ERR_QUIC_PROTOCOL_ERROR.
+        # Falling back to TCP/TLS avoids that browser-level failure.
+        self.options.add_argument("--disable-quic")
         self.options.add_argument("--disable-blink-features=AutomationControlled")
         self.options.add_argument("--start-maximized")
         self.options.add_argument("--lang=en-PH")
@@ -790,14 +788,71 @@ class LazadaScraper:
             blocked = False
         return blocked
 
+    @staticmethod
+    def _chrome_network_error(page_source):
+        """Return Chrome's error code when navigation rendered an error page."""
+        source = str(page_source or "")
+        lowered = source.casefold()
+        error_page_markers = (
+            "main-frame-error",
+            "sub-frame-error-details",
+            '"errorcode"',
+            "this site can’t be reached",
+            "this site can't be reached",
+        )
+        if not any(marker in lowered for marker in error_page_markers):
+            return ""
+        match = re.search(r"\bERR_[A-Z0-9_]+\b", source, re.I)
+        return match.group(0).upper() if match else "CHROME_NETWORK_ERROR"
+
     def _safe_get(self, url, check_verification=True):
-        self.driver.get(url)
-        try:
-            WebDriverWait(self.driver, 25).until(
-                lambda driver: driver.execute_script("return document.readyState") == "complete"
+        attempts = 3
+        network_error = ""
+        for attempt in range(1, attempts + 1):
+            try:
+                self.driver.get(url)
+            except WebDriverException as exc:
+                if attempt >= attempts:
+                    raise RuntimeError(
+                        f"Lazada navigation failed after {attempts} attempts: {exc}"
+                    ) from exc
+                logging.warning(
+                    "Lazada navigation attempt %s/%s failed; retrying: %s",
+                    attempt,
+                    attempts,
+                    exc,
+                )
+                time.sleep(attempt)
+                continue
+
+            try:
+                WebDriverWait(self.driver, 25).until(
+                    lambda driver: driver.execute_script("return document.readyState") == "complete"
+                )
+            except TimeoutException:
+                logging.warning("Timed out waiting for %s", url)
+
+            network_error = self._chrome_network_error(self.driver.page_source)
+            if not network_error:
+                break
+            logging.warning(
+                "Chrome returned %s for %s (attempt %s/%s)",
+                network_error,
+                url,
+                attempt,
+                attempts,
             )
-        except TimeoutException:
-            logging.warning("Timed out waiting for %s", url)
+            if attempt < attempts:
+                time.sleep(attempt)
+        else:  # pragma: no cover - the loop always exits through break or exhaustion
+            network_error = network_error or "CHROME_NETWORK_ERROR"
+
+        if network_error:
+            self._save_debug_artifacts("network_error")
+            raise RuntimeError(
+                f"Lazada could not load after {attempts} attempts ({network_error}). "
+                "Check the connection and retry the scan."
+            )
         if check_verification:
             self._check_verification()
 
@@ -1165,47 +1220,6 @@ class LazadaScraper:
             self._save_debug_artifacts("review_pagination_failure")
         return False
 
-    def _click_rating_filter_with_elements(self, rating):
-        container = self._review_container()
-        if container is None:
-            return False
-        # The current Lazada PH desktop widget first exposes a "Filter by / All
-        # stars" control; star choices are rendered only after it is opened.
-        filter_controls = container.find_elements(
-            By.CSS_SELECTOR, '.pdp-mod-filterSort-v2 .oper, [class*="filter"] [role="button"]'
-        )
-        if filter_controls:
-            try:
-                filter_controls[0].click()
-            except Exception:
-                self.driver.execute_script("arguments[0].click()", filter_controls[0])
-            time.sleep(0.5)
-        candidates = container.find_elements(
-            By.CSS_SELECTOR,
-            'button, [role="button"], [role="option"], .condition',
-        )
-        candidates.extend(
-            self.driver.find_elements(
-                By.CSS_SELECTOR,
-                '[role="option"], .next-menu-item, .iweb-select-option, [class*="dropdown"] li',
-            )
-        )
-        pattern = re.compile(rf"(^|\D){rating}\s*(?:star|stars|★)", re.I)
-        for candidate in candidates:
-            label = " ".join(
-                filter(None, (candidate.text, candidate.get_attribute("aria-label"), candidate.get_attribute("title")))
-            )
-            if not pattern.search(label):
-                continue
-            try:
-                candidate.click()
-            except Exception:
-                self.driver.execute_script("arguments[0].click()", candidate)
-            time.sleep(1)
-            return True
-        logging.warning("Could not locate the %s-star Lazada review filter", rating)
-        return False
-
     def _click_rating_filter(self, rating):
         """Click a star option without retaining elements across DOM rebuilds."""
         click_option_script = r"""
@@ -1297,6 +1311,47 @@ class LazadaScraper:
                 review.get("source_rating_filter") or review.get("rating", 0) or 6
             ),
         )
+
+    def _collect_reviews_lowest_first(self, product, max_reviews):
+        """Fill a review sample from verified 1-star feedback upward."""
+        if max_reviews <= 0:
+            product["applied_rating_filters"] = []
+            return []
+
+        reviews = []
+        applied_filters = []
+        for star in range(1, 6):
+            remaining = max_reviews - len(reviews)
+            if remaining <= 0:
+                break
+            if not self._click_rating_filter(star):
+                product["review_filter_warning"] = (
+                    f"Could not identify or apply the {star}-star Lazada filter; "
+                    "lowest-rating-first collection stopped"
+                )
+                break
+
+            applied_filters.append(star)
+            star_reviews = self._collect_reviews(
+                remaining,
+                product=product,
+                source_filter=star,
+            )
+            if not star_reviews:
+                continue
+            if not self._reviews_match_rating_filter(star_reviews, star):
+                product["review_filter_warning"] = (
+                    f"Lazada did not return verified {star}-star reviews; "
+                    "mismatched results were discarded"
+                )
+                break
+            for review in star_reviews:
+                review["source_rating_filter"] = star
+            reviews.extend(star_reviews)
+            reviews = self._order_reviews_low_to_high(reviews)
+
+        product["applied_rating_filters"] = applied_filters
+        return self._order_reviews_low_to_high(reviews)[:max_reviews]
 
     def _collect_reviews(self, max_reviews, product=None, source_filter=None):
         if max_reviews <= 0 or self._review_container() is None:
@@ -1569,11 +1624,11 @@ class LazadaScraper:
             product["review_status"] = "complete"
             return
 
-        # Default research mode retains Lazada's rendered order. Sampling the
-        # 1-star filter first would systematically inflate the risk score.
-        product["comments"] = self._deduplicate_reviews(
-            self._collect_reviews(self.review_limit, product=product)
-        )[: self.review_limit]
+        product["review_order"] = "lowest_rating_first"
+        product["comments"] = self._collect_reviews_lowest_first(
+            product,
+            self.review_limit,
+        )
         if product["comments"]:
             product["review_status"] = "complete"
         elif product.get("total_rating", 0) > 0:

@@ -1,6 +1,6 @@
 import unittest
 
-from research_utils import score_sus, score_umux
+from research_utils import evaluate_labels, normalize_sentiment_label, score_sus, score_umux
 
 
 class TestResearchUtils(unittest.TestCase):
@@ -19,6 +19,22 @@ class TestResearchUtils(unittest.TestCase):
             score_sus([3] * 9)
         with self.assertRaises(ValueError):
             score_umux([4] * 3)
+
+    def test_firecs_numeric_labels_are_normalized(self):
+        self.assertEqual(normalize_sentiment_label(0.0), "negative")
+        self.assertEqual(normalize_sentiment_label("1.0"), "neutral")
+        self.assertEqual(normalize_sentiment_label(2), "positive")
+
+    def test_evaluation_includes_macro_and_per_class_metrics(self):
+        result = evaluate_labels(
+            [0.0, 1.0, 2.0, 2.0],
+            ["negative", "positive", "positive", "neutral"],
+        )
+
+        self.assertEqual(result["labels"], ["negative", "neutral", "positive"])
+        self.assertEqual(result["sample_count"], 4)
+        self.assertEqual(result["per_class"]["positive"]["support"], 2)
+        self.assertEqual(len(result["matrix"]), 3)
 
 
 if __name__ == "__main__":

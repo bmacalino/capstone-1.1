@@ -51,18 +51,18 @@ When you see the search page loaded in the browser:
 ### Scraping Modes
 
 1. **Review Limit Mode:**
-   - Use `-r` or `--review-limit` to collect reviews in the marketplace's rendered order:
+   - Use `-r` or `--review-limit` to collect the requested number of reviews from the lowest rating upward (1-star, then 2-star, and so on):
      ```bash
      python src/retriv.py -k "laptop" -n 5 -r 10
      ```
-   This preserves the platform's normal order instead of intentionally oversampling low ratings, which would bias the research risk score.
+   This intentionally prioritizes reported problems and adverse product experiences. Because it is not a representative marketplace sample, risk scores derived from this mode will tend to be higher than scores based on Shopee's normal review order.
 
 2. **All-Star Types Mode:**
    - Combine `--all-star-types` with `--star-limit-per-type` to specify how many reviews to retrieve for each star rating:
      ```bash
      python src/retriv.py -k "laptop" -n 5 --all-star-types --star-limit-per-type 5
      ```
-   This collects 5 reviews for 5-star, 4-star, 3-star, etc., in separate queries.
+   This collects up to 5 reviews for each star rating in separate queries and stores them from 1-star through 5-star.
 
 ### Command-Line Arguments
 
@@ -72,15 +72,12 @@ When you see the search page loaded in the browser:
 - `--index-only`: If set, only retrieve index data without details
 - `--all-star-types`: Collect each star rating separately
 - `--star-limit-per-type`: Reviews per star type (default: 10)
-- `--chrome-user-data-dir`: Path to your Chrome profile directory
-- `--site`: Shopee market; `shopee.ph` (or shorthand `ph`) is supported
 - `--product-url`: Direct Shopee PH product URL; repeatable
 - `--output`: Custom result JSON path
-- `--pagination-retries`, `--pagination-timeout`: Review-page recovery controls
-- `--checkpoint-every`: Save resumable progress every N pages
 - `--no-prompt`: Dashboard-safe verification polling mode
+- `--verification-timeout`: Seconds to wait for login or CAPTCHA completion
 
-Results are saved atomically and incrementally to `shopee_ph_<search_term>.json`. Review checkpoints allow interrupted collection to resume without duplicating saved feedback. Authentication cookies are stored separately and excluded from Git.
+Results are saved incrementally to `shopee_ph_<search_term>.json` after each product. Shopee runs use a fresh temporary Chrome session and do not create or restore a cookie file or persistent browser profile.
 
 ## Beta marketplace connectors
 
@@ -111,6 +108,12 @@ pip install -r requirements.txt
 python -m nltk.downloader vader_lexicon
 python webapp.py
 ```
+
+On Windows, you can instead double-click `run_capstone.cmd`. This starts the app
+with the project's virtual environment and opens it in your default browser.
+Run this launcher from File Explorer or a normal PowerShell window so Chrome has
+normal network access; restricted coding-agent terminals can cause
+`ERR_NETWORK_ACCESS_DENIED` during a live marketplace scan.
 
 Open `http://127.0.0.1:5000` in a browser. The original Streamlit prototype
 remains in `app.py` during the transition and can still be started with

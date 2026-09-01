@@ -16,7 +16,6 @@ from dashboard_utils import (
     product_reliability,
     product_risk_level,
     product_risk_percent,
-    rank_alternatives,
     rank_recommendations,
     recommendation_search_query,
     reliability_score,
@@ -198,12 +197,9 @@ class TestDashboardUtils(unittest.TestCase):
         self.assertEqual(product_risk_level(product), "Low")
         self.assertEqual(product_reliability(product), 65.7)
 
-    def test_product_reliability_and_alternative_ranking(self):
-        current = {"link": "current", "category": "Audio", "sentiment_summary": {"risk_score": 70, "sentiment_ratios": {"positive": .2}}}
+    def test_product_reliability(self):
         same_category = {"link": "same", "category": "Audio", "sentiment_summary": {"risk_score": 10, "sentiment_ratios": {"positive": .7}, "review_count": 5}}
-        other_category = {"link": "other", "category": "Power", "sentiment_summary": {"risk_score": 0, "sentiment_ratios": {"positive": 1}, "review_count": 20}}
         self.assertEqual(product_reliability(same_category), 60.0)
-        self.assertEqual(rank_alternatives(current, [current, other_category, same_category], 2)[0]["link"], "same")
 
     def test_keyword_counts_ignore_negated_evidence(self):
         product = {"comments": [

@@ -8,8 +8,6 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import io
-import json
 import os
 import secrets
 import subprocess
@@ -36,7 +34,6 @@ from dashboard_utils import (
     merge_product_catalogs,
     output_path,
     product_risk_level,
-    product_reliability,
     product_rows,
     rank_recommendations,
     result_files,
@@ -54,6 +51,13 @@ MAX_REVIEWS = 200
 _catalogs: dict[str, list[dict[str, Any]]] = {}
 _jobs: dict[str, dict[str, Any]] = {}
 _lock = threading.RLock()
+
+NETWORK_ACCESS_DENIED_MESSAGE = (
+    "Chrome was denied network access (ERR_NETWORK_ACCESS_DENIED). "
+    "Close this server, start run_capstone.cmd from File Explorer or a normal "
+    "PowerShell window, and retry the live scan. Do not start the server from "
+    "a restricted coding-agent terminal."
+)
 
 
 def _integer(value: Any, default: int, minimum: int, maximum: int) -> int:
@@ -118,18 +122,32 @@ def _command_for_scrape(keyword: str, platform: str, product_count: int, review_
     direct_url = parsed.scheme in {"http", "https"} and bool(parsed.netloc)
     direct_id = hashlib.sha256(keyword.strip().encode("utf-8")).hexdigest()[:12]
     target = output_path(f"direct_{direct_id}" if direct_url else keyword, platform)
-    profile = ROOT / ".browser_profiles" / platform
-    profile.mkdir(parents=True, exist_ok=True)
     if platform == "shopee":
-        command = [sys.executable, str(ROOT / "src" / "retriv.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-prompt", "--verification-timeout", str(MANUAL_VERIFICATION_TIMEOUT), "--chrome-user-data-dir", str(profile)]
+        command = [sys.executable, str(ROOT / "src" / "retriv.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-prompt", "--verification-timeout", str(MANUAL_VERIFICATION_TIMEOUT)]
         command.extend(["--product-url", keyword] if direct_url else ["-k", keyword])
     elif platform == "lazada":
-        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600", "--chrome-user-data-dir", str(profile)]
+        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600"]
         command.extend(["--product-url", keyword] if direct_url else [keyword])
     else:
+        profile = ROOT / ".browser_profiles" / platform
+        profile.mkdir(parents=True, exist_ok=True)
         command = [sys.executable, str(ROOT / "temu-scraper" / "src" / "temu_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600", "--chrome-user-data-dir", str(profile)]
         command.extend(["--product-url", keyword] if direct_url else [keyword])
     return command, target
+
+
+def _user_facing_failure(output: Any) -> str:
+    """Replace known infrastructure errors with concise recovery guidance."""
+    output = str(output or "").strip()
+    if "ERR_NETWORK_ACCESS_DENIED" in output.upper():
+        return NETWORK_ACCESS_DENIED_MESSAGE
+    return output[-1800:] if output else "Marketplace collection failed."
+
+
+def _scraper_failure_message(result: subprocess.CompletedProcess[str]) -> str:
+    """Turn scraper output into a useful, browser-sized error message."""
+    output = "\n".join(part for part in (result.stderr, result.stdout) if part)
+    return _user_facing_failure(output)
 
 
 def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int, review_count: int) -> dict[str, Any]:
@@ -143,8 +161,7 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
             command, target = _command_for_scrape(keyword, platform, product_count, review_count)
             result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=SCRAPER_PROCESS_TIMEOUT)
             if result.returncode:
-                detail = (result.stderr or result.stdout or "Marketplace collection failed.")[-1800:]
-                raise RuntimeError(detail)
+                raise RuntimeError(_scraper_failure_message(result))
             with _lock:
                 job.update(stage=2, message="Analyzing English, Filipino, and Taglish review sentiment…")
             products = load_products(target)
@@ -161,7 +178,7 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
                 job.update(state="error", message="Marketplace verification timed out. Start a new scan when you are ready.")
         except Exception as exc:
             with _lock:
-                job.update(state="error", message=str(exc))
+                job.update(state="error", message=_user_facing_failure(exc))
 
     threading.Thread(target=run, daemon=True, name=f"defaketive-scrape-{job_id}").start()
     return job
@@ -295,7 +312,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             frame = pd.read_csv(uploaded)
             actual = next((name for name in ("actual_label", "true_label", "label") if name in frame), None)
             predicted = next((name for name in ("predicted_label", "prediction") if name in frame), None)
-            text_column = next((name for name in ("review_text", "text", "content") if name in frame), None)
+            text_column = next((name for name in ("review_text", "review", "text", "content") if name in frame), None)
             if not actual or not (predicted or text_column):
                 raise ValueError("CSV needs actual_label and either predicted_label or review_text columns.")
             if predicted:
@@ -323,4 +340,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    # Scrapes run in background subprocesses and their job state lives in this
+    # process.  Flask's development reloader would restart the process when the
+    # scraper imports monitored files, losing the job and closing its pipes.
+    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)

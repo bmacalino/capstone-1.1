@@ -7,12 +7,9 @@ from __future__ import annotations
 
 import html
 import hashlib
-import json
 import subprocess
 import sys
-from collections import Counter
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -61,14 +58,10 @@ from research_utils import evaluate_labels, score_sus, score_umux
 
 
 INDIGO = "#3E4784"
-NAVY = "#11152F"
-VIOLET = "#4F46E5"
-CYAN = "#18C8FF"
 GREEN = "#12B76A"
 AMBER = "#F79009"
 RED = "#F04438"
 INK = "#101828"
-MUTED = "#667085"
 RISK_COLORS = {"Low": GREEN, "Moderate": AMBER, "High": RED}
 MANUAL_VERIFICATION_TIMEOUT = 900
 SCRAPER_PROCESS_TIMEOUT = MANUAL_VERIFICATION_TIMEOUT + 300
@@ -474,17 +467,15 @@ def run_live_scrape(keyword: str, product_count: int, review_count: int, platfor
         return []
     direct_id = hashlib.sha256(keyword.strip().encode("utf-8")).hexdigest()[:12]
     target = output_path(f"direct_{direct_id}" if direct_url else keyword, marketplace)
-    # Keep scraper authentication separate from the user's everyday Chrome
-    # profile while preserving it between dashboard runs.
-    browser_profile = ROOT / ".browser_profiles" / marketplace
-    browser_profile.mkdir(parents=True, exist_ok=True)
     if marketplace == "shopee":
-        command = [sys.executable, str(ROOT / "src" / "retriv.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-prompt", "--verification-timeout", str(MANUAL_VERIFICATION_TIMEOUT), "--chrome-user-data-dir", str(browser_profile)]
+        command = [sys.executable, str(ROOT / "src" / "retriv.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-prompt", "--verification-timeout", str(MANUAL_VERIFICATION_TIMEOUT)]
         command.extend(["--product-url", keyword] if direct_url else ["-k", keyword])
     elif marketplace == "lazada":
-        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600", "--chrome-user-data-dir", str(browser_profile)]
+        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600"]
         command.extend(["--product-url", keyword] if direct_url else [keyword])
     else:
+        browser_profile = ROOT / ".browser_profiles" / marketplace
+        browser_profile.mkdir(parents=True, exist_ok=True)
         command = [sys.executable, str(ROOT / "temu-scraper" / "src" / "temu_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600", "--chrome-user-data-dir", str(browser_profile)]
         command.extend(["--product-url", keyword] if direct_url else [keyword])
     with st.status("Starting live analysis…", expanded=True) as status:
@@ -1411,7 +1402,7 @@ def model_page() -> None:
             evaluation_frame = pd.read_csv(uploaded)
             actual_column = next((name for name in ("actual_label", "true_label", "label") if name in evaluation_frame), None)
             predicted_column = next((name for name in ("predicted_label", "prediction") if name in evaluation_frame), None)
-            text_column = next((name for name in ("review_text", "text", "content") if name in evaluation_frame), None)
+            text_column = next((name for name in ("review_text", "review", "text", "content") if name in evaluation_frame), None)
             if not actual_column or not (predicted_column or text_column):
                 st.error("CSV needs actual_label and either predicted_label or review_text columns.")
             elif st.button("Run verified evaluation", type="primary"):

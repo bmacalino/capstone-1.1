@@ -1,4 +1,6 @@
+import subprocess
 import unittest
+from io import BytesIO
 from unittest.mock import patch
 
 import webapp
@@ -49,12 +51,67 @@ class TestWebApp(unittest.TestCase):
         self.assertEqual(detail.status_code, 200)
         self.assertEqual(detail.json["product"]["name"], "Sample gadget")
 
+    def test_lazada_live_search_uses_clean_browser_session(self):
+        command, _target = webapp._command_for_scrape("earphones", "lazada", 1, 1)
+
+        self.assertIn("earphones", command)
+        self.assertNotIn("--chrome-user-data-dir", command)
+
+    def test_network_access_denied_has_actionable_launcher_message(self):
+        result = subprocess.CompletedProcess(
+            args=["python", "lazada_scraper.py"],
+            returncode=1,
+            stdout="unknown error: net::ERR_NETWORK_ACCESS_DENIED",
+            stderr="",
+        )
+
+        message = webapp._scraper_failure_message(result)
+
+        self.assertIn("ERR_NETWORK_ACCESS_DENIED", message)
+        self.assertIn("run_capstone.cmd", message)
+        self.assertNotIn("unknown error", message)
+
+    def test_other_scraper_errors_keep_the_original_detail(self):
+        result = subprocess.CompletedProcess(
+            args=["python", "scraper.py"],
+            returncode=1,
+            stdout="No real products were extracted",
+            stderr="",
+        )
+
+        self.assertEqual(
+            webapp._scraper_failure_message(result),
+            "No real products were extracted",
+        )
+
+    def test_background_job_exception_also_normalizes_network_denial(self):
+        self.assertEqual(
+            webapp._user_facing_failure(
+                "RuntimeError: navigation failed: net::ERR_NETWORK_ACCESS_DENIED"
+            ),
+            webapp.NETWORK_ACCESS_DENIED_MESSAGE,
+        )
+
     def test_survey_uses_existing_research_scoring(self):
         with patch("webapp.save_survey_response") as save:
             response = self.client.post("/api/survey", json={"frequency": "Weekly", "sus": [3] * 10, "umux": [4] * 4})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["sus_score"], 50.0)
         self.assertEqual(response.json["umux_score"], 50.0)
+        save.assert_called_once()
+
+    def test_evaluation_accepts_firecs_columns_and_numeric_labels(self):
+        dataset = b"review,label\nsira at hindi gumagana,0.0\nmaganda at sulit,2.0\n"
+        with patch("webapp.save_evaluation_run") as save:
+            response = self.client.post(
+                "/api/evaluation",
+                data={"file": (BytesIO(dataset), "FiReCS_sample.csv")},
+                content_type="multipart/form-data",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["sample_count"], 2)
+        self.assertEqual(response.json["labels"], ["negative", "positive"])
         save.assert_called_once()
 
 

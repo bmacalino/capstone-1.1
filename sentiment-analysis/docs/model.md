@@ -64,12 +64,28 @@ markers.
 
 ## Research status
 
-`defaketive-vader-seed-0.1.0` is an engineering baseline, not a validated final
+`defaketive-vader-seed-0.1.2` is an engineering baseline, not a validated final
 research model. The Filipino/Taglish entries are deliberately kept in editable
-TSV files under `defaketive_sentiment/lexicons`. Before reporting model accuracy, the project
-must create a human-annotated validation set, measure inter-annotator agreement,
-freeze training and test splits, tune thresholds only on training/development
-data, and report precision, recall, F1, confusion matrices, and error analysis.
+TSV files under `defaketive_sentiment/lexicons`. FiReCS supplies an external
+human-annotated benchmark. Before making final in-domain research claims, the
+project should also annotate a local Shopee/Lazada sample, measure annotator
+agreement, tune only on training/development data, and report precision, recall,
+F1, confusion matrices, and error analysis.
+
+## FiReCS benchmark
+
+The repository includes the human-annotated FiReCS train and test splits under
+`sentiment-analysis/data/firecs`. Run the untouched test benchmark from the
+repository root:
+
+```powershell
+.\.venv\Scripts\python.exe .\evaluate_firecs.py
+```
+
+Metrics are saved to `sentiment-analysis/evaluation/firecs_test_baseline.json`.
+Misclassified reviews are saved separately for error analysis. Do not use the
+test errors to tune the lexicon or thresholds; use the official training split
+for development and reserve the test split for final reporting.
 
 The preliminary product risk score is:
 

@@ -1,0 +1,56 @@
+{
+  "sample_count": 3147,
+  "labels": [
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "accuracy": 0.5284,
+  "precision": 0.5058,
+  "recall": 0.5357,
+  "f1": 0.4818,
+  "per_class": {
+    "negative": {
+      "precision": 0.6256,
+      "recall": 0.6329,
+      "f1": 0.6292,
+      "support": 1027
+    },
+    "neutral": {
+      "precision": 0.3947,
+      "recall": 0.1242,
+      "f1": 0.1889,
+      "support": 1087
+    },
+    "positive": {
+      "precision": 0.4972,
+      "recall": 0.85,
+      "f1": 0.6274,
+      "support": 1033
+    }
+  },
+  "matrix": [
+    [
+      650,
+      155,
+      222
+    ],
+    [
+      286,
+      135,
+      666
+    ],
+    [
+      103,
+      52,
+      878
+    ]
+  ],
+  "dataset": "FiReCS",
+  "split_file": "FiReCS_test_set.csv",
+  "dataset_sha256": "6c172b8a52ad5d320d445bcf2229557de103587673582767cc59f8fc42754875",
+  "model_version": "defaketive-vader-seed-0.1.2",
+  "license": "CC BY 4.0",
+  "source": "https://huggingface.co/datasets/ccosme/FiReCS",
+  "error_count": 1484
+}
