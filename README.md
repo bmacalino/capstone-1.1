@@ -81,39 +81,43 @@ the app.
 
 1. Enter a name such as `wireless earbuds`.
 2. Select Shopee PH, Lazada PH, or Temu PH.
-3. Enable **Live marketplace scan**.
-4. Choose the product and review limits.
-5. Select **Check now**.
-6. Complete any login or CAPTCHA in the Chrome window opened by the scraper.
-7. Wait for scraping, sentiment analysis, and risk computation to finish.
+3. Select **Search analyzed products** to look for an existing report, or
+   **Collect fresh reviews** to run a marketplace scan.
+4. If needed, expand **Advanced options** to change the product and review
+   limits.
+5. Complete any login or CAPTCHA in the Chrome window opened by the scraper.
+6. Wait for scraping, sentiment analysis, and risk computation to finish.
 
-If **Live marketplace scan** is disabled, a product-name search only checks
-results already saved in the app. It does not contact the marketplace, so a new
-name may return no matches.
+Searching analyzed products does not contact the marketplace, so a new name may
+return no matches. A fresh collection opens Chrome on the right side of the
+screen so the app's progress panel remains visible.
 
 ### Search using a product link
 
 1. Paste a supported Shopee PH, Lazada PH, or Temu PH product URL.
-2. Enable **Live marketplace scan** to collect fresh reviews.
-3. Select **Check now** and complete verification if requested.
+2. If a saved report exists, select **View saved report** or **Refresh with new
+   reviews**.
+3. If no report exists, select **Analyze this product** and complete browser
+   verification if requested.
 
-For supported URLs, the app detects the marketplace from the link. Links from
-other countries or unsupported websites are rejected.
+For supported URLs, the app selects the marketplace automatically and scans one
+product. Links from other countries or unsupported websites are rejected.
 
-### Use an existing result without scraping
-
-Select **Import JSON** in the navigation bar and choose a JSON result generated
-by one of the included scrapers. The app analyzes the imported products locally.
-
-The results page lets you inspect sentiment and risk evidence, filter products,
-open detailed reports, view suggested lower-risk alternatives, and export CSV
-files. The administration area shows locally stored results, lexicons, scraper
-logs, and model-evaluation tools.
+The **Analyzed products** page lets you filter saved reports and inspect review
+evidence. The **Insights** page summarizes risk levels, review reliability, and
+products that may need closer review.
 
 ## FiReCS sentiment evaluation
 
-The repository includes the human-labeled FiReCS train and test sets. To run the
-current model against the held-out test set:
+The included supervised sentiment classifier was trained from the human-labeled
+FiReCS training split. To reproduce candidate selection, training, and the
+recorded held-out evaluation:
+
+```powershell
+.\.venv\Scripts\python.exe .\train_firecs.py
+```
+
+To evaluate the currently deployed hybrid model:
 
 ```powershell
 .\.venv\Scripts\python.exe .\evaluate_firecs.py
@@ -121,11 +125,29 @@ current model against the held-out test set:
 
 The command updates:
 
-- `sentiment-analysis/evaluation/firecs_test_baseline.json`
-- `sentiment-analysis/evaluation/firecs_test_errors.csv`
+- `sentiment-analysis/evaluation/firecs_current_model.json`
+- `sentiment-analysis/evaluation/firecs_current_model_errors.csv`
 
-The CSV contains the reviews that the model mislabeled and can be used to guide
-future lexicon and model improvements.
+The trained classifier reached `0.8137` test macro F1. The deployed hybrid,
+which retains explicit VADER/Taglish safeguards for short phrases, negation,
+emoji, and product-risk evidence, reached `0.7370`; the original VADER baseline
+was `0.4818`. Keep the official test split and its errors out of future tuning.
+
+Optional SentiTaglish and TagaSenti source files are stored under
+`sentiment-analysis/data`. Train them as a separate research candidate without
+overwriting the deployed artifact:
+
+```powershell
+.\.venv\Scripts\python.exe .\train_firecs.py `
+  --include-sentitaglish --include-tagasenti `
+  --model-output .\sentiment-analysis\models\multisource_sentiment_candidate.joblib `
+  --result-output .\sentiment-analysis\evaluation\multisource_sentiment_candidate.json `
+  --errors-output .\sentiment-analysis\evaluation\multisource_sentiment_candidate_errors.csv
+```
+
+The leakage-filtered multisource experiment produced 32,342 training rows but
+reached only `0.7951` FiReCS test macro F1, below the deployed classifier's
+`0.8137`. It is retained for research and is not automatically promoted.
 
 ## Optional scraper command line
 

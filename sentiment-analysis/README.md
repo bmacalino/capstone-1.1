@@ -4,18 +4,18 @@ This is the standalone sentiment-analysis component for DeFaketive. It reads
 review data produced by either the Shopee Philippines scraper or the Lazada
 Philippines scraper; neither scraper needs to contain or import this model.
 
-The model extends NLTK VADER with editable Filipino and Taglish lexicons. It
-returns positive/neutral/negative sentiment, matched evidence, product-risk
-categories, and duplicate-review markers. Analysis runs locally.
+The hybrid model uses a supervised FiReCS word-and-character TF-IDF classifier
+for positive/neutral/negative labels. NLTK VADER and editable Filipino/Taglish
+lexicons continue to supply reviewable evidence, explicit safeguards, and
+independent product-risk categories. Analysis runs locally.
 
 ## Setup on Windows PowerShell
 
 ```powershell
-cd E:\school\SCRAPPERS\shopee-scraper\sentiment-analysis
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-python -m nltk.downloader vader_lexicon
+cd path\to\capstone-1.1
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m nltk.downloader vader_lexicon
 ```
 
 ## Analyze one review
@@ -47,6 +47,40 @@ Unless `--output` is supplied, the analyzer writes a sibling file ending in
 
 For model fields, scoring, and research limitations, see
 [`docs/model.md`](docs/model.md).
+
+## Reproduce FiReCS training
+
+Run from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe .\train_firecs.py
+```
+
+The script audits duplicate and cross-split text, selects among four candidates
+using a stratified validation split, retrains the winner, and records the final
+held-out metrics. Do not tune future changes against the official test errors.
+
+## Optional auxiliary datasets
+
+The repository also contains SentiTaglish and TagaSenti under `data/`. Their
+loaders are built into `train_firecs.py`; installing the Hugging Face `datasets`
+package is not required after the CSV files are present.
+
+Run the auxiliary experiment into separate candidate files:
+
+```powershell
+.\.venv\Scripts\python.exe .\train_firecs.py `
+  --include-sentitaglish --include-tagasenti `
+  --model-output .\sentiment-analysis\models\multisource_sentiment_candidate.joblib `
+  --result-output .\sentiment-analysis\evaluation\multisource_sentiment_candidate.json `
+  --errors-output .\sentiment-analysis\evaluation\multisource_sentiment_candidate_errors.csv
+```
+
+The trainer excludes SentiTaglish's mixed class from the three-class model,
+uses punctuation-insensitive leakage keys, gives FiReCS labels precedence, and
+removes every matching FiReCS test review before fitting. TagaSenti is recorded
+as mixed-provenance auxiliary data because its CSV does not identify which rows
+are human, synthetic, translated, or LLM-labeled.
 
 The original scraper's unrelated Vietnamese labeling script is preserved under
 `legacy/` for reference, but it is not imported or installed by this project.

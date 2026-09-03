@@ -7,6 +7,38 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Added
+
+- A reproducible FiReCS training pipeline that audits duplicates and cross-split
+  overlap, compares four supervised candidates, and records held-out metrics.
+- A compact trained word/character TF-IDF sentiment artifact with probabilities
+  and active-feature evidence.
+- A smart product search flow with automatic marketplace and saved-report
+  detection, dynamic actions, advanced collection limits, persistent errors,
+  and inline scan progress.
+- Local SentiTaglish and TagaSenti datasets, provenance documentation, optional
+  multisource loaders, and a punctuation-insensitive leakage audit.
+
+### Changed
+
+- Sentiment labels now use the trained FiReCS classifier for ordinary review
+  text while retaining explainable VADER/Taglish overrides and product-risk
+  rules for explicit cases.
+- Pinned scikit-learn and joblib to the artifact's training versions for
+  reproducible installation on another computer.
+- Auxiliary models must now match or beat the current trained classifier before
+  they qualify for integration; the initial multisource candidate was retained
+  as a rejected research result rather than replacing the stronger model.
+- Redesigned the shopper dashboard, analysis report, navigation, product cards,
+  filters, and interface wording around clear shopping decisions.
+- Live scraper browsers now open in an adaptive right-side window so the app's
+  collection progress remains visible.
+
+### Fixed
+
+- Prevented a manually selected marketplace from conflicting with the
+  marketplace detected from a supported product URL.
+
 ## [1.2.0] - 2026-09-01
 
 ### Added

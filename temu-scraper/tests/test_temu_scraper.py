@@ -26,6 +26,8 @@ class TestTemuScraper(unittest.TestCase):
         self.assertEqual(self.scraper.out_file, "temu_ph_laptop_stand.json")
         self.assertIn("--no-first-run", self.scraper.options.arguments)
         self.assertIn("--disable-search-engine-choice-screen", self.scraper.options.arguments)
+        self.assertIn("--window-size=900,700", self.scraper.options.arguments)
+        self.assertNotIn("--start-maximized", self.scraper.options.arguments)
 
     def test_cookie_save_is_atomic_and_preserves_previous_session_on_browser_failure(self):
         class BrokenDriver:

@@ -2,7 +2,8 @@
 
 This directory contains version 1.0 of the Filipino-English Reviews with
 Code-Switching (FiReCS) dataset by Camilla Johnine Cosme and Marlene M. De
-Leon. It is used to evaluate DeFaketive's three-class sentiment labels.
+Leon. It is used to train and evaluate DeFaketive's three-class sentiment
+labels.
 
 - Source: https://huggingface.co/datasets/ccosme/FiReCS
 - License: Creative Commons Attribution 4.0 International (CC BY 4.0)
@@ -20,3 +21,9 @@ The official train and test files are retained unchanged:
 Label encoding is `0 = negative`, `1 = neutral`, and `2 = positive`. Use the
 training set for model development. Keep the test set untouched until final
 evaluation so benchmark results do not leak into model tuning.
+
+The original CSV files above are never rewritten. The training pipeline
+normalizes text in memory, removes two duplicate training rows, and excludes
+four training texts also present in the official test split before fitting.
+Model selection uses a stratified validation subset of the remaining training
+data; test labels are not used for candidate selection.

@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from selenium.common.exceptions import TimeoutException
 
-from src.retriv import ShopeeScraper, _progress, build_parser
+from src.retriv import ShopeeScraper, _position_scraper_window, _progress, build_parser
 
 
 class TestShopeeScraper(unittest.TestCase):
@@ -35,6 +35,17 @@ class TestShopeeScraper(unittest.TestCase):
         self.assertFalse(self.scraper.index_only)
         self.assertEqual(self.scraper.review_limit, 10)
         self.assertEqual(self.scraper.out_file, "shopee_ph_test.json")
+        self.assertIn("--window-size=900,700", self.scraper.options.arguments)
+        self.assertNotIn("--start-maximized", self.scraper.options.arguments)
+
+    def test_scraper_window_leaves_dashboard_visible(self):
+        driver = Mock()
+        driver.execute_script.return_value = {"width": 1920, "height": 1080}
+
+        _position_scraper_window(driver)
+
+        driver.set_window_size.assert_called_once_with(1050, 820)
+        driver.set_window_position.assert_called_once_with(854, 40)
 
     def test_captcha_check_accepts_byte_url(self):
         class FakeDriver:

@@ -1,0 +1,339 @@
+{
+  "model_version": "defaketive-multisource-tfidf-0.3.0-candidate",
+  "selected_candidate": "word_character_logistic_regression",
+  "labels": [
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "expects_normalized_text": true,
+  "trained_at": "2026-09-02T12:22:02.863258+00:00",
+  "random_state": 42,
+  "sklearn_version": "1.9.0",
+  "training_audit": {
+    "original_train_rows": 50139,
+    "clean_train_rows": 32342,
+    "duplicate_train_rows_removed": 14861,
+    "conflicting_duplicate_texts": 932,
+    "cross_split_train_rows_removed": 2936,
+    "test_rows": 3147,
+    "clean_train_label_counts": {
+      "negative": 11907,
+      "neutral": 11626,
+      "positive": 8809
+    },
+    "test_label_counts": {
+      "negative": 1027,
+      "neutral": 1087,
+      "positive": 1033
+    },
+    "original_source_counts": {
+      "firecs_human": 7340,
+      "sentitaglish_human": 7113,
+      "tagasenti_mixed_provenance": 35686
+    },
+    "clean_source_counts": {
+      "firecs_human": 7334,
+      "sentitaglish_human": 12,
+      "tagasenti_mixed_provenance": 24996
+    }
+  },
+  "auxiliary_datasets": [
+    {
+      "file": "SentiTaglish_ProductsAndServices.csv",
+      "sha256": "965040798aa172aba316e9902303da181eeab9502dde3dec9b81be4f6afa2688",
+      "usable_three_class_rows": 7113,
+      "mixed_rows_excluded": 3397,
+      "invalid_rows_excluded": 0,
+      "license": "CC BY 4.0",
+      "source": "https://huggingface.co/datasets/ccosme/SentiTaglishProductsAndServices"
+    },
+    {
+      "file": "tagasenti_dataset.csv",
+      "sha256": "f9e189b33242b92235ee675affc7e4c06c7fd192972fe9e9fc0c24cad6eb9ccf",
+      "usable_rows": 35686,
+      "invalid_rows_excluded": 0,
+      "provenance_warning": "The downloadable CSV has no row-level source field and combines human, synthetic, translated, and LLM-labeled data.",
+      "license": "CC BY-SA 4.0",
+      "source": "https://huggingface.co/datasets/jjjardev/tagasenti"
+    }
+  ],
+  "validation": {
+    "random_state": 42,
+    "strategy": "stratified 80/20 split of cleaned training data",
+    "fit_rows": 25873,
+    "validation_rows": 6469,
+    "selection_metric": "macro_f1",
+    "candidates": {
+      "word_linear_svc": {
+        "sample_count": 6469,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.7479,
+        "precision": 0.7479,
+        "recall": 0.7476,
+        "f1": 0.7477,
+        "per_class": {
+          "negative": {
+            "precision": 0.7589,
+            "recall": 0.7557,
+            "f1": 0.7573,
+            "support": 2382
+          },
+          "neutral": {
+            "precision": 0.7364,
+            "recall": 0.7415,
+            "f1": 0.739,
+            "support": 2325
+          },
+          "positive": {
+            "precision": 0.7483,
+            "recall": 0.7457,
+            "f1": 0.747,
+            "support": 1762
+          }
+        },
+        "matrix": [
+          [
+            1800,
+            371,
+            211
+          ],
+          [
+            370,
+            1724,
+            231
+          ],
+          [
+            202,
+            246,
+            1314
+          ]
+        ],
+        "fit_seconds": 3.852
+      },
+      "character_linear_svc": {
+        "sample_count": 6469,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.7289,
+        "precision": 0.7294,
+        "recall": 0.7287,
+        "f1": 0.729,
+        "per_class": {
+          "negative": {
+            "precision": 0.7342,
+            "recall": 0.7284,
+            "f1": 0.7313,
+            "support": 2382
+          },
+          "neutral": {
+            "precision": 0.7193,
+            "recall": 0.7308,
+            "f1": 0.725,
+            "support": 2325
+          },
+          "positive": {
+            "precision": 0.7345,
+            "recall": 0.727,
+            "f1": 0.7307,
+            "support": 1762
+          }
+        },
+        "matrix": [
+          [
+            1735,
+            421,
+            226
+          ],
+          [
+            389,
+            1699,
+            237
+          ],
+          [
+            239,
+            242,
+            1281
+          ]
+        ],
+        "fit_seconds": 11.687
+      },
+      "word_character_linear_svc": {
+        "sample_count": 6469,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.7542,
+        "precision": 0.7542,
+        "recall": 0.7541,
+        "f1": 0.7541,
+        "per_class": {
+          "negative": {
+            "precision": 0.763,
+            "recall": 0.7624,
+            "f1": 0.7627,
+            "support": 2382
+          },
+          "neutral": {
+            "precision": 0.7451,
+            "recall": 0.7467,
+            "f1": 0.7459,
+            "support": 2325
+          },
+          "positive": {
+            "precision": 0.7544,
+            "recall": 0.7531,
+            "f1": 0.7538,
+            "support": 1762
+          }
+        },
+        "matrix": [
+          [
+            1816,
+            364,
+            202
+          ],
+          [
+            359,
+            1736,
+            230
+          ],
+          [
+            205,
+            230,
+            1327
+          ]
+        ],
+        "fit_seconds": 15.111
+      },
+      "word_character_logistic_regression": {
+        "sample_count": 6469,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.7579,
+        "precision": 0.7586,
+        "recall": 0.7579,
+        "f1": 0.7582,
+        "per_class": {
+          "negative": {
+            "precision": 0.7709,
+            "recall": 0.7527,
+            "f1": 0.7617,
+            "support": 2382
+          },
+          "neutral": {
+            "precision": 0.7411,
+            "recall": 0.7634,
+            "f1": 0.7521,
+            "support": 2325
+          },
+          "positive": {
+            "precision": 0.7637,
+            "recall": 0.7577,
+            "f1": 0.7607,
+            "support": 1762
+          }
+        },
+        "matrix": [
+          [
+            1793,
+            387,
+            202
+          ],
+          [
+            339,
+            1775,
+            211
+          ],
+          [
+            194,
+            233,
+            1335
+          ]
+        ],
+        "fit_seconds": 21.27
+      }
+    },
+    "selected_candidate": "word_character_logistic_regression"
+  },
+  "final_fit_seconds": 30.196,
+  "test_metrics": {
+    "sample_count": 3147,
+    "labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "accuracy": 0.7941,
+    "precision": 0.795,
+    "recall": 0.7954,
+    "f1": 0.7951,
+    "per_class": {
+      "negative": {
+        "precision": 0.8028,
+        "recall": 0.7926,
+        "f1": 0.7976,
+        "support": 1027
+      },
+      "neutral": {
+        "precision": 0.7211,
+        "recall": 0.7185,
+        "f1": 0.7198,
+        "support": 1087
+      },
+      "positive": {
+        "precision": 0.861,
+        "recall": 0.8751,
+        "f1": 0.868,
+        "support": 1033
+      }
+    },
+    "matrix": [
+      [
+        814,
+        194,
+        19
+      ],
+      [
+        179,
+        781,
+        127
+      ],
+      [
+        21,
+        108,
+        904
+      ]
+    ],
+    "error_count": 648
+  },
+  "baseline_macro_f1": 0.4818,
+  "macro_f1_delta": 0.3133,
+  "minimum_required_improvement": 0.02,
+  "incumbent_macro_f1": 0.8137,
+  "macro_f1_delta_vs_incumbent": -0.0186,
+  "minimum_incumbent_improvement": 0.0,
+  "qualified_for_integration": false,
+  "train_file": "FiReCS_train_set.csv",
+  "train_sha256": "9ca5ef80b8f93836f5966a1db8d017ebbd474e4b615468269cb0ba9d3778eb39",
+  "test_file": "FiReCS_test_set.csv",
+  "test_sha256": "6c172b8a52ad5d320d445bcf2229557de103587673582767cc59f8fc42754875",
+  "license": "CC BY-SA 4.0 combined auxiliary candidate",
+  "source": "https://huggingface.co/datasets/ccosme/FiReCS",
+  "artifact_file": "multisource_sentiment_candidate.joblib",
+  "artifact_sha256": "ac3976b1b8cd5915b09cb276e7754e1a3ead28bc4f1ff09fc6aa793df33a0dd1",
+  "result_file": "multisource_sentiment_candidate.json",
+  "errors_file": "multisource_sentiment_candidate_errors.csv"
+}

@@ -40,8 +40,159 @@ class TestWebApp(unittest.TestCase):
         catalog = self.client.get("/api/products")
         self.assertEqual(page.status_code, 200)
         self.assertIn(b"DeFaketive", page.data)
+        self.assertIn(b"Analyzed products", page.data)
+        self.assertNotIn(b"Check another product", page.data)
+        self.assertIn(b"Back to analyzed products", page.data)
         self.assertEqual(catalog.status_code, 200)
         self.assertEqual(catalog.json["count"], 1)
+
+    def test_search_interface_has_smart_actions_feedback_and_progress(self):
+        page = self.client.get("/")
+        script = self.client.get("/static/js/app.js")
+        script_data = script.get_data()
+        script.close()
+
+        self.assertIn(b"What product do you want to check?", page.data)
+        self.assertNotIn(b'name="search-mode"', page.data)
+        self.assertIn(b'name="marketplace" value="shopee"', page.data)
+        self.assertIn(b'name="marketplace" value="lazada"', page.data)
+        self.assertIn(b'name="marketplace" value="temu"', page.data)
+        self.assertIn(b'id="advanced-options"', page.data)
+        self.assertIn(b'id="saved-match"', page.data)
+        self.assertIn(b'data-search-intent="saved"', page.data)
+        self.assertIn(b'data-search-intent="live"', page.data)
+        self.assertIn(b'id="marketplace-detection"', page.data)
+        self.assertIn(b'id="search-feedback"', page.data)
+        self.assertIn(b'data-job-stage="1"', page.data)
+        self.assertIn(b'id="job-elapsed"', page.data)
+        self.assertLess(page.data.index(b'id="job-panel"'), page.data.index(b'</form>'))
+        self.assertIn(b"function queryContext", script_data)
+        self.assertIn(b"function savedProductForQuery", script_data)
+        self.assertIn(b"event.submitter", script_data)
+        self.assertIn(b"Refresh with new reviews", script_data)
+
+    def test_dashboard_is_shopper_focused(self):
+        page = self.client.get("/")
+        overview = self.client.get("/api/admin/overview")
+
+        self.assertIn(b"Shopping insights", page.data)
+        self.assertIn(b"simple overview", page.data)
+        self.assertIn(b"All analyzed products", page.data)
+        self.assertIn(b"Update insights", page.data)
+        self.assertNotIn(b"Scraper manager", page.data)
+        self.assertNotIn(b"Lexicon dictionary", page.data)
+        self.assertEqual(
+            overview.json["summary"],
+            {
+                "products": 1,
+                "reviews": 1,
+                "average_reliability": 90.0,
+                "high_risk": 0,
+                "marketplaces": 1,
+            },
+        )
+
+    def test_dashboard_reports_a_products_main_risk_issue(self):
+        product = {
+            **SAMPLE_PRODUCT,
+            "sentiment_summary": {
+                **SAMPLE_PRODUCT["sentiment_summary"],
+                "risk_score": 80,
+            },
+            "comments": [
+                {
+                    "content": "Sira agad",
+                    "sentiment_analysis": {
+                        "risk": {
+                            "detected": True,
+                            "categories": ["defect"],
+                            "evidence": [
+                                {"category": "defect", "term": "sira", "negated": False}
+                            ],
+                        }
+                    },
+                }
+            ],
+        }
+        webapp._catalogs["webapp-test"] = [product]
+
+        overview = self.client.get("/api/admin/overview")
+
+        self.assertEqual(overview.json["summary"]["high_risk"], 1)
+        self.assertEqual(overview.json["flagged"][0]["Main issue"], "Defect")
+
+    def test_analysis_ui_explains_scores_and_filters_review_evidence(self):
+        response = self.client.get("/static/js/app.js")
+        script = response.get_data()
+        response.close()
+
+        self.assertIn(b"Lower is better", script)
+        self.assertIn(b"Higher is better", script)
+        self.assertIn(b"Reviews containing risk signals", script)
+        self.assertIn(b"Top reported issues", script)
+        self.assertIn(b'data-review-filter="risk"', script)
+        self.assertIn(b'id="review-search"', script)
+        self.assertIn(b"Duplicates excluded", script)
+        self.assertNotIn(b"Active defect/fraud terms", script)
+        self.assertNotIn(b'id="sentiment-chart"', script)
+
+    def test_top_navigation_is_shopper_focused_and_accessible(self):
+        page = self.client.get("/")
+        script_response = self.client.get("/static/js/app.js")
+        script = script_response.get_data()
+        script_response.close()
+
+        self.assertIn(b'>Home</a>', page.data)
+        self.assertIn(b'>Analyzed products</a>', page.data)
+        self.assertIn(b'>Insights</a>', page.data)
+        self.assertIn(b'data-focus-search>Check a product</a>', page.data)
+        self.assertIn(b'aria-label="Open navigation"', page.data)
+        self.assertIn(b'class="nav-toggle-line"', page.data)
+        self.assertNotIn(b'>Reports</a>', page.data)
+        self.assertNotIn(b'>Dashboard</a>', page.data)
+        self.assertIn(b"function setActiveNavigation", script)
+        self.assertIn(b'event.key === "Escape"', script)
+        self.assertIn(b"focusProductSearch", script)
+
+    def test_product_link_marketplace_overrides_selected_marketplace(self):
+        job = {
+            "id": "temu-job",
+            "state": "running",
+            "stage": 1,
+            "platform": "temu",
+        }
+        with patch("webapp._start_job", return_value=job) as start_job:
+            response = self.client.post(
+                "/api/search",
+                json={
+                    "query": "https://www.temu.com/ph-en/goods.html",
+                    "platform": "lazada",
+                    "live": True,
+                    "product_count": 1,
+                    "review_count": 30,
+                },
+            )
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.json["job"]["platform"], "temu")
+        start_job.assert_called_once_with(
+            "webapp-test",
+            "https://www.temu.com/ph-en/goods.html",
+            "temu",
+            1,
+            30,
+        )
+
+    def test_job_exposes_limits_and_progress_metadata(self):
+        with patch("webapp.threading.Thread") as thread:
+            job = webapp._start_job("catalog", "earphones", "lazada", 4, 25)
+
+        self.assertEqual(job["platform"], "lazada")
+        self.assertEqual(job["product_limit"], 4)
+        self.assertEqual(job["review_limit"], 25)
+        self.assertEqual(job["stage_label"], "Collect reviews")
+        self.assertEqual(job["progress"], 18)
+        thread.return_value.start.assert_called_once()
 
     def test_saved_search_and_product_detail_are_available(self):
         response = self.client.post("/api/search", json={"query": "sample gadget", "live": False})

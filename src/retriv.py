@@ -18,6 +18,29 @@ def _progress(iterable=None, **kwargs):
     kwargs.setdefault("disable", not sys.stderr.isatty())
     return tqdm(iterable, **kwargs)
 
+
+def _position_scraper_window(driver):
+    """Leave the left side of the screen visible for the app's progress panel."""
+    screen_width, screen_height = 1366, 768
+    try:
+        screen = driver.execute_script(
+            "return {width: window.screen.availWidth, height: window.screen.availHeight};"
+        )
+        screen_width = int(screen.get("width") or screen_width)
+        screen_height = int(screen.get("height") or screen_height)
+    except Exception:
+        logging.debug("Could not read the available screen size", exc_info=True)
+    width = min(1050, max(720, int(screen_width * 0.60)), max(640, screen_width - 32))
+    height = min(820, max(560, int(screen_height * 0.84)), max(520, screen_height - 64))
+    left = max(0, screen_width - width - 16)
+    top = max(0, min(40, screen_height - height))
+    try:
+        driver.set_window_size(width, height)
+        driver.set_window_position(left, top)
+        logging.info("Chrome window positioned at %sx%s so app progress remains visible.", width, height)
+    except Exception:
+        logging.warning("Chrome window could not be resized; continuing normally.", exc_info=True)
+
 class ShopeeScraper:
     """Selenium scraper configured exclusively for Shopee Philippines."""
 
@@ -95,7 +118,7 @@ class ShopeeScraper:
         self.options.add_argument("--no-sandbox")
         self.options.add_argument("--disable-dev-shm-usage")
         self.options.add_argument("--disable-blink-features=AutomationControlled")
-        self.options.add_argument("--start-maximized")
+        self.options.add_argument("--window-size=900,700")
         self.options.add_argument("--lang=en-PH")
 
     @staticmethod
@@ -870,7 +893,7 @@ class ShopeeScraper:
             chrome_kwargs["version_main"] = chrome_major
             logging.info("Starting Chrome with matching major version %s.", chrome_major)
         self.driver = uc.Chrome(**chrome_kwargs)
-        self.driver.maximize_window()
+        _position_scraper_window(self.driver)
 
         # Run the missing comments scraper if we have existing data
         if self.output_data:

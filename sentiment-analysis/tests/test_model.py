@@ -88,7 +88,8 @@ class TestDefaketiveSentimentModel(unittest.TestCase):
         self.assertIn("safety", result["risk"]["categories"])
 
     def test_low_rating_resolves_positive_vader_words_in_negative_review(self):
-        result = self.model.analyze(
+        fallback = DefaketiveSentimentModel(use_trained=False)
+        result = fallback.analyze(
             "I am disappointed. The wires are exposed, but I would appreciate a refund.",
             rating=1,
         )
@@ -97,6 +98,30 @@ class TestDefaketiveSentimentModel(unittest.TestCase):
             result["label_adjustment"]["reason"],
             "low_rating_with_negative_evidence",
         )
+
+    def test_trained_classifier_is_loaded_with_probabilities_and_evidence(self):
+        result = self.model.analyze(
+            "okay naman ang item pero medyo manipis ang material"
+        )
+
+        self.assertEqual(result["model_version"], "defaketive-firecs-tfidf-0.2.0")
+        self.assertIsNotNone(result["classifier"])
+        self.assertIn(result["classifier"]["label"], {"negative", "neutral", "positive"})
+        self.assertAlmostEqual(
+            sum(result["classifier"]["probabilities"].values()), 1.0, places=4
+        )
+        self.assertTrue(result["classifier"]["evidence"])
+
+    def test_missing_trained_artifact_falls_back_to_vader(self):
+        model = DefaketiveSentimentModel(
+            trained_model_path="missing-firecs-model.joblib"
+        )
+        result = model.analyze("Maganda at sulit")
+
+        self.assertEqual(result["model_version"], "defaketive-vader-seed-0.1.2")
+        self.assertEqual(result["label_source"], "vader_rules")
+        self.assertIsNone(result["classifier"])
+        self.assertIn("not found", model.trained_model_error)
 
     def test_low_rating_resolves_unrecognized_terse_complaint(self):
         result = self.model.analyze("The volume automatically goes down.", rating=1)

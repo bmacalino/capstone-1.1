@@ -65,7 +65,7 @@ class TestDashboardUtils(unittest.TestCase):
             "name": "Anker 25000mAh Laptop Power Bank",
             "brand": "Anker",
             "category": "Power Banks",
-            "sentiment_summary": {"risk_score": 1, "risk_score_scale": "percent"},
+            "sentiment_summary": {"risk_score": 50, "risk_score_scale": "percent"},
         }
         good_match = {
             "link": "good",

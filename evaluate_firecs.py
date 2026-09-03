@@ -15,12 +15,14 @@ SENTIMENT_ROOT = ROOT / "sentiment-analysis"
 if str(SENTIMENT_ROOT) not in sys.path:
     sys.path.insert(0, str(SENTIMENT_ROOT))
 
-from defaketive_sentiment.model import MODEL_VERSION, DefaketiveSentimentModel
+from defaketive_sentiment.model import DefaketiveSentimentModel
 from research_utils import evaluate_labels, normalize_sentiment_label
 
 DEFAULT_DATASET = SENTIMENT_ROOT / "data" / "firecs" / "FiReCS_test_set.csv"
-DEFAULT_RESULT = SENTIMENT_ROOT / "evaluation" / "firecs_test_baseline.json"
-DEFAULT_ERRORS = SENTIMENT_ROOT / "evaluation" / "firecs_test_errors.csv"
+DEFAULT_RESULT = SENTIMENT_ROOT / "evaluation" / "firecs_current_model.json"
+DEFAULT_ERRORS = SENTIMENT_ROOT / "evaluation" / "firecs_current_model_errors.csv"
+VADER_RESULT = SENTIMENT_ROOT / "evaluation" / "firecs_test_baseline.json"
+VADER_ERRORS = SENTIMENT_ROOT / "evaluation" / "firecs_test_errors.csv"
 
 
 def load_firecs(path: Path) -> list[dict[str, str]]:
@@ -57,11 +59,14 @@ def evaluate_firecs(
         prediction = analysis["label"]
         predictions.append(prediction)
         if prediction != record["label"]:
+            classifier = analysis.get("classifier") or {}
             errors.append(
                 {
                     "review": record["review"],
                     "actual_label": record["label"],
                     "predicted_label": prediction,
+                    "label_source": analysis.get("label_source", "unknown"),
+                    "classifier_confidence": classifier.get("confidence"),
                     "compound": analysis["scores"]["compound"],
                     "sentiment_evidence": json.dumps(
                         analysis["sentiment_evidence"], ensure_ascii=False
@@ -77,7 +82,7 @@ def evaluate_firecs(
             "dataset": "FiReCS",
             "split_file": path.name,
             "dataset_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-            "model_version": MODEL_VERSION,
+            "model_version": getattr(model, "model_version", "custom-model"),
             "license": "CC BY 4.0",
             "source": "https://huggingface.co/datasets/ccosme/FiReCS",
             "error_count": len(errors),
@@ -102,6 +107,8 @@ def write_results(
             "review",
             "actual_label",
             "predicted_label",
+            "label_source",
+            "classifier_confidence",
             "compound",
             "sentiment_evidence",
             "risk_evidence",
@@ -125,13 +132,21 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_ERRORS,
         help="Misclassified-review CSV output",
     )
+    parser.add_argument(
+        "--vader-only",
+        action="store_true",
+        help="Disable the trained FiReCS classifier and evaluate the VADER fallback",
+    )
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    metrics, errors = evaluate_firecs(args.dataset.resolve())
-    write_results(metrics, errors, args.output.resolve(), args.errors_output.resolve())
+    model = DefaketiveSentimentModel(use_trained=not args.vader_only)
+    metrics, errors = evaluate_firecs(args.dataset.resolve(), model)
+    result_path = VADER_RESULT if args.vader_only and args.output == DEFAULT_RESULT else args.output
+    errors_path = VADER_ERRORS if args.vader_only and args.errors_output == DEFAULT_ERRORS else args.errors_output
+    write_results(metrics, errors, result_path.resolve(), errors_path.resolve())
     print(json.dumps(metrics, ensure_ascii=False, indent=2))
     return 0
 

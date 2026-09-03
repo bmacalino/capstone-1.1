@@ -13,6 +13,7 @@ import secrets
 import subprocess
 import sys
 import threading
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -152,7 +153,19 @@ def _scraper_failure_message(result: subprocess.CompletedProcess[str]) -> str:
 
 def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int, review_count: int) -> dict[str, Any]:
     job_id = secrets.token_urlsafe(12)
-    job = {"id": job_id, "state": "running", "stage": 1, "message": f"Opening {platform.title()} and collecting public reviews…", "created_at": datetime.now(timezone.utc).isoformat()}
+    job = {
+        "id": job_id,
+        "state": "running",
+        "stage": 1,
+        "stage_label": "Collect reviews",
+        "progress": 18,
+        "message": f"Opening {platform.title()} and collecting public reviews…",
+        "platform": platform,
+        "query": keyword,
+        "product_limit": product_count,
+        "review_limit": review_count,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
     with _lock:
         _jobs[job_id] = job
 
@@ -163,22 +176,49 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
             if result.returncode:
                 raise RuntimeError(_scraper_failure_message(result))
             with _lock:
-                job.update(stage=2, message="Analyzing English, Filipino, and Taglish review sentiment…")
+                job.update(
+                    stage=2,
+                    stage_label="Analyze reviews",
+                    progress=68,
+                    message="Analyzing English, Filipino, and Taglish review sentiment…",
+                )
             products = load_products(target)
             if not has_usable_products(products):
                 raise RuntimeError("The marketplace did not return a usable product.")
             analyzed = analyze_products(products)
+            with _lock:
+                job.update(
+                    stage=3,
+                    stage_label="Prepare report",
+                    progress=92,
+                    message="Preparing the risk report and saving analyzed results…",
+                )
             target.write_bytes(json_bytes(analyzed))
             save_products(analyzed, source=str(target))
             with _lock:
                 _catalogs[catalog_key] = analyzed
-                job.update(state="complete", stage=3, message=f"Analysis complete — {len(analyzed)} product(s) found.", product_count=len(analyzed))
+                job.update(
+                    state="complete",
+                    stage=3,
+                    stage_label="Complete",
+                    progress=100,
+                    message=f"Analysis complete — {len(analyzed)} product(s) found.",
+                    product_count=len(analyzed),
+                )
         except subprocess.TimeoutExpired:
             with _lock:
-                job.update(state="error", message="Marketplace verification timed out. Start a new scan when you are ready.")
+                job.update(
+                    state="error",
+                    stage_label="Stopped",
+                    message="Marketplace verification timed out. Start a new scan when you are ready.",
+                )
         except Exception as exc:
             with _lock:
-                job.update(state="error", message=_user_facing_failure(exc))
+                job.update(
+                    state="error",
+                    stage_label="Stopped",
+                    message=_user_facing_failure(exc),
+                )
 
     threading.Thread(target=run, daemon=True, name=f"defaketive-scrape-{job_id}").start()
     return job
@@ -192,6 +232,35 @@ def _lexicon_rows(filename: str, columns: list[str]) -> list[dict[str, str]]:
             if record:
                 rows.append(dict(zip(columns, record)))
     return rows
+
+
+def _main_product_issue(product: dict[str, Any]) -> str:
+    """Return the most frequently detected risk category for a product."""
+    issues: Counter[str] = Counter()
+    comments = product.get("comments")
+    if not isinstance(comments, list):
+        return "No dominant issue"
+
+    for comment in comments:
+        if not isinstance(comment, dict) or comment.get("is_duplicate"):
+            continue
+        risk = (comment.get("sentiment_analysis") or {}).get("risk") or {}
+        evidence = risk.get("evidence") or []
+        categories = {
+            str(item.get("category") or "").strip().lower()
+            for item in evidence
+            if isinstance(item, dict) and not item.get("negated")
+        }
+        if not categories:
+            categories = {
+                str(category).strip().lower()
+                for category in (risk.get("categories") or [])
+            }
+        issues.update(category for category in categories if category)
+
+    if not issues:
+        return "No dominant issue"
+    return issues.most_common(1)[0][0].replace("_", " ").title()
 
 
 def create_app(test_config: dict[str, Any] | None = None) -> Flask:
@@ -273,8 +342,29 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             level = product_risk_level(product)
             if level in distribution:
                 distribution[level] += 1
-        flagged = [row for row in product_rows(products) if str(row.get("Risk level")) == "High"][:10]
-        return jsonify({"counts": database_counts(), "catalog_count": len(products), "risk_distribution": distribution, "flagged": flagged})
+        rows = product_rows(products)
+        for product, row in zip(products, rows):
+            row["Main issue"] = _main_product_issue(product)
+        flagged = [row for row in rows if str(row.get("Risk level")) == "High"][:10]
+        sampled_reviews = sum(int(row.get("Reviews") or 0) for row in rows)
+        average_reliability = (
+            sum(float(row.get("Reliability score") or 0) for row in rows) / len(rows)
+            if rows
+            else 0.0
+        )
+        marketplaces = {
+            str(row.get("Platform") or "").strip()
+            for row in rows
+            if str(row.get("Platform") or "").strip()
+        }
+        summary = {
+            "products": len(rows),
+            "reviews": sampled_reviews,
+            "average_reliability": round(average_reliability, 1),
+            "high_risk": distribution["High"],
+            "marketplaces": len(marketplaces),
+        }
+        return jsonify({"summary": summary, "risk_distribution": distribution, "flagged": flagged})
 
     @app.get("/api/admin/database")
     def database_api() -> Response:

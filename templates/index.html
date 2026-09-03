@@ -18,14 +18,16 @@
   <body>
     <header class="site-header">
       <a class="brand" href="#home" data-route="home" aria-label="DeFaketive home"><span class="brand-mark">⌾</span>DeFaketive<span>.</span></a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Menu</button>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open navigation">
+        <span class="nav-toggle-line"></span><span class="nav-toggle-line"></span><span class="nav-toggle-line"></span>
+      </button>
       <nav id="main-nav" class="main-nav" aria-label="Main navigation">
-        <a href="#how" data-scroll="how">How it works</a>
-        <a href="#results" data-route="results">Reports</a>
-        <a href="#admin" data-route="admin">Dashboard</a>
-        <a href="#survey" data-route="survey">Feedback</a>
+        <a class="nav-link active" href="#home" data-route="home" aria-current="page">Home</a>
+        <a class="nav-link" href="#how" data-scroll="how">How it works</a>
+        <a class="nav-link" href="#results" data-route="results">Analyzed products</a>
+        <a class="nav-link" href="#admin" data-route="admin">Insights</a>
+        <a class="nav-cta" href="#home" data-route="home" data-focus-search>Check a product</a>
       </nav>
-      <label class="upload-button" title="Load an existing scraper JSON result">Import JSON<input id="dataset-upload" type="file" accept="application/json" hidden></label>
     </header>
 
     <main>
@@ -35,20 +37,58 @@
           <h1>Bago mo bilhin,<br><em>i-check muna.</em></h1>
           <p class="hero-text">Understand what real product reviews are saying: sentiment, defect signals, duplicate markers, and an explainable risk score.</p>
           <form id="search-form" class="search-panel">
-            <label for="search-query">Product link or search</label>
-            <div class="search-row"><input id="search-query" name="query" autocomplete="off" placeholder="Paste a Shopee, Lazada, or Temu link — or search by name" required><button class="primary-button" type="submit">Check now <span aria-hidden="true">→</span></button></div>
-            <div class="search-options">
-              <label class="check-label"><input id="live-scan" type="checkbox"> Live marketplace scan</label>
-              <label>Marketplace <select id="marketplace"><option value="shopee">Shopee PH</option><option value="lazada">Lazada PH</option><option value="temu">Temu PH</option></select></label>
-              <label>Products <input id="product-count" type="number" min="1" max="30" value="6"></label>
-              <label>Reviews each <input id="review-count" type="number" min="1" max="200" value="30"></label>
+            <label for="search-query">What product do you want to check?</label>
+            <div class="search-row"><input id="search-query" name="query" autocomplete="off" placeholder="Paste a product link or enter a product name" required aria-describedby="search-example marketplace-detection saved-match scan-summary search-feedback"></div>
+            <p id="search-example" class="search-example">Try “wireless earbuds” or paste a Shopee, Lazada, or Temu product link.</p>
+            <p id="marketplace-detection" class="field-status" aria-live="polite" hidden></p>
+            <div id="saved-match" class="saved-match" aria-live="polite" hidden></div>
+            <fieldset id="marketplace-field" class="marketplace-choice" hidden>
+              <legend>Choose a marketplace</legend>
+              <div class="marketplace-buttons">
+                <label><input type="radio" name="marketplace" value="shopee" checked><span>Shopee PH</span></label>
+                <label><input type="radio" name="marketplace" value="lazada"><span>Lazada PH</span></label>
+                <label><input type="radio" name="marketplace" value="temu"><span>Temu PH</span></label>
+              </div>
+            </fieldset>
+            <details id="advanced-options" class="advanced-options" hidden>
+              <summary>
+                <span class="advanced-icon" aria-hidden="true">⚙</span>
+                <span class="advanced-label"><b>Advanced options</b><small>Adjust product and review limits</small></span>
+                <span class="advanced-chevron" aria-hidden="true">▾</span>
+              </summary>
+              <div class="search-options">
+                <label id="product-count-field">Products <input id="product-count" type="number" min="1" max="30" value="6"></label>
+                <label>Reviews each <input id="review-count" type="number" min="1" max="200" value="30"></label>
+              </div>
+            </details>
+            <p id="scan-summary" class="scan-summary" hidden></p>
+            <div class="search-actions">
+              <button id="search-submit" class="primary-button" type="submit" data-search-intent="saved" disabled>Search analyzed products <span aria-hidden="true">→</span></button>
+              <button id="fresh-search" class="secondary-button" type="submit" data-search-intent="live" hidden>Collect fresh reviews</button>
+            </div>
+            <div id="search-feedback" class="search-feedback" role="alert" hidden>
+              <strong id="search-feedback-title">Scan could not start</strong>
+              <p id="search-feedback-message"></p>
+              <div class="feedback-actions"><button id="retry-search" type="button">Retry</button></div>
+            </div>
+            <div id="job-panel" class="job-panel" role="status" aria-live="polite" hidden>
+              <div class="spinner"></div>
+              <div class="job-body">
+                <div class="job-heading"><b id="job-title">Live analysis running</b><span id="job-elapsed">0:00</span></div>
+                <p id="job-message">Preparing…</p>
+                <ol class="job-steps" aria-label="Analysis stages">
+                  <li data-job-stage="1">Collect reviews</li>
+                  <li data-job-stage="2">Analyze reviews</li>
+                  <li data-job-stage="3">Prepare report</li>
+                </ol>
+                <div class="progress" aria-hidden="true"><i id="job-progress"></i></div>
+              </div>
             </div>
           </form>
-          <p class="form-note">Live scans may open a dedicated browser window for marketplace login or CAPTCHA verification.</p>
+          <p id="search-note" class="form-note">We’ll suggest the best next action after you enter a product.</p>
         </div>
         <div class="hero-visual" aria-hidden="true">
           <div class="orb orb-one"></div><div class="orb orb-two"></div>
-          <div class="signal-card main-signal"><span>REVIEW RISK</span><strong id="hero-score">—</strong><small>weighted score</small><div class="meter"><i></i></div></div>
           <div class="signal-card mini-signal"><span class="risk-dot"></span><b>Explainable</b><small>every signal has evidence</small></div>
           <div class="scan-lines"></div>
         </div>
@@ -65,36 +105,27 @@
       </section>
 
       <section id="results" class="view app-view" data-view="results" hidden>
-        <div class="view-heading"><div><p class="eyebrow">Shopper portal</p><h2>Search results</h2><p>Products are ranked by reliability. Open one to inspect the review evidence.</p></div><div class="heading-actions"><a class="text-link" id="export-products" href="/api/export/products.csv">Export CSV</a><button class="secondary-button" data-route="home">New search</button></div></div>
-        <div class="filters" aria-label="Result filters"><label>Platform <select id="filter-platform"><option value="all">All marketplaces</option><option value="Shopee PH">Shopee PH</option><option value="Lazada PH">Lazada PH</option><option value="Temu PH">Temu PH</option></select></label><label>Risk <select id="filter-risk"><option value="all">All risk levels</option><option>Low</option><option>Moderate</option><option>High</option></select></label><label>Sort <select id="filter-sort"><option value="reliability">Highest reliability</option><option value="risk">Lowest risk</option><option value="reviews">Most reviews</option></select></label></div>
+        <div class="view-heading"><div><h2>Analyzed products</h2><p>Browse products with completed review analysis. Products with the strongest review reliability appear first.</p></div></div>
+        <div class="filters" aria-label="Filter analyzed products"><label>Marketplace <select id="filter-platform"><option value="all">All marketplaces</option><option value="Shopee PH">Shopee PH</option><option value="Lazada PH">Lazada PH</option><option value="Temu PH">Temu PH</option></select></label><label>Risk level <select id="filter-risk"><option value="all">All risk levels</option><option>Low</option><option>Moderate</option><option>High</option></select></label><label>Sort by <select id="filter-sort"><option value="reliability">Highest reliability</option><option value="risk">Lowest risk</option><option value="reviews">Most reviews analyzed</option></select></label></div>
         <p id="results-summary" class="muted"></p><div id="product-grid" class="product-grid"></div>
       </section>
 
       <section id="analysis" class="view app-view" data-view="analysis" hidden>
-        <button class="back-button" data-route="results">← Back to results</button>
+        <button class="back-button" data-route="results">← Back to analyzed products</button>
         <div id="analysis-content"></div>
       </section>
 
       <section id="admin" class="view app-view" data-view="admin" hidden>
-        <div class="view-heading"><div><p class="eyebrow">Administration</p><h2>System overview</h2><p>Collection, analysis, and research records in one local workspace.</p></div><button class="secondary-button" id="refresh-admin">Refresh data</button></div>
-        <nav class="subnav" aria-label="Administration sections"><button class="active" data-admin="overview">Overview</button><button data-admin="scraper">Scraper manager</button><button data-admin="database">Product database</button><button data-admin="lexicons">Lexicon dictionary</button></nav>
+        <div class="view-heading"><div><h2>Shopping insights</h2><p>See a simple overview of the products and customer reviews analyzed so far.</p></div><button class="secondary-button" id="refresh-admin">Update insights</button></div>
+        <nav class="subnav" aria-label="Insight sections"><button class="active" data-admin="overview">Summary</button><button data-admin="database">All analyzed products</button></nav>
         <div id="admin-content"></div>
+        <p class="dashboard-disclaimer">These insights are based on a sample of public reviews. Use them as a shopping guide—not as proof that a product or listing is genuine or fake.</p>
       </section>
 
-      <section id="survey" class="view app-view narrow-view" data-view="survey" hidden>
-        <p class="eyebrow">Customer acceptance</p><h2>SUS / UMUX feedback</h2><p>Anonymous research feedback. SUS uses 1–5; UMUX uses 1–7.</p>
-        <form id="survey-form" class="survey-form"><label>How often do you shop online?<select name="frequency"><option>Weekly</option><option>Monthly</option><option>A few times a year</option><option>Rarely</option></select></label><fieldset><legend>System Usability Scale</legend><div id="sus-questions"></div></fieldset><fieldset><legend>Usability Metric for User Experience</legend><div id="umux-questions"></div></fieldset><button class="primary-button" type="submit">Submit feedback</button></form><p id="survey-result" class="notice" hidden></p>
-      </section>
-
-      <section id="model" class="view app-view narrow-view" data-view="model" hidden>
-        <button class="back-button" data-route="admin">← Back to administration</button><p class="eyebrow">Administration · Objective 5</p><h2>Model evaluation</h2><p>Upload a human-verified CSV containing <code>actual_label</code> and either <code>predicted_label</code> or <code>review_text</code>.</p>
-        <form id="evaluation-form" class="file-form"><input id="evaluation-file" type="file" accept=".csv,text/csv" required><button class="primary-button" type="submit">Run verified evaluation</button></form><div id="evaluation-result"></div>
-      </section>
     </main>
 
-    <div id="job-panel" class="job-panel" hidden><div class="spinner"></div><div><b id="job-title">Live analysis running</b><p id="job-message">Preparing…</p><div class="progress"><i id="job-progress"></i></div></div></div>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-    <footer>DeFaketive · Explainable Taglish sentiment analysis · <button data-route="model">Model evaluation</button></footer>
+    <footer>DeFaketive · Explainable Taglish sentiment analysis</footer>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
   </body>

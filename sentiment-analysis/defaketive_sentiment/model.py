@@ -19,8 +19,11 @@ try:
 except ImportError:  # pragma: no cover - exercised only in an incomplete install
     SentimentIntensityAnalyzer = None
 
+from .trained import DEFAULT_ARTIFACT, TrainedModelError, TrainedSentimentClassifier
 
-MODEL_VERSION = "defaketive-vader-seed-0.1.2"
+VADER_MODEL_VERSION = "defaketive-vader-seed-0.1.2"
+TRAINED_MODEL_VERSION = "defaketive-firecs-tfidf-0.2.0"
+MODEL_VERSION = TRAINED_MODEL_VERSION if DEFAULT_ARTIFACT.is_file() else VADER_MODEL_VERSION
 LEXICON_DIR = Path(__file__).with_name("lexicons")
 
 FILIPINO_NEGATORS = {
@@ -105,9 +108,16 @@ def _term_pattern(term: str) -> re.Pattern[str]:
 
 
 class DefaketiveSentimentModel:
-    """NLTK VADER with Filipino/Taglish rules and an independent risk layer."""
+    """FiReCS classifier with explainable VADER and an independent risk layer."""
 
-    def __init__(self, positive_threshold: float = 0.05, negative_threshold: float = -0.05):
+    def __init__(
+        self,
+        positive_threshold: float = 0.05,
+        negative_threshold: float = -0.05,
+        *,
+        use_trained: bool = True,
+        trained_model_path: str | Path | None = None,
+    ):
         if negative_threshold >= positive_threshold:
             raise ValueError("negative_threshold must be lower than positive_threshold")
         if SentimentIntensityAnalyzer is None:
@@ -125,6 +135,22 @@ class DefaketiveSentimentModel:
         self.negative_threshold = negative_threshold
         self.sentiment_entries = _load_tsv(LEXICON_DIR / "sentiment_lexicon.tsv")
         self.risk_entries = _load_tsv(LEXICON_DIR / "risk_lexicon.tsv")
+        self.trained_classifier = None
+        self.trained_model_error = None
+        if use_trained:
+            try:
+                self.trained_classifier = TrainedSentimentClassifier(
+                    trained_model_path or DEFAULT_ARTIFACT
+                )
+            except TrainedModelError as exc:
+                # Preserve the rule-based fallback so a missing optional
+                # artifact never prevents local review analysis.
+                self.trained_model_error = str(exc)
+        self.model_version = (
+            self.trained_classifier.model_version
+            if self.trained_classifier is not None
+            else VADER_MODEL_VERSION
+        )
 
         self.analyzer.constants.NEGATE.update(FILIPINO_NEGATORS)
         self.analyzer.constants.BOOSTER_DICT.update(FILIPINO_BOOSTERS)
@@ -284,14 +310,68 @@ class DefaketiveSentimentModel:
             return None
         return value if 1 <= value <= 5 else None
 
+    @staticmethod
+    def _rule_override(
+        normalized: str,
+        vader_label: str,
+        scores: dict[str, float],
+        sentiment_evidence: list[dict[str, Any]],
+        active_risks: list[dict[str, Any]],
+    ) -> str | None:
+        """Keep explicit, explainable rules authoritative in narrow cases."""
+        if vader_label == "neutral":
+            return None
+        if not re.search(r"\w", normalized, flags=re.UNICODE) and sentiment_evidence:
+            return "symbol_only_review"
+
+        active_custom = [
+            item
+            for item in sentiment_evidence
+            if item["category"] != "vader" and not item["negated"]
+        ]
+        if vader_label == "negative" and any(
+            item["severity"] >= 2 for item in active_risks
+        ):
+            return "explicit_product_risk"
+        if vader_label == "negative" and any(
+            item["valence"] <= -2.2 for item in active_custom
+        ):
+            return "explicit_negative_phrase"
+        if vader_label == "positive" and not active_risks and (
+            any(item["valence"] >= 2.0 for item in active_custom)
+            or any(
+                item["negated"] and item["valence"] <= -2.2
+                for item in sentiment_evidence
+            )
+        ):
+            return "explicit_positive_or_negated_failure"
+
+        words = re.findall(r"[\w']+", normalized, flags=re.UNICODE)
+        active_values = [
+            float(item["valence"])
+            for item in sentiment_evidence
+            if not item["negated"]
+        ]
+        same_polarity = active_values and (
+            all(value >= 0 for value in active_values)
+            or all(value <= 0 for value in active_values)
+        )
+        if len(words) <= 8 and abs(float(scores["compound"])) >= 0.5 and same_polarity:
+            return "short_unambiguous_review"
+        return None
+
     def analyze(self, text: Any, rating: Any = None) -> dict[str, Any]:
         normalized = self.normalize(text)
         if not normalized:
             return {
-                "model_version": MODEL_VERSION,
+                "model_version": self.model_version,
                 "label": "neutral",
+                "label_source": "empty_text",
+                "vader_label": "neutral",
                 "scores": {"neg": 0.0, "neu": 1.0, "pos": 0.0, "compound": 0.0},
+                "classifier": None,
                 "sentiment_evidence": [],
+                "hybrid_adjustment": None,
                 "label_adjustment": None,
                 "risk": {"detected": False, "score": 0.0, "categories": [], "evidence": []},
             }
@@ -299,16 +379,42 @@ class DefaketiveSentimentModel:
         scores = self.analyzer.polarity_scores(self._prepare_for_vader(normalized))
         compound = scores["compound"]
         if compound >= self.positive_threshold:
-            label = "positive"
+            vader_label = "positive"
         elif compound <= self.negative_threshold:
-            label = "negative"
+            vader_label = "negative"
         else:
-            label = "neutral"
+            vader_label = "neutral"
+
+        classifier_output = None
+        label = vader_label
+        label_source = "vader_rules"
+        if self.trained_classifier is not None:
+            try:
+                classifier_output = self.trained_classifier.predict(normalized)
+                label = classifier_output["label"]
+                label_source = "firecs_supervised_classifier"
+            except Exception as exc:  # pragma: no cover - artifact/runtime mismatch
+                self.trained_model_error = f"Trained classifier prediction failed: {exc}"
 
         sentiment_evidence = self._sentiment_evidence(normalized)
         risk_evidence = self._risk_evidence(normalized)
         active_risks = [item for item in risk_evidence if not item["negated"]]
         max_severity = max((item["severity"] for item in active_risks), default=0)
+
+        hybrid_adjustment = None
+        if self.trained_classifier is not None:
+            override_reason = self._rule_override(
+                normalized, vader_label, scores, sentiment_evidence, active_risks
+            )
+            if override_reason is not None and label != vader_label:
+                hybrid_adjustment = {
+                    "source": "explainable_rule_override",
+                    "classifier_label": label,
+                    "rule_label": vader_label,
+                    "reason": override_reason,
+                }
+                label = vader_label
+                label_source = "explainable_rule_override"
 
         # Text remains the primary signal, but a one- or two-star rating is a
         # useful tie-breaker for terse complaints that VADER cannot understand
@@ -338,12 +444,18 @@ class DefaketiveSentimentModel:
                     "rating": rating_value,
                     "reason": "low_rating_with_negative_evidence",
                 }
+        if label_adjustment is not None:
+            label_source = f"{label_source}+rating_context"
 
         return {
-            "model_version": MODEL_VERSION,
+            "model_version": self.model_version,
             "label": label,
+            "label_source": label_source,
+            "vader_label": vader_label,
             "scores": scores,
+            "classifier": classifier_output,
             "sentiment_evidence": sentiment_evidence,
+            "hybrid_adjustment": hybrid_adjustment,
             "label_adjustment": label_adjustment,
             "risk": {
                 "detected": bool(active_risks),

@@ -328,18 +328,21 @@ def rank_recommendations(
     min_positive_ratio: float = 0.55,
     min_review_count: int = 5,
 ) -> list[dict[str, Any]]:
-    """Rank similar, well-reviewed Low Risk products with explainable signals."""
+    """Rank similar Low Risk products that improve on the target's risk score."""
     if limit <= 0:
         return []
     target_terms = _recommendation_terms(product)
     target_type = _recommendation_type(product)
     target_category = str(product.get("category") or "").strip().casefold()
     target_brand = _recommendation_brand(product).casefold()
+    target_risk = product_risk_percent(product)
     ranked: list[tuple[float, float, float, int, int, dict[str, Any]]] = []
     for index, candidate in enumerate(products):
         if candidate.get("link") == product.get("link") or not candidate.get("sentiment_summary"):
             continue
         if product_risk_level(candidate) != "Low":
+            continue
+        if product_risk_percent(candidate) >= target_risk:
             continue
         summary = candidate.get("sentiment_summary") or {}
         positive = float((summary.get("sentiment_ratios") or {}).get("positive") or 0)
