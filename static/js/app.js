@@ -1,4 +1,4 @@
-const state = { products: [], catalogProducts: [], adminProducts: [], admin: "overview", toastTimer: null, activeJobId: null, jobStartedAt: null, jobElapsedTimer: null, searchBusy: false };
+const state = { homeScan: null, catalogLoading: true, currentProduct: null, reportFrom: "history", activity: {}, wishlist: [], catalogError: false, products: [], catalogProducts: [], toastTimer: null, activeJobId: null, jobStartedAt: null, jobElapsedTimer: null, searchBusy: false };
 const MARKETPLACES = { shopee: "Shopee PH", lazada: "Lazada PH", temu: "Temu PH" };
 const $ = (selector) => document.querySelector(selector);
 const esc = (value) => String(value ?? "").replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
@@ -7,7 +7,7 @@ const score = (product) => Number(product?.sentiment_summary?.risk_score || 0);
 const reliability = (product) => Math.round(Number(product?.reliability_score ?? product?.sentiment_summary?.reliability_score ?? (100 - score(product))) || 0);
 const reviewCount = (product) => Number(product?.sentiment_summary?.review_count ?? product?.comments?.length ?? 0) || 0;
 function riskLevel(product) { const risk = score(product); return risk <= 30 ? "Low" : risk <= 60 ? "Moderate" : "High"; }
-function safeImage(product) { const candidate = product?.img || product?.image || product?.image_url || product?.thumbnail; return /^https?:\/\//i.test(String(candidate || "")) ? candidate : ""; }
+function safeImage(product) { const candidate = product?.img || product?.image || product?.image_url || product?.thumbnail; return /^(https?:\/\/|\/static\/)/i.test(String(candidate || "")) ? candidate : ""; }
 function safeLink(value) { return /^https?:\/\//i.test(String(value || "")) ? String(value) : ""; }
 function toast(message, kind = "info") { const node = $("#toast"); node.textContent = message; node.dataset.kind = kind; node.hidden = false; clearTimeout(state.toastTimer); state.toastTimer = setTimeout(() => { node.hidden = true; }, 5000); }
 async function api(url, options = {}) { const response = await fetch(url, options); const body = await response.json().catch(() => ({})); if (!response.ok) throw new Error(body.error || "Something went wrong."); return body; }
@@ -20,6 +20,8 @@ function productLinkIdentity(value) { try { const url = new URL(String(value || 
 function savedProductForQuery(value) { const identity = productLinkIdentity(value); if (!identity) return null; const catalog = state.catalogProducts.length ? state.catalogProducts : state.products; return catalog.find(product => productLinkIdentity(product.link) === identity) || null; }
 function setSearchBusy(busy) {
   state.searchBusy = busy;
+  $("#active-scan-link").hidden = !busy;
+  $("#active-scan-link").textContent = busy ? "Scan in progress →" : "Return to scan →";
   ["#search-query", "#product-count", "#review-count"].forEach(selector => { const node = $(selector); if (node) node.disabled = busy; });
   document.querySelectorAll('input[name="marketplace"]').forEach(input => { input.disabled = busy; });
   updateSearchUI();
@@ -39,7 +41,7 @@ function updateSearchUI(clearFeedback = false) {
   const primary = $("#search-submit");
   const fresh = $("#fresh-search");
   const summary = $("#scan-summary");
-  const match = context.platform ? savedProductForQuery(query) : null;
+  const match = context.platform ? (savedProductForQuery(query) || workspaceProducts().find(product => productLinkIdentity(product.link) === productLinkIdentity(query))) : null;
 
   if (context.platform) {
     if (!productCount.dataset.linkMode) {
@@ -97,13 +99,14 @@ function updateSearchUI(clearFeedback = false) {
     summary.textContent = `Fresh collection settings: ${MARKETPLACES[marketplace]} · up to ${products} product${products === 1 ? "" : "s"} · up to ${reviews} reviews each`;
     summary.hidden = false;
   }
-  $("#search-note").textContent = hasQuery && !unsupported
-    ? "Fresh collection may open Chrome for marketplace login or CAPTCHA verification."
-    : "We’ll suggest the best next action after you enter a product.";
+  $("#search-note").textContent = state.searchBusy
+    ? "You can browse your workspace while this scan runs. Use the progress button above to return."
+    : "Results are based on a sample of public reviews. Collection time varies by marketplace.";
+
 }
 function setJobStage(stage, reportedProgress) { const fallback = { 1: 18, 2: 68, 3: 92 }[stage] || 18; const progress = Number.isFinite(Number(reportedProgress)) ? Math.min(100, Math.max(0, Number(reportedProgress))) : fallback; $("#job-progress").style.width = `${progress}%`; document.querySelectorAll("[data-job-stage]").forEach(item => { const itemStage = Number(item.dataset.jobStage); item.classList.toggle("complete", itemStage < stage); item.classList.toggle("active", itemStage === stage); }); }
-function startJobClock(createdAt) { clearInterval(state.jobElapsedTimer); const parsed = Date.parse(createdAt || ""); state.jobStartedAt = Number.isNaN(parsed) ? Date.now() : parsed; const update = () => { const seconds = Math.max(0, Math.floor((Date.now() - state.jobStartedAt) / 1000)); $("#job-elapsed").textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; }; update(); state.jobElapsedTimer = setInterval(update, 1000); }
-function finishJob() { clearInterval(state.jobElapsedTimer); state.jobElapsedTimer = null; state.activeJobId = null; setSearchBusy(false); }
+function startJobClock(createdAt) { clearInterval(state.jobElapsedTimer); const parsed = Date.parse(createdAt || ""); state.jobStartedAt = Number.isNaN(parsed) ? Date.now() : parsed; const update = () => { const seconds = Math.max(0, Math.floor((Date.now() - state.jobStartedAt) / 1000)); const elapsed = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; $("#job-elapsed").textContent = elapsed; $("#home-scan-elapsed").textContent = elapsed + " elapsed"; }; update(); state.jobElapsedTimer = setInterval(update, 1000); }
+function finishJob() { clearInterval(state.jobElapsedTimer); state.jobElapsedTimer = null; state.activeJobId = null; try { sessionStorage.removeItem("defaketive-active-job"); } catch (_) {} setSearchBusy(false); }
 function closeMainNavigation() {
   const nav = $("#main-nav");
   const toggle = $(".nav-toggle");
@@ -113,35 +116,37 @@ function closeMainNavigation() {
   toggle.setAttribute("aria-label", "Open navigation");
 }
 
-function setActiveNavigation(view, howActive = false) {
+function setActiveNavigation(view, section = "") {
   const links = document.querySelectorAll("#main-nav .nav-link");
   links.forEach(link => {
     link.classList.remove("active");
     link.removeAttribute("aria-current");
   });
-  const targetView = view === "analysis" ? "results" : view;
-  const active = howActive
-    ? document.querySelector('#main-nav .nav-link[data-scroll="how"]')
-    : document.querySelector(`#main-nav .nav-link[data-route="${targetView}"]`);
+  if (view !== "landing") return;
+  const active = section
+    ? document.querySelector(`#main-nav .nav-link[data-scroll="${section}"]`)
+    : document.querySelector('#main-nav .nav-link[data-route="landing"]');
   if (active) {
     active.classList.add("active");
-    active.setAttribute("aria-current", "page");
+    active.setAttribute("aria-current", section ? "location" : "page");
   }
 }
 
 function currentView() {
-  return document.querySelector("[data-view]:not([hidden])")?.dataset.view || "home";
+  return document.querySelector("[data-view]:not([hidden])")?.dataset.view || "landing";
 }
 
 function updateHeaderState() {
   const header = $(".site-header");
   if (!header) return;
   header.classList.toggle("scrolled", window.scrollY > 8);
-  if (currentView() !== "home") return;
-  const how = $("#how");
-  const threshold = header.offsetHeight + 80;
-  const howActive = Boolean(how && how.getBoundingClientRect().top <= threshold && how.getBoundingClientRect().bottom > threshold);
-  setActiveNavigation("home", howActive);
+  if (currentView() !== "landing") return;
+  const threshold = (header.offsetHeight || 72) + 48;
+  const activeSection = ["faq", "about"].filter(id => {
+    const section = $("#" + id);
+    return section && section.getBoundingClientRect().top <= threshold;
+  }).at(-1) || "";
+  setActiveNavigation("landing", activeSection);
 }
 
 function focusProductSearch() {
@@ -153,29 +158,288 @@ function focusProductSearch() {
   });
 }
 
-function go(view) {
+const WORKSPACE_ROUTES = ["home", "analyze", "history", "wishlist", "settings", "results", "analysis"];
+const ROUTE_LABELS = {home: "Home", analyze: "Analyze product", history: "History", wishlist: "Wishlist", settings: "Settings", results: "Search results", analysis: "Product report"};
+function closeWorkspaceNavigation() {
+  $("#workspace-shell").classList.remove("sidebar-open");
+  $(".workspace-mobile-menu").setAttribute("aria-expanded", "false");
+  $(".workspace-backdrop").hidden = true;
+}
+function go(view, replace = false, preserveUrl = false) {
+  const previousView = currentView();
+  if (view === "dashboard") view = "home";
+  if (view === "admin") view = "history";
+  if (view !== "landing" && !WORKSPACE_ROUTES.includes(view)) view = "home";
+  document.body.dataset.activeView = view;
   document.querySelectorAll("[data-view]").forEach(node => {
-    const visible = node.dataset.view === view || (view === "home" && node.dataset.view === "how");
+    const visible = node.dataset.view === view;
     node.hidden = !visible;
     node.classList.toggle("active", visible);
   });
-  window.location.hash = view;
+  $("#workspace-shell").hidden = view === "landing";
+  $("#workspace-page-label").textContent = ROUTE_LABELS[view] || "Home";
+  let hash = view;
+  if (view === "analysis" && state.currentProduct?.link) {
+    hash += "?" + new URLSearchParams({product: state.currentProduct.link, from: state.reportFrom});
+  }
+  if (!preserveUrl && window.location.hash !== "#" + hash) {
+    window.history[replace ? "replaceState" : "pushState"](null, "", "#" + hash);
+  }
+  const activeRoute = view === "analysis" ? state.reportFrom : view === "results" ? "analyze" : view;
+  document.querySelectorAll(".workspace-nav [data-route]").forEach(link => {
+    const active = link.dataset.route === activeRoute;
+    link.classList.toggle("active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
   setActiveNavigation(view);
   closeMainNavigation();
+  closeWorkspaceNavigation();
   if (view === "results") renderResults();
-  if (view === "admin") renderAdmin();
-  window.scrollTo({top: 0, behavior: "smooth"});
+  if (view === "home" || view === "history" || view === "wishlist") renderWorkspace();
+  if (view === "analysis" && !state.currentProduct) {
+    $("#analysis-content").innerHTML = '<div class="flow-empty"><h1>Choose a product report</h1><p>Open an analysis from History, or analyze a product to get started.</p><a href="#history">View history →</a></div>';
+    $("#report-save").hidden = true;
+  }
+  $("#report-back").textContent = "← Back to " + (ROUTE_LABELS[state.reportFrom] || "History").toLowerCase();
+  document.title = (view === "landing" ? "DeFaketive — Review Risk Intelligence" : ROUTE_LABELS[view] + " · DeFaketive");
+  window.scrollTo({top: 0, behavior: "instant"});
+  if (previousView !== view) {
+    const heading = document.querySelector(`[data-view="${view}"] h1, [data-view="${view}"] h2`);
+    if (heading) { heading.setAttribute("tabindex", "-1"); heading.focus({preventScroll: true}); }
+  }
+}
+function readWorkspaceStorage(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (_) { return fallback; }
+}
+function persistWorkspace(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); }
+  catch (_) { toast("Browser storage is unavailable. Your changes will last for this visit only.", "warning"); }
+}
+function cacheWorkspaceProducts(products, opened = false) {
+  products.forEach(product => {
+    if (!safeLink(product?.link)) return;
+    // Keep compact summaries locally; the complete review evidence stays in the app's saved reports.
+    const {comments, ...summary} = product;
+    state.activity[product.link] = {product: summary, openedAt: opened ? Date.now() : state.activity[product.link]?.openedAt || 0};
+  });
+  state.activity = Object.fromEntries(Object.entries(state.activity).sort((a, b) => b[1].openedAt - a[1].openedAt).filter(([link], index) => index < 100 || state.wishlist.includes(link)));
+  persistWorkspace("defaketive-activity", state.activity);
+}
+function rememberProduct(product) { cacheWorkspaceProducts([product], true); }
+function workspaceProducts() {
+  const products = new Map();
+  Object.values(state.activity).forEach(entry => {
+    if (entry?.product && safeLink(entry.product.link)) products.set(entry.product.link, entry.product);
+  });
+  state.catalogProducts.forEach(product => {
+    if (safeLink(product.link)) products.set(product.link, product);
+  });
+  return [...products.values()].sort((a, b) => {
+    const date = p => state.activity[p.link]?.openedAt || Date.parse(p.analyzed_at || p.analysis_date || p.updated_at || "") || 0;
+    return date(b) - date(a);
+  });
+}
+function toggleWishlist(link) {
+  if (!safeLink(link)) return;
+  const saved = state.wishlist.includes(link);
+  state.wishlist = saved ? state.wishlist.filter(item => item !== link) : [...state.wishlist, link];
+  const product = workspaceProducts().find(item => item.link === link) || state.currentProduct;
+  if (!saved && product?.link === link) cacheWorkspaceProducts([product]);
+  persistWorkspace("defaketive-wishlist", state.wishlist);
+  syncReportSave();
+  renderWorkspace();
+  toast(saved ? "Removed from wishlist." : "Saved to your wishlist on this browser.");
+}
+function syncReportSave() {
+  const button = $("#report-save");
+  const link = safeLink(state.currentProduct?.link);
+  const saved = state.wishlist.includes(link);
+  button.hidden = !link;
+  button.setAttribute("aria-pressed", String(saved));
+  button.textContent = saved ? "♥ Saved to wishlist" : "♡ Save to wishlist";
+}
+function reportDate(product) {
+  const value = product.analysis_date || product.analyzed_at || product.updated_at;
+  const date = value && !Number.isNaN(Date.parse(value)) ? new Date(value) : null;
+  return date ? {iso: date.toISOString(), label: new Intl.DateTimeFormat("en-PH", {month: "short", day: "numeric", year: "numeric"}).format(date)} : null;
+}
+function workspaceRows(products, emptyTitle, emptyCopy) {
+  if (!products.length) return '<div class="flow-empty"><h3>' + esc(emptyTitle) + '</h3><p>' + esc(emptyCopy) + '</p><a href="#analyze">Analyze a product →</a></div>';
+  return '<div class="flow-report-list">' + products.map(product => {
+    const level = riskLevel(product), saved = state.wishlist.includes(product.link), image = safeImage(product), date = reportDate(product);
+    return `<article class="flow-report-row"><div class="flow-product-thumb">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : '<span aria-hidden="true">▤</span>'}</div><div class="flow-product-info"><h3 title="${esc(product.name || "Unnamed product")}">${esc(product.name || "Unnamed product")}</h3><p><span class="flow-market-label">${esc(platform(product))}</span><span>${reviewCount(product).toLocaleString()} reviews</span><span class="flow-analysis-date">${date ? `Analyzed <time datetime="${esc(date.iso)}">${esc(date.label)}</time>` : "Analysis date unavailable"}</span></p></div><span class="risk-badge ${level.toLowerCase()}">${level} risk · ${(score(product) / 100).toFixed(2)}</span><div class="flow-row-actions"><button type="button" class="flow-save" data-save-link="${esc(product.link)}" aria-label="${saved ? "Remove from" : "Save to"} wishlist: ${esc(product.name)}" aria-pressed="${saved}">${saved ? "♥" : "♡"}</button><button type="button" class="flow-open" data-product-link="${esc(product.link)}">View report →</button></div></article>`;
+  }).join("") + "</div>";
+}
+function persistHomeScan(scan) {
+  state.homeScan = scan;
+  try { sessionStorage.setItem("defaketive-home-scan", JSON.stringify(scan)); } catch (_) {}
+  renderHomeScan();
+}
+function renderHomeScan() {
+  const scan = state.homeScan, panel = $("#home-scan-status");
+  panel.hidden = !scan;
+  if (!scan) return;
+  const complete = scan.state === "complete", stopped = scan.state === "error", attention = scan.state === "attention";
+  panel.dataset.state = scan.state;
+  const stage = Math.min(3, Math.max(1, Number(scan.stage) || 1));
+  $("#home-scan-platform").textContent = MARKETPLACES[scan.platform] || "Product analysis";
+  $("#home-scan-title").textContent = complete ? "Your report is ready" : stopped ? "This scan couldn't finish" : attention ? "Scan progress needs checking" : ["Collecting product reviews", "Analyzing review signals", "Preparing your report"][stage - 1];
+  const product = workspaceProducts().find(item => item.link === scan.productLink);
+  $("#home-scan-product").textContent = product?.name || scan.query || "Your product";
+  $("#home-scan-message").textContent = complete ? "Your analysis is saved. Open the report whenever you're ready." : scan.message || "You can keep browsing while we work.";
+  $("#home-scan-action").textContent = complete ? (scan.productLink ? "Open report →" : "View results →") : stopped ? "View scan details →" : attention ? "Check progress →" : "View progress →";
+  const progress = Number.isFinite(Number(scan.progress)) ? Math.min(100, Math.max(0, Number(scan.progress))) : {1: 18, 2: 68, 3: 92}[stage];
+  $("#home-scan-progress").hidden = complete || stopped || attention;
+  $("#home-scan-progress").setAttribute("aria-valuenow", String(progress));
+  $("#home-scan-progress-fill").style.width = progress + "%";
+  $("#home-scan-elapsed").hidden = complete || stopped;
+}
+async function openHomeScan() {
+  const scan = state.homeScan;
+  if (!scan) return;
+  if (scan.state === "complete") {
+    if (scan.resultsPending) {
+      try {
+        await loadProducts();
+        const direct = queryContext(scan.query).isUrl;
+        const product = direct ? state.products.find(item => productLinkIdentity(item.link) === productLinkIdentity(scan.query)) || (state.products.length === 1 ? state.products[0] : null) : null;
+        persistHomeScan({...scan, productLink: product?.link || scan.productLink, resultLinks: state.products.map(item => item.link).filter(safeLink), resultsPending: false});
+        return openHomeScan();
+      } catch (_) { return toast("Saved results are still unavailable. Please try opening the report again shortly.", "error"); }
+    }
+    if (safeLink(scan.productLink)) return openProduct(scan.productLink);
+    const links = new Set(scan.resultLinks || []);
+    state.products = workspaceProducts().filter(product => links.has(product.link));
+    go("results");
+  } else {
+    go("analyze");
+    if (scan.state === "attention") pollJob(scan.id, scan);
+    if (scan.state === "error") showSearchFeedback(scan.message || "Try another product link.", "Live scan stopped");
+    $("#job-panel").scrollIntoView({behavior: "smooth", block: "center"});
+  }
+}
+function renderHomeProducts(products, highRisk) {
+  renderHomeScan();
+  const lastOpened = Object.values(state.activity).filter(entry => entry.openedAt > 0 && safeLink(entry.product?.link)).sort((a, b) => b.openedAt - a.openedAt)[0];
+  $("#home-continue").hidden = !lastOpened;
+  $("#home-continue").dataset.productLink = lastOpened?.product.link || "";
+  $("#home-continue-name").textContent = lastOpened?.product.name || "Your last analysis";
+  $("#home-continue").title = lastOpened?.product.name || "";
+  $("#home-recent").setAttribute("aria-busy", String(state.catalogLoading));
+  $("#home-wishlist-preview").setAttribute("aria-busy", String(state.catalogLoading));
+  if (state.catalogLoading && !products.length) {
+    $("#home-metrics").innerHTML = '<span class="home-list-caption">Loading your activity…</span>';
+    return;
+  }
+  $("#home-metrics").innerHTML = [
+    [products.length, "Saved analyses"],
+    [products.reduce((total, product) => total + reviewCount(product), 0), "Reviews analyzed"],
+    [state.wishlist.length, "In your wishlist"],
+  ].map(([value, label]) => `<article><b>${value.toLocaleString()}</b><span>${label}</span></article>`).join("");
+  const query = $("#home-recent-search").value.trim().toLowerCase();
+  const matched = products.filter(product => !query || `${product.name} ${platform(product)}`.toLowerCase().includes(query));
+  $("#home-clear-search").hidden = !query;
+  $("#home-recent-count").textContent = query ? `${matched.length} matching report${matched.length === 1 ? "" : "s"} · showing ${Math.min(4, matched.length)}` : products.length ? `Showing ${Math.min(4, products.length)} recent reports · ${products.length} saved` : "";
+  $("#home-recent").innerHTML = workspaceRows(matched.slice(0, 4),
+    query ? "No matching analyses" : state.catalogError ? "Saved reports could not be loaded" : "Your first analysis starts here",
+    query ? "Try another name or marketplace, or clear your search." : state.catalogError ? "Reload the page to try again, or start a new analysis above." : "Paste a product link above. Your completed report will appear here.");
+  const byLink = new Map(products.map(product => [product.link, product]));
+  const saved = [...state.wishlist].reverse().map(link => byLink.get(link)).filter(Boolean);
+  $("#home-wishlist-count").textContent = String(saved.length);
+  $("#home-wishlist-preview").innerHTML = saved.length ? saved.slice(0, 3).map(product => {
+    const image = safeImage(product), level = riskLevel(product);
+    return `<article class="home-saved-product"><div class="home-saved-thumb">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : '<img src="/static/assets/figma/home-report.svg" width="20" height="20" alt="">'}</div><div><button type="button" data-product-link="${esc(product.link)}">${esc(product.name || "Unnamed product")}</button><p>${esc(platform(product))}</p><span class="risk-badge ${level.toLowerCase()}">${level} risk</span></div></article>`;
+  }).join("") : '<div class="home-wishlist-empty"><span aria-hidden="true">♡</span><h3>Keep your options together</h3><p>Save a product using the heart beside its report. Your shortlist will appear here.</p></div>';
+  $("#home-risk-alert").innerHTML = highRisk.length ? `<header><div><p class="flow-eyebrow">BEFORE YOU BUY</p><h2>Worth a closer look</h2><p>High risk signals in your saved analyses.</p></div><button class="home-text-button" type="button" data-show-risk>View all ${highRisk.length} →</button></header><div class="home-risk-products">${highRisk.slice(0, 2).map(product => {
+    const concern = analysisMainIssue(product.sentiment_summary || {});
+    return `<article><span class="risk-badge high">High risk · ${(score(product) / 100).toFixed(2)}</span><h3>${esc(product.name || "Unnamed product")}</h3><p>${concern === "No dominant issue" ? "High measured risk across " + reviewCount(product) + " sampled reviews. Open the report to inspect the evidence." : "Most reported concern: " + esc(concern) + ". Check what reviewers actually said."}</p><button type="button" class="home-text-button" data-home-evidence="${esc(product.link)}">Read the evidence →</button></article>`;
+  }).join("")}</div>` : "";
+  bindProductButtons($("#home-wishlist-preview"));
+  $("#home-risk-alert").querySelectorAll("[data-home-evidence]").forEach(button => button.addEventListener("click", async () => {
+    const link = button.dataset.homeEvidence;
+    await openProduct(link);
+    if (currentView() !== "analysis" || state.currentProduct?.link !== link) return;
+    document.querySelector('[data-review-filter="risk"]')?.click();
+    const section = $("#report-evidence");
+    section?.scrollIntoView({behavior: "smooth", block: "start"});
+    section?.focus({preventScroll: true});
+  }));
+}
+function renderWorkspace() {
+  const products = workspaceProducts();
+  const highRisk = products.filter(product => riskLevel(product) === "High");
+  renderHomeProducts(products, highRisk);
+  const query = $("#history-search").value.trim().toLowerCase(), risk = $("#history-risk").value;
+  const filtered = products.filter(product => (!query || `${product.name} ${platform(product)}`.toLowerCase().includes(query)) && (risk === "all" || riskLevel(product) === risk));
+  $("#history-count").textContent = `${filtered.length} of ${products.length} saved reports`;
+  $("#history-list").innerHTML = workspaceRows(filtered, products.length ? "No reports match these filters" : "No analyses yet", products.length ? "Try another product name or select all risk levels." : "Analyze a product to start your history.");
+  $("#wishlist-list").innerHTML = workspaceRows(products.filter(product => state.wishlist.includes(product.link)), "Keep a product in mind", "Use the heart beside a saved analysis or save a product from its report. It will appear here.");
+  ["#home-recent", "#history-list", "#wishlist-list"].forEach(selector => {
+    const holder = $(selector);
+    bindProductButtons(holder);
+    holder.querySelectorAll("[data-save-link]").forEach(button => button.addEventListener("click", () => toggleWishlist(button.dataset.saveLink)));
+  });
+  $("[data-show-risk]")?.addEventListener("click", () => {
+    $("#history-search").value = "";
+    $("#history-risk").value = "High";
+    go("history");
+  });
+}
+async function routeFromHash() {
+  const [route, query = ""] = window.location.hash.slice(1).split("?");
+  const params = new URLSearchParams(query);
+  if (["about", "faq", "how"].includes(route)) {
+    go("landing", true);
+    requestAnimationFrame(() => $("#" + route)?.scrollIntoView({behavior: "smooth"}));
+    return;
+  }
+  if (route === "analysis" && params.get("product")) {
+    const from = params.get("from");
+    state.reportFrom = ["home", "history", "wishlist", "results", "analyze"].includes(from) ? from : "history";
+    if (state.currentProduct?.link !== params.get("product")) {
+      await openProduct(params.get("product"), true, true);
+      return;
+    }
+  }
+  go(route || "landing", true);
 }
 function platform(product) { return product?.platform ? (MARKETPLACES[String(product.platform).toLowerCase()] || product.platform) : "Marketplace"; }
 function productCard(product) { const level = riskLevel(product); const image = safeImage(product); const link = safeLink(product.link); return `<article class="product-card"><div class="product-image">${image ? `<img src="${esc(image)}" alt="">` : "Listing image unavailable"}</div><div class="product-card-body"><span class="platform-badge">${esc(platform(product))}</span><h3>${esc(product.name || "Unnamed product")}</h3><div class="product-price">${esc(money(product.price))}</div><div class="card-meta">★ ${esc(product.rating || "—")} · ${reviewCount(product).toLocaleString()} reviews analyzed</div><span class="risk-badge ${level.toLowerCase()}">${level} risk · ${score(product).toFixed(0)}% score</span><div class="reliability"><i style="width:${Math.min(100, Math.max(0, reliability(product)))}%"></i></div><div class="card-meta">Review reliability: ${reliability(product)}%</div><button class="card-button" data-product-link="${esc(link)}">Open report →</button></div></article>`; }
+function bindProductButtons(root = document) {
+  root.querySelectorAll("[data-product-link]").forEach(button => button.addEventListener("click", () => openProduct(button.dataset.productLink)));
+}
 function filteredProducts() { const platformFilter = $("#filter-platform")?.value || "all"; const riskFilter = $("#filter-risk")?.value || "all"; const sort = $("#filter-sort")?.value || "all"; const visible = state.products.filter(product => (platformFilter === "all" || platform(product) === platformFilter) && (riskFilter === "all" || riskLevel(product) === riskFilter)); return visible.sort((a,b) => { if (sort === "risk") return score(a)-score(b); if (sort === "reviews") return reviewCount(b)-reviewCount(a); return reliability(b)-reliability(a); }); }
-function renderResults() { const products = filteredProducts(); $("#results-summary").textContent = products.length ? `${products.length} analyzed product${products.length === 1 ? "" : "s"} shown.` : "No products match your selected filters."; $("#product-grid").innerHTML = products.map(productCard).join(""); document.querySelectorAll("[data-product-link]").forEach(button => button.addEventListener("click", () => openProduct(button.dataset.productLink))); }
-async function loadProducts() { const data = await api("/api/products"); state.products = data.products || []; state.catalogProducts = [...state.products]; const heroScore = $("#hero-score"); if (heroScore) { const first = state.products[0]; heroScore.textContent = first ? `${score(first).toFixed(0)}%` : "—"; } if ($("#search-form")) updateSearchUI(); }
+function renderResults() { const products = filteredProducts(); $("#results-summary").textContent = products.length ? `${products.length} analyzed product${products.length === 1 ? "" : "s"} shown.` : "No products match your selected filters."; $("#product-grid").innerHTML = products.map(productCard).join(""); bindProductButtons($("#product-grid")); }
+async function loadProducts() { const data = await api("/api/products"); state.products = data.products || []; state.catalogProducts = [...state.products]; state.catalogError = false; state.catalogLoading = false; cacheWorkspaceProducts(state.catalogProducts); if ($("#search-form")) updateSearchUI(); renderWorkspace(); }
 function highlightReview(review) { const analysis = review.sentiment_analysis || {}; const terms = (analysis.risk?.evidence || []).filter(item => !item.negated).map(item => item.term).filter(Boolean); let content = esc(review.content || "No written review was collected."); terms.forEach(term => { const escaped = esc(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); if (escaped) content = content.replace(new RegExp(`(${escaped})`, "ig"), "<mark>$1</mark>"); }); return content; }
-async function openProduct(link) { if (!link) return toast("This product has no listing link."); try { const data = await api(`/api/products/detail?${new URLSearchParams({link})}`); renderAnalysis(data.product, data.recommendations || []); go("analysis"); } catch (error) { toast(error.message, "error"); } }
+async function openProduct(link, replace = false, restoring = false) {
+  if (!safeLink(link)) return toast("This product has no valid listing link.", "error");
+  if (!restoring && currentView() !== "analysis") state.reportFrom = ["home", "history", "wishlist", "results", "analyze"].includes(currentView()) ? currentView() : "history";
+  if (restoring) {
+    state.currentProduct = null;
+    go("analysis", true, true);
+    $("#analysis-content").innerHTML = '<div class="flow-empty" role="status">Loading product report…</div>';
+  }
+  const originHash = window.location.hash;
+  const requestId = (state.reportRequestId || 0) + 1;
+  state.reportRequestId = requestId;
+  try {
+    const data = await api(`/api/products/detail?${new URLSearchParams({link})}`);
+    if (state.reportRequestId !== requestId || window.location.hash !== originHash) return;
+    renderAnalysis(data.product, data.recommendations || []);
+    go("analysis", replace);
+  } catch (error) {
+    toast(error.message, "error");
+    if (restoring && window.location.hash === originHash) go("history", true);
+  }
+}
+async function openSignedInPage() {
+  go("home");
+}
 function sentimentData(product) { const counts = product.sentiment_summary?.sentiment_counts || {}; return [{label:"Positive", value:Number(counts.positive || 0), color:"#12b76a"},{label:"Neutral", value:Number(counts.neutral || 0), color:"#94a3b8"},{label:"Negative", value:Number(counts.negative || 0), color:"#f04438"}]; }
 function analysisMainIssue(summary) {
-  const issues = Object.entries(summary.risk_categories || {}).sort((a, b) => Number(b[1]) - Number(a[1]));
+  const issues = Object.entries(summary.risk_categories || {}).filter(([, count]) => Number(count) > 0).sort((a, b) => Number(b[1]) - Number(a[1]));
   return issues.length ? String(issues[0][0]).replaceAll("_", " ").replace(/\b\w/g, letter => letter.toUpperCase()) : "No dominant issue";
 }
 
@@ -200,16 +464,61 @@ function issueBars(summary, reviewTotal) {
   }).join("")}</div>`;
 }
 
+const REPORT_ASSET_BASE = "/static/assets/figma/report";
+function reportIcon(file, alt = "", width = 16, height = width, className = "") {
+  return `<img${className ? ` class="${esc(className)}"` : ""} src="${REPORT_ASSET_BASE}/${esc(file)}" width="${width}" height="${height}" alt="${esc(alt)}">`;
+}
+
+function starMarkup(value) {
+  const rating = Math.max(0, Math.min(5, Number(value || 0)));
+  const stars = [1, 2, 3, 4, 5].map(position => {
+    const icon = rating >= position - .25 ? "icon-07.svg" : rating >= position - .75 ? "icon-08.svg" : "icon-02.svg";
+    return reportIcon(icon, "", 20, 20);
+  }).join("");
+  return `<span class="report-stars" role="img" aria-label="${rating.toFixed(1)} out of 5 stars">${stars}</span>`;
+}
+
+function sentimentPercentages(product) {
+  const data = sentimentData(product);
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  return data.map(item => ({...item, percent: total ? item.value / total * 100 : 0}));
+}
+
+function reportKeywords(reviews, summary) {
+  const terms = new Map();
+  reviews.forEach(review => {
+    (review.sentiment_analysis?.risk?.evidence || []).filter(item => !item.negated && item.term).forEach(item => {
+      const key = String(item.term).trim().toLowerCase();
+      if (key) terms.set(key, (terms.get(key) || 0) + 1);
+    });
+  });
+  if (!terms.size) Object.entries(summary.risk_categories || {}).forEach(([term, count]) => terms.set(String(term).replaceAll("_", " "), Number(count || 0)));
+  const ranked = [...terms.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  return ranked.length
+    ? ranked.map(([term, count]) => `<span class="report-keyword"><b>${esc(term.replace(/\b\w/g, letter => letter.toUpperCase()))}</b><small>${count} mention${count === 1 ? "" : "s"}</small></span>`).join("")
+    : '<p class="report-empty-copy">No active risk terms were detected.</p>';
+}
+
+function riskRecommendation(level) {
+  if (level === "Low") return {title: "Generally safe to buy", copy: "Review signals indicate a low likelihood of product-quality issues."};
+  if (level === "Moderate") return {title: "Buy with caution", copy: "Compare recent reviews and seller policies before purchasing."};
+  return {title: "Not recommended", copy: "Strong review signals suggest choosing a lower-risk alternative."};
+}
+
 function reviewCard(review) {
   const analysis = review.sentiment_analysis || {};
   const label = String(analysis.label || "unanalyzed").toLowerCase();
   const activeRisk = Boolean(analysis.risk?.detected);
   const stars = Math.max(0, Math.min(5, Number(review.rating || 0)));
   const meta = [review.time || review.date, review.variation].filter(Boolean).map(esc).join(" · ");
-  return `<article class="review evidence-review"><div class="review-top"><div><b>${esc(review.author || "Verified shopper")}</b><span class="review-rating" aria-label="${stars} out of 5 stars">★ ${stars || "—"}</span></div><div class="review-labels"><span class="sentiment-pill ${esc(label)}">${esc(label)}</span>${activeRisk ? '<span class="risk-badge high">Risk evidence</span>' : ""}</div></div>${meta ? `<small class="review-meta">${meta}</small>` : ""}<p>${highlightReview(review)}</p></article>`;
+  const evidence = (analysis.risk?.evidence || []).filter(item => !item.negated && item.term).slice(0, 3);
+  return `<article class="report-review-card"><div class="report-review-head"><div>${starMarkup(stars)}<small>${stars ? stars.toFixed(1) : "No rating"}</small></div><span class="sentiment-pill ${esc(label)}">${esc(label)}</span></div><p>${highlightReview(review)}</p>${evidence.length ? `<div class="report-evidence-tags">${evidence.map(item => `<span>${esc(item.term)}</span>`).join("")}</div>` : ""}<footer><b>${esc(review.author || "Verified shopper")}</b>${meta ? `<span>${meta}</span>` : ""}${activeRisk ? '<span class="report-risk-evidence">Risk evidence</span>' : ""}</footer></article>`;
 }
 
 function renderAnalysis(product, recommendations) {
+  state.currentProduct = product;
+  rememberProduct(product);
+  syncReportSave();
   const summary = product.sentiment_summary || {};
   const allReviews = Array.isArray(product.comments) ? product.comments.filter(item => item && typeof item === "object") : [];
   const reviews = allReviews.filter(item => !item.is_duplicate);
@@ -228,24 +537,62 @@ function renderAnalysis(product, recommendations) {
   const mainIssue = analysisMainIssue(summary);
   const image = safeImage(product);
   const link = safeLink(product.link);
-  const saferRecommendations = recommendations.filter(item => score(item) < productRisk);
+  const customerRating = Math.max(0, Math.min(5, Number(product.rating || 0)));
+  const adjustedRating = Math.max(0, Math.min(5, Number(product.adjusted_rating ?? product.authenticity_adjusted_rating ?? product.rating ?? 0)));
+  const sentiment = sentimentPercentages(product);
+  const positive = sentiment.find(item => item.label === "Positive") || {value: 0, percent: 0};
+  const neutral = sentiment.find(item => item.label === "Neutral") || {value: 0, percent: 0};
+  const negative = sentiment.find(item => item.label === "Negative") || {value: 0, percent: 0};
+  const saferRecommendations = recommendations.slice(0, 3);
   const recommendationMarkup = saferRecommendations.length
-    ? `<div class="recommendation-list analysis-recommendations">${saferRecommendations.map(item => {
+    ? `<div class="report-alternative-grid">${saferRecommendations.map(item => {
         const itemLevel = riskLevel(item);
         const itemImage = safeImage(item);
-        return `<article class="recommendation comparison-card"><div class="recommendation-image">${itemImage ? `<img src="${esc(itemImage)}" alt="">` : "No image"}</div><div><span class="risk-badge ${itemLevel.toLowerCase()}">${itemLevel} · ${score(item).toFixed(0)}% risk</span><b>${esc(item.name || "Unnamed product")}</b><small>${esc(money(item.price))} · ${reliability(item).toFixed(0)}% reliability · ${reviewCount(item).toLocaleString()} reviews</small><button class="table-action recommendation-open" data-product-link="${esc(safeLink(item.link))}">View comparison</button></div></article>`;
+        const itemSentiment = sentimentPercentages(item).find(entry => entry.label === "Positive")?.percent || Math.max(0, 100 - score(item));
+        const isSafer = score(item) < productRisk;
+        const statusIcon = isSafer ? "icon-14.svg" : "icon-13.svg";
+        const statusLabel = isSafer ? "Recommended" : "Consider";
+        return `<article class="report-alternative"><header><div class="report-alt-image">${itemImage ? `<img src="${esc(itemImage)}" width="64" height="64" alt="">` : '<span>No image</span>'}</div><div><h4>${esc(item.name || "Unnamed product")}</h4><div class="report-alt-rating">${starMarkup(item.rating)}<span>${Number(item.rating || 0).toFixed(1)}</span></div></div></header><dl><div><dt>Positive</dt><dd>${itemSentiment.toFixed(0)}%</dd></div><div><dt>Risk</dt><dd>${score(item).toFixed(0)}%</dd></div><div><dt>Reliability</dt><dd>${reliability(item).toFixed(0)}%</dd></div></dl><button class="recommendation-open report-alt-action" data-product-link="${esc(safeLink(item.link))}">${reportIcon(statusIcon, "", 14, 14)}${statusLabel}<span>View report →</span></button></article>`;
       }).join("")}</div>`
-    : '<p class="analysis-empty">No sufficiently similar product with a lower measured risk is available in the analyzed collection.</p>';
-  const integrityTotal = uniqueCount + duplicateCount;
-  const uniqueWidth = integrityTotal ? uniqueCount / integrityTotal * 100 : 0;
-  const duplicateWidth = integrityTotal ? duplicateCount / integrityTotal * 100 : 0;
+    : '<p class="report-empty-copy">No sufficiently similar product with a lower measured risk is available in the analyzed collection.</p>';
+  const defaultReviewFilter = negativeCount ? "negative" : "all";
+  const brand = product.brand || product.seller || "Not specified";
+  const category = product.category || "Not specified";
+  const date = reportDate(product);
+  const formattedDate = date?.label || "Unavailable";
+  const findings = [
+    {title: "Risk signals", value: uniqueCount ? `${riskReviewCount} of ${uniqueCount} reviews` : "No review sample", copy: uniqueCount ? "Contain recorded product-risk signals." : "There are no sampled reviews to assess."},
+    {title: "Most reported concern", value: mainIssue === "No dominant issue" ? "None recorded" : mainIssue, copy: mainIssue === "No dominant issue" ? "No leading concern is recorded in this sample." : "The most frequent issue in the analyzed sample."},
+    {title: "Negative experiences", value: uniqueCount ? `${negativeCount} of ${uniqueCount} reviews` : "Not available", copy: uniqueCount ? "Were classified as negative. Read the context below." : "Sentiment needs a usable review sample."},
+  ];
+  $("#analysis-content").innerHTML = `<section class="report-card report-overview">
+    <div class="report-overview-product"><div class="report-product-image">${image ? `<img src="${esc(image)}" width="112" height="112" alt="">` : '<span>Listing image unavailable</span>'}</div><div><p class="report-overview-meta"><span>${esc(platform(product))}</span><span>${esc(money(product.price))}</span></p><h1>${esc(product.name || "Unnamed product")}</h1><p class="report-sample-note">${uniqueCount.toLocaleString()} reviews analyzed <span aria-hidden="true">·</span> ${date ? `<time datetime="${esc(date.iso)}">${esc(date.label)}</time>` : "Analysis date unavailable"}</p></div></div>
+    <div class="report-verdict ${uniqueCount ? riskClass : "unknown"}"><span class="report-verdict-label">${uniqueCount ? productRiskLevel + " risk" : "Insufficient review data"}</span><strong>${uniqueCount ? (productRisk / 100).toFixed(2) : "—"}<small>${uniqueCount ? "/ 1.00" : ""}</small></strong><p>${uniqueCount ? "Lower is better. Based on the sampled reviews." : "Analyze reviews before making a risk assessment."}</p></div>
+    <div class="report-overview-bottom"><p>Review signals are a guide, not proof of authenticity.</p><div><button type="button" data-report-jump="report-evidence">Read the evidence ↓</button><button type="button" data-report-jump="report-details">How is this calculated?</button></div></div>
+  </section>
+  <section class="report-findings" aria-labelledby="report-findings-title"><header><span class="report-eyebrow">AT A GLANCE</span><h2 id="report-findings-title">Three things to know</h2></header><div>${findings.map((finding, index) => `<article><span class="report-finding-index">0${index + 1}</span><h3>${esc(finding.title)}</h3><strong>${esc(finding.value)}</strong><p>${esc(finding.copy)}</p></article>`).join("")}</div></section>
+  <section id="report-evidence" class="report-card report-evidence-panel" tabindex="-1"><header class="report-section-head"><div><span class="report-eyebrow">Review evidence</span><h2>Top Negative Reviews</h2><p>Risk terms are highlighted only when the model recorded active evidence.</p></div><span id="review-result-count" class="report-result-count"></span></header><div class="report-tools"><div class="review-filter-chips" role="group" aria-label="Filter reviews"><button class="${defaultReviewFilter === "all" ? "active" : ""}" data-review-filter="all">All</button><button data-review-filter="risk">Risk evidence</button><button class="${defaultReviewFilter === "negative" ? "active" : ""}" data-review-filter="negative">Negative</button><button data-review-filter="neutral">Neutral</button><button data-review-filter="positive">Positive</button></div><div class="review-search-row"><label>Search reviews<input id="review-search" type="search" placeholder="Keyword or reviewer"></label><label>Rating<select id="review-rating"><option value="all">All ratings</option><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></label></div></div><div id="analysis-review-list" class="report-review-grid"></div><button id="show-more-reviews" class="report-show-more" type="button">${reportIcon("icon-05.svg", "", 16, 16)}View more reviews</button></section>
 
-  $("#analysis-content").innerHTML = `<div class="analysis-header analysis-summary-header"><div class="product-image">${image ? `<img src="${esc(image)}" alt="">` : "Listing image unavailable"}</div><div class="analysis-product-copy"><span class="platform-badge">${esc(platform(product))}</span><h2>${esc(product.name || "Unnamed product")}</h2><p>${esc(money(product.price))} · ★ ${esc(product.rating || "—")} · ${uniqueCount.toLocaleString()} sampled reviews</p>${link ? `<a class="text-link" target="_blank" rel="noreferrer" href="${esc(link)}">View original listing ↗</a>` : ""}</div><div class="analysis-score-card"><div class="score-pair"><div><span>Risk score</span><strong class="${riskClass}">${productRisk.toFixed(0)}%</strong><small>Lower is better</small></div><div><span>Reliability</span><strong>${productReliability.toFixed(0)}%</strong><small>Higher is better</small></div></div><div class="risk-meter" role="img" aria-label="${productRisk.toFixed(0)} percent risk, ${productRiskLevel}"><div><span class="low"></span><span class="moderate"></span><span class="high"></span><i style="left:calc(${Math.min(100, Math.max(0, productRisk))}% - 6px)"></i></div><small><span>Low</span><span>Moderate</span><span>High</span></small></div></div></div><div class="analysis-kpis"><article><span>Reviews analyzed</span><b>${uniqueCount.toLocaleString()}</b><small>Unique sample</small></article><article><span>Reviews with risk signals</span><b>${riskReviewCount.toLocaleString()}</b><small>${(riskReviewRate * 100).toFixed(0)}% of sample</small></article><article><span>Main reported issue</span><b>${esc(mainIssue)}</b><small>Most frequent risk category</small></article><article><span>Duplicates excluded</span><b>${duplicateCount.toLocaleString()}</b><small>Not used in scoring</small></article></div><div class="analysis-grid insight-grid"><section class="panel"><h3>Why this score?</h3><p class="panel-subtitle">The weighted score uses unique reviews: 30% negative sentiment and 70% active product-risk signals.</p><div class="contribution-list"><div class="contribution-row"><div><span>Negative-review rate</span><b>${negativeCount}/${uniqueCount} · ${(negativeRate * 100).toFixed(1)}%</b></div><div class="contribution-track"><i class="negative" style="width:${negativeRate * 100}%"></i></div><small>Contributes ${negativePoints.toFixed(1)} points</small></div><div class="contribution-row"><div><span>Reviews containing risk signals</span><b>${riskReviewCount}/${uniqueCount} · ${(riskReviewRate * 100).toFixed(1)}%</b></div><div class="contribution-track"><i class="risk" style="width:${riskReviewRate * 100}%"></i></div><small>Contributes ${riskPoints.toFixed(1)} points</small></div></div><div class="score-formula"><span>Final weighted risk</span><b>${productRisk.toFixed(1)}%</b></div></section><section class="panel"><h3>Sentiment distribution</h3><p class="panel-subtitle">Review counts and percentages after duplicate exclusion.</p>${sentimentStack(product)}</section></div><div class="analysis-grid secondary-insights"><section class="panel"><h3>Top reported issues</h3><p class="panel-subtitle">Risk categories found in the sampled reviews.</p>${issueBars(summary, uniqueCount)}</section><section class="panel"><h3>Review integrity</h3><p class="panel-subtitle">Duplicate reviews are shown separately and excluded from analysis.</p><div class="integrity-stack" role="img" aria-label="${uniqueCount} unique and ${duplicateCount} duplicate reviews"><span class="unique" style="width:${uniqueWidth}%"></span><span class="duplicate" style="width:${duplicateWidth}%"></span></div><div class="integrity-legend"><div><i class="unique"></i><span>Unique reviews</span><b>${uniqueCount}</b></div><div><i class="duplicate"></i><span>Duplicates excluded</span><b>${duplicateCount}</b></div></div></section></div><section class="panel recommendations analysis-recommendation-panel"><div class="section-heading"><div><h3>Lower-risk alternatives</h3><p>Similar analyzed products with a lower risk score than this listing.</p></div></div>${recommendationMarkup}</section><section class="panel evidence-panel"><div class="section-heading"><div><h3>Review evidence</h3><p>Risk terms are highlighted only when the model recorded active evidence.</p></div><span id="review-result-count" class="result-count"></span></div><div class="review-tools"><div class="review-filter-chips" role="group" aria-label="Filter reviews"><button class="active" data-review-filter="all">All</button><button data-review-filter="risk">Risk evidence</button><button data-review-filter="negative">Negative</button><button data-review-filter="neutral">Neutral</button><button data-review-filter="positive">Positive</button></div><div class="review-search-row"><label>Search reviews<input id="review-search" type="search" placeholder="Keyword or reviewer"></label><label>Rating<select id="review-rating"><option value="all">All ratings</option><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></label></div></div><div id="analysis-review-list" class="review-list"></div><button id="show-more-reviews" class="secondary-button show-more" type="button">Show more reviews</button></section><p class="analysis-disclaimer">This report analyzes a sample of public reviews. It supports shopping decisions but does not prove that a listing or product is authentic or counterfeit.</p>`;
+  <details id="report-details" class="report-details"><summary><span><b>Score details &amp; methodology</b><small>Ratings, review breakdown, and how the score is calculated</small></span><span class="report-details-chevron" aria-hidden="true">＋</span></summary><div class="report-details-body">
+    <section class="report-card report-listing-details"><header><h2>Listing details</h2></header><dl class="report-product-meta"><div><dt>Brand</dt><dd>${esc(brand)}</dd></div><div><dt>Category</dt><dd>${esc(category)}</dd></div></dl><div class="report-ratings"><article><span>Customer rating</span><div>${starMarkup(customerRating)}<b>${customerRating ? customerRating.toFixed(1) : "—"}</b></div><small>From ${uniqueCount.toLocaleString()} sampled reviews</small></article><article><span>Adjusted rating</span><div>${starMarkup(adjustedRating)}<b>${adjustedRating ? adjustedRating.toFixed(1) : "—"}</b></div><small>After review-risk adjustment</small></article></div>${link ? `<a class="report-listing-link" target="_blank" rel="noreferrer" href="${esc(link)}">View original listing ↗</a>` : ""}</section>
+  <section class="report-card report-classification"><div><span class="report-eyebrow">Risk classification</span><h2>${productRiskLevel} risk detected</h2><p>Defaketive measured a <b>${productRisk.toFixed(1)}% weighted risk score</b> across ${uniqueCount.toLocaleString()} unique reviews. ${mainIssue === "No dominant issue" ? "No dominant issue was recorded." : esc(mainIssue) + " is the most frequent reported issue."}</p><div class="report-key-stats"><span>${reportIcon("icon-09.svg", "", 14, 14)} ${riskReviewCount} reviews containing risk signals</span><span>${reportIcon("icon-11.svg", "", 14, 14)} ${duplicateCount} Duplicates excluded</span></div></div><div class="report-thresholds"><table><thead><tr><th>Score</th><th>Classification</th><th>Guidance</th></tr></thead><tbody><tr class="${productRiskLevel === "Low" ? "active" : ""}"><td>0.00–0.30</td><td><span class="low">Low risk</span></td><td>Fewer measured risk signals</td></tr><tr class="${productRiskLevel === "Moderate" ? "active" : ""}"><td>0.31–0.60</td><td><span class="moderate">Moderate risk</span></td><td>Review with caution</td></tr><tr class="${productRiskLevel === "High" ? "active" : ""}"><td>0.61–1.00</td><td><span class="high">High risk</span></td><td>Consider alternatives</td></tr></tbody></table><div class="report-model-note"><b>How the score is calculated</b><span>30% negative sentiment + 70% active product-risk signals. Higher is better applies to the separate ${productReliability.toFixed(0)}% reliability score.</span></div></div></section>
+  <section class="report-card report-breakdown"><header><span class="report-eyebrow">Analysis breakdown</span><h2>Review Analysis Summary</h2><p>Signals from unique reviews after duplicate exclusion.</p></header><div class="report-breakdown-grid"><article><h3>Sentiment distribution</h3><div class="report-donut-row"><div class="report-donut" style="--positive-stop:${positive.percent}%;--neutral-stop:${positive.percent + neutral.percent}%">${reportIcon("icon-04.svg", "", 120, 120, "report-donut-art")}<span><b>${uniqueCount}</b><small>reviews</small></span></div><div class="report-sentiment-legend">${sentiment.map(item => `<p class="${item.label.toLowerCase()}"><i></i><span>${item.label}</span><b>${item.percent.toFixed(0)}%</b><small>${item.value}</small></p>`).join("")}</div></div></article><article><h3>Risk score breakdown</h3><div class="report-score-lines"><p><span>Negative-review rate</span><b>${(negativeRate * 100).toFixed(1)}%</b><i><em style="width:${negativeRate * 100}%"></em></i><small>Contributes ${negativePoints.toFixed(1)} points</small></p><p><span>Reviews containing risk signals</span><b>${(riskReviewRate * 100).toFixed(1)}%</b><i><em style="width:${riskReviewRate * 100}%"></em></i><small>Contributes ${riskPoints.toFixed(1)} points</small></p></div><footer><span>Final weighted risk</span><b>${productRisk.toFixed(1)}%</b></footer></article><article><h3>Detected keywords</h3><div class="report-keywords">${reportKeywords(reviews, summary)}</div><small class="report-card-note">Top reported issues from active, non-negated evidence.</small></article><article><h3>Aspects analyzed</h3><div class="report-aspects"><p>${reportIcon("icon-09.svg", "", 14, 14)}<span><b>Durability</b><small>Breakage and wear</small></span></p><p>${reportIcon("icon-10.svg", "", 14, 14)}<span><b>Quality</b><small>Materials and finish</small></span></p><p>${reportIcon("icon-11.svg", "", 14, 14)}<span><b>Performance</b><small>Function and reliability</small></span></p><p>${reportIcon("icon-14.svg", "", 14, 14)}<span><b>Overall</b><small>Sentiment and value</small></span></p></div></article></div></section>
+  </div></details>
+  <section class="report-card report-alternatives"><header class="report-section-head"><div><span class="report-eyebrow">Safer choices</span><h2>Recommended Alternatives</h2><p>Similar analyzed products with a lower measured risk score.</p></div></header>${recommendationMarkup}</section><p class="analysis-disclaimer report-disclaimer">This report analyzes a sample of public reviews. It supports shopping decisions but does not prove that a listing or product is authentic or counterfeit.</p>`;
 
+  document.querySelectorAll("[data-report-jump]").forEach(button => button.addEventListener("click", () => {
+    const section = document.getElementById(button.dataset.reportJump);
+    if (!section) return;
+    if (section.tagName === "DETAILS") section.open = true;
+    section.scrollIntoView({behavior: "smooth", block: "start"});
+    (section.querySelector("summary") || section).focus({preventScroll: true});
+  }));
+  const dateNode = $("#report-analysis-date");
+  if (dateNode) dateNode.textContent = `Analysis date: ${formattedDate}`;
   document.querySelectorAll(".recommendation-open").forEach(button => button.addEventListener("click", () => openProduct(button.dataset.productLink)));
 
-  let activeFilter = "all";
-  let visibleLimit = 10;
+  let activeFilter = defaultReviewFilter;
+  let visibleLimit = 3;
   const drawReviews = () => {
     const query = $("#review-search").value.trim().toLowerCase();
     const rating = $("#review-rating").value;
@@ -259,22 +606,23 @@ function renderAnalysis(product, recommendations) {
     });
     const visible = filtered.slice(0, visibleLimit);
     $("#review-result-count").textContent = `${filtered.length} review${filtered.length === 1 ? "" : "s"}`;
-    $("#analysis-review-list").innerHTML = visible.length ? visible.map(reviewCard).join("") : '<p class="analysis-empty">No reviews match these filters.</p>';
+    $("#analysis-review-list").innerHTML = visible.length ? visible.map(reviewCard).join("") : '<p class="report-empty-copy">No reviews match these filters.</p>';
     const showMore = $("#show-more-reviews");
     showMore.hidden = visible.length >= filtered.length;
-    showMore.textContent = `Show more reviews (${filtered.length - visible.length} remaining)`;
+    showMore.innerHTML = `${reportIcon("icon-05.svg", "", 16, 16)}View more reviews (${filtered.length - visible.length})`;
   };
   document.querySelectorAll("[data-review-filter]").forEach(button => button.addEventListener("click", () => {
     activeFilter = button.dataset.reviewFilter;
-    visibleLimit = 10;
+    visibleLimit = 3;
     document.querySelectorAll("[data-review-filter]").forEach(item => item.classList.toggle("active", item === button));
     drawReviews();
   }));
-  $("#review-search").addEventListener("input", () => { visibleLimit = 10; drawReviews(); });
-  $("#review-rating").addEventListener("change", () => { visibleLimit = 10; drawReviews(); });
-  $("#show-more-reviews").addEventListener("click", () => { visibleLimit += 10; drawReviews(); });
+  $("#review-search").addEventListener("input", () => { visibleLimit = 3; drawReviews(); });
+  $("#review-rating").addEventListener("change", () => { visibleLimit = 3; drawReviews(); });
+  $("#show-more-reviews").addEventListener("click", () => { visibleLimit += 6; drawReviews(); });
   drawReviews();
 }
+
 async function search(event) {
   event.preventDefault();
   if (state.searchBusy) return;
@@ -288,6 +636,10 @@ async function search(event) {
   const intent = event.submitter?.dataset.searchIntent || $("#search-submit").dataset.searchIntent || "saved";
   const live = intent === "live";
   clearSearchFeedback();
+  if (!live && context.platform) {
+    const saved = workspaceProducts().find(product => productLinkIdentity(product.link) === productLinkIdentity(query));
+    if (saved) return openProduct(saved.link);
+  }
   setSearchBusy(true);
   let jobStarted = false;
   try {
@@ -305,6 +657,7 @@ async function search(event) {
     if (data.job) {
       jobStarted = true;
       state.activeJobId = data.job.id;
+      try { sessionStorage.setItem("defaketive-active-job", JSON.stringify(data.job)); } catch (_) {}
       pollJob(data.job.id, data.job);
     } else {
       state.products = data.products || [];
@@ -312,7 +665,8 @@ async function search(event) {
         showSearchFeedback("No saved analysis matched this search. Choose Collect fresh reviews to scan the marketplace, or try another name.", "No saved match", "warning");
         return;
       }
-      go("results");
+      if (context.isUrl && state.products.length === 1) await openProduct(state.products[0].link);
+      else go("results");
     }
   } catch (error) {
     showSearchFeedback(error.message);
@@ -320,112 +674,137 @@ async function search(event) {
     if (!jobStarted) setSearchBusy(false);
   }
 }
-async function pollJob(id, initialJob = {}) { const panel = $("#job-panel"); panel.hidden = false; $("#job-title").textContent = initialJob.platform ? `${MARKETPLACES[initialJob.platform] || initialJob.platform} live scan` : "Live analysis running"; $("#job-message").textContent = initialJob.message || "Opening the marketplace and preparing collection…"; setJobStage(Number(initialJob.stage || 1), initialJob.progress); startJobClock(initialJob.created_at); async function tick() { try { const job = await api(`/api/jobs/${id}`); $("#job-message").textContent = job.message; setJobStage(Number(job.stage || 1), job.progress); if (job.state === "complete") { panel.hidden = true; finishJob(); await loadProducts(); toast(job.message); go("results"); return; } if (job.state === "error") { panel.hidden = true; finishJob(); showSearchFeedback(job.message, "Live scan stopped"); toast("Live scan stopped. See the message near the search form.", "error"); return; } setTimeout(tick, 2500); } catch (error) { panel.hidden = true; finishJob(); showSearchFeedback(error.message, "Could not read scan progress"); toast("Scan progress could not be updated.", "error"); } } tick(); }
-async function uploadDataset(event) { const file = event.target.files[0]; if (!file) return; const body = new FormData(); body.append("file", file); try { const data = await api("/api/upload", {method:"POST",body}); state.products = data.products || []; state.catalogProducts = [...state.products]; updateSearchUI(); toast(`${data.count} product${data.count === 1 ? "" : "s"} imported and analyzed.`); go("results"); } catch (error) { toast(error.message, "error"); } finally { event.target.value = ""; } }
-function table(rows, columns) { if (!rows.length) return "<p class=\"muted\" style=\"padding:15px\">No data available.</p>"; return `<div class="table-wrap"><table class="data-table"><thead><tr>${columns.map(column => `<th>${esc(column)}</th>`).join("")}</tr></thead><tbody>${rows.map(row => `<tr>${columns.map(column => `<td>${esc(row[column] ?? "—")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`; }
-function dashboardRiskDistribution(distribution) {
-  const levels = [
-    {label: "Low", className: "low"},
-    {label: "Moderate", className: "moderate"},
-    {label: "High", className: "high"},
-  ];
-  const total = levels.reduce((sum, level) => sum + Number(distribution[level.label] || 0), 0);
-  if (!total) return '<p class="dashboard-empty">Analyze a product to see an overview of its risk level.</p>';
-  const segments = levels.map(level => {
-    const count = Number(distribution[level.label] || 0);
-    const percentage = count / total * 100;
-    return `<span class="risk-segment ${level.className}" style="width:${percentage}%" title="${level.label}: ${count} product${count === 1 ? "" : "s"}" aria-label="${level.label}: ${count} products"></span>`;
-  }).join("");
-  const legend = levels.map(level => {
-    const count = Number(distribution[level.label] || 0);
-    const percentage = Math.round(count / total * 100);
-    return `<div><i class="${level.className}"></i><span>${level.label}</span><b>${count}</b><small>${percentage}%</small></div>`;
-  }).join("");
-  return `<div class="risk-stack" role="img" aria-label="Risk levels for ${total} analyzed products">${segments}</div><div class="risk-legend">${legend}</div>`;
-}
-
-function dashboardProductTable(rows, compact = false) {
-  if (!rows.length) return '<p class="dashboard-empty">No saved reports match your search or filter.</p>';
-  const head = compact
-    ? "<th>Product</th><th>Main concern</th><th>Reviews analyzed</th><th>Risk level</th><th><span class=\"sr-only\">Action</span></th>"
-    : "<th>Product</th><th>Marketplace</th><th>Reviews analyzed</th><th>Review reliability</th><th>Risk level</th><th><span class=\"sr-only\">Action</span></th>";
-  const body = rows.map(row => {
-    const name = String(row.Product || "Unnamed product");
-    const image = safeLink(row.Image);
-    const link = safeLink(row.Link);
-    const level = String(row["Risk level"] || "Low");
-    const levelClass = level.toLowerCase();
-    const reliabilityValue = Number(row["Reliability score"] || 0);
-    const reliabilityWidth = Math.min(100, Math.max(0, reliabilityValue));
-    const product = `<div class="dashboard-product"><div class="dashboard-thumb">${image ? `<img src="${esc(image)}" alt="">` : `<span>${esc(name.charAt(0).toUpperCase())}</span>`}</div><div><b title="${esc(name)}">${esc(name)}</b><small>${esc(row.Price || "Price unavailable")}</small></div></div>`;
-    const details = compact
-      ? `<td><span class="issue-label">${esc(row["Main issue"] || "No common concern")}</span></td><td>${Number(row.Reviews || 0).toLocaleString()}</td>`
-      : `<td>${esc(row.Platform || "Marketplace")}</td><td>${Number(row.Reviews || 0).toLocaleString()}</td><td><div class="table-reliability"><span><i style="width:${reliabilityWidth}%"></i></span><b>${reliabilityValue.toFixed(0)}%</b></div></td>`;
-    const action = link ? `<button class="table-action" data-dashboard-product-link="${esc(link)}">Open report</button>` : '<span class="muted">No report</span>';
-    return `<tr><td>${product}</td>${details}<td><span class="risk-badge ${esc(levelClass)}">${esc(level)} · ${Number(row["Risk score"] || 0).toFixed(0)}%</span></td><td>${action}</td></tr>`;
-  }).join("");
-  return `<div class="table-wrap dashboard-table-wrap"><table class="data-table dashboard-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
-}
-
-function bindDashboardProductLinks(holder) {
-  holder.querySelectorAll("[data-dashboard-product-link]").forEach(button => {
-    button.addEventListener("click", () => openProduct(button.dataset.dashboardProductLink));
-  });
-}
-
-function renderAnalyzedProducts(holder, rows) {
-  state.adminProducts = rows;
-  holder.innerHTML = `<section class="dashboard-section"><div class="section-heading"><div><h3>All analyzed products</h3><p>Find and reopen a saved product report.</p></div><span id="analyzed-count" class="result-count"></span></div><div class="dashboard-filters"><label>Find a product<input id="dashboard-search" type="search" placeholder="Enter a product or marketplace"></label><label>Risk level<select id="dashboard-risk"><option value="all">All risk levels</option><option>Low</option><option>Moderate</option><option>High</option></select></label></div><div id="dashboard-products"></div></section>`;
-  const draw = () => {
-    const query = $("#dashboard-search").value.trim().toLowerCase();
-    const risk = $("#dashboard-risk").value;
-    const visible = state.adminProducts.filter(row => {
-      const matchesQuery = !query || `${row.Product || ""} ${row.Platform || ""}`.toLowerCase().includes(query);
-      const matchesRisk = risk === "all" || row["Risk level"] === risk;
-      return matchesQuery && matchesRisk;
-    });
-    $("#analyzed-count").textContent = `${visible.length} saved report${visible.length === 1 ? "" : "s"}`;
-    $("#dashboard-products").innerHTML = dashboardProductTable(visible);
-    bindDashboardProductLinks(holder);
-  };
-  $("#dashboard-search").addEventListener("input", draw);
-  $("#dashboard-risk").addEventListener("change", draw);
-  draw();
-}
-
-async function renderAdmin() {
-  const holder = $("#admin-content");
-  holder.innerHTML = '<div class="dashboard-loading"><div class="spinner"></div><span>Updating your insights…</span></div>';
-  try {
-    if (state.admin === "database") {
-      const data = await api("/api/admin/database");
-      renderAnalyzedProducts(holder, data.products || []);
-      return;
+async function pollJob(id, initialJob = {}) {
+  const panel = $("#job-panel");
+  const pollToken = (state.pollToken || 0) + 1;
+  state.pollToken = pollToken;
+  state.activeJobId = id;
+  setSearchBusy(true);
+  panel.hidden = false;
+  const initial = {...initialJob, id, state: "running"};
+  persistHomeScan(initial);
+  $("#job-title").textContent = initialJob.platform ? `${MARKETPLACES[initialJob.platform] || initialJob.platform} live scan` : "Live analysis running";
+  $("#job-message").textContent = initialJob.message || "Opening the marketplace and preparing collection…";
+  setJobStage(Number(initialJob.stage || 1), initialJob.progress);
+  startJobClock(initialJob.created_at);
+  async function tick() {
+    try {
+      const update = await api(`/api/jobs/${id}`);
+      if (state.pollToken !== pollToken) return;
+      const job = {...initial, ...update, id};
+      $("#job-message").textContent = job.message || "Analysis in progress…";
+      setJobStage(Number(job.stage || 1), job.progress);
+      if (job.state === "complete") {
+        panel.hidden = true;
+        finishJob();
+        // Keep the terminal result even if refreshing the catalog temporarily fails.
+        let loaded = false;
+        try { await loadProducts(); loaded = true; }
+        catch (_) { toast("The scan finished, but saved results could not be refreshed. Reopen Home to try again.", "warning"); }
+        if (state.pollToken !== pollToken) return;
+        const directLink = queryContext(job.query).isUrl;
+        const product = directLink && loaded ? state.products.find(item => productLinkIdentity(item.link) === productLinkIdentity(job.query)) || (state.products.length === 1 ? state.products[0] : null) : null;
+        persistHomeScan({...job, productLink: product?.link || (directLink ? safeLink(job.query) : ""), resultLinks: loaded ? state.products.map(item => item.link).filter(safeLink) : [], resultsPending: !loaded});
+        toast("Your report is ready.");
+        // A visitor who stayed on the analysis screen continues straight to the report.
+        // Other workspace pages keep their place and expose the completed scan card.
+        if (currentView() === "analyze" && loaded) {
+          if (product) await openProduct(product.link);
+          else go("results");
+        }
+        return;
+      }
+      if (job.state === "error") {
+        panel.hidden = true;
+        finishJob();
+        persistHomeScan(job);
+        showSearchFeedback(job.message || "The marketplace couldn't complete this scan.", "Live scan stopped");
+        $("#active-scan-link").hidden = false;
+        $("#active-scan-link").textContent = "Scan needs attention →";
+        return;
+      }
+      persistHomeScan(job);
+      setTimeout(tick, 2500);
+    } catch (error) {
+      if (state.pollToken !== pollToken) return;
+      persistHomeScan({...state.homeScan, state: "attention", message: error.message});
+      showSearchFeedback(error.message, "Could not read scan progress");
+      $("#active-scan-link").hidden = false;
+      $("#active-scan-link").textContent = "Check scan progress →";
     }
-
-    state.admin = "overview";
-    const data = await api("/api/admin/overview");
-    const fallbackProducts = state.products || [];
-    const summary = data.summary || {
-      products: fallbackProducts.length || Number(data.catalog_count || 0),
-      reviews: fallbackProducts.reduce((total, product) => total + reviewCount(product), 0),
-      average_reliability: fallbackProducts.length
-        ? fallbackProducts.reduce((total, product) => total + reliability(product), 0) / fallbackProducts.length
-        : 0,
-      high_risk: Number(data.risk_distribution?.High || 0),
-      marketplaces: new Set(fallbackProducts.map(platform).filter(Boolean)).size,
-    };
-    holder.innerHTML = `<div class="metrics dashboard-metrics"><article class="metric"><small>Products checked</small><strong>${Number(summary.products || 0).toLocaleString()}</strong><span>Saved product reports</span></article><article class="metric"><small>Reviews analyzed</small><strong>${Number(summary.reviews || 0).toLocaleString()}</strong><span>Across all saved reports</span></article><article class="metric"><small>Average review reliability</small><strong>${Number(summary.average_reliability || 0).toFixed(0)}%</strong><span>Higher is better</span></article><article class="metric" data-tone="danger"><small>Products to review carefully</small><strong>${Number(summary.high_risk || 0).toLocaleString()}</strong><span>Rated high risk</span></article><article class="metric"><small>Marketplaces included</small><strong>${Number(summary.marketplaces || 0).toLocaleString()}</strong><span>Shopee, Lazada, or Temu</span></article></div><div class="dashboard-grid"><section class="panel dashboard-section"><div class="section-heading"><div><h3>Product risk levels</h3><p>See how analyzed products are grouped from low to high risk.</p></div></div>${dashboardRiskDistribution(data.risk_distribution || {})}</section><section class="panel dashboard-section high-risk-section"><div class="section-heading"><div><h3>Products to review carefully</h3><p>These products have the highest risk scores in your saved reports.</p></div></div>${data.flagged?.length ? dashboardProductTable(data.flagged, true) : '<div class="dashboard-empty dashboard-empty-success"><span>✓</span><div><b>No high-risk products right now</b><p>None of the analyzed products are currently rated high risk.</p></div></div>'}</section></div>`;
-    bindDashboardProductLinks(holder);
-  } catch (error) {
-    holder.innerHTML = `<p class="notice">${esc(error.message)}</p>`;
   }
+  return tick();
 }
+async function uploadDataset(event) { const file = event.target.files[0]; if (!file) return; const body = new FormData(); body.append("file", file); try { const data = await api("/api/upload", {method:"POST",body}); state.products = data.products || []; state.catalogProducts = [...state.products]; cacheWorkspaceProducts(state.catalogProducts); updateSearchUI(); toast(`${data.count} product${data.count === 1 ? "" : "s"} imported and analyzed.`); go("results"); } catch (error) { toast(error.message, "error"); } finally { event.target.value = ""; } }
 function setup() {
+  WORKSPACE_ROUTES.forEach(route => $("#workspace-pages").append($("#" + route)));
+  const activity = readWorkspaceStorage("defaketive-activity", {});
+  state.activity = activity && typeof activity === "object" && !Array.isArray(activity)
+    ? Object.fromEntries(Object.entries(activity).filter(([link, entry]) => safeLink(link) && entry?.product?.link === link && Number.isFinite(entry.openedAt))) : {};
+  const wishlist = readWorkspaceStorage("defaketive-wishlist", []);
+  state.wishlist = Array.isArray(wishlist) ? [...new Set(wishlist.filter(link => safeLink(link)))] : [];
+  document.querySelectorAll("[data-start-analysis]").forEach(form => form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!state.searchBusy) $("#search-query").value = form.querySelector("input").value.trim();
+    go("analyze");
+    updateSearchUI(true);
+    focusProductSearch();
+  }));
+  try {
+    const scan = JSON.parse(sessionStorage.getItem("defaketive-home-scan") || "null");
+    if (scan && typeof scan === "object" && ["running", "complete", "error", "attention"].includes(scan.state)) state.homeScan = scan;
+  } catch (_) {}
+  $("#home-continue").addEventListener("click", () => openProduct($("#home-continue").dataset.productLink));
+  $("#home-scan-action").addEventListener("click", openHomeScan);
+  $("#home-recent-search").addEventListener("input", renderWorkspace);
+  $("#home-clear-search").addEventListener("click", () => {
+    $("#home-recent-search").value = "";
+    renderWorkspace();
+    $("#home-recent-search").focus();
+  });
+  $("#history-search").addEventListener("input", renderWorkspace);
+  $("#history-risk").addEventListener("change", renderWorkspace);
+  $("#report-back").addEventListener("click", () => go(state.reportFrom));
+  $("#report-save").addEventListener("click", () => toggleWishlist(state.currentProduct?.link));
+  $("#active-scan-link").addEventListener("click", () => { if (state.homeScan?.state === "attention") openHomeScan(); else go("analyze"); });
+  $(".workspace-backdrop").addEventListener("click", closeWorkspaceNavigation);
+  window.addEventListener("hashchange", routeFromHash);
+
   document.querySelectorAll("[data-route]").forEach(link => link.addEventListener("click", event => {
     event.preventDefault();
     go(link.dataset.route);
     if (link.hasAttribute("data-focus-search")) focusProductSearch();
+  }));
+  document.querySelectorAll("[data-signin]").forEach(button => button.addEventListener("click", openSignedInPage));
+
+  const activateExploreTab = name => {
+    document.querySelectorAll("[data-explore-tab]").forEach(button => {
+      const active = button.dataset.exploreTab === name;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    document.querySelectorAll("[data-explore-panel]").forEach(panel => {
+      const active = panel.dataset.explorePanel === name;
+      panel.hidden = !active;
+      panel.classList.toggle("active", active);
+    });
+  };
+  document.querySelectorAll("[data-explore-tab]").forEach(button => {
+    button.addEventListener("click", () => activateExploreTab(button.dataset.exploreTab));
+    button.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      const tabs = [...document.querySelectorAll("[data-explore-tab]")];
+      const step = event.key === "ArrowRight" ? 1 : -1;
+      const next = tabs[(tabs.indexOf(button) + step + tabs.length) % tabs.length];
+      activateExploreTab(next.dataset.exploreTab);
+      next.focus();
+    });
+  });
+  document.querySelectorAll("[data-explore-link]").forEach(link => link.addEventListener("click", event => {
+    event.preventDefault();
+    go("landing");
+    activateExploreTab(link.dataset.exploreLink);
+    requestAnimationFrame(() => $("#how")?.scrollIntoView({behavior: "smooth"}));
   }));
 
   const searchForm = $("#search-form");
@@ -448,14 +827,6 @@ function setup() {
     const node = $(id);
     if (node) node.addEventListener("change", renderResults);
   });
-  const refreshAdmin = $("#refresh-admin");
-  if (refreshAdmin) refreshAdmin.addEventListener("click", renderAdmin);
-  document.querySelectorAll("[data-admin]").forEach(button => button.addEventListener("click", () => {
-    state.admin = button.dataset.admin;
-    document.querySelectorAll("[data-admin]").forEach(item => item.classList.toggle("active", item === button));
-    renderAdmin();
-  }));
-
   const navToggle = $(".nav-toggle");
   if (navToggle) navToggle.addEventListener("click", event => {
     const nav = $("#main-nav");
@@ -463,26 +834,99 @@ function setup() {
     const open = nav.classList.toggle("open");
     event.currentTarget.setAttribute("aria-expanded", String(open));
     event.currentTarget.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+    if (open) nav.querySelector(".nav-link")?.focus();
   });
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape") closeMainNavigation();
+    if (event.key === "Escape") {
+      if ($("#main-nav")?.classList.contains("open")) navToggle?.focus();
+      closeMainNavigation();
+      closeWorkspaceNavigation();
+    }
   });
   document.addEventListener("click", event => {
     const header = $(".site-header");
     if (header && !header.contains(event.target)) closeMainNavigation();
   });
   window.addEventListener("scroll", updateHeaderState, {passive: true});
+  const desktopNavigation = window.matchMedia?.("(min-width: 761px)");
+  desktopNavigation?.addEventListener("change", event => {
+    if (event.matches) closeMainNavigation();
+  });
 
   document.querySelectorAll("[data-scroll]").forEach(link => link.addEventListener("click", event => {
     event.preventDefault();
-    go("home");
+    go("landing");
     closeMainNavigation();
     requestAnimationFrame(() => {
-      const section = $("#how");
-      if (section) section.scrollIntoView({behavior: "smooth"});
+      const section = $(`#${link.dataset.scroll || "how"}`);
+      if (section) {
+        section.scrollIntoView({behavior: "smooth"});
+        const heading = section.querySelector("h2") || section;
+        heading.setAttribute("tabindex", "-1");
+        heading.focus({preventScroll: true});
+      }
+      setActiveNavigation("landing", link.dataset.scroll);
     });
+  }));
+
+  document.querySelectorAll("[data-focus-search]:not([data-route])").forEach(link => link.addEventListener("click", event => {
+    event.preventDefault();
+    go("analyze");
+    focusProductSearch();
+  }));
+
+  document.querySelectorAll("[data-landing-scroll]").forEach(link => link.addEventListener("click", event => {
+    event.preventDefault();
+    go("landing");
+    requestAnimationFrame(() => $(`#${link.dataset.landingScroll}`)?.scrollIntoView({behavior: "smooth"}));
+  }));
+
+  const workspaceMenu = $(".workspace-mobile-menu");
+  workspaceMenu.addEventListener("click", () => {
+    const open = $("#workspace-shell").classList.toggle("sidebar-open");
+    workspaceMenu.setAttribute("aria-expanded", String(open));
+    $(".workspace-backdrop").hidden = !open;
+  });
+
+  const themeToggles = [$("#theme-toggle"), $("#workspace-theme-toggle")].filter(Boolean);
+  const syncTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    $("#appearance-select").value = theme;
+    themeToggles.forEach(button => {
+      button.setAttribute("aria-pressed", String(theme === "dark"));
+      button.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} theme`);
+      button.setAttribute("title", `Switch to ${theme === "dark" ? "light" : "dark"} theme`);
+      button.querySelector("span").textContent = button.id === "workspace-theme-toggle" ? (theme === "dark" ? "Dark" : "Light") : (theme === "dark" ? "Light" : "Dark");
+    });
+  };
+  syncTheme((() => { try { return localStorage.getItem("defaketive-theme"); } catch (_) { return "light"; } })() === "dark" ? "dark" : "light");
+  $("#appearance-select").addEventListener("change", event => {
+    const theme = event.target.value;
+    try { localStorage.setItem("defaketive-theme", theme); } catch (_) {}
+    syncTheme(theme);
+  });
+  themeToggles.forEach(button => button.addEventListener("click", () => {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    try { localStorage.setItem("defaketive-theme", nextTheme); } catch (_) {}
+    syncTheme(nextTheme);
   }));
   updateSearchUI();
   updateHeaderState();
 }
-document.addEventListener("DOMContentLoaded", async () => { setup(); try { await loadProducts(); } catch (error) { toast("Saved results could not be loaded. You can still import a scraper JSON file.","error"); } const route = window.location.hash.slice(1); if (["results","analysis","admin"].includes(route)) go(route); });
+document.addEventListener("DOMContentLoaded", async () => {
+  setup();
+  // Render routes immediately, so a slow catalog request never strands navigation on the landing page.
+  const routeReady = routeFromHash();
+  try { await loadProducts(); }
+  catch (error) { state.catalogError = true; state.catalogLoading = false; renderWorkspace(); toast("Saved results could not be loaded. You can still start a new analysis.", "error"); }
+  await routeReady;
+  try {
+    const job = JSON.parse(sessionStorage.getItem("defaketive-active-job") || "null");
+    if (job?.id && !state.activeJobId) {
+      state.activeJobId = job.id;
+      $("#search-query").value = job.query || "";
+      setSearchBusy(true);
+      pollJob(job.id, job);
+    }
+  } catch (_) { /* Storage may be disabled; the rest of the workspace remains usable. */ }
+});
