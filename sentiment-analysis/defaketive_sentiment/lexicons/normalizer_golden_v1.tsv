@@ -1,0 +1,42 @@
+# Frozen normalizer behaviour for taglish-norm-1.0.0.
+#
+# These rows ARE the specification. Every sentence label collected by this
+# project is keyed by a hash of its normalized segment text, so a change to any
+# expected value below invalidates the labelled data. If a row here has to
+# change, the normalizer version changes with it and the affected labels are
+# re-derived - they are not silently reused.
+#
+# COLUMNS  input <TAB> expected_hazard <TAB> expected_legacy <TAB> note
+# Literal "\n" in a field means a newline. Empty expected values are written as
+# the two characters <> so the row stays readable.
+#
+input	expected_hazard	expected_legacy	note
+	<>	<>	empty input
+   	<>	<>	whitespace only
+Maganda pero mabilis masira.	maganda pero mabilis sira.	maganda pero mabilis masira.	affix folding is hazard-only
+HNDI gumagana	hindi gumagana	hindi gumagana	spelling variant, both profiles
+poor-quality item	poor quality item	poor quality item	ordinary word-joining hyphen becomes a space
+nag-init agad	init agad	nag init agad	affix hyphen closes up, then folds to the lemma
+na-overheat yung unit	overheat yung unit	na overheat yung unit	English root with a Filipino affix
+I-charge mo muna	charge mo muna	i charge mo muna	i- is an affix prefix
+walang-hiya	walang hiya	walang hiya	walang is not an affix prefix
+uminit sobra tapos namaga	init sobra tapos maga	uminit sobra tapos namaga	two hazard roots folded
+umiinit	init	umiinit	reduplicated affix form
+mainit	init	mainit	adjective form folds to the same lemma
+grabeee ang initttt	grabe ang init	grabeee ang initttt	elongation collapses in the hazard profile only
+sobranggg init	sobrang init	sobrang init	legacy handles this one variant by table
+20.000mah pb	20.000mah powerbank	20.000mah pb	digits are never collapsed as elongation
+10000mah powerbank	10000mah powerbank	10000mah powerbank	a capacity figure survives intact
+Sira agad!!! Umiinit	sira agad!!! init	sira agad!!! umiinit	punctuation runs are left alone
+l am disappointed	i am disappointed	i am disappointed	Temu OCR fix, both profiles
+iba’t ibang klase	iba't ibang klase	iba't ibang klase	curly apostrophe folds
+emoji 😡😡 test	emoji 😡😡 test	emoji 😡😡 test	emoji survive normalization
+  spaced   out  	spaced out	spaced out	whitespace collapses and trims
+swollen battery	swell battery	swollen battery	English inflection folds in the hazard profile
+bloated na ang pb	bloat na ang powerbank	bloated na ang pb	abbreviation expands
+hindi naman umiinit	hindi naman init	hindi naman umiinit	negation words are preserved for the negation check
+walang sira	walang sira	walang sira	unchanged in both profiles
+nasunog yung wiring	sunog yung wiring	nasunog yung wiring	fire root folds
+nagsspark yung charger	spark yung charger	nagsspark yung charger	affix plus doubled consonant
+sabog ang sound	sabog ang sound	sabog ang sound	deliberately NOT folded to an explosion term
+sumabog ang adaptor	sumabog ang adaptor	sumabog ang adaptor	kept distinct from bare sabog on purpose

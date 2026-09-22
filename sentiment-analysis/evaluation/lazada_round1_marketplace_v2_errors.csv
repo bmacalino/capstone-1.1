@@ -1,0 +1,102 @@
+﻿task,review_id,product_id,expected,predicted,review_text
+sentiment,lazada-r1-0011,3034831887,positive,neutral,"The blue color is stunning, The blue color is stunning, The blue color is stunning,"
+sentiment,lazada-r1-0012,3034831887,negative,neutral,tarantado rider ndi nakarating sakin parcel
+sentiment,lazada-r1-0018,3034831887,positive,neutral,"The blue color is stunning,"
+sentiment,lazada-r1-0053,4507172427,positive,neutral,Nice look..but the sound is not loud enough especially if you have a 2-flr. house
+sentiment,lazada-r1-0072,5166282734,negative,neutral,Wala pa 1 month di na agad working yung fan. Minsan lang naman nagagamit yung fan pag naka 4hrs na gamit na yung laptop. Then pinakamatagal na gamit na 4hrs on yung fan. Unang gamit ko nga lang noon amoy sunog na kaya bihira ko din gamitin yung fan.
+sentiment,lazada-r1-0073,5166282734,positive,neutral,okay naman sakuhan lang yung fan hindi masyadong malakas. piro pwede na pag supurta.
+sentiment,lazada-r1-0101,5381386541,neutral,negative,🌙Night Vision:I think no need to connect to the wifi and internet. this unit if you have no wifi and internet its useless Thier is no motion detection.
+sentiment,lazada-r1-0130,4507172427,positive,neutral,Functional. Screen is small
+sentiment,lazada-r1-0148,4507172427,positive,neutral,⚙️Features:make of the equipment doesn't seem as heavyduty as it ahould be
+sentiment,lazada-r1-0178,5256422305,positive,negative,"1 device connected, di man lang umabot 100 Mbps speed, location is bucal calamba, mabilis lang dumating"
+sentiment,lazada-r1-0245,5256422305,positive,neutral,Works for what I need it for. Acts as the failover router for outages with my other ISP. Speeds in my area can reach up to ~350mbps down and ~40 mbps up over LAN. For WLAN I got ~280 mbps down and ~30mbps up. Setup was easy and straightforward. The SIM card was installed already when I opened the packaging. Changing the SSID and passkey is very simple and is done during the initial setup.
+sentiment,lazada-r1-0257,3034831887,negative,positive,Functionality:good
+sentiment,lazada-r1-0269,5256422305,negative,neutral,Unable to register smart wifi in smart app. Hard to set up. Decent speed and stable connection. Delivered on time.
+sentiment,lazada-r1-0288,3034831887,positive,neutral,"nakuha ko for only 9pesos. thank you. working, astig. maganda. parehas side naman ay naganaThe sound volume is adjustable and cool,"
+sentiment,lazada-r1-0312,3034831887,negative,positive,"Comfortable to wear for long periods, Comfortable to wear for long periods, High-quality materials used in construction,"
+sentiment,lazada-r1-0339,4507172427,negative,neutral,not useful for live monitoring. you can only use if the doorbell is press.
+sentiment,lazada-r1-0348,3034831887,positive,neutral,Pwede naman xia gamitin kaso di rin tumagal ang hina kasi ng wire and uncomfortable din suotin pero pwede na kung nagtitipid
+sentiment,lazada-r1-0361,5256422305,neutral,negative,this is my honest review on the product Malakas sya sa 15 days nya na free unli hinintay ko lang matapos yung 15 na free unli tapos pag load ko lang ng 1299 unli sa unang load malakas pa pagkabukasan mahina na nasa 30-50 mbps tas may data capping pa so i give it a 3 star
+sentiment,lazada-r1-0385,4507172427,positive,negative,Hingi ko pa na gamit kasi di nsman pala with Cam saka need pa icharge akala ko di battery sayang ang money
+sentiment,lazada-r1-0386,3034831887,neutral,positive,"Love the macaron colors!,"
+sentiment,lazada-r1-0461,3034831887,neutral,positive,"Love the macaron colors!, Love the macaron colors!, Love the macaron colors!, Love the macaron colors!,"
+sentiment,lazada-r1-0470,4507172427,positive,negative,"The shooting is very clear. The shooting area is also large. Not bad, not bad, satisfied. A sense of security"
+sentiment,lazada-r1-0511,5256422305,neutral,negative,"Fast and stable internet, Strong signal coverage, TERRIBLE phone app"
+sentiment,lazada-r1-0513,3034831887,positive,neutral,"This Item is great, it arrived on time and it's good overall, however most of the time I need to get it in a specific place to get to fully work which is kind of disappointing but it's expected for a cheap product"
+sentiment,lazada-r1-0524,5256422305,negative,neutral,very slow.. mas mabilis pa ung lumang globe ko na prepaid..
+sentiment,lazada-r1-0574,5381386541,negative,neutral,my is CCTV why is memory card only
+sentiment,lazada-r1-0585,5256422305,positive,negative,Nice! Good for back up internet and its handy! Plug and play do not forget to register the sim card prior usage
+sentiment,lazada-r1-0640,4507172427,positive,negative,"Performance:Wide viewing angle for better coverage, Wide viewing angle for better coverage, Wide viewing angle for better coverage,"
+sentiment,lazada-r1-0659,5166282734,positive,negative,matibay sya... kaya yta ipatong isang sakong bogas dito d to bibigay lol..thanks
+sentiment,lazada-r1-0700,3034831887,neutral,positive,"Impressive build-in microphone, Impressive build-in microphone, Impressive build-in microphone,"
+sentiment,lazada-r1-0754,5381386541,negative,neutral,Ok naman. la syang night vision. mura lang kasi. hirap din iset-up. manual isn't enough. ok lang naman si seller! fast shipping din.
+risk_detection,lazada-r1-0011,3034831887,0,1,"The blue color is stunning, The blue color is stunning, The blue color is stunning,"
+risk_detection,lazada-r1-0018,3034831887,0,1,"The blue color is stunning,"
+risk_detection,lazada-r1-0053,4507172427,0,1,Nice look..but the sound is not loud enough especially if you have a 2-flr. house
+risk_detection,lazada-r1-0073,5166282734,0,1,okay naman sakuhan lang yung fan hindi masyadong malakas. piro pwede na pag supurta.
+risk_detection,lazada-r1-0101,5381386541,0,1,🌙Night Vision:I think no need to connect to the wifi and internet. this unit if you have no wifi and internet its useless Thier is no motion detection.
+risk_detection,lazada-r1-0130,4507172427,0,1,Functional. Screen is small
+risk_detection,lazada-r1-0161,4507172427,1,0,"For its purpose its ok. For the camera, maganda sana kung fish eye view. For the monitor medyo old school it is not HD"
+risk_detection,lazada-r1-0178,5256422305,0,1,"1 device connected, di man lang umabot 100 Mbps speed, location is bucal calamba, mabilis lang dumating"
+risk_detection,lazada-r1-0257,3034831887,1,0,Functionality:good
+risk_detection,lazada-r1-0279,5381386541,1,0,SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM
+risk_detection,lazada-r1-0312,3034831887,1,0,"Comfortable to wear for long periods, Comfortable to wear for long periods, High-quality materials used in construction,"
+risk_detection,lazada-r1-0348,3034831887,0,1,Pwede naman xia gamitin kaso di rin tumagal ang hina kasi ng wire and uncomfortable din suotin pero pwede na kung nagtitipid
+risk_detection,lazada-r1-0361,5256422305,0,1,this is my honest review on the product Malakas sya sa 15 days nya na free unli hinintay ko lang matapos yung 15 na free unli tapos pag load ko lang ng 1299 unli sa unang load malakas pa pagkabukasan mahina na nasa 30-50 mbps tas may data capping pa so i give it a 3 star
+risk_detection,lazada-r1-0385,4507172427,0,1,Hingi ko pa na gamit kasi di nsman pala with Cam saka need pa icharge akala ko di battery sayang ang money
+risk_detection,lazada-r1-0470,4507172427,0,1,"The shooting is very clear. The shooting area is also large. Not bad, not bad, satisfied. A sense of security"
+risk_detection,lazada-r1-0511,5256422305,0,1,"Fast and stable internet, Strong signal coverage, TERRIBLE phone app"
+risk_detection,lazada-r1-0513,3034831887,0,1,"This Item is great, it arrived on time and it's good overall, however most of the time I need to get it in a specific place to get to fully work which is kind of disappointing but it's expected for a cheap product"
+risk_detection,lazada-r1-0524,5256422305,1,0,very slow.. mas mabilis pa ung lumang globe ko na prepaid..
+risk_detection,lazada-r1-0585,5256422305,0,1,Nice! Good for back up internet and its handy! Plug and play do not forget to register the sim card prior usage
+risk_detection,lazada-r1-0727,5166282734,0,1,"sulit na sulit ang pera, totoo nga rotating sya at napaka sturdy, kaya nga laptop ko na 15.6in. ang bigay din nito matibay talaga."
+risk_detection,lazada-r1-0754,5381386541,1,0,Ok naman. la syang night vision. mura lang kasi. hirap din iset-up. manual isn't enough. ok lang naman si seller! fast shipping din.
+risk_category,lazada-r1-0046,4227077318,quality,defect,hmmm works quietly and can detect the air quality fast. however medyo may alikabok parin sa mga laptop ko. pero isang buwan palang naman. baka need pa habaan running time.
+risk_category,lazada-r1-0049,4507172427,seller_service,defect,Verry very poor product pls pls pls dont buy this product this product is scammer and its not working....
+risk_category,lazada-r1-0069,5166282734,quality,seller_service,"mauga pag nag type ka, ending need mong bumili ng keyboard para di ka mahilo mag type. may scratch den yung item at di naman ganun kalakas yung fan as advertise."
+risk_category,lazada-r1-0072,5166282734,other,quality,Wala pa 1 month di na agad working yung fan. Minsan lang naman nagagamit yung fan pag naka 4hrs na gamit na yung laptop. Then pinakamatagal na gamit na 4hrs on yung fan. Unang gamit ko nga lang noon amoy sunog na kaya bihira ko din gamitin yung fan.
+risk_category,lazada-r1-0075,5256422305,seller_service,quality|seller_service,"Supports 40 devices, Good customer service, Strong signal coverage, Excellent speed performance, Fast and stable internet,"
+risk_category,lazada-r1-0081,5166282734,defect,delivery,"There was a tear in the packaging when I received it, a dent and a scratch on the actual laptop stand itself in a very visible area too. The packaging is also thin despite the product being bulky. If not for the hassle of shipping back since I live far, I would've returned the product. The only silver lining is that the stand is still usable but receiving a damaged good is still super disappointing."
+risk_category,lazada-r1-0089,5381386541,seller_service,quality,not functioning. i have been scammed
+risk_category,lazada-r1-0112,3034831887,quality,defect,Hindi na gumana sa akin 2 days lang
+risk_category,lazada-r1-0116,3034831887,other,quality,grounded ung mic.ng headset
+risk_category,lazada-r1-0151,4227077318,delivery,delivery|seller_service,It took 8 days to deliver. I know this is logistic issue but seller should proactively reach out to Lazada’s logistics to ensure their customers are taoen care of.
+risk_category,lazada-r1-0160,5256422305,seller_service,quality|seller_service,"Good customer service, Excellent speed performance, strong signal in parañaque and muntinlupa. Bought 2 already."
+risk_category,lazada-r1-0174,5256422305,defect,quality,"Napakahirap kumonek sa smart app, walang maka resolba jusme. Tapos humihingi lang ako ng napakasimpleng resibo dahil wala silang na include sa package, jusko napakatagal, parang nagkukunware lang sila na finorward sa support team pero wala naman talaga. Puro AI bot nalang kumakausap sa concern ko napaka hassle."
+risk_category,lazada-r1-0192,3034831887,quality,delivery,"𝚍𝚒 𝚔𝚘 𝚗𝚊 𝚛𝚎𝚛𝚎𝚝𝚞𝚛𝚗 𝚜𝚊𝚢𝚊𝚗𝚐 𝚕𝚊𝚗𝚐 𝚘𝚛𝚊𝚜 , 𝚙𝚎𝚛𝚘 𝚋𝚊𝚔𝚒𝚝 𝚐𝚊𝚗𝚞𝚗 𝚑𝚊𝚕𝚘𝚜 𝚠𝚊𝚕𝚊 𝚊𝚔𝚘𝚗𝚐 𝚖𝚊𝚛𝚒𝚗𝚒𝚐 𝚗𝚊𝚙𝚊𝚔𝚊𝚑𝚒𝚗𝚊 𝚔𝚊𝚑𝚒𝚝 𝚝𝚘𝚍𝚘 𝚗𝚊 𝚟𝚘𝚕𝚞𝚖𝚎 𝚔𝚘 𝚔𝚊𝚊𝚜𝚊𝚛 𝚜𝚊𝚢𝚊𝚗𝚐 𝚏𝚛𝚎𝚎 𝚜𝚑𝚒𝚙𝚙𝚒𝚗𝚐 𝚔𝚘 𝚜𝚊𝚗𝚊 𝚙𝚊𝚕𝚊 𝚜𝚊 𝚒𝚋𝚊 𝚔𝚘 𝚗𝚊𝚕𝚊𝚗𝚐 𝚐𝚒𝚗𝚊𝚖𝚒𝚝"
+risk_category,lazada-r1-0216,3034831887,quality,quality|seller_service,ganda sulit pero dipanatry eh mgfollow ako dito kapag natry kona sa ngaun bigyan kita 3stars
+risk_category,lazada-r1-0269,5256422305,delivery,delivery|quality,Unable to register smart wifi in smart app. Hard to set up. Decent speed and stable connection. Delivered on time.
+risk_category,lazada-r1-0279,5381386541,seller_service,quality|seller_service,SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM
+risk_category,lazada-r1-0359,5256422305,seller_service,seller_service|wrong_item,the sim card that you put was in the wrong way so it's hard to function we had to bring it to the customer service center.
+risk_category,lazada-r1-0367,3034831887,defect,defect|quality,Its not working after 1 day of using it 😔
+risk_category,lazada-r1-0369,5381386541,seller_service,delivery,peke sya hindi gumagana kahit long press yung off hindi na ma off.. alam ko kung pano gamitin ang mga ganito pero ngayon lang ako naka encountwr ng peke.. walang kwenta.. delayed na nga ang delivery..fake pa nabili ko..
+risk_category,lazada-r1-0403,3034831887,defect,delivery,"Quality: 5/10 Function: defective, sobrang hina ng sounds nya need mo imax yung volume para marinig maigi sounds which isn't good for the ears. Napansin ko is di siya ganung fit sa 3 cp tinest ko yung jack kaya siguro ang hina nya compared sa blue color na inorder ko kasabay nito. Delivery: 10/10 pero expected ko na to dahil sa price. still a good buy! 2nd item out of 3."
+risk_category,lazada-r1-0415,5256422305,defect,delivery,"Dual band Wi-Fi 6, Supports 40 devices, Fast and stable internet, Good customer service, well packed. Maayos na dumating ang item walang damage. malakas ang signal at bumilis talaga ang internet ko. maraming salamat smart sa discount."
+risk_category,lazada-r1-0429,5256422305,seller_service,defect,Box was already tampered with and simcard was already stolen. There is a seal on the box but it seems fake. DO NOT BUY!
+risk_category,lazada-r1-0601,3034831887,defect,defect|quality,Functionality:good siya kpg sa music lng pero hindi gumagana kapag call na
+risk_category,lazada-r1-0604,5256422305,delivery,quality,"Matagal dumating, ang mahal na compare sa nauna kong binili last Aug2025 (half ng price) same lang naman na unit. Now ang bagal up to 5mbps lang ang download and upload up to 2mbps lang. Naka unli data pa ako eh halos di ko rin magamit dahil sa bagal. Laging disconnnected pa. Worth it ba ito???? 4g ang nasasaganp dito sa area ko pero ganyan kabagal, hay naku sobrang disappointed!!!! Di pa umaabot ng 5 devices ang naka connect niyan, sobrang bagal."
+risk_category,lazada-r1-0711,4507172427,wrong_item,quality,"Wireless connection, real-time viewing, fully meets my needs, maganda ang quality, mukhang matangkad kapag nakalagay sa pinto, malinaw ang video, 👍👍😎"
+risk_category,lazada-r1-0838,5381386541,wrong_item,delivery|wrong_item,mali yung dumating memory card order ko ay camera
+risk_severity,lazada-r1-0012,3034831887,3,2,tarantado rider ndi nakarating sakin parcel
+risk_severity,lazada-r1-0046,4227077318,1,2,hmmm works quietly and can detect the air quality fast. however medyo may alikabok parin sa mga laptop ko. pero isang buwan palang naman. baka need pa habaan running time.
+risk_severity,lazada-r1-0049,4507172427,2,3,Verry very poor product pls pls pls dont buy this product this product is scammer and its not working....
+risk_severity,lazada-r1-0079,5256422305,2,1,"I tried setting it up, activated the sim through my mobile device however when I tried to connect w/ the wifi and set it up, the router is not detecting the sim, tried to insert my phone smart sim and it is not being detected too. I just got the device for a few minutes"
+risk_severity,lazada-r1-0081,5166282734,3,2,"There was a tear in the packaging when I received it, a dent and a scratch on the actual laptop stand itself in a very visible area too. The packaging is also thin despite the product being bulky. If not for the hassle of shipping back since I live far, I would've returned the product. The only silver lining is that the stand is still usable but receiving a damaged good is still super disappointing."
+risk_severity,lazada-r1-0089,5381386541,2,1,not functioning. i have been scammed
+risk_severity,lazada-r1-0112,3034831887,2,3,Hindi na gumana sa akin 2 days lang
+risk_severity,lazada-r1-0116,3034831887,3,2,grounded ung mic.ng headset
+risk_severity,lazada-r1-0161,4507172427,1,2,"For its purpose its ok. For the camera, maganda sana kung fish eye view. For the monitor medyo old school it is not HD"
+risk_severity,lazada-r1-0174,5256422305,3,2,"Napakahirap kumonek sa smart app, walang maka resolba jusme. Tapos humihingi lang ako ng napakasimpleng resibo dahil wala silang na include sa package, jusko napakatagal, parang nagkukunware lang sila na finorward sa support team pero wala naman talaga. Puro AI bot nalang kumakausap sa concern ko napaka hassle."
+risk_severity,lazada-r1-0184,5381386541,3,2,This item is not working so well. Never never buy this CCTV. when you connected and watch in your cellphone it's so blurred. NO USE... AND YOU CANNOT REFUND YOUR MONEY
+risk_severity,lazada-r1-0216,3034831887,1,2,ganda sulit pero dipanatry eh mgfollow ako dito kapag natry kona sa ngaun bigyan kita 3stars
+risk_severity,lazada-r1-0244,4507172427,1,2,Video /and pic are at very low / poor quality especially at night time or without good lighting. Not water proof also
+risk_severity,lazada-r1-0276,5256422305,1,2,sana legit 3 stars lang muna kasi maraming nagsasabi na humihina yung signal after 15 days 🥲bilhin update ko po kayo pag humina o hindi once na naloadan ko sya
+risk_severity,lazada-r1-0286,5381386541,1,2,the item is working but it can viewed only by its hot spot and cannot be accessed online via wifi. So it is useless as a CCTV.
+risk_severity,lazada-r1-0339,4507172427,2,1,not useful for live monitoring. you can only use if the doorbell is press.
+risk_severity,lazada-r1-0371,5381386541,1,2,📺Resolution:not good
+risk_severity,lazada-r1-0403,3034831887,3,2,"Quality: 5/10 Function: defective, sobrang hina ng sounds nya need mo imax yung volume para marinig maigi sounds which isn't good for the ears. Napansin ko is di siya ganung fit sa 3 cp tinest ko yung jack kaya siguro ang hina nya compared sa blue color na inorder ko kasabay nito. Delivery: 10/10 pero expected ko na to dahil sa price. still a good buy! 2nd item out of 3."
+risk_severity,lazada-r1-0414,4507172427,1,2,disappointed. low quality. can’t view live. only record pictures. never again! I thought it can record video. but no.
+risk_severity,lazada-r1-0415,5256422305,3,2,"Dual band Wi-Fi 6, Supports 40 devices, Fast and stable internet, Good customer service, well packed. Maayos na dumating ang item walang damage. malakas ang signal at bumilis talaga ang internet ko. maraming salamat smart sa discount."
+risk_severity,lazada-r1-0601,3034831887,3,2,Functionality:good siya kpg sa music lng pero hindi gumagana kapag call na
+risk_severity,lazada-r1-0682,5381386541,2,1,not clear na cam.
+risk_severity,lazada-r1-0910,5381386541,1,2,Do not order. item is not as good as advertised. video is very poor quality. video is stretched and no way to fix or adjust. very short wire. difficult to position.

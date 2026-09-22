@@ -1,0 +1,239 @@
+{
+  "source": "firecs_trained_model_errors.csv",
+  "error_count": 594,
+  "confusions": {
+    "negative -> neutral": 192,
+    "neutral -> negative": 164,
+    "positive -> neutral": 132,
+    "neutral -> positive": 82,
+    "positive -> negative": 16,
+    "negative -> positive": 8
+  },
+  "length_buckets": {
+    "16-40 words": 322,
+    "41+ words": 131,
+    "6-15 words": 129,
+    "1-5 words": 12
+  },
+  "features": {
+    "likely_taglish": {
+      "error_count": 521,
+      "confusions": {
+        "negative -> neutral": 173,
+        "neutral -> negative": 145,
+        "positive -> neutral": 117,
+        "neutral -> positive": 69,
+        "positive -> negative": 11,
+        "negative -> positive": 6
+      },
+      "examples": [
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "natagalan bago dumating kc nanibago c kuyang delivery mas nauna pang dumating yung huli kung order tpos nung dumating yung medium kasin laki lng ng small na naunang naorder ko ending d nagamit ng pamangkin ko kaya binenta nlng nmen sa iba kaya oorder nlng ulit kmi pero sna dis tym"
+        },
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "bettle socks yung i norder ko pero star yung dumating bettle socks sana gusto ko kasi terno ng damit niya na bettle din maganda sana at makapal pero nakakadismaya maganda naman ang star kaya lang bettle talaga pili ko kasi terno sa pang 3months old pictorial ng baby ko"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "dumating na po cute sana kaso sira yong isa hindi omilaw hindi rin mag charge"
+        }
+      ]
+    },
+    "negation": {
+      "error_count": 310,
+      "confusions": {
+        "negative -> neutral": 117,
+        "neutral -> negative": 100,
+        "positive -> neutral": 53,
+        "neutral -> positive": 30,
+        "positive -> negative": 8,
+        "negative -> positive": 2
+      },
+      "examples": [
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "dumating na po cute sana kaso sira yong isa hindi omilaw hindi rin mag charge"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "the best food but not good in service the server not that friendly and accommodating nasa 60 ganun nag smile sana po"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "ok sya malakai kaso mali ang kulay pink ang order ko dumating orange hays seller wala namang pasabi bago iship edi sana nakapili man lang ako ng ibang kulay na option"
+        }
+      ]
+    },
+    "contrast": {
+      "error_count": 306,
+      "confusions": {
+        "negative -> neutral": 125,
+        "positive -> neutral": 83,
+        "neutral -> negative": 61,
+        "neutral -> positive": 32,
+        "negative -> positive": 3,
+        "positive -> negative": 2
+      },
+      "examples": [
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "natagalan bago dumating kc nanibago c kuyang delivery mas nauna pang dumating yung huli kung order tpos nung dumating yung medium kasin laki lng ng small na naunang naorder ko ending d nagamit ng pamangkin ko kaya binenta nlng nmen sa iba kaya oorder nlng ulit kmi pero sna dis tym"
+        },
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "bettle socks yung i norder ko pero star yung dumating bettle socks sana gusto ko kasi terno ng damit niya na bettle din maganda sana at makapal pero nakakadismaya maganda naman ang star kaya lang bettle talaga pili ko kasi terno sa pang 3months old pictorial ng baby ko"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "dumating na po cute sana kaso sira yong isa hindi omilaw hindi rin mag charge"
+        }
+      ]
+    },
+    "order_accuracy": {
+      "error_count": 151,
+      "confusions": {
+        "negative -> neutral": 64,
+        "neutral -> negative": 42,
+        "positive -> neutral": 31,
+        "neutral -> positive": 12,
+        "positive -> negative": 2
+      },
+      "examples": [
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "ok sya malakai kaso mali ang kulay pink ang order ko dumating orange hays seller wala namang pasabi bago iship edi sana nakapili man lang ako ng ibang kulay na option"
+        },
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "dalawa yung binili ko isa sakin tsaka sa friend ko first of all kaunti lang yung laman nung isa habang medyo mas lamang yung sa isa about sa color maroon yung sa tingin kong dapat maging kakalabasan niya pero violet yung kulay niya kapag nilagay na sa labi also kulang"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "10 10 hindi siya 10 meters misleading sa description palitan nyo yan para sa mga nag susukat di pwede yung kulang ang inyong ipapadala thanks okey sana pero mali ang sukat"
+        }
+      ]
+    },
+    "delivery": {
+      "error_count": 139,
+      "confusions": {
+        "negative -> neutral": 44,
+        "neutral -> negative": 39,
+        "positive -> neutral": 33,
+        "neutral -> positive": 20,
+        "positive -> negative": 3
+      },
+      "examples": [
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "natagalan bago dumating kc nanibago c kuyang delivery mas nauna pang dumating yung huli kung order tpos nung dumating yung medium kasin laki lng ng small na naunang naorder ko ending d nagamit ng pamangkin ko kaya binenta nlng nmen sa iba kaya oorder nlng ulit kmi pero sna dis tym"
+        },
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "bettle socks yung i norder ko pero star yung dumating bettle socks sana gusto ko kasi terno ng damit niya na bettle din maganda sana at makapal pero nakakadismaya maganda naman ang star kaya lang bettle talaga pili ko kasi terno sa pang 3months old pictorial ng baby ko"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "dumating na po cute sana kaso sira yong isa hindi omilaw hindi rin mag charge"
+        }
+      ]
+    },
+    "functionality": {
+      "error_count": 69,
+      "confusions": {
+        "neutral -> negative": 28,
+        "negative -> neutral": 23,
+        "positive -> neutral": 14,
+        "neutral -> positive": 4
+      },
+      "examples": [
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "dumating na po cute sana kaso sira yong isa hindi omilaw hindi rin mag charge"
+        },
+        {
+          "actual": "positive",
+          "predicted": "neutral",
+          "review": "sana gumana ok lang naman itsura pero diko nasubukan chinarge ko muna medyo matagal delivery pero sana worth it siy"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "positive",
+          "review": "working naman po yung lahat ng air purofier kaso yung isa walang beep sound and ang bilis din dumating ng mga items secured din yung packaging at walang damage"
+        }
+      ]
+    },
+    "packaging": {
+      "error_count": 57,
+      "confusions": {
+        "negative -> neutral": 18,
+        "neutral -> negative": 14,
+        "positive -> neutral": 14,
+        "neutral -> positive": 9,
+        "negative -> positive": 1,
+        "positive -> negative": 1
+      },
+      "examples": [
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "good im not totally sa satisfied because the glue was spill siguro kasi maluwag ang takip neto when i open the box i saw na wala ng natira sa isang bottle ng glue yung dalawa naman is may bawas na maybe natapon din yung laman kasi kalahati na sya"
+        },
+        {
+          "actual": "positive",
+          "predicted": "neutral",
+          "review": "subrang maganda po ang laki nya siguro until 3 years old ni baby pd gamitin higaan at may isng unan sya n ksama medyo manipis lang pero ok nmn no damage at mganda packaging ni seller thank you kahit medyo mabigat s bulsa ang price"
+        },
+        {
+          "actual": "neutral",
+          "predicted": "positive",
+          "review": "working naman po yung lahat ng air purofier kaso yung isa walang beep sound and ang bilis din dumating ng mga items secured din yung packaging at walang damage"
+        }
+      ]
+    },
+    "risk_language": {
+      "error_count": 31,
+      "confusions": {
+        "negative -> neutral": 12,
+        "neutral -> negative": 9,
+        "positive -> neutral": 7,
+        "neutral -> positive": 3
+      },
+      "examples": [
+        {
+          "actual": "neutral",
+          "predicted": "negative",
+          "review": "good im not totally sa satisfied because the glue was spill siguro kasi maluwag ang takip neto when i open the box i saw na wala ng natira sa isang bottle ng glue yung dalawa naman is may bawas na maybe natapon din yung laman kasi kalahati na sya"
+        },
+        {
+          "actual": "negative",
+          "predicted": "neutral",
+          "review": "normal goods idk if the basag is visible pero meron siya i m a bit disappointed lang since maganda feedback that s y i purchased tyeso sa store na ito pero may basag pala mapupunta sa akin medj sadboi aq hehee"
+        },
+        {
+          "actual": "positive",
+          "predicted": "neutral",
+          "review": "subrang maganda po ang laki nya siguro until 3 years old ni baby pd gamitin higaan at may isng unan sya n ksama medyo manipis lang pero ok nmn no damage at mganda packaging ni seller thank you kahit medyo mabigat s bulsa ang price"
+        }
+      ]
+    }
+  },
+  "recommendation": "Prioritize contrast/aspect-aware labeling and training if those features dominate the error groups; otherwise inspect the largest confusion pair first."
+}

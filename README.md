@@ -18,6 +18,11 @@ signals, and presents the evidence in a local web dashboard.
 
 Chrome may ask you to log in or solve a CAPTCHA during a live scan. Keep the
 Chrome window open until collection finishes.
+Shopee scans in the web app allow up to 15 minutes for manual verification.
+If a challenge fails, the window stays open so you can recover manually; the
+scraper does not automatically retry the challenge. Collection resumes when
+Shopee redirects out of login/verification. Use Shopee login or QR login rather
+than Google sign-in, which may reject automated browsers.
 
 ## Install on a new computer
 
@@ -148,6 +153,27 @@ overwriting the deployed artifact:
 The leakage-filtered multisource experiment produced 32,342 training rows but
 reached only `0.7951` FiReCS test macro F1, below the deployed classifier's
 `0.8137`. It is retained for research and is not automatically promoted.
+
+## Marketplace v2 research candidate
+
+The experimental rebuild trains separate sentiment, risk detection, risk
+category, and risk severity models with product-disjoint partitions. It remains
+isolated from production because it has not passed every evaluation gate. See
+[`research/MARKETPLACE_V2_MODEL_CARD.md`](research/MARKETPLACE_V2_MODEL_CARD.md)
+for held-out results, limitations, and reproduction commands.
+
+## Production risk scoring
+
+The production path uses trained marketplace sentiment and binary-risk
+classifiers at review level, with VADER and the editable lexicons retained as
+supporting evidence. Product aggregation follows the manuscript formula: 30%
+of the negative-review ratio plus 70% of the detected-risk ratio. Severity is
+not part of the score. It analyzes all usable reviews or a representative
+maximum of 100. Set `DEFAKETIVE_MODEL_MODE=manuscript` to run the strict
+VADER/lexicon research baseline. See
+[`research/RISK_SCORING_MODEL_PLAN.md`](research/RISK_SCORING_MODEL_PLAN.md) and
+[`research/sample_size_protocol.md`](research/sample_size_protocol.md).
+
 
 ## Optional scraper command line
 

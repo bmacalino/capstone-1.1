@@ -1,0 +1,69 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "smart_home",
+  "minimum_collected_reviews": 200,
+  "products_checked": 3,
+  "status_counts": {
+    "insufficient_written_reviews": 3
+  },
+  "products": [
+    {
+      "name": "Xiaomi Smart Camera C301 2K 3MP IP Security Camera 360° Pan Tilt AI Human Detection Night Vision Two Way Audio WiFi Indoor CCTV",
+      "link": "https://www.lazada.com.ph/products/pdp-i4474319488-s25490790848.html",
+      "reported_review_count": 3712,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 24,
+      "collected_by_star": {
+        "1": 6,
+        "2": 3,
+        "3": 5,
+        "4": 10,
+        "5": 0
+      },
+      "review_status": "complete",
+      "stop_reason": "page_signature_timeout_attempt_3",
+      "filter_warning": "Lazada did not return verified 5-star reviews; balanced collection stopped to prevent mislabeled data"
+    },
+    {
+      "name": "🎖 TP-Link Official Store | Tapo C200C | 1080p Indoor 360 Degrees Pan and Tilt Wireless WiFi IP Security CCTV Sale Hidden Camera Connect to Cellphone Two Way Audio with Mic and Speaker [NO WALL MOUNT INCLUDED]",
+      "link": "https://www.lazada.com.ph/products/pdp-i4547888367-s29807638342.html",
+      "reported_review_count": 8719,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "collecting",
+      "stop_reason": "empty_review_page",
+      "filter_warning": "Lazada did not return verified 1-star reviews; balanced collection stopped to prevent mislabeled data"
+    },
+    {
+      "name": "V380 PRO Q16S Smart Camera Bulb 1080P HD Night Vision Wifi IP Camera connect to mobile 360 ° Panoramic Rotatable Smart Security CCTV Camera baby motion detection Indoor and Outdoor Two-Way Audio without using wifi",
+      "link": "https://www.lazada.com.ph/products/pdp-i3626751806-s19094066174.html",
+      "reported_review_count": 5392,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "collecting",
+      "stop_reason": "empty_review_page",
+      "filter_warning": "Lazada did not return verified 1-star reviews; balanced collection stopped to prevent mislabeled data"
+    }
+  ],
+  "generated_at": "2026-09-10T16:58:13"
+}

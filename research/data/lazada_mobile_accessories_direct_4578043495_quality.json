@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "100W 3 in 1 Super Charging Cable 6A Type C Fast Charger Type-C Cable Data Nylon Braid Super Fast Charge 120W Cable Charger for All Smart Phone",
+      "link": "https://www.lazada.com.ph/products/pdp-i4578043495-s26385163838.html",
+      "reported_review_count": 1770,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 121,
+      "collected_by_star": {
+        "1": 36,
+        "2": 18,
+        "3": 17,
+        "4": 10,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T16:09:27"
+}

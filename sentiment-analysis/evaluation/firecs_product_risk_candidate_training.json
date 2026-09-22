@@ -1,0 +1,134 @@
+{
+  "metadata": {
+    "model_version": "defaketive-firecs-product-risk-0.1.0-candidate",
+    "created_at": "2026-09-18T10:58:25.609993+00:00",
+    "sklearn_version": "1.9.0",
+    "deployment_status": "development_candidate",
+    "qualified_for_integration": false,
+    "qualified_for_risk_scoring_development": true,
+    "qualification_note": "Passed review-level duplicate-grouped nested cross-validation. FiReCS has no product identifier, so a locked product-disjoint test is still required before deployment.",
+    "sentiment_policy": "preserved from active hybrid artifact",
+    "risk_policy": "binary product-only yes/no; no categories or severity",
+    "score_formula": "100 * (0.30 * negative_review_ratio + 0.70 * detected_risk_review_ratio)",
+    "random_state": 42,
+    "risk_training_rows": 1000,
+    "risk_distribution": {
+      "no_risk": 562,
+      "risk": 438
+    },
+    "sentiment_distribution": {
+      "negative": 334,
+      "neutral": 333,
+      "positive": 333
+    },
+    "unique_normalized_reviews": 1000,
+    "risk_detection_threshold": 0.4700000000000001,
+    "threshold_selection": "five-fold stratified duplicate-text-group out-of-fold predictions",
+    "sources": [
+      {
+        "path": "outputs\\firecs_risk_annotation_final\\firecs_product_only_final.json",
+        "sha256": "40f17d371c8b04d248fbcd4332a09c31fea3ec0a8bcb55900ce29285bb826e22"
+      },
+      {
+        "path": "outputs\\firecs_risk_annotation_final\\FiReCS_Risk_Annotation_Round_1_Product_Only_Final.xlsx",
+        "sha256": "523cc50249b3e7911e7c2ee8a0f0260e28d5b21a4617741564ab1bf74019af13"
+      },
+      {
+        "path": "sentiment-analysis\\evaluation\\firecs_product_only_risk_cross_validation.json",
+        "sha256": "dc32523175dcdc2867e65733bd983cb4ef99e9643bf70fc80935c03a2a9d4237"
+      },
+      {
+        "path": "sentiment-analysis\\models\\hybrid_manuscript_v1.joblib",
+        "sha256": "a89200e884c86542998330441733ea3481601b8b904beb0446a9d7e71030bcf7",
+        "use": "sentiment pipeline only"
+      }
+    ]
+  },
+  "artifact": "sentiment-analysis\\models\\firecs_product_risk_candidate.joblib",
+  "artifact_sha256": "81927271b5dc9e38fa73a9ceaa85dd23dbb34736f0018264093e424895aaa5aa",
+  "threshold_selection": {
+    "threshold": 0.47,
+    "selection_macro_f1": 0.7835,
+    "selection_risk_recall": 0.8014,
+    "oof_metrics_for_threshold_selection": {
+      "sample_count": 1000,
+      "accuracy": 0.785,
+      "balanced_accuracy": 0.7868,
+      "macro_f1": 0.7835,
+      "no_risk": {
+        "precision": 0.833,
+        "recall": 0.7722,
+        "f1": 0.8015,
+        "support": 562
+      },
+      "risk": {
+        "precision": 0.7328,
+        "recall": 0.8014,
+        "f1": 0.7655,
+        "support": 438
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_risk",
+          "risk"
+        ],
+        "values": [
+          [
+            434,
+            128
+          ],
+          [
+            87,
+            351
+          ]
+        ]
+      },
+      "roc_auc": 0.8716,
+      "average_precision": 0.839,
+      "brier_score": 0.1455
+    },
+    "fold_counts": {
+      "1": 200,
+      "2": 200,
+      "3": 200,
+      "4": 200,
+      "5": 200
+    },
+    "note": "These pooled out-of-fold predictions select the final threshold. Use the separate nested cross-validation metrics for an unbiased development estimate."
+  },
+  "side_by_side": {
+    "candidate_nested_cross_validation": {
+      "accuracy": 0.781,
+      "balanced_accuracy": 0.784,
+      "macro_f1": 0.7798,
+      "risk_precision": 0.7239,
+      "risk_recall": 0.8082,
+      "risk_f1": 0.7638,
+      "false_positive_count": 135,
+      "false_negative_count": 84
+    },
+    "currently_deployed_external_diagnostic": {
+      "accuracy": 0.522,
+      "balanced_accuracy": 0.5553,
+      "macro_f1": 0.5021,
+      "risk_precision": 0.4738,
+      "risk_recall": 0.8242,
+      "risk_f1": 0.6017,
+      "false_positive_count": 401,
+      "false_negative_count": 77
+    }
+  },
+  "development_gates": {
+    "risk_recall_at_least_0_80": true,
+    "risk_macro_f1_at_least_0_75": true
+  },
+  "passes_all_development_gates": true,
+  "runtime_smoke_test": {
+    "loaded": true,
+    "model_version": "defaketive-firecs-product-risk-0.1.0-candidate+manuscript-wsm-1.0.0",
+    "risk_detected_type": "bool",
+    "threshold": 0.4700000000000001
+  },
+  "deployment_changed": false,
+  "next_gate": "Evaluate on a newly frozen product-disjoint locked test set."
+}

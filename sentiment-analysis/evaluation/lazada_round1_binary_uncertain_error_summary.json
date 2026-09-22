@@ -1,0 +1,25 @@
+{
+  "dataset": "lazada_round1_all.csv",
+  "artifact": "lazada_round1_binary_uncertain.joblib",
+  "test_rows": 133,
+  "evaluated": {
+    "sentiment": 133,
+    "risk_detection": 133,
+    "risk_category": 80,
+    "risk_severity": 80
+  },
+  "error_counts": {
+    "risk_category": 26,
+    "risk_detection": 21,
+    "risk_severity": 23,
+    "sentiment": 46
+  },
+  "sentiment_confusions": {
+    "negative -> positive": 3,
+    "negative -> uncertain": 3,
+    "positive -> negative": 6,
+    "positive -> uncertain": 14,
+    "uncertain -> negative": 12,
+    "uncertain -> positive": 8
+  }
+}

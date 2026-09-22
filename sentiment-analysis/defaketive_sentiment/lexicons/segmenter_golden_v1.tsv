@@ -1,0 +1,29 @@
+# Frozen segmenter behaviour for taglish-seg-1.0.0.
+#
+# Every sentence_id in the annotation queue is sha256(review_id | index | text),
+# so changing any expected value below invalidates the labels keyed to it. The
+# verification script re-derives every id from these rules and fails if they no
+# longer reproduce.
+#
+# COLUMNS  input <TAB> expected_segments <TAB> note
+# Segments are joined with " || ". Literal "\n" in the input means a newline.
+#
+input	expected_segments	note
+Maganda ang packaging pero sobrang init.	Maganda ang packaging || pero sobrang init.	contrast splits and keeps the connective
+charger at cable ok lang	charger at cable ok lang	additive "at" deliberately does NOT split
+walang sira at gumagana	walang sira at gumagana	a negation and its scope stay together
+ok naman\nkaso umuusok\n\nayaw ko na	ok naman || kaso umuusok || ayaw ko na	newlines split, blank lines collapse
+ang ganda 😍 sulit sa presyo	ang ganda 😍 || sulit sa presyo	a single emoji followed by a word ends a segment
+sulit 😍😡	sulit 😍😡	a trailing emoji run has nothing after it to start
+bumili ako ng 20.000mah pb. sira agad.	bumili ako ng 20.000mah pb. || sira agad.	the decimal point is not a boundary
+5 pcs. lang ang dumating. kulang.	5 pcs. lang ang dumating. || kulang.	"pcs." is an abbreviation, not a sentence end
+Sira agad!!! Ayaw ko na.	Sira agad!!! || Ayaw ko na.	a punctuation run is one boundary
+Hindi ko alam... ayaw gumana	Hindi ko alam... || ayaw gumana	an ellipsis is one boundary
+bili kayo sa shopee.ph/item maganda	bili kayo sa shopee.ph/item maganda	a URL contains no boundary
+maganda; kaso mabilis masira	maganda; || kaso mabilis masira	a semicolon splits
+Good quality but it overheated	Good quality || but it overheated	English contrast splits too
+ok	ok	a single short segment survives
+	<>	empty input yields no segments
+   	<>	whitespace only yields no segments
+!!!	<>	no word characters at all yields no segments
+maganda. !!!	maganda. !!!	a punctuation-only tail attaches to the previous segment

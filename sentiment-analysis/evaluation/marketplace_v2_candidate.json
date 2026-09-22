@@ -1,0 +1,510 @@
+{
+  "metadata": {
+    "model_version": "defaketive-marketplace-v2-0.1.0-candidate",
+    "created_at": "2026-09-12T03:51:46.715974+00:00",
+    "sklearn_version": "1.9.0",
+    "qualified_for_integration": false,
+    "gates": {
+      "sentiment_macro_f1_at_least_0_75": false,
+      "sentiment_beats_incumbent_by_0_02": true,
+      "neutral_f1_at_least_0_60": false,
+      "risk_recall_at_least_0_80": true,
+      "risk_macro_f1_at_least_0_75": true,
+      "category_macro_f1_at_least_0_65": false,
+      "severity_weighted_kappa_at_least_0_65": false
+    },
+    "random_state": 42,
+    "marketplace_file": "complete_manual_marketplace_reviews (1).csv",
+    "marketplace_sha256": "82c1a94f62355f8bfa6fa82f737bf1d4a7096599937d52d5532e691b32081183",
+    "firecs_train_file": "FiReCS_train_set.csv",
+    "firecs_train_sha256": "9ca5ef80b8f93836f5966a1db8d017ebbd474e4b615468269cb0ba9d3778eb39",
+    "mixed_sentiment_policy": "excluded from three-class sentiment only; retained for risk tasks",
+    "category_policy": "pipe- or comma-delimited multilabel categories",
+    "category_probability_threshold": 0.15,
+    "split_policy": "Repeated StratifiedGroupKFold by product_id, selected from label/size balance only; no product crosses partitions"
+  },
+  "dataset": {
+    "rows": 498,
+    "products": 15,
+    "platforms": {
+      "lazada": 173,
+      "temu": 325
+    },
+    "sentiment": {
+      "mixed": 28,
+      "negative": 363,
+      "neutral": 18,
+      "positive": 89
+    },
+    "blank_annotator_ids": 498
+  },
+  "splits": {
+    "train": {
+      "rows": 372,
+      "products": 7,
+      "platforms": {
+        "lazada": 100,
+        "temu": 272
+      },
+      "sentiment": {
+        "mixed": 20,
+        "negative": 274,
+        "neutral": 11,
+        "positive": 67
+      },
+      "product_ids": [
+        "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+        "https://www.lazada.com.ph/products/pdp-i5014079183.html",
+        "https://www.lazada.com.ph/products/pdp-i5084402409.html",
+        "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+        "https://www.temu.com/goods.html?goods_id=601099715489226",
+        "https://www.temu.com/goods.html?goods_id=601100260215296",
+        "https://www.temu.com/goods.html?goods_id=605886403728740"
+      ]
+    },
+    "validation": {
+      "rows": 52,
+      "products": 3,
+      "platforms": {
+        "lazada": 45,
+        "temu": 7
+      },
+      "sentiment": {
+        "mixed": 1,
+        "negative": 40,
+        "neutral": 3,
+        "positive": 8
+      },
+      "product_ids": [
+        "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+        "https://www.lazada.com.ph/products/pdp-i4983206125-s29079712739.html",
+        "https://www.temu.com/goods.html?goods_id=606514626540267"
+      ]
+    },
+    "test": {
+      "rows": 74,
+      "products": 5,
+      "platforms": {
+        "lazada": 28,
+        "temu": 46
+      },
+      "sentiment": {
+        "mixed": 7,
+        "negative": 49,
+        "neutral": 4,
+        "positive": 14
+      },
+      "product_ids": [
+        "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+        "https://www.temu.com/goods.html?goods_id=601099533822138",
+        "https://www.temu.com/goods.html?goods_id=601100261015054",
+        "https://www.temu.com/goods.html?goods_id=601100344333196",
+        "https://www.temu.com/goods.html?goods_id=601100935391760"
+      ]
+    }
+  },
+  "training": {
+    "sentiment_rows": 7692,
+    "sentiment_local_rows": 352,
+    "sentiment_firecs_rows": 7340,
+    "risk_detection_rows": 368,
+    "risk_category_rows": 298,
+    "risk_severity_rows": 296
+  },
+  "validation": {
+    "sentiment": {
+      "sample_count": 51,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.902,
+      "precision": 0.6296,
+      "recall": 0.5833,
+      "f1": 0.5994,
+      "per_class": {
+        "negative": {
+          "precision": 0.8889,
+          "recall": 1.0,
+          "f1": 0.9412,
+          "support": 40
+        },
+        "neutral": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "positive": {
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "support": 8
+        }
+      },
+      "matrix": [
+        [
+          40,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          6
+        ]
+      ]
+    },
+    "risk_detection": {
+      "sample_count": 52,
+      "accuracy": 0.8462,
+      "macro_f1": 0.5574,
+      "no_risk": {
+        "precision": 0.5,
+        "recall": 0.125,
+        "f1": 0.2,
+        "support": 8
+      },
+      "risk": {
+        "precision": 0.86,
+        "recall": 0.9773,
+        "f1": 0.9149,
+        "support": 44
+      }
+    },
+    "risk_category": {
+      "sample_count": 44,
+      "classes": [
+        "damage",
+        "defect",
+        "delivery",
+        "durability",
+        "missing_item",
+        "other",
+        "performance",
+        "quality",
+        "seller_service",
+        "wrong_color_or_size",
+        "wrong_item"
+      ],
+      "exact_match_accuracy": 0.1364,
+      "macro_f1": 0.1839,
+      "micro_f1": 0.5,
+      "hamming_loss": 0.1529,
+      "per_class": {
+        "damage": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "defect": {
+          "precision": 0.8919,
+          "recall": 0.9167,
+          "f1": 0.9041,
+          "support": 36
+        },
+        "delivery": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "durability": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "missing_item": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "other": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "performance": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "quality": {
+          "precision": 0.1667,
+          "recall": 1.0,
+          "f1": 0.2857,
+          "support": 2
+        },
+        "seller_service": {
+          "precision": 0.3333,
+          "recall": 1.0,
+          "f1": 0.5,
+          "support": 1
+        },
+        "wrong_color_or_size": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "wrong_item": {
+          "precision": 0.25,
+          "recall": 0.5,
+          "f1": 0.3333,
+          "support": 2
+        }
+      },
+      "unknown_category_rows_excluded": 0,
+      "probability_threshold": 0.15
+    },
+    "risk_severity": {
+      "sample_count": 44,
+      "accuracy": 0.7727,
+      "macro_f1": 0.2944,
+      "weighted_kappa": 0.1941,
+      "mean_absolute_error": 0.2273
+    }
+  },
+  "test": {
+    "sentiment": {
+      "sample_count": 67,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.8657,
+      "precision": 0.6902,
+      "recall": 0.6412,
+      "f1": 0.6619,
+      "per_class": {
+        "negative": {
+          "precision": 0.9038,
+          "recall": 0.9592,
+          "f1": 0.9307,
+          "support": 49
+        },
+        "neutral": {
+          "precision": 0.3333,
+          "recall": 0.25,
+          "f1": 0.2857,
+          "support": 4
+        },
+        "positive": {
+          "precision": 0.8333,
+          "recall": 0.7143,
+          "f1": 0.7692,
+          "support": 14
+        }
+      },
+      "matrix": [
+        [
+          47,
+          0,
+          2
+        ],
+        [
+          3,
+          1,
+          0
+        ],
+        [
+          2,
+          2,
+          10
+        ]
+      ]
+    },
+    "incumbent_sentiment": {
+      "sample_count": 67,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.7313,
+      "precision": 0.5393,
+      "recall": 0.5799,
+      "f1": 0.549,
+      "per_class": {
+        "negative": {
+          "precision": 0.9048,
+          "recall": 0.7755,
+          "f1": 0.8352,
+          "support": 49
+        },
+        "neutral": {
+          "precision": 0.125,
+          "recall": 0.25,
+          "f1": 0.1667,
+          "support": 4
+        },
+        "positive": {
+          "precision": 0.5882,
+          "recall": 0.7143,
+          "f1": 0.6452,
+          "support": 14
+        }
+      },
+      "matrix": [
+        [
+          38,
+          5,
+          6
+        ],
+        [
+          2,
+          1,
+          1
+        ],
+        [
+          2,
+          2,
+          10
+        ]
+      ]
+    },
+    "risk_detection": {
+      "sample_count": 72,
+      "accuracy": 0.9028,
+      "macro_f1": 0.8049,
+      "no_risk": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6667,
+        "support": 14
+      },
+      "risk": {
+        "precision": 0.8923,
+        "recall": 1.0,
+        "f1": 0.9431,
+        "support": 58
+      }
+    },
+    "incumbent_risk_detection": {
+      "sample_count": 72,
+      "accuracy": 0.4167,
+      "macro_f1": 0.4162,
+      "no_risk": {
+        "precision": 0.25,
+        "recall": 1.0,
+        "f1": 0.4,
+        "support": 14
+      },
+      "risk": {
+        "precision": 1.0,
+        "recall": 0.2759,
+        "f1": 0.4324,
+        "support": 58
+      }
+    },
+    "risk_category": {
+      "sample_count": 58,
+      "classes": [
+        "damage",
+        "defect",
+        "delivery",
+        "durability",
+        "missing_item",
+        "other",
+        "performance",
+        "quality",
+        "seller_service",
+        "wrong_color_or_size",
+        "wrong_item"
+      ],
+      "exact_match_accuracy": 0.069,
+      "macro_f1": 0.2659,
+      "micro_f1": 0.4078,
+      "hamming_loss": 0.1912,
+      "per_class": {
+        "damage": {
+          "precision": 0.0714,
+          "recall": 0.2,
+          "f1": 0.1053,
+          "support": 5
+        },
+        "defect": {
+          "precision": 0.3953,
+          "recall": 0.9444,
+          "f1": 0.5574,
+          "support": 18
+        },
+        "delivery": {
+          "precision": 0.375,
+          "recall": 0.6,
+          "f1": 0.4615,
+          "support": 5
+        },
+        "durability": {
+          "precision": 0.0833,
+          "recall": 1.0,
+          "f1": 0.1538,
+          "support": 1
+        },
+        "missing_item": {
+          "precision": 0.5,
+          "recall": 0.25,
+          "f1": 0.3333,
+          "support": 4
+        },
+        "other": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "performance": {
+          "precision": 0.0385,
+          "recall": 1.0,
+          "f1": 0.0741,
+          "support": 1
+        },
+        "quality": {
+          "precision": 0.6538,
+          "recall": 0.85,
+          "f1": 0.7391,
+          "support": 20
+        },
+        "seller_service": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "wrong_color_or_size": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "wrong_item": {
+          "precision": 0.3333,
+          "recall": 1.0,
+          "f1": 0.5,
+          "support": 1
+        }
+      },
+      "unknown_category_rows_excluded": 0,
+      "probability_threshold": 0.15
+    },
+    "risk_severity": {
+      "sample_count": 58,
+      "accuracy": 0.6034,
+      "macro_f1": 0.4163,
+      "weighted_kappa": 0.2603,
+      "mean_absolute_error": 0.431
+    }
+  }
+}

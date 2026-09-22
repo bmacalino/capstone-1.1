@@ -1,0 +1,50 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "audio",
+  "minimum_collected_reviews": 200,
+  "products_checked": 2,
+  "status_counts": {
+    "insufficient_written_reviews": 2
+  },
+  "products": [
+    {
+      "name": "PORTABLE MK-102 SUPER BASS BLUETOOTH WIRELESS SPEAKER WITH RGB LIGHT",
+      "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+      "reported_review_count": 3079,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 152,
+      "collected_by_star": {
+        "1": 40,
+        "2": 29,
+        "3": 27,
+        "4": 16,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Computer Wired Bluetooth Speakers Audio Sound Bully Speaker Wired USB-Powered PC Gaming Sound-bar Speakers",
+      "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+      "reported_review_count": 1807,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 63,
+      "collected_by_star": {
+        "1": 4,
+        "2": 4,
+        "3": 5,
+        "4": 10,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T16:03:17"
+}

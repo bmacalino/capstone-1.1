@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "smart_home",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "KASIDA Bluetooth WIFI Tuya smart lock 6 in 1 Biometric fingerprint door knob main door lock door knob with finger print smart home room rental Check-In remotely unlock smart door lock Touch Password/Key/Card electronic door lock fit right & left door",
+      "link": "https://www.lazada.com.ph/products/pdp-i3075012546-s133100712220.html",
+      "reported_review_count": 836,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 58,
+      "collected_by_star": {
+        "1": 11,
+        "2": 3,
+        "3": 2,
+        "4": 2,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T13:33:45"
+}

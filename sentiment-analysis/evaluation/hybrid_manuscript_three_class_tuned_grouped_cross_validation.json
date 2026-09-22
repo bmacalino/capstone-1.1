@@ -1,0 +1,811 @@
+{
+  "metadata": {
+    "created_at": "2026-09-16T15:38:54.271278+00:00",
+    "evaluation_status": "development_product_grouped_cross_validation",
+    "limitation": "All reviews were previously available during development. This is a product-grouped cross-validation estimate, not an independent locked test.",
+    "dataset": "outputs\\lazada_gold_test_v1\\lazada_round1_all_adjudicated.csv",
+    "dataset_sha256": "5b4f1d59d06aaf4570a8adacfd0089020ea5061132028ec761b1e2ae793b8e0c",
+    "auxiliary_dataset": "sentiment-analysis\\data\\firecs\\FiReCS_train_set.csv",
+    "auxiliary_dataset_sha256": "9ca5ef80b8f93836f5966a1db8d017ebbd474e4b615468269cb0ba9d3778eb39",
+    "random_state": 42,
+    "outer_folds": 5,
+    "inner_folds": 4,
+    "rows": 907,
+    "products": 24,
+    "product_leakage": false,
+    "sentiment_policy": "mixed, neutral, and uncertain map to uncertain",
+    "sentiment_strategy": "direct-three-class-tuned",
+    "risk_policy": "binary yes/no; no categories or severity",
+    "score_formula": "100 * (0.30 * negative_ratio + 0.70 * detected_risk_ratio)",
+    "firecs_rows_loaded": 7340,
+    "firecs_sentiment_rows_used": 7340,
+    "firecs_marketplace_overlap_rows_excluded": 0
+  },
+  "dataset_distribution": {
+    "sentiment": {
+      "positive": 306,
+      "negative": 322,
+      "uncertain": 279
+    },
+    "risk": {
+      "no_risk": 392,
+      "risk": 515
+    }
+  },
+  "pooled_out_of_fold": {
+    "sentiment": {
+      "sample_count": 907,
+      "labels": [
+        "negative",
+        "positive",
+        "uncertain"
+      ],
+      "accuracy": 0.6229,
+      "precision": 0.6076,
+      "recall": 0.6139,
+      "f1": 0.6095,
+      "per_class": {
+        "negative": {
+          "precision": 0.6789,
+          "recall": 0.7484,
+          "f1": 0.712,
+          "support": 322
+        },
+        "positive": {
+          "precision": 0.6935,
+          "recall": 0.7026,
+          "f1": 0.6981,
+          "support": 306
+        },
+        "uncertain": {
+          "precision": 0.4504,
+          "recall": 0.3907,
+          "f1": 0.4184,
+          "support": 279
+        }
+      },
+      "matrix": [
+        [
+          241,
+          18,
+          63
+        ],
+        [
+          21,
+          215,
+          70
+        ],
+        [
+          93,
+          77,
+          109
+        ]
+      ]
+    },
+    "risk_detection": {
+      "sample_count": 907,
+      "accuracy": 0.7707,
+      "macro_f1": 0.7647,
+      "no_risk": {
+        "precision": 0.7486,
+        "recall": 0.7066,
+        "f1": 0.727,
+        "support": 392
+      },
+      "risk": {
+        "precision": 0.7858,
+        "recall": 0.8194,
+        "f1": 0.8023,
+        "support": 515
+      }
+    },
+    "product_risk_score": {
+      "products": 24,
+      "mean_absolute_error_points": 9.7817,
+      "root_mean_squared_error_points": 14.2313,
+      "pearson_correlation": 0.7697,
+      "spearman_rank_correlation": 0.7372,
+      "risk_level_accuracy": 0.8333,
+      "per_product": [
+        {
+          "product_id": "15411207559",
+          "fold": 4,
+          "reviews": 6,
+          "human_score": 100.0,
+          "predicted_score": 50.0,
+          "absolute_error": 50.0,
+          "human_level": "high",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "1676918812",
+          "fold": 4,
+          "reviews": 30,
+          "human_score": 24.67,
+          "predicted_score": 27.0,
+          "absolute_error": 2.33,
+          "human_level": "low",
+          "predicted_level": "low"
+        },
+        {
+          "product_id": "1994197909",
+          "fold": 2,
+          "reviews": 78,
+          "human_score": 64.62,
+          "predicted_score": 70.38,
+          "absolute_error": 5.77,
+          "human_level": "high",
+          "predicted_level": "high"
+        },
+        {
+          "product_id": "2386662601",
+          "fold": 1,
+          "reviews": 16,
+          "human_score": 17.5,
+          "predicted_score": 26.25,
+          "absolute_error": 8.75,
+          "human_level": "low",
+          "predicted_level": "low"
+        },
+        {
+          "product_id": "3034831887",
+          "fold": 2,
+          "reviews": 29,
+          "human_score": 39.31,
+          "predicted_score": 33.1,
+          "absolute_error": 6.21,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "3041489531",
+          "fold": 1,
+          "reviews": 23,
+          "human_score": 24.35,
+          "predicted_score": 50.0,
+          "absolute_error": 25.65,
+          "human_level": "low",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "3075012546",
+          "fold": 5,
+          "reviews": 30,
+          "human_score": 59.33,
+          "predicted_score": 51.33,
+          "absolute_error": 8.0,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "3401407254",
+          "fold": 5,
+          "reviews": 25,
+          "human_score": 50.0,
+          "predicted_score": 33.6,
+          "absolute_error": 16.4,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "3646051280",
+          "fold": 4,
+          "reviews": 72,
+          "human_score": 44.17,
+          "predicted_score": 56.81,
+          "absolute_error": 12.64,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "3999327536",
+          "fold": 5,
+          "reviews": 86,
+          "human_score": 59.3,
+          "predicted_score": 50.35,
+          "absolute_error": 8.95,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "4227077318",
+          "fold": 2,
+          "reviews": 2,
+          "human_score": 50.0,
+          "predicted_score": 35.0,
+          "absolute_error": 15.0,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "4363184044",
+          "fold": 2,
+          "reviews": 31,
+          "human_score": 53.87,
+          "predicted_score": 55.48,
+          "absolute_error": 1.61,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "4507172427",
+          "fold": 3,
+          "reviews": 24,
+          "human_score": 51.67,
+          "predicted_score": 49.58,
+          "absolute_error": 2.08,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "4584110073",
+          "fold": 2,
+          "reviews": 35,
+          "human_score": 30.86,
+          "predicted_score": 40.57,
+          "absolute_error": 9.71,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "4946943100",
+          "fold": 3,
+          "reviews": 35,
+          "human_score": 48.57,
+          "predicted_score": 42.86,
+          "absolute_error": 5.71,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "4983206125",
+          "fold": 5,
+          "reviews": 30,
+          "human_score": 44.67,
+          "predicted_score": 50.33,
+          "absolute_error": 5.67,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "5037745180",
+          "fold": 3,
+          "reviews": 86,
+          "human_score": 56.4,
+          "predicted_score": 67.56,
+          "absolute_error": 11.16,
+          "human_level": "moderate",
+          "predicted_level": "high"
+        },
+        {
+          "product_id": "5166282734",
+          "fold": 1,
+          "reviews": 17,
+          "human_score": 21.76,
+          "predicted_score": 40.0,
+          "absolute_error": 18.24,
+          "human_level": "low",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "5211290661",
+          "fold": 3,
+          "reviews": 40,
+          "human_score": 24.75,
+          "predicted_score": 28.5,
+          "absolute_error": 3.75,
+          "human_level": "low",
+          "predicted_level": "low"
+        },
+        {
+          "product_id": "5256422305",
+          "fold": 1,
+          "reviews": 30,
+          "human_score": 61.33,
+          "predicted_score": 69.67,
+          "absolute_error": 8.33,
+          "human_level": "high",
+          "predicted_level": "high"
+        },
+        {
+          "product_id": "527362407",
+          "fold": 1,
+          "reviews": 65,
+          "human_score": 48.92,
+          "predicted_score": 55.23,
+          "absolute_error": 6.31,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        },
+        {
+          "product_id": "5381386541",
+          "fold": 1,
+          "reviews": 28,
+          "human_score": 93.93,
+          "predicted_score": 91.79,
+          "absolute_error": 2.14,
+          "human_level": "high",
+          "predicted_level": "high"
+        },
+        {
+          "product_id": "5384903372",
+          "fold": 4,
+          "reviews": 3,
+          "human_score": 100.0,
+          "predicted_score": 100.0,
+          "absolute_error": 0.0,
+          "human_level": "high",
+          "predicted_level": "high"
+        },
+        {
+          "product_id": "650518893",
+          "fold": 4,
+          "reviews": 86,
+          "human_score": 55.23,
+          "predicted_score": 54.88,
+          "absolute_error": 0.35,
+          "human_level": "moderate",
+          "predicted_level": "moderate"
+        }
+      ]
+    }
+  },
+  "fold_variability": {
+    "sentiment_macro_f1": {
+      "mean": 0.6102,
+      "standard_deviation": 0.0479,
+      "minimum": 0.5736,
+      "maximum": 0.6905
+    },
+    "risk_macro_f1": {
+      "mean": 0.7653,
+      "standard_deviation": 0.0399,
+      "minimum": 0.735,
+      "maximum": 0.8333
+    },
+    "risk_recall": {
+      "mean": 0.8218,
+      "standard_deviation": 0.0788,
+      "minimum": 0.7009,
+      "maximum": 0.8922
+    }
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "train_rows": 728,
+      "test_rows": 179,
+      "train_products": 18,
+      "test_products": 6,
+      "test_product_ids": [
+        "2386662601",
+        "3041489531",
+        "5166282734",
+        "5256422305",
+        "527362407",
+        "5381386541"
+      ],
+      "sentiment_uncertainty_threshold": 0.5,
+      "risk_detection_threshold": 0.525,
+      "inner_risk_threshold_selection": {
+        "macro_f1": 0.7891,
+        "risk_recall": 0.8421
+      },
+      "sentiment": {
+        "sample_count": 179,
+        "labels": [
+          "negative",
+          "positive",
+          "uncertain"
+        ],
+        "accuracy": 0.7151,
+        "precision": 0.6962,
+        "recall": 0.6893,
+        "f1": 0.6905,
+        "per_class": {
+          "negative": {
+            "precision": 0.7532,
+            "recall": 0.8406,
+            "f1": 0.7945,
+            "support": 69
+          },
+          "positive": {
+            "precision": 0.8571,
+            "recall": 0.7385,
+            "f1": 0.7934,
+            "support": 65
+          },
+          "uncertain": {
+            "precision": 0.4783,
+            "recall": 0.4889,
+            "f1": 0.4835,
+            "support": 45
+          }
+        },
+        "matrix": [
+          [
+            58,
+            2,
+            9
+          ],
+          [
+            2,
+            48,
+            15
+          ],
+          [
+            17,
+            6,
+            22
+          ]
+        ]
+      },
+      "risk_detection": {
+        "sample_count": 179,
+        "accuracy": 0.7654,
+        "macro_f1": 0.756,
+        "no_risk": {
+          "precision": 0.8226,
+          "recall": 0.622,
+          "f1": 0.7083,
+          "support": 82
+        },
+        "risk": {
+          "precision": 0.735,
+          "recall": 0.8866,
+          "f1": 0.8037,
+          "support": 97
+        }
+      }
+    },
+    {
+      "fold": 2,
+      "train_rows": 732,
+      "test_rows": 175,
+      "train_products": 19,
+      "test_products": 5,
+      "test_product_ids": [
+        "1994197909",
+        "3034831887",
+        "4227077318",
+        "4363184044",
+        "4584110073"
+      ],
+      "sentiment_uncertainty_threshold": 0.5,
+      "risk_detection_threshold": 0.52,
+      "inner_risk_threshold_selection": {
+        "macro_f1": 0.7333,
+        "risk_recall": 0.8015
+      },
+      "sentiment": {
+        "sample_count": 175,
+        "labels": [
+          "negative",
+          "positive",
+          "uncertain"
+        ],
+        "accuracy": 0.6,
+        "precision": 0.5905,
+        "recall": 0.5946,
+        "f1": 0.5916,
+        "per_class": {
+          "negative": {
+            "precision": 0.6571,
+            "recall": 0.7302,
+            "f1": 0.6917,
+            "support": 63
+          },
+          "positive": {
+            "precision": 0.7222,
+            "recall": 0.6964,
+            "f1": 0.7091,
+            "support": 56
+          },
+          "uncertain": {
+            "precision": 0.3922,
+            "recall": 0.3571,
+            "f1": 0.3738,
+            "support": 56
+          }
+        },
+        "matrix": [
+          [
+            46,
+            1,
+            16
+          ],
+          [
+            2,
+            39,
+            15
+          ],
+          [
+            22,
+            14,
+            20
+          ]
+        ]
+      },
+      "risk_detection": {
+        "sample_count": 175,
+        "accuracy": 0.84,
+        "macro_f1": 0.8333,
+        "no_risk": {
+          "precision": 0.8358,
+          "recall": 0.7671,
+          "f1": 0.8,
+          "support": 73
+        },
+        "risk": {
+          "precision": 0.8426,
+          "recall": 0.8922,
+          "f1": 0.8667,
+          "support": 102
+        }
+      }
+    },
+    {
+      "fold": 3,
+      "train_rows": 722,
+      "test_rows": 185,
+      "train_products": 20,
+      "test_products": 4,
+      "test_product_ids": [
+        "4507172427",
+        "4946943100",
+        "5037745180",
+        "5211290661"
+      ],
+      "sentiment_uncertainty_threshold": 0.4,
+      "risk_detection_threshold": 0.55,
+      "inner_risk_threshold_selection": {
+        "macro_f1": 0.7633,
+        "risk_recall": 0.8129
+      },
+      "sentiment": {
+        "sample_count": 185,
+        "labels": [
+          "negative",
+          "positive",
+          "uncertain"
+        ],
+        "accuracy": 0.5838,
+        "precision": 0.5804,
+        "recall": 0.5725,
+        "f1": 0.5736,
+        "per_class": {
+          "negative": {
+            "precision": 0.7015,
+            "recall": 0.7344,
+            "f1": 0.7176,
+            "support": 64
+          },
+          "positive": {
+            "precision": 0.6897,
+            "recall": 0.5714,
+            "f1": 0.625,
+            "support": 70
+          },
+          "uncertain": {
+            "precision": 0.35,
+            "recall": 0.4118,
+            "f1": 0.3784,
+            "support": 51
+          }
+        },
+        "matrix": [
+          [
+            47,
+            0,
+            17
+          ],
+          [
+            8,
+            40,
+            22
+          ],
+          [
+            12,
+            18,
+            21
+          ]
+        ]
+      },
+      "risk_detection": {
+        "sample_count": 185,
+        "accuracy": 0.7676,
+        "macro_f1": 0.7642,
+        "no_risk": {
+          "precision": 0.7895,
+          "recall": 0.6897,
+          "f1": 0.7362,
+          "support": 87
+        },
+        "risk": {
+          "precision": 0.7523,
+          "recall": 0.8367,
+          "f1": 0.7923,
+          "support": 98
+        }
+      }
+    },
+    {
+      "fold": 4,
+      "train_rows": 710,
+      "test_rows": 197,
+      "train_products": 19,
+      "test_products": 5,
+      "test_product_ids": [
+        "15411207559",
+        "1676918812",
+        "3646051280",
+        "5384903372",
+        "650518893"
+      ],
+      "sentiment_uncertainty_threshold": 0.5,
+      "risk_detection_threshold": 0.465,
+      "inner_risk_threshold_selection": {
+        "macro_f1": 0.7829,
+        "risk_recall": 0.8861
+      },
+      "sentiment": {
+        "sample_count": 197,
+        "labels": [
+          "negative",
+          "positive",
+          "uncertain"
+        ],
+        "accuracy": 0.5838,
+        "precision": 0.5772,
+        "recall": 0.5902,
+        "f1": 0.5785,
+        "per_class": {
+          "negative": {
+            "precision": 0.5857,
+            "recall": 0.6833,
+            "f1": 0.6308,
+            "support": 60
+          },
+          "positive": {
+            "precision": 0.6267,
+            "recall": 0.7015,
+            "f1": 0.662,
+            "support": 67
+          },
+          "uncertain": {
+            "precision": 0.5192,
+            "recall": 0.3857,
+            "f1": 0.4426,
+            "support": 70
+          }
+        },
+        "matrix": [
+          [
+            41,
+            7,
+            12
+          ],
+          [
+            7,
+            47,
+            13
+          ],
+          [
+            22,
+            21,
+            27
+          ]
+        ]
+      },
+      "risk_detection": {
+        "sample_count": 197,
+        "accuracy": 0.7411,
+        "macro_f1": 0.735,
+        "no_risk": {
+          "precision": 0.716,
+          "recall": 0.6744,
+          "f1": 0.6946,
+          "support": 86
+        },
+        "risk": {
+          "precision": 0.7586,
+          "recall": 0.7928,
+          "f1": 0.7753,
+          "support": 111
+        }
+      }
+    },
+    {
+      "fold": 5,
+      "train_rows": 736,
+      "test_rows": 171,
+      "train_products": 20,
+      "test_products": 4,
+      "test_product_ids": [
+        "3075012546",
+        "3401407254",
+        "3999327536",
+        "4983206125"
+      ],
+      "sentiment_uncertainty_threshold": 0.55,
+      "risk_detection_threshold": 0.565,
+      "inner_risk_threshold_selection": {
+        "macro_f1": 0.7782,
+        "risk_recall": 0.8113
+      },
+      "sentiment": {
+        "sample_count": 171,
+        "labels": [
+          "negative",
+          "positive",
+          "uncertain"
+        ],
+        "accuracy": 0.6374,
+        "precision": 0.6259,
+        "recall": 0.6433,
+        "f1": 0.6169,
+        "per_class": {
+          "negative": {
+            "precision": 0.6901,
+            "recall": 0.7424,
+            "f1": 0.7153,
+            "support": 66
+          },
+          "positive": {
+            "precision": 0.6119,
+            "recall": 0.8542,
+            "f1": 0.713,
+            "support": 48
+          },
+          "uncertain": {
+            "precision": 0.5758,
+            "recall": 0.3333,
+            "f1": 0.4222,
+            "support": 57
+          }
+        },
+        "matrix": [
+          [
+            49,
+            8,
+            9
+          ],
+          [
+            2,
+            41,
+            5
+          ],
+          [
+            20,
+            18,
+            19
+          ]
+        ]
+      },
+      "risk_detection": {
+        "sample_count": 171,
+        "accuracy": 0.7427,
+        "macro_f1": 0.7379,
+        "no_risk": {
+          "precision": 0.619,
+          "recall": 0.8125,
+          "f1": 0.7027,
+          "support": 64
+        },
+        "risk": {
+          "precision": 0.8621,
+          "recall": 0.7009,
+          "f1": 0.7732,
+          "support": 107
+        }
+      }
+    }
+  ],
+  "development_gates": {
+    "sentiment_macro_f1_at_least_0_75": false,
+    "uncertain_f1_at_least_0_60": false,
+    "risk_recall_at_least_0_80": true,
+    "risk_macro_f1_at_least_0_75": true
+  },
+  "passes_all_development_gates": false
+}

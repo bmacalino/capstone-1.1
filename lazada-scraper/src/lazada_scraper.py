@@ -18,6 +18,7 @@ import re
 import subprocess
 import sys
 import time
+from collections import Counter
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 
@@ -78,6 +79,10 @@ class LazadaScraper:
     """Scrape public Lazada Philippines product metadata and written reviews."""
 
     BASE_URL = "https://www.lazada.com.ph"
+    # Three-star reviews are the highest-priority annotation stratum. Continue
+    # with the other underrepresented middle ratings before the abundant
+    # one- and five-star extremes.
+    RATING_COLLECTION_ORDER = (3, 2, 4, 1, 5)
     PRODUCT_CARD_SELECTORS = (
         '[data-qa-locator="product-item"]',
         '[data-item-id]',
@@ -109,7 +114,7 @@ class LazadaScraper:
         self,
         keyword: str = "",
         max_products: int = 10,
-        review_limit: int = 30,
+        review_limit: int = 100,
         pages: int = 1,
         product_urls: list[str] | None = None,
         category_urls: list[str] | None = None,
@@ -128,6 +133,9 @@ class LazadaScraper:
         min_rating: float = 0.0,
         min_reviews: int = 0,
         discovery_checkpoint: str | None = None,
+        research_stratum: str = "",
+        min_collected_reviews: int = 0,
+        collection_report: str | None = None,
     ):
         if not keyword.strip() and not product_urls and not category_urls:
             raise ValueError(
@@ -139,11 +147,13 @@ class LazadaScraper:
             raise ValueError("min_rating must be between 0 and 5")
         if min_reviews < 0:
             raise ValueError("min_reviews cannot be negative")
+        if min_collected_reviews < 0:
+            raise ValueError("min_collected_reviews cannot be negative")
 
         self.driver = None
         self.keyword = keyword.strip()
         self.max_products = max(0, max_products)
-        self.review_limit = max(0, review_limit)
+        self.review_limit = min(100, max(0, review_limit))
         self.pages = max(1, pages)
         self.product_urls = [self._normalize_product_url(url) for url in (product_urls or [])]
         self.product_urls = [url for url in self.product_urls if url]
@@ -166,6 +176,8 @@ class LazadaScraper:
         self.max_review_pages = max(1, max_review_pages)
         self.min_rating = float(min_rating)
         self.min_reviews = int(min_reviews)
+        self.research_stratum = research_stratum.strip()
+        self.min_collected_reviews = int(min_collected_reviews)
         self._last_pagination_stop_reason = ""
         self.cookies_file = "cookies_lazada_ph.dat"
         self._cookies_loaded = False
@@ -179,6 +191,11 @@ class LazadaScraper:
         output_path = Path(self.out_file)
         self.discovery_checkpoint_file = discovery_checkpoint or str(
             output_path.with_name(f"{output_path.stem}_discovery.json")
+        )
+        self.collection_report_file = collection_report or (
+            str(output_path.with_name(f"{output_path.stem}_quality.json"))
+            if self.research_stratum or self.min_collected_reviews
+            else ""
         )
         self.output_data: dict[str, dict] = {}
         self.discovery_products: dict[str, dict] = {}
@@ -667,6 +684,66 @@ class LazadaScraper:
         os.replace(temporary_path, output_path)
         logging.info("Saved %s product(s) to %s", len(self.output_data), self.out_file)
 
+    def _apply_research_quality(self, product):
+        """Attach post-collection eligibility facts without hiding partial data."""
+        self._sync_review_counts(product)
+        comments = self._deduplicate_reviews(product.get("comments", []))
+        usable = [review for review in comments if str(review.get("content") or "").strip()]
+        per_star = Counter(
+            str(int(review.get("source_rating_filter") or review.get("rating") or 0))
+            for review in usable
+            if int(review.get("source_rating_filter") or review.get("rating") or 0) in range(1, 6)
+        )
+        collected = len(usable)
+        minimum = self.min_collected_reviews
+        if product.get("qualification", {}).get("status") == "rejected":
+            status = "not_collected"
+        elif collected >= minimum:
+            status = "eligible"
+        else:
+            status = "insufficient_written_reviews"
+        product["research"] = {
+            "stratum": self.research_stratum,
+            "status": status,
+            "minimum_collected_reviews": minimum,
+            "usable_written_reviews": collected,
+            "collected_by_star": {str(star): per_star.get(str(star), 0) for star in range(1, 6)},
+            "review_status": product.get("review_status", "unknown"),
+            "stop_reason": (product.get("review_checkpoint") or {}).get("stop_reason", ""),
+            "filter_warning": product.get("review_filter_warning", ""),
+        }
+        return product["research"]
+
+    def _write_collection_report(self):
+        if not self.collection_report_file:
+            return
+        rows = []
+        for product in self.output_data.values():
+            quality = self._apply_research_quality(product)
+            rows.append({
+                "name": product.get("name", ""),
+                "link": product.get("link", ""),
+                "reported_review_count": product.get("reported_review_count", 0),
+                **quality,
+            })
+        statuses = Counter(row["status"] for row in rows)
+        payload = {
+            "scope": "Lazada Philippines electronics and gadgets",
+            "stratum": self.research_stratum,
+            "minimum_collected_reviews": self.min_collected_reviews,
+            "products_checked": len(rows),
+            "status_counts": dict(sorted(statuses.items())),
+            "products": rows,
+            "generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
+        }
+        report_path = Path(self.collection_report_file)
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary_path = report_path.with_name(f"{report_path.name}.tmp")
+        with temporary_path.open("w", encoding="utf-8") as file:
+            json.dump(payload, file, ensure_ascii=False, indent=2)
+        os.replace(temporary_path, report_path)
+        logging.info("Saved research quality report to %s", report_path)
+
     def _checkpoint_reviews(self, product, reviews, page_number, stop_reason="", context="all"):
         product["comments"] = self._deduplicate_reviews(reviews)
         self._sync_review_counts(product)
@@ -781,7 +858,10 @@ class LazadaScraper:
             return True
         if self.rating is not None:
             return context == str(self.rating)
-        return context == "5" and product.get("applied_rating_filters") == [1, 2, 3, 4, 5]
+        return (
+            context == str(self.RATING_COLLECTION_ORDER[-1])
+            and product.get("applied_rating_filters") == list(self.RATING_COLLECTION_ORDER)
+        )
 
     def _verification_detected(self):
         current_url = self.driver.current_url
@@ -1039,36 +1119,49 @@ class LazadaScraper:
         for _ in range(45):
             container = self._review_container(timeout=1)
             if container:
-                self.driver.execute_script(
-                    "arguments[0].scrollIntoView({block:'start'})", container
-                )
-                try:
-                    WebDriverWait(self.driver, 20, poll_frequency=0.5).until(
-                        lambda driver: driver.execute_script(
-                            """
-                            const container = document.querySelector(
-                              '#module_product_review, .mod-reviews, '
-                              + '[data-qa-locator="product-review"], '
-                              + '[data-spm="product_review"]'
-                            );
-                            if (!container) return false;
-                            const placeholder = container.querySelector(
-                              '.lazy-load-placeholder, .lazy-load-skeleton'
-                            );
-                            if (placeholder) {
-                              container.scrollIntoView({block: 'center'});
-                              window.scrollBy(0, 80);
-                              return false;
-                            }
-                            return container.children.length > 0
-                              || (container.innerText || '').trim().length > 0;
-                            """
-                        )
+                # Lazada's review module is intersection-observer driven. Move
+                # beyond it and then return so the widget crosses the viewport
+                # boundary instead of remaining a visible skeleton forever.
+                for attempt in range(3):
+                    self.driver.execute_script(
+                        "arguments[0].scrollIntoView({block:'start'}); "
+                        "window.scrollBy(0, Math.max(500, Math.floor(window.innerHeight * 0.75)));",
+                        container,
                     )
-                    return True
-                except TimeoutException:
-                    logging.warning("Lazada review widget stayed in its lazy-load placeholder")
-                    return False
+                    time.sleep(0.5)
+                    self.driver.execute_script(
+                        "arguments[0].scrollIntoView({block:'center'}); window.scrollBy(0, -80);",
+                        container,
+                    )
+                    try:
+                        WebDriverWait(self.driver, 15, poll_frequency=0.5).until(
+                            lambda driver: driver.execute_script(
+                                """
+                                const container = document.querySelector(
+                                  '#module_product_review, .mod-reviews, '
+                                  + '[data-qa-locator="product-review"], '
+                                  + '[data-spm="product_review"]'
+                                );
+                                if (!container) return false;
+                                const placeholder = container.querySelector(
+                                  '.lazy-load-placeholder, .lazy-load-skeleton'
+                                );
+                                if (placeholder) return false;
+                                const reviewItems = container.querySelectorAll(
+                                  '.item, [data-qa-locator="review-item"], .review-item'
+                                );
+                                return reviewItems.length > 0;
+                                """
+                            )
+                        )
+                        return True
+                    except TimeoutException:
+                        logging.warning(
+                            "Lazada review items did not load after activation attempt %s/3",
+                            attempt + 1,
+                        )
+                logging.warning("Lazada review widget exposed no actual review items")
+                return False
             self.driver.execute_script(
                 "window.scrollBy(0, Math.max(700, Math.floor(window.innerHeight * 0.85)))"
             )
@@ -1336,21 +1429,21 @@ class LazadaScraper:
         )
 
     def _collect_reviews_lowest_first(self, product, max_reviews):
-        """Fill a review sample from verified 1-star feedback upward."""
+        """Fill a review sample from verified 3-star feedback first."""
         if max_reviews <= 0:
             product["applied_rating_filters"] = []
             return []
 
         reviews = []
         applied_filters = []
-        for star in range(1, 6):
+        for star in self.RATING_COLLECTION_ORDER:
             remaining = max_reviews - len(reviews)
             if remaining <= 0:
                 break
             if not self._click_rating_filter(star):
                 product["review_filter_warning"] = (
                     f"Could not identify or apply the {star}-star Lazada filter; "
-                    "lowest-rating-first collection stopped"
+                    "three-star-first collection stopped"
                 )
                 break
 
@@ -1596,7 +1689,7 @@ class LazadaScraper:
         if self.all_star_types:
             reviews = []
             applied_filters = []
-            for star in range(1, 6):
+            for star in self.RATING_COLLECTION_ORDER:
                 if not self._click_rating_filter(star):
                     product["review_filter_warning"] = (
                         f"Could not identify or apply the {star}-star Lazada filter"
@@ -1647,11 +1740,10 @@ class LazadaScraper:
             product["review_status"] = "complete"
             return
 
-        product["review_order"] = "lowest_rating_first"
-        product["comments"] = self._collect_reviews_lowest_first(
-            product,
-            self.review_limit,
-        )
+        product["review_order"] = "marketplace_default"
+        product["sampling_method"] = "marketplace_default_unfiltered"
+        product["sampling_representative"] = None
+        product["comments"] = self._collect_reviews(self.review_limit, product=product)
         if product["comments"]:
             product["review_status"] = "complete"
         elif product.get("total_rating", 0) > 0:
@@ -1721,7 +1813,10 @@ class LazadaScraper:
                     logging.warning("Detail scrape failed for %s: %s", link, exc, exc_info=True)
                     product.setdefault("comments", [])
                 self.output_data[link] = product
+                if self.research_stratum or self.min_collected_reviews:
+                    self._apply_research_quality(product)
                 self._periodic_save()
+                self._write_collection_report()
                 qualification_status = product.get("qualification", {}).get("status")
                 if qualification_status == "rejected":
                     discovery_status = "rejected"
@@ -1744,6 +1839,7 @@ class LazadaScraper:
             self._save_cookies()
             if self.driver:
                 self.driver.quit()
+        self._write_collection_report()
         self._periodic_save()
         return list(self.output_data.values())
 
@@ -1771,6 +1867,9 @@ def build_parser():
     parser.add_argument("--min-rating", type=float, default=0.0, help="Minimum detail-page product rating (0-5)")
     parser.add_argument("--min-reviews", type=int, default=0, help="Minimum detail-page reported review count")
     parser.add_argument("--discovery-checkpoint", help="Optional discovery checkpoint JSON path")
+    parser.add_argument("--research-stratum", default="", help="Research cohort stratum stored with every product")
+    parser.add_argument("--min-collected-reviews", type=int, default=0, help="Minimum usable written reviews required after collection")
+    parser.add_argument("--collection-report", help="Research collection-quality JSON report")
     return parser
 
 
@@ -1798,6 +1897,9 @@ def main():
         min_rating=args.min_rating,
         min_reviews=args.min_reviews,
         discovery_checkpoint=args.discovery_checkpoint,
+        research_stratum=args.research_stratum,
+        min_collected_reviews=args.min_collected_reviews,
+        collection_report=args.collection_report,
     )
     scraper.execute()
 

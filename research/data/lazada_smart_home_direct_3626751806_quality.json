@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "smart_home",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "V380 PRO Q16S Smart Camera Bulb 1080P HD Night Vision Wifi IP Camera connect to mobile 360 ° Panoramic Rotatable Smart Security CCTV Camera baby motion detection Indoor and Outdoor Two-Way Audio without using wifi",
+      "link": "https://www.lazada.com.ph/products/pdp-i3626751806-s19094066174.html",
+      "reported_review_count": 5392,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 125,
+      "collected_by_star": {
+        "1": 5,
+        "2": 10,
+        "3": 30,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T17:04:50"
+}

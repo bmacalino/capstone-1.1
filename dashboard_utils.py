@@ -8,6 +8,7 @@ import csv
 import io
 import json
 import math
+import os
 import re
 import sys
 from pathlib import Path
@@ -547,9 +548,47 @@ def review_signal_counts(product: dict[str, Any]) -> dict[str, int]:
     return dict(counts.most_common())
 
 
-def weighted_risk_breakdown(product: dict[str, Any]) -> dict[str, float | int]:
+def weighted_risk_breakdown(product: dict[str, Any]) -> dict[str, Any]:
     """Return the WSM inputs and their contributions on a 0..100 scale."""
     summary = product.get("sentiment_summary") or {}
+    probability_methods = {
+        "confidence_severity_frequency_bayesian",
+        "calibrated_probability_expected_severity",
+    }
+    if summary.get("risk_score_method") in probability_methods:
+        review_count = max(0, int(summary.get("review_count") or 0))
+        risk_reviews = max(0, int(summary.get("risk_review_count") or 0))
+        evidence_confidence = min(
+            1.0, max(0.0, float(summary.get("evidence_confidence") or 0))
+        )
+        raw_points = min(100.0, max(0.0, float(summary.get("raw_risk_score") or 0)))
+        prior = min(1.0, max(0.0, float(summary.get("risk_prior") or 0)))
+        evidence_points = evidence_confidence * raw_points
+        prior_points = (1 - evidence_confidence) * prior * 100
+        return {
+            "method": summary.get("risk_score_method"),
+            "review_count": review_count,
+            "negative_reviews": int(
+                (summary.get("sentiment_counts") or {}).get("negative") or 0
+            ),
+            "risk_reviews": risk_reviews,
+            "negative_ratio": 0.0,
+            "defect_review_ratio": risk_reviews / review_count if review_count else 0.0,
+            "negative_weight": 0.0,
+            "defect_weight": 0.0,
+            "negative_points": 0.0,
+            "defect_points": evidence_points,
+            "raw_risk_points": raw_points,
+            "evidence_confidence": evidence_confidence,
+            "prior_points": prior_points,
+            "average_risk_probability": float(
+                summary.get("average_risk_probability") or 0
+            ),
+            "average_risk_severity": float(
+                summary.get("average_risk_severity") or 0
+            ),
+            "total_points": evidence_points + prior_points,
+        }
     unique_reviews = [
         review
         for review in product.get("comments") or []
@@ -581,7 +620,13 @@ def weighted_risk_breakdown(product: dict[str, Any]) -> dict[str, float | int]:
             if (review.get("sentiment_analysis") or {}).get("label") == "negative"
         )
     negative_reviews = min(review_count, negative_reviews) if review_count else 0
-    if negative_count_value is not None and review_count:
+    manuscript_method = summary.get("risk_score_method") in {
+        "manuscript_vader_keyword_wsm",
+        "hybrid_classifier_manuscript_wsm",
+    }
+    if manuscript_method and "negative" in ratios:
+        negative_ratio = bounded_ratio(ratios.get("negative"))
+    elif negative_count_value is not None and review_count:
         negative_ratio = negative_reviews / review_count
     elif "negative" in ratios:
         negative_ratio = bounded_ratio(ratios.get("negative"))
@@ -598,7 +643,11 @@ def weighted_risk_breakdown(product: dict[str, Any]) -> dict[str, float | int]:
             if ((review.get("sentiment_analysis") or {}).get("risk") or {}).get("detected")
         )
     risk_reviews = min(review_count, risk_reviews) if review_count else 0
-    if risk_review_value is not None and review_count:
+    if manuscript_method and "detected_risk_ratio" in summary:
+        defect_review_ratio = bounded_ratio(summary.get("detected_risk_ratio"))
+    elif manuscript_method and "keyword_failure_rate" in summary:
+        defect_review_ratio = bounded_ratio(summary.get("keyword_failure_rate"))
+    elif risk_review_value is not None and review_count:
         defect_review_ratio = risk_reviews / review_count
     elif "keyword_failure_rate" in summary:
         defect_review_ratio = bounded_ratio(summary.get("keyword_failure_rate"))
@@ -608,6 +657,7 @@ def weighted_risk_breakdown(product: dict[str, Any]) -> dict[str, float | int]:
     negative_points = 30.0 * negative_ratio
     defect_points = 70.0 * defect_review_ratio
     return {
+        "method": summary.get("risk_score_method"),
         "review_count": review_count,
         "negative_reviews": negative_reviews,
         "risk_reviews": risk_reviews,
@@ -626,6 +676,8 @@ def review_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for product in products:
         for review in product.get("comments") or []:
             if not isinstance(review, dict):
+                continue
+            if review.get("included_in_analysis") is False:
                 continue
             analysis = review.get("sentiment_analysis") or {}
             risk = analysis.get("risk") or {}
@@ -649,13 +701,30 @@ def review_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
-def sentiment_model_version() -> str:
+def _ensure_sentiment_path() -> None:
     sentiment_root = ROOT / "sentiment-analysis"
     if str(sentiment_root) not in sys.path:
         sys.path.insert(0, str(sentiment_root))
-    from defaketive_sentiment.model import MODEL_VERSION
 
-    return MODEL_VERSION
+
+def sentiment_model_version() -> str:
+    """Return the version of the model the application actually runs.
+
+    Delegates to the registry so this can never name a different model from the
+    one `analyze_products` loads. When they disagree, `analysis_is_current`
+    either re-analyzes on every request or fails to re-analyze when the model
+    really has changed.
+    """
+    _ensure_sentiment_path()
+    from defaketive_sentiment.registry import ModelUnavailableError, model_version
+
+    try:
+        return model_version()
+    except ModelUnavailableError:
+        # Only used to decide whether stored analyses are stale. An unloadable
+        # model means nothing can be current, and analyze_products will raise
+        # with the real reason when it is called.
+        return "unavailable"
 
 
 def analysis_is_current(products: list[dict[str, Any]]) -> bool:
@@ -671,6 +740,8 @@ def analysis_is_current(products: list[dict[str, Any]]) -> bool:
         for review in product.get("comments") or []:
             if not isinstance(review, dict):
                 continue
+            if review.get("included_in_analysis") is False:
+                continue
             analysis = review.get("sentiment_analysis") or {}
             if analysis.get("model_version") != expected_version:
                 return False
@@ -678,14 +749,19 @@ def analysis_is_current(products: list[dict[str, Any]]) -> bool:
 
 
 def analyze_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    sentiment_root = ROOT / "sentiment-analysis"
-    if str(sentiment_root) not in sys.path:
-        sys.path.insert(0, str(sentiment_root))
+    """Analyze products with the configured model.
+
+    Raises ModelUnavailableError if that model cannot be loaded. It deliberately
+    does not fall back to a different model: with badges, a substitution would
+    change the shape of the output, and the report would render another model's
+    verdict with nothing to show that it had happened.
+    """
+    _ensure_sentiment_path()
     from defaketive_sentiment.analyze_reviews import analyze_product_json
-    from defaketive_sentiment.model import DefaketiveSentimentModel
+    from defaketive_sentiment.registry import load_model
 
     analyzed = copy.deepcopy(products)
-    return analyze_product_json(analyzed, DefaketiveSentimentModel())
+    return analyze_product_json(analyzed, load_model())
 
 
 def json_bytes(products: list[dict[str, Any]]) -> bytes:

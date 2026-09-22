@@ -1,7 +1,7 @@
 import unittest
 import pickle
-from unittest.mock import patch
-from selenium.common.exceptions import StaleElementReferenceException
+from unittest.mock import Mock, patch
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import parse_qs, urlsplit
@@ -26,6 +26,8 @@ class TestLazadaScraper(unittest.TestCase):
         self.assertEqual(self.scraper.pages, 2)
         self.assertEqual(self.scraper.min_rating, 0.0)
         self.assertEqual(self.scraper.min_reviews, 0)
+        self.assertEqual(self.scraper.min_collected_reviews, 0)
+        self.assertEqual(self.scraper.research_stratum, "")
         self.assertEqual(self.scraper.out_file, "lazada_ph_laptop_stand.json")
         self.assertEqual(
             self.scraper.discovery_checkpoint_file,
@@ -36,6 +38,58 @@ class TestLazadaScraper(unittest.TestCase):
         self.assertIn("--window-size=900,700", self.scraper.options.arguments)
         self.assertNotIn("--start-maximized", self.scraper.options.arguments)
         self.assertIn("--disable-search-engine-choice-screen", self.scraper.options.arguments)
+
+    def test_scroll_to_reviews_overshoots_then_waits_for_actual_items(self):
+        container = object()
+        driver = Mock()
+        driver.execute_script.return_value = True
+        self.scraper.driver = driver
+
+        class ImmediateWait:
+            def __init__(self, driver, *_args, **_kwargs):
+                self.driver = driver
+
+            def until(self, condition):
+                return condition(self.driver)
+
+        with (
+            patch.object(self.scraper, "_review_container", return_value=container),
+            patch("src.lazada_scraper.WebDriverWait", ImmediateWait),
+            patch("src.lazada_scraper.time.sleep"),
+        ):
+            self.assertTrue(self.scraper._scroll_to_reviews())
+
+        scripts = [call.args[0] for call in driver.execute_script.call_args_list]
+        self.assertIn("window.scrollBy(0, Math.max(500", scripts[0])
+        self.assertIn("window.scrollBy(0, -80)", scripts[1])
+        self.assertIn("reviewItems.length > 0", scripts[2])
+
+    def test_scroll_to_reviews_retries_when_no_actual_items_load(self):
+        container = object()
+        driver = Mock()
+        driver.execute_script.return_value = False
+        self.scraper.driver = driver
+
+        class TimeoutWait:
+            def __init__(self, *_args, **_kwargs):
+                pass
+
+            def until(self, _condition):
+                raise TimeoutException()
+
+        with (
+            patch.object(self.scraper, "_review_container", return_value=container),
+            patch("src.lazada_scraper.WebDriverWait", TimeoutWait),
+            patch("src.lazada_scraper.time.sleep"),
+        ):
+            self.assertFalse(self.scraper._scroll_to_reviews())
+
+        activation_scripts = [
+            call.args[0]
+            for call in driver.execute_script.call_args_list
+            if "Math.max(500" in call.args[0]
+        ]
+        self.assertEqual(len(activation_scripts), 3)
 
     def test_safe_get_retries_chrome_network_error_page(self):
         error_page = '<div id="main-frame-error">ERR_QUIC_PROTOCOL_ERROR</div>'
@@ -265,6 +319,40 @@ class TestLazadaScraper(unittest.TestCase):
             LazadaScraper(keyword="lcd", min_rating=-0.1)
         with self.assertRaises(ValueError):
             LazadaScraper(keyword="lcd", min_reviews=-1)
+        with self.assertRaises(ValueError):
+            LazadaScraper(keyword="lcd", min_collected_reviews=-1)
+
+    def test_cli_accepts_research_collection_options(self):
+        args = build_parser().parse_args([
+            "earbuds",
+            "--research-stratum", "audio",
+            "--min-collected-reviews", "200",
+            "--collection-report", "quality.json",
+        ])
+        self.assertEqual(args.research_stratum, "audio")
+        self.assertEqual(args.min_collected_reviews, 200)
+        self.assertEqual(args.collection_report, "quality.json")
+
+    def test_research_quality_uses_written_deduplicated_reviews(self):
+        scraper = LazadaScraper(
+            keyword="earbuds",
+            research_stratum="audio",
+            min_collected_reviews=3,
+            pause_for_verification=False,
+        )
+        product = {
+            "review_status": "complete",
+            "comments": [
+                {"comment_id": "1", "content": "bad battery", "rating": 1, "source_rating_filter": 1},
+                {"comment_id": "1", "content": "bad battery", "rating": 1, "source_rating_filter": 1},
+                {"comment_id": "2", "content": "okay", "rating": 3, "source_rating_filter": 3},
+                {"comment_id": "3", "content": "", "rating": 5, "source_rating_filter": 5},
+            ],
+        }
+        quality = scraper._apply_research_quality(product)
+        self.assertEqual(quality["status"], "insufficient_written_reviews")
+        self.assertEqual(quality["usable_written_reviews"], 2)
+        self.assertEqual(quality["collected_by_star"], {"1": 1, "2": 0, "3": 1, "4": 0, "5": 0})
 
     def test_exact_qualification_boundaries_are_accepted(self):
         scraper = LazadaScraper(
@@ -460,14 +548,14 @@ class TestLazadaScraper(unittest.TestCase):
             ["low", "middle", "high"],
         )
 
-    def test_default_review_limit_fills_from_lowest_rating_upward(self):
+    def test_default_review_limit_starts_with_three_star_reviews(self):
         product = {"comments": []}
         clicked = []
         requested = []
         available = {
-            1: [
-                {"comment_id": "one-a", "rating": 1},
-                {"comment_id": "one-b", "rating": 1},
+            3: [
+                {"comment_id": "three-a", "rating": 3},
+                {"comment_id": "three-b", "rating": 3},
             ],
             2: [
                 {"comment_id": "two-a", "rating": 2},
@@ -484,10 +572,22 @@ class TestLazadaScraper(unittest.TestCase):
         self.scraper._collect_reviews = collect
         reviews = self.scraper._collect_reviews_lowest_first(product, 5)
 
-        self.assertEqual(clicked, [1, 2])
-        self.assertEqual(requested, [(1, 5), (2, 3)])
-        self.assertEqual([review["rating"] for review in reviews], [1, 1, 2, 2, 2])
-        self.assertEqual(product["applied_rating_filters"], [1, 2])
+        self.assertEqual(clicked, [3, 2])
+        self.assertEqual(requested, [(3, 5), (2, 3)])
+        # Stored output remains numerically ordered for downstream consumers;
+        # applied_rating_filters records the actual collection priority.
+        self.assertEqual([review["rating"] for review in reviews], [2, 2, 2, 3, 3])
+        self.assertEqual(product["applied_rating_filters"], [3, 2])
+
+    def test_balanced_collection_uses_three_star_first_order(self):
+        self.assertEqual(self.scraper.RATING_COLLECTION_ORDER, (3, 2, 4, 1, 5))
+
+    def test_completed_three_star_first_checkpoint_is_terminal(self):
+        product = {
+            "review_checkpoint": {"stop_reason": "next_button_disabled", "context": "5"},
+            "applied_rating_filters": [3, 2, 4, 1, 5],
+        }
+        self.assertTrue(self.scraper._review_checkpoint_is_terminal(product))
 
     def test_lowest_first_discards_mismatched_filter_results(self):
         product = {"comments": []}

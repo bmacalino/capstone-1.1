@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "smart_home",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "SMATRUL Wifi Smart Light Switch, No Neutral need,Touch Control, Single Fire Smart Timer Home Automation, Smart Life/Tuya app - work for Alexa / Google Home Black and White6 Gang",
+      "link": "https://www.lazada.com.ph/products/pdp-i4371692812-s24531254372.html",
+      "reported_review_count": 434,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "review_widget_missing",
+      "stop_reason": "review_widget_missing",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T13:07:21"
+}

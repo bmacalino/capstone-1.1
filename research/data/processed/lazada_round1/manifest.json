@@ -1,0 +1,65 @@
+{
+  "source_file": "Gemini_Lazada_Annotation_Round_1_Fully_Annotated.xlsx",
+  "source_sha256": "5d327f071bacd90e05c248923bd45d28d98d435edca194af7f734078a7fbf17b",
+  "policy": {
+    "final_label": "adjudicated label when present, otherwise verified primary label",
+    "mixed": "retained for risk; excluded by the existing trainer from three-class sentiment",
+    "split": "deterministic product-grouped 70/15/15 target",
+    "risk_taxonomy": [
+      "damage",
+      "defect",
+      "delivery",
+      "durability",
+      "missing_item",
+      "other",
+      "performance",
+      "quality",
+      "seller_service",
+      "wrong_color_or_size",
+      "wrong_item"
+    ]
+  },
+  "counts": {
+    "source_rows": 1000,
+    "retained_rows": 907,
+    "excluded_out_of_scope": 84,
+    "removed_duplicate_texts": 9,
+    "products": 24
+  },
+  "splits": {
+    "train": {
+      "rows": 636,
+      "products": 11,
+      "sentiment": {
+        "positive": 213,
+        "negative": 206,
+        "neutral": 65,
+        "mixed": 152
+      },
+      "risk_yes": 357
+    },
+    "validation": {
+      "rows": 138,
+      "products": 6,
+      "sentiment": {
+        "positive": 46,
+        "negative": 44,
+        "neutral": 12,
+        "mixed": 36
+      },
+      "risk_yes": 80
+    },
+    "test": {
+      "rows": 133,
+      "products": 7,
+      "sentiment": {
+        "positive": 44,
+        "negative": 53,
+        "neutral": 9,
+        "mixed": 27
+      },
+      "risk_yes": 80
+    }
+  },
+  "leakage_check": true
+}

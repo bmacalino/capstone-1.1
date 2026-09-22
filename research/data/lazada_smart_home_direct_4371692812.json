@@ -1,0 +1,55 @@
+[
+  {
+    "link": "https://www.lazada.com.ph/products/pdp-i4371692812-s24531254372.html",
+    "name": "SMATRUL Wifi Smart Light Switch, No Neutral need,Touch Control, Single Fire Smart Timer Home Automation, Smart Life/Tuya app - work for Alexa / Google Home Black and White6 Gang",
+    "price": "₱429.12",
+    "rating": 4.9,
+    "sold_count": 0,
+    "img": "https://img.lazcdn.com/g/ff/kf/S09f493bbd0d0469c945ca7780cbd2a95w.png_720x720q80.png_.webp",
+    "location": "",
+    "platform": "lazada",
+    "market": "PH",
+    "currency": "PHP",
+    "brand": "",
+    "seller": "SMATRUL Smart store",
+    "description": "",
+    "total_rating": 434,
+    "reported_review_count": 434,
+    "written_reviews_collected": 0,
+    "qualification": {
+      "status": "qualified",
+      "rating": 4.9,
+      "reported_review_count": 434,
+      "min_rating": 0.0,
+      "min_reviews": 0,
+      "reasons": [],
+      "checked_at": "2026-09-11T13:07:20"
+    },
+    "comments": [],
+    "review_status": "review_widget_missing",
+    "review_collection_warning": "Lazada reports 434 reviews, but the rendered review widget exposed no written-review records",
+    "review_checkpoint": {
+      "context": "all",
+      "completed_pages": 0,
+      "collected_reviews": 0,
+      "stop_reason": "review_widget_missing",
+      "updated_at": "2026-09-11T13:07:20"
+    },
+    "research": {
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "review_widget_missing",
+      "stop_reason": "review_widget_missing",
+      "filter_warning": ""
+    }
+  }
+]

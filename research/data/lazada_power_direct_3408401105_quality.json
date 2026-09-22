@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "power",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Essager 10W USB Charger Portable Dual USB Ports Travel Charger Adapter Wall Charger For Huawei Xiaomi Phone Charging For iPhone Samsung",
+      "link": "https://www.lazada.com.ph/products/essager-10w-usb-charger-portable-dual-usb-ports-travel-charger-adapter-wall-charger-for-huawei-xiaomi-phone-charging-for-iphone-samsung-i3408401105-s17423442017.html",
+      "reported_review_count": 2135,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 64,
+      "collected_by_star": {
+        "1": 8,
+        "2": 5,
+        "3": 5,
+        "4": 6,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T11:04:17"
+}

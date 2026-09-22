@@ -1,0 +1,166 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "audio",
+  "minimum_collected_reviews": 200,
+  "products_checked": 8,
+  "status_counts": {
+    "eligible": 2,
+    "insufficient_written_reviews": 2,
+    "not_collected": 4
+  },
+  "products": [
+    {
+      "name": "USB Rechargeable GTS - 1346, 1349, 1360 & 1361 Bluetooth Wireless 3 Inch Mini Speaker",
+      "link": "https://www.lazada.com.ph/products/pdp-i4734275923.html",
+      "reported_review_count": 128,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "GTS 1346 and 1361 Mini Wireless Bluetooth Speaker Rechargeable USB 3 Inch Extra Bass Speaker",
+      "link": "https://www.lazada.com.ph/products/pdp-i4394195263.html",
+      "reported_review_count": 32,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "Jbl Partybox On the Go 2 / On the Go 2 Plus - Bluetooth Speaker With FREE Wireless High End Microphone",
+      "link": "https://www.lazada.com.ph/products/pdp-i1704736116.html",
+      "reported_review_count": 468,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "USB Rechargeable Speaker 3 Inch GTS - 1346, 1349, 1360 & 1361 Bluetooth Wireless Mini Speaker",
+      "link": "https://www.lazada.com.ph/products/pdp-i4738552392.html",
+      "reported_review_count": 24268,
+      "stratum": "audio",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "✅100% Original AMZ 2 Inch ZQS-1202 Multicolor Luminous Portable Bluetooth Wireless Speaker",
+      "link": "https://www.lazada.com.ph/products/pdp-i3169275025.html",
+      "reported_review_count": 23220,
+      "stratum": "audio",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Japan Osaka Original Karaoke Bluetooth Speaker With FREE Microphone Wire Mic Portable JPJ4",
+      "link": "https://www.lazada.com.ph/products/pdp-i3545666471.html",
+      "reported_review_count": 13,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "Lazy People 3 in 1 BlueTooth Speaker Power bank With Phone Stand Adjustable Portable Folding Phone Holder Eletronic Smartphone Cellphone",
+      "link": "https://www.lazada.com.ph/products/pdp-i4991072731.html",
+      "reported_review_count": 3957,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 141,
+      "collected_by_star": {
+        "1": 40,
+        "2": 14,
+        "3": 26,
+        "4": 21,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "PORTABLE MK-102 SUPER BASS BLUETOOTH WIRELESS SPEAKER WITH RGB LIGHT",
+      "link": "https://www.lazada.com.ph/products/pdp-i3252473210.html",
+      "reported_review_count": 3078,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 152,
+      "collected_by_star": {
+        "1": 40,
+        "2": 29,
+        "3": 27,
+        "4": 16,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T10:07:16"
+}

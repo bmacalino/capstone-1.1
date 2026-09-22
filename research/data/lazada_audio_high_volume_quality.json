@@ -1,0 +1,166 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "audio",
+  "minimum_collected_reviews": 200,
+  "products_checked": 8,
+  "status_counts": {
+    "eligible": 3,
+    "insufficient_written_reviews": 2,
+    "not_collected": 3
+  },
+  "products": [
+    {
+      "name": "M10 TWS Bluetooth Headphone Waterproof With Changing Case Music Gaming Headset Wireless Earphone For Any Phone",
+      "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+      "reported_review_count": 41033,
+      "stratum": "audio",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "X55 Sleeping Earbuds Wireless Mini Headphones For Work TWS Bluetooth Earphone Stereo Hidden Headsets with Mic HD Call Waterproof",
+      "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+      "reported_review_count": 11134,
+      "stratum": "audio",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "KIMP Pro 6 TWS Wireless Earphones Bluetooth Game Headsets Sport Waterproof Earbuds with Mic Touch Control Bluetooth Headphones earphones high quality sound wireless earpads bluetooth",
+      "link": "https://www.lazada.com.ph/products/pdp-i4136508203.html",
+      "reported_review_count": 10824,
+      "stratum": "audio",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "M10 TWS Bluetooth Headphone Waterproof With Changing Case Music Gaming Headset Wireless Earphone For Any Phone",
+      "link": "https://www.lazada.com.ph/products/pdp-i3430740731.html",
+      "reported_review_count": 5463,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 183,
+      "collected_by_star": {
+        "1": 40,
+        "2": 23,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Single ear Earbuds bluetooth Open Wearable Stereo wireless Bluetooth earphones with mic Digital display bluetooth earphones",
+      "link": "https://www.lazada.com.ph/products/pdp-i4523101417.html",
+      "reported_review_count": 4751,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 147,
+      "collected_by_star": {
+        "1": 40,
+        "2": 15,
+        "3": 15,
+        "4": 37,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "M25 Wireless Bluetooth Earphone with Emergency Power Bank and Digital Power LED Display In Ear Earbuds",
+      "link": "https://www.lazada.com.ph/products/pdp-i4442695519.html",
+      "reported_review_count": 793,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "A2Pro TWS Bluetooth Earphone HiFI Stereo Earbuds Build-in Mic Game Headset Touch Control Wireless Headphones For All Phone",
+      "link": "https://www.lazada.com.ph/products/pdp-i4637060597.html",
+      "reported_review_count": 18,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "Q10 dual set earphones Ear Clip Bluetooth Earphones Bone Conduction Clip-on Semi-In-Ear Running Noise Cancelling With Microphone for Calls Reduction Waterproof Long Battery Stylish Music Gaming Headset For Any Phon",
+      "link": "https://www.lazada.com.ph/products/pdp-i5365482741.html",
+      "reported_review_count": 128,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T09:58:34"
+}

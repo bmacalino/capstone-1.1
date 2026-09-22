@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "created_at": "2026-09-14T15:16:23.189312+00:00",
+    "train_dataset": "lazada_round1_train.csv",
+    "train_dataset_sha256": "8e20e62cfc2aa92ad95e91455e9c8e43d4048e1d80632bc131c74990bfb4827c",
+    "validation_dataset": "lazada_round1_validation_adjudicated.csv",
+    "validation_dataset_sha256": "919e19a3b3bb48eae24431571ef4841e27d443471b46004ad502c0b60e685cb1",
+    "base_artifact": "lazada_round1_binary_uncertain.joblib",
+    "base_artifact_sha256": "a31acca846494aad9b20d053197fb562756bfefd9b7d7de6dabbb6b6f06ed70b",
+    "candidate_artifact": "lazada_risk_heads_v3_candidate.joblib",
+    "candidate_artifact_sha256": "eee410bd9c58a645545b8fab82e5683bc559199f86b79346d0fa7c52c5f0988b",
+    "selection_policy": "Severity thresholds selected on validation only; locked test labels were not read.",
+    "test_predictions_computed": false,
+    "train_rows": 357,
+    "validation_rows": 73
+  },
+  "validation": {
+    "severity": {
+      "accuracy": 0.5205,
+      "macro_f1": 0.4742,
+      "weighted_kappa": 0.3891,
+      "mean_absolute_error": 0.5205,
+      "threshold_ge2": 0.75,
+      "threshold_ge3": 0.65
+    }
+  }
+}

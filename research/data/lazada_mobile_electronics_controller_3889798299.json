@@ -1,0 +1,55 @@
+[
+  {
+    "link": "https://www.lazada.com.ph/products/pdp-i3889798299-s20829210524.html",
+    "name": "DualShock 4 Wireless Gamepad Controller",
+    "price": "₱470.00",
+    "rating": 4.9,
+    "sold_count": 0,
+    "img": "https://img.lazcdn.com/g/p/658840d60dc6108d5703d5b2c2955667.png_720x720q80.png_.webp",
+    "location": "",
+    "platform": "lazada",
+    "market": "PH",
+    "currency": "PHP",
+    "brand": "",
+    "seller": "TechTime_PH",
+    "description": "",
+    "total_rating": 4662,
+    "reported_review_count": 4662,
+    "written_reviews_collected": 0,
+    "qualification": {
+      "status": "qualified",
+      "rating": 4.9,
+      "reported_review_count": 4662,
+      "min_rating": 0.0,
+      "min_reviews": 0,
+      "reasons": [],
+      "checked_at": "2026-09-11T09:06:35"
+    },
+    "comments": [],
+    "review_status": "review_widget_missing",
+    "review_collection_warning": "Lazada reports 4662 reviews, but the rendered review widget exposed no written-review records",
+    "review_checkpoint": {
+      "context": "all",
+      "completed_pages": 0,
+      "collected_reviews": 0,
+      "stop_reason": "review_widget_missing",
+      "updated_at": "2026-09-11T09:06:35"
+    },
+    "research": {
+      "stratum": "computer_peripherals",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "review_widget_missing",
+      "stop_reason": "review_widget_missing",
+      "filter_warning": ""
+    }
+  }
+]

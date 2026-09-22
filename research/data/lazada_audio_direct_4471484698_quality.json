@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "audio",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "K12 Mini High End Wireless Audio Mini Home With 1 Microphones Professional Karaoke Speaker",
+      "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+      "reported_review_count": 3120,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 158,
+      "collected_by_star": {
+        "1": 40,
+        "2": 23,
+        "3": 23,
+        "4": 32,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T11:13:34"
+}

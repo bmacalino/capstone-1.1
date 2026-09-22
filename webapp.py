@@ -47,7 +47,7 @@ from research_utils import evaluate_labels, score_sus, score_umux
 MANUAL_VERIFICATION_TIMEOUT = 900
 SCRAPER_PROCESS_TIMEOUT = MANUAL_VERIFICATION_TIMEOUT + 300
 MAX_PRODUCTS = 30
-MAX_REVIEWS = 200
+MAX_REVIEWS = 100
 
 _catalogs: dict[str, list[dict[str, Any]]] = {}
 _jobs: dict[str, dict[str, Any]] = {}
@@ -142,6 +142,12 @@ def _user_facing_failure(output: Any) -> str:
     output = str(output or "").strip()
     if "ERR_NETWORK_ACCESS_DENIED" in output.upper():
         return NETWORK_ACCESS_DENIED_MESSAGE
+    if "SHOPEE_VERIFICATION_BLOCKED" in output:
+        return "Shopee could not complete browser verification and asked you to try again later. Collection stopped without a new report. Wait before retrying."
+    if "SHOPEE_BROWSER_CLOSED" in output or "invalid session id" in output.lower():
+        return "Chrome closed or disconnected before collection completed. Start a fresh scan and keep the scraper window open through login and collection."
+    if "SHOPEE_COLLECTION_FAILED" in output:
+        return "Shopee did not return usable product data. Complete login or verification in the scraper window and try again."
     return output[-1800:] if output else "Marketplace collection failed."
 
 
@@ -289,7 +295,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
         if bool(payload.get("live")):
-            job = _start_job(_catalog_key(), query, platform, _integer(payload.get("product_count"), 6, 1, MAX_PRODUCTS), _integer(payload.get("review_count"), 30, 1, MAX_REVIEWS))
+            job = _start_job(_catalog_key(), query, platform, _integer(payload.get("product_count"), 6, 1, MAX_PRODUCTS), _integer(payload.get("review_count"), 100, 1, MAX_REVIEWS))
             return jsonify({"job": job}), 202
         matches = cached_product_matches(_products(), query, limit=MAX_PRODUCTS)
         return jsonify({"products": matches, "count": len(matches), "mode": "saved"})

@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "computer_peripherals",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Ethernet Cable High Speed RJ45 CAT5e Internet Cable Lan Network Wire Internet Lead Cord Router Computer Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i4153633764-s23123240208.html",
+      "reported_review_count": 5248,
+      "stratum": "computer_peripherals",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 159,
+      "collected_by_star": {
+        "1": 40,
+        "2": 18,
+        "3": 25,
+        "4": 36,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T16:43:12"
+}

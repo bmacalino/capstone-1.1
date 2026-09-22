@@ -1,4 +1,4 @@
-"""DeFaketive shopper and administrator dashboard.
+﻿"""DeFaketive shopper and administrator dashboard.
 
 Run with: streamlit run app.py
 """
@@ -340,7 +340,7 @@ def inject_landing_theme() -> None:
         .review-author {{ color:#11152F;font-size:.78rem;font-weight:800; }} .review-stars {{ color:#12B76A;font-size:.72rem; }}
         .review-text {{ color:#344054;font-size:.78rem;line-height:1.45; }}
         .review-sentiment {{ display:inline-block;border-radius:999px;padding:.2rem .45rem;font-size:.6rem;font-weight:800;margin-top:.7rem;text-transform:uppercase; }}
-        .review-sentiment.positive {{ background:#D1FADF;color:#067647; }} .review-sentiment.negative {{ background:#FEE4E2;color:#B42318; }} .review-sentiment.neutral {{ background:#F2F4F7;color:#475467; }}
+        .review-sentiment.positive {{ background:#D1FADF;color:#067647; }} .review-sentiment.negative {{ background:#FEE4E2;color:#B42318; }} .review-sentiment.uncertain,.review-sentiment.neutral {{ background:#F2F4F7;color:#475467; }}
         .alternatives-shell {{ background:white;border-radius:22px;padding:1.5rem;margin-top:1rem; }}
         .alternatives-title {{ color:#11152F;font-size:1.25rem;font-weight:800; }} .alternatives-subtitle {{ color:#667085;font-size:.76rem;margin-bottom:1.1rem; }}
         .alternatives-grid {{ display:grid;grid-template-columns:repeat(3,1fr);gap:1rem; }}
@@ -742,7 +742,7 @@ def landing_page(products: list[dict[str, Any]]) -> None:
         with intro:
             st.markdown(
                 '<p class="section-copy">DeFaketive turns an unfamiliar listing into an explainable review-risk report. Every signal remains traceable to the sampled review and matched term, so the result is easier to inspect.</p>'
-                '<span class="learn-pill">Risk score = 30% sentiment + 70% failure terms</span>',
+                '<span class="learn-pill">Risk score = 30% negative-review ratio + 70% detected-risk ratio</span>',
                 unsafe_allow_html=True,
             )
 
@@ -779,7 +779,7 @@ def landing_page(products: list[dict[str, Any]]) -> None:
             st.markdown(
                 """<div class="safety-grid">
                 <div class="safety-card"><div class="safety-icon">&#128269;</div><b>Review evidence</b><small>See the text behind every warning.</small></div>
-                <div class="safety-card"><div class="safety-icon">&#128200;</div><b>Sentiment trends</b><small>Compare positive, neutral, and negative feedback.</small></div>
+                <div class="safety-card"><div class="safety-icon">&#128200;</div><b>Sentiment trends</b><small>Compare positive, uncertain, and negative feedback.</small></div>
                 <div class="safety-card"><div class="safety-icon">&#128737;</div><b>Risk signals</b><small>Spot defect and counterfeit language.</small></div>
                 <div class="safety-card"><div class="safety-icon">&#8644;</div><b>Safer options</b><small>Rank stored products by reliability.</small></div>
                 </div>""",
@@ -807,7 +807,7 @@ def landing_page(products: list[dict[str, Any]]) -> None:
                     st.rerun()
         with member_preview:
             st.markdown(
-                """<div class="dashboard-preview"><div class="preview-head"><span>&#9671;</span> DeFaketive &nbsp; / &nbsp; Product analysis</div><div class="preview-grid"><div class="preview-panel"><div class="preview-risk">RISK SCORE</div><div class="preview-score">28<small style="font-size:.75rem;color:#8AA0C8"> /100</small></div><span class="preview-low">Low risk</span><div style="font-size:.68rem;color:#8AA0C8;margin-top:1rem">This sample shows fewer high-risk indicators.</div></div><div class="preview-panel"><div style="font-size:.7rem;color:#D0D5DD">Sentiment over sampled reviews</div><div class="chart-lines"></div><div class="signal"><span>Positive</span><i>68%</i></div><div class="signal"><span>Neutral</span><i>20%</i></div><div class="signal"><span>Negative</span><i>12%</i></div></div></div></div>""",
+                """<div class="dashboard-preview"><div class="preview-head"><span>&#9671;</span> DeFaketive &nbsp; / &nbsp; Product analysis</div><div class="preview-grid"><div class="preview-panel"><div class="preview-risk">RISK SCORE</div><div class="preview-score">28<small style="font-size:.75rem;color:#8AA0C8"> /100</small></div><span class="preview-low">Low risk</span><div style="font-size:.68rem;color:#8AA0C8;margin-top:1rem">This sample shows fewer high-risk indicators.</div></div><div class="preview-panel"><div style="font-size:.7rem;color:#D0D5DD">Sentiment over sampled reviews</div><div class="chart-lines"></div><div class="signal"><span>Positive</span><i>68%</i></div><div class="signal"><span>Uncertain</span><i>20%</i></div><div class="signal"><span>Negative</span><i>12%</i></div></div></div></div>""",
                 unsafe_allow_html=True,
             )
 
@@ -890,6 +890,47 @@ def render_weighted_score_breakdown(
 ) -> None:
     """Render WSM rates, weights, and point contributions without mixing scales."""
     values = weighted_risk_breakdown(product)
+    if values.get("method") in {
+        "confidence_severity_frequency_bayesian",
+        "calibrated_probability_expected_severity",
+    }:
+        review_count = int(values["review_count"])
+        risk_reviews = int(values["risk_reviews"])
+        raw_points = float(values["raw_risk_points"])
+        evidence_confidence = float(values["evidence_confidence"])
+        prior_points = float(values["prior_points"])
+        average_probability = float(values["average_risk_probability"])
+        average_severity = float(values["average_risk_severity"])
+        st.markdown(
+            '<div class="analysis-panel-title">Evidence-weighted risk breakdown</div>'
+            '<div class="analysis-panel-subtitle">Calibrated risk probability is multiplied by expected severity for each review, averaged, then adjusted for sample size.</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f"""<div class="wsm-row">
+              <div class="wsm-name"><span class="wsm-dot" style="background:#F04438"></span><div>
+              <b>Review risk evidence</b><small>{risk_reviews:,} of {review_count:,} reviews flagged</small></div></div>
+              <div class="wsm-equation">
+                <span><small>Avg probability</small>{average_probability:.1%}</span><i>+</i>
+                <span><small>Avg severity</small>{average_severity:.2f}/3</span><i>=</i>
+                <strong><small>Raw score</small>{raw_points:.1f}</strong>
+              </div>
+            </div>
+            <div class="wsm-row">
+              <div class="wsm-name"><span class="wsm-dot" style="background:#7F56D9"></span><div>
+              <b>Sample confidence</b><small>More unique reviews reduce prior adjustment</small></div></div>
+              <div class="wsm-equation">
+                <span><small>Evidence</small>{evidence_confidence:.1%}</span><i>+</i>
+                <span><small>Prior points</small>{prior_points:.1f}</span><i>=</i>
+                <strong><small>Final</small>{score:.1f}</strong>
+              </div>
+            </div>
+            <div class="wsm-total"><div class="wsm-total-head"><div><div class="wsm-total-label">FINAL PRODUCT RISK</div>
+            <div class="wsm-total-note">Sentiment does not override detected product risk.</div></div><div class="wsm-total-score" style="color:{risk_color}">{score:.1f}/100</div></div>
+            <div class="wsm-score-track"><span style="width:{score:.2f}%;background:{risk_color}"></span></div></div>""",
+            unsafe_allow_html=True,
+        )
+        return
     review_count = int(values["review_count"])
     negative_reviews = int(values["negative_reviews"])
     risk_reviews = int(values["risk_reviews"])
@@ -922,7 +963,7 @@ def render_weighted_score_breakdown(
         </div>
         <div class="wsm-row">
           <div class="wsm-name"><span class="wsm-dot" style="background:#F04438"></span><div>
-          <b>Defect or fraud terms</b><small>{risk_reviews:,} of {review_count:,} sampled reviews</small></div></div>
+          <b>Detected product risk</b><small>{risk_reviews:,} of {review_count:,} sampled reviews</small></div></div>
           <div class="wsm-equation">
             <span><small>Rate</small>{defect_rate:.1%}</span><i>&times;</i>
             <span><small>Weight</small>70%</span><i>=</i>
@@ -1206,12 +1247,12 @@ def inline_product_analysis(product: dict[str, Any], products: list[dict[str, An
                 render_weighted_score_breakdown(product, score, risk_color)
 
         sentiment_col, keyword_col = st.columns(2, gap="large")
-        counts = summary.get("sentiment_counts") or {"positive": 0, "neutral": 0, "negative": 0}
+        counts = summary.get("sentiment_counts") or {"positive": 0, "uncertain": 0, "negative": 0}
         with sentiment_col:
             with st.container(key="inline_sentiment_panel"):
                 st.markdown('<div class="analysis-panel-title">Sentiment summary</div>', unsafe_allow_html=True)
                 sentiment_frame = pd.DataFrame(
-                    {"Sentiment": ["Positive", "Neutral", "Negative"], "Reviews": [counts.get("positive", 0), counts.get("neutral", 0), counts.get("negative", 0)]}
+                    {"Sentiment": ["Positive", "Uncertain", "Negative"], "Reviews": [counts.get("positive", 0), counts.get("uncertain", counts.get("neutral", 0)), counts.get("negative", 0)]}
                 )
                 sentiment_chart = px.pie(
                     sentiment_frame,
@@ -1219,7 +1260,7 @@ def inline_product_analysis(product: dict[str, Any], products: list[dict[str, An
                     names="Sentiment",
                     hole=.64,
                     color="Sentiment",
-                    color_discrete_map={"Positive": GREEN, "Neutral": "#98A2B3", "Negative": RED},
+                    color_discrete_map={"Positive": GREEN, "Uncertain": "#98A2B3", "Negative": RED},
                 )
                 sentiment_chart.update_traces(marker=dict(line=dict(color="white", width=3)))
                 sentiment_chart.add_annotation(
@@ -1241,7 +1282,7 @@ def inline_product_analysis(product: dict[str, Any], products: list[dict[str, An
             review_cards = []
             for review in reviews:
                 analysis = review.get("sentiment_analysis") or {}
-                sentiment = str(analysis.get("label") or "neutral").casefold()
+                sentiment = str(analysis.get("label") or "uncertain").casefold()
                 author = html.escape(str(review.get("author") or "Verified shopper"))
                 initial = html.escape(author[:1].upper() or "S")
                 stars = "★" * max(0, min(5, int(review.get("rating") or 0)))
@@ -1286,27 +1327,31 @@ def product_page(products: list[dict[str, Any]]) -> None:
     with st.container(key="product_breakdown_panel"):
         render_weighted_score_breakdown(product, score, RISK_COLORS[level])
     with st.expander("How is this calculated?"):
-        st.write("Risk score = 30% of the negative-review rate + 70% of the rate of reviews containing active defect or fraud terms. Duplicate reviews are excluded. Scores of 0–30 are Low, 31–60 Moderate, and 61–100 High. This is decision support, not proof that a listing is counterfeit.")
-    counts = summary.get("sentiment_counts") or {"positive": 0, "neutral": 0, "negative": 0}
+        st.write("A trained marketplace-review classifier labels each unique review as positive, negative, or uncertain and separately detects whether it reports product risk. VADER and the reviewable lexicons provide supporting signals, but do not override the trained decisions. The product risk score is 30% of the negative-review ratio plus 70% of the detected-risk ratio. Each review counts at most once in the risk ratio, severity is not used, and duplicate reviews are excluded. This is decision support, not proof that a listing is counterfeit.")
+    counts = summary.get("sentiment_counts") or {"positive": 0, "uncertain": 0, "negative": 0}
     chart1, chart2 = st.columns([1, 1.5])
     with chart1:
         st.subheader("Sentiment summary")
-        frame = pd.DataFrame({"Sentiment": ["Positive", "Neutral", "Negative"], "Reviews": [counts.get("positive", 0), counts.get("neutral", 0), counts.get("negative", 0)]})
-        fig = px.pie(frame, values="Reviews", names="Sentiment", hole=.68, color="Sentiment", color_discrete_map={"Positive": GREEN, "Neutral": "#98A2B3", "Negative": RED})
+        frame = pd.DataFrame({"Sentiment": ["Positive", "Uncertain", "Negative"], "Reviews": [counts.get("positive", 0), counts.get("uncertain", counts.get("neutral", 0)), counts.get("negative", 0)]})
+        fig = px.pie(frame, values="Reviews", names="Sentiment", hole=.68, color="Sentiment", color_discrete_map={"Positive": GREEN, "Uncertain": "#98A2B3", "Negative": RED})
         fig.update_layout(height=290, margin=dict(l=5, r=5, t=5, b=5), legend=dict(orientation="h", y=-.08), paper_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
     with chart2:
         with st.container(key="product_terms_panel"):
             render_term_or_signal_panel(product)
     st.subheader("Review evidence")
-    sentiment_filter = st.segmented_control("Sentiment", ["All", "Positive", "Neutral", "Negative", "Flagged"], default="All")
-    reviews = [item for item in product.get("comments") or [] if not item.get("is_duplicate")]
+    sentiment_filter = st.segmented_control("Sentiment", ["All", "Positive", "Uncertain", "Negative", "Flagged"], default="All")
+    reviews = [
+        item
+        for item in product.get("comments") or []
+        if not item.get("is_duplicate") and item.get("included_in_analysis") is not False
+    ]
     if sentiment_filter != "All":
         reviews = [r for r in reviews if (((r.get("sentiment_analysis") or {}).get("risk") or {}).get("detected") if sentiment_filter == "Flagged" else (r.get("sentiment_analysis") or {}).get("label") == sentiment_filter.lower())]
     for index, review in enumerate(reviews[:30]):
         analysis = review.get("sentiment_analysis") or {}
-        label = analysis.get("label", "neutral").title()
-        color = {"Positive": GREEN, "Neutral": "#667085", "Negative": RED}.get(label, "#667085")
+        label = analysis.get("label", "uncertain").title()
+        color = {"Positive": GREEN, "Uncertain": "#667085", "Negative": RED}.get(label, "#667085")
         stars = "★" * int(review.get("rating") or 0)
         st.markdown(f'<div class="review"><div class="review-top"><span><b>{html.escape(review.get("author") or "Verified shopper")}</b> · {stars}</span><span style="color:{color};font-weight:700">{label}</span></div>{highlight_review(review)}</div>', unsafe_allow_html=True)
     render_recommendations(product, products, limit=4, key_prefix="product-page")
@@ -1412,8 +1457,8 @@ def model_page() -> None:
                     sentiment_root = ROOT / "sentiment-analysis"
                     if str(sentiment_root) not in sys.path:
                         sys.path.insert(0, str(sentiment_root))
-                    from defaketive_sentiment.model import DefaketiveSentimentModel
-                    evaluator = DefaketiveSentimentModel()
+                    from defaketive_sentiment.manuscript import HybridManuscriptRiskModel
+                    evaluator = HybridManuscriptRiskModel(allow_unqualified=True)
                     predictions = [evaluator.analyze(text)["label"] for text in evaluation_frame[text_column].fillna("")]
                 result = evaluate_labels(evaluation_frame[actual_column].astype(str), predictions)
                 save_evaluation_run(uploaded.name, result)

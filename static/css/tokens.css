@@ -1,0 +1,16 @@
+/* Hallmark · DeFaketive runtime tokens · canonical export: /tokens.css */
+:root {
+  --color-paper: oklch(97% 0.018 88); --color-paper-2: oklch(94% 0.025 86); --color-paper-3: oklch(89% 0.032 82); --color-card: oklch(99% 0.009 90);
+  --color-ink: oklch(18% 0.022 276); --color-ink-2: oklch(31% 0.026 274); --color-muted: oklch(48% 0.025 270); --color-rule: oklch(75% 0.032 82); --color-rule-strong: oklch(46% 0.035 275);
+  --color-accent: oklch(57% 0.245 292); --color-accent-hover: oklch(49% 0.245 292); --color-accent-soft: oklch(91% 0.055 292); --color-accent-ink: oklch(99% 0.006 90); --color-focus: oklch(68% 0.21 286);
+  --color-graphite: oklch(16% 0.021 276); --color-graphite-2: oklch(23% 0.028 275); --color-graphite-ink: oklch(96% 0.015 88);
+  --color-success: oklch(48% 0.14 150); --color-success-soft: oklch(92% 0.045 145); --color-warning: oklch(60% 0.145 72); --color-warning-soft: oklch(93% 0.055 78); --color-danger: oklch(52% 0.195 27); --color-danger-soft: oklch(93% 0.045 28);
+  --font-display: "Space Grotesk", ui-sans-serif, sans-serif; --font-body: "IBM Plex Sans", ui-sans-serif, sans-serif; --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --space-3xs: .25rem; --space-2xs: .5rem; --space-xs: .75rem; --space-sm: 1rem; --space-md: 1.5rem; --space-lg: 2rem; --space-xl: 3rem; --space-2xl: 4.5rem; --space-3xl: 7rem;
+  --text-xs: .75rem; --text-sm: .875rem; --text-base: 1rem; --text-md: 1.25rem; --text-lg: 1.5625rem; --text-xl: 1.953rem; --text-2xl: 2.441rem; --text-3xl: 3.052rem; --text-display: clamp(3rem, 8vw, 8.25rem);
+  --ease-out: cubic-bezier(.16,1,.3,1); --ease-in: cubic-bezier(.7,0,.84,0); --ease-in-out: cubic-bezier(.65,0,.35,1); --dur-short: 120ms; --dur-base: 220ms; --dur-long: 480ms;
+  --rule-thin: 1px; --rule-heavy: 2px; --radius-control: 2px; --radius-card: 0; --radius-panel: 0;
+}
+html[data-theme="dark"] {
+  --color-paper: oklch(16% 0.023 276); --color-paper-2: oklch(20% 0.027 275); --color-paper-3: oklch(25% 0.032 274); --color-card: oklch(19% 0.025 275); --color-ink: oklch(95% 0.017 88); --color-ink-2: oklch(80% 0.023 86); --color-muted: oklch(67% 0.025 280); --color-rule: oklch(34% 0.035 275); --color-rule-strong: oklch(52% 0.045 278); --color-accent: oklch(70% 0.19 292); --color-accent-hover: oklch(77% 0.16 292); --color-accent-soft: oklch(28% 0.065 292); --color-accent-ink: oklch(15% 0.023 276); --color-focus: oklch(76% 0.17 286);
+}

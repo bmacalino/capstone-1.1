@@ -1,0 +1,11 @@
+annotation_id,review,label,risk_present,risk_categories,source,source_id,annotator,annotation_notes,adjudication_status
+mixed-001,"Okay naman pero wrong color ang dumating.",neutral,no,,,,,,
+mixed-002,"Maganda naman siya kaso may leak, pero overall okay.",neutral,yes,quality,,,,,pending
+mixed-003,"Good packaging, but the item does not work.",negative,yes,defect,,,,,pending
+mixed-004,"Okay lang naman, may minor defect pero nagagamit pa.",neutral,yes,defect,,,,,pending
+mixed-005,"Nice product, wrong size lang yung isa.",neutral,yes,completeness,,,,,pending
+mixed-006,"Maganda ang item pero mabilis masira.",neutral,yes,durability,,,,,pending
+mixed-007,"The packaging is good but there is a glitch while using the phone.",negative,yes,performance,,,,,pending
+mixed-008,"Okay naman yung kulay pero hindi nasunod yung order ko.",positive,no,,,,,pending
+mixed-009,"Received on time, but the missing accessory was disappointing.",negative,yes,,completeness,,,,pending
+mixed-010,"Satisfied overall, although the material is thinner than expected.",positive,yes,quality,,,,,pending

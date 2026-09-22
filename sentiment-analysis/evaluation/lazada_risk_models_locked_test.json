@@ -1,0 +1,244 @@
+{
+  "metadata": {
+    "created_at": "2026-09-14T16:04:56.972538+00:00",
+    "evaluation_scope": "locked_product_disjoint_test_once",
+    "test_predictions_computed": true,
+    "test_dataset": "lazada_round1_test.csv",
+    "test_dataset_sha256": "565974304a00e130ab95744e267bc2a57572664371838495ff242be910a1b263",
+    "rows": 133,
+    "products": 7,
+    "selection_statement": "Candidate architecture and thresholds were frozen before this test evaluation; no test label was used for fitting or tuning.",
+    "canonical_category_classes": [
+      "damage",
+      "defect",
+      "delivery",
+      "other",
+      "performance",
+      "quality",
+      "seller_service",
+      "wrong_item"
+    ],
+    "test_category_support": {
+      "defect": 19,
+      "delivery": 10,
+      "other": 2,
+      "performance": 1,
+      "quality": 37,
+      "seller_service": 9,
+      "wrong_item": 2
+    }
+  },
+  "current": {
+    "artifact": "lazada_round1_binary_uncertain.joblib",
+    "artifact_sha256": "a31acca846494aad9b20d053197fb562756bfefd9b7d7de6dabbb6b6f06ed70b",
+    "model_version": "defaketive-marketplace-v2-0.1.0-candidate-binary-uncertain",
+    "risk_detection": {
+      "sample_count": 133,
+      "accuracy": 0.8421,
+      "macro_f1": 0.8296,
+      "no_risk": {
+        "precision": 0.8636,
+        "recall": 0.717,
+        "f1": 0.7835,
+        "support": 53
+      },
+      "risk": {
+        "precision": 0.8315,
+        "recall": 0.925,
+        "f1": 0.8757,
+        "support": 80
+      }
+    },
+    "risk_category": {
+      "sample_count": 80,
+      "classes": [
+        "damage",
+        "defect",
+        "delivery",
+        "other",
+        "performance",
+        "quality",
+        "seller_service",
+        "wrong_item"
+      ],
+      "exact_match_accuracy": 0.675,
+      "macro_f1": 0.5503,
+      "micro_f1": 0.7529,
+      "hamming_loss": 0.0656,
+      "per_class": {
+        "damage": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "defect": {
+          "precision": 0.7895,
+          "recall": 0.7895,
+          "f1": 0.7895,
+          "support": 19
+        },
+        "delivery": {
+          "precision": 0.6,
+          "recall": 0.9,
+          "f1": 0.72,
+          "support": 10
+        },
+        "other": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "performance": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "quality": {
+          "precision": 0.7333,
+          "recall": 0.8919,
+          "f1": 0.8049,
+          "support": 37
+        },
+        "seller_service": {
+          "precision": 0.625,
+          "recall": 0.5556,
+          "f1": 0.5882,
+          "support": 9
+        },
+        "wrong_item": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "support": 2
+        }
+      },
+      "supported_macro_f1": 0.6289,
+      "unknown_category_rows_excluded": 0
+    },
+    "risk_severity": {
+      "sample_count": 80,
+      "accuracy": 0.7125,
+      "macro_f1": 0.63,
+      "weighted_kappa": 0.5979,
+      "mean_absolute_error": 0.2875
+    }
+  },
+  "candidate": {
+    "artifact": "lazada_risk_heads_v4_candidate.joblib",
+    "artifact_sha256": "a6e42386f8bb719abdfd51c08d047aaca0880ba794e2c02d98250c09e5f40b97",
+    "model_version": "defaketive-marketplace-v4-hybrid-risk-category-candidate",
+    "risk_detection": {
+      "sample_count": 133,
+      "accuracy": 0.8421,
+      "macro_f1": 0.8296,
+      "no_risk": {
+        "precision": 0.8636,
+        "recall": 0.717,
+        "f1": 0.7835,
+        "support": 53
+      },
+      "risk": {
+        "precision": 0.8315,
+        "recall": 0.925,
+        "f1": 0.8757,
+        "support": 80
+      }
+    },
+    "risk_category": {
+      "sample_count": 80,
+      "classes": [
+        "damage",
+        "defect",
+        "delivery",
+        "other",
+        "performance",
+        "quality",
+        "seller_service",
+        "wrong_item"
+      ],
+      "exact_match_accuracy": 0.225,
+      "macro_f1": 0.4388,
+      "micro_f1": 0.5238,
+      "hamming_loss": 0.1562,
+      "per_class": {
+        "damage": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "defect": {
+          "precision": 0.9091,
+          "recall": 0.5263,
+          "f1": 0.6667,
+          "support": 19
+        },
+        "delivery": {
+          "precision": 0.8,
+          "recall": 0.8,
+          "f1": 0.8,
+          "support": 10
+        },
+        "other": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "performance": {
+          "precision": 0.0182,
+          "recall": 1.0,
+          "f1": 0.0357,
+          "support": 1
+        },
+        "quality": {
+          "precision": 0.725,
+          "recall": 0.7838,
+          "f1": 0.7532,
+          "support": 37
+        },
+        "seller_service": {
+          "precision": 0.625,
+          "recall": 0.5556,
+          "f1": 0.5882,
+          "support": 9
+        },
+        "wrong_item": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "support": 2
+        }
+      },
+      "supported_macro_f1": 0.5015,
+      "unknown_category_rows_excluded": 0
+    },
+    "risk_severity": {
+      "sample_count": 80,
+      "accuracy": 0.675,
+      "macro_f1": 0.6082,
+      "weighted_kappa": 0.3944,
+      "mean_absolute_error": 0.3875
+    }
+  },
+  "comparison": {
+    "risk_macro_f1_delta": 0.0,
+    "risk_recall_delta": 0.0,
+    "category_macro_f1_delta": -0.1115,
+    "category_supported_macro_f1_delta": -0.1274,
+    "category_micro_f1_delta": -0.2291,
+    "category_exact_match_delta": -0.45,
+    "severity_weighted_kappa_delta": -0.2035,
+    "severity_macro_f1_delta": -0.0218
+  },
+  "qualification_gates": {
+    "risk_recall_at_least_0_80": true,
+    "risk_macro_f1_at_least_0_75": true,
+    "category_macro_f1_at_least_0_65": false,
+    "severity_weighted_kappa_at_least_0_65": false
+  },
+  "qualified_for_integration": false
+}

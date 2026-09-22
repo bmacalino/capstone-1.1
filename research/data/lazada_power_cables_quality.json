@@ -1,0 +1,165 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "power",
+  "minimum_collected_reviews": 200,
+  "products_checked": 8,
+  "status_counts": {
+    "insufficient_written_reviews": 2,
+    "not_collected": 6
+  },
+  "products": [
+    {
+      "name": "100W 3-in-1 Super Charging Cable 6A Micro USB Type C Fast Charger Type-C Data Cable for Samsung Android iOS Carry On",
+      "link": "https://www.lazada.com.ph/products/pdp-i4811436757.html",
+      "reported_review_count": 57,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "4 IN 1 65W Spring Data Cable for IOS/Type C - USB/TYPE C and Micro/Type C - USB/TYE C Cable Ultra Fast Charging Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i5227433249.html",
+      "reported_review_count": 116,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "Multifunctional 4 in 1 65W Spring Cable for IOS/Type C - USB/TYPE C and Micro/Type C - USB/TYE C",
+      "link": "https://www.lazada.com.ph/products/pdp-i5238358692.html",
+      "reported_review_count": 94,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "IOS/Type C - USB/TYPE C and Micro/Type C - USB/TYE C Cable Ultra Fast Charging 65W Spring Data Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i5250181750.html",
+      "reported_review_count": 27,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "4 IN 1 Spring Cable Ultra Fast Charging 65W for IOS/Type C - USB/TYPE C and Micro/Type C - USB/TYE C Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i5233328698.html",
+      "reported_review_count": 2312,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 110,
+      "collected_by_star": {
+        "1": 34,
+        "2": 7,
+        "3": 13,
+        "4": 16,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "3-IN-1 240W USB TypeC Fast Charging Cable with Foldable Stand – 360° Adjustable Foldable Phone Stand Charger Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i15491967864.html",
+      "reported_review_count": 304,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "[Leslye] Durable Type C Cables, 120W 10A Fast Charging data Cable Cord, Charger Cable Line For Android Phone",
+      "link": "https://www.lazada.com.ph/products/pdp-i3991929010.html",
+      "reported_review_count": 1901,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 73,
+      "collected_by_star": {
+        "1": 13,
+        "2": 2,
+        "3": 10,
+        "4": 8,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "USB C to Lightning Cable Fast Charger Cable, Power Delivery Type C Charging Cord Compatible for iPhone 12~14 Series",
+      "link": "https://www.lazada.com.ph/products/pdp-i4963379453.html",
+      "reported_review_count": 192,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T10:26:11"
+}

@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "smart_home",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "🎖 TP-Link Official Store | Tapo C200C | 1080p Indoor 360 Degrees Pan and Tilt Wireless WiFi IP Security CCTV Sale Hidden Camera Connect to Cellphone Two Way Audio with Mic and Speaker [NO WALL MOUNT INCLUDED]",
+      "link": "https://www.lazada.com.ph/products/pdp-i4547888367-s29807638342.html",
+      "reported_review_count": 8719,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 119,
+      "collected_by_star": {
+        "1": 28,
+        "2": 5,
+        "3": 18,
+        "4": 28,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T17:01:27"
+}

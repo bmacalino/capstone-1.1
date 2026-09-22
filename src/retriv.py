@@ -6,10 +6,14 @@ import logging
 import argparse
 import re
 import datetime
+import subprocess
+import socket
 from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit
 import undetected_chromedriver as uc
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, InvalidSessionIdException, NoSuchWindowException
 from tqdm import tqdm
 
 
@@ -89,7 +93,7 @@ class ShopeeScraper:
             raise ValueError("Provide a search keyword or a Shopee PH product URL")
 
         self._setup_logging()
-        self.options = uc.ChromeOptions()
+        self.options = webdriver.ChromeOptions()
         self._configure_options()
         self.output_data = {}
         slug_source = "products" if self.product_urls else self.search_term
@@ -115,11 +119,11 @@ class ShopeeScraper:
     def _configure_options(self):
         if sys.platform.startswith('linux'):
             self.options.add_argument("--disable-gpu")
-        self.options.add_argument("--no-sandbox")
-        self.options.add_argument("--disable-dev-shm-usage")
-        self.options.add_argument("--disable-blink-features=AutomationControlled")
+        if sys.platform.startswith('linux'):
+            self.options.add_argument("--disable-dev-shm-usage")
         self.options.add_argument("--window-size=900,700")
         self.options.add_argument("--lang=en-PH")
+        self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
     @staticmethod
     def _detect_chrome_major():
@@ -221,6 +225,7 @@ class ShopeeScraper:
                     self._periodic_save()
                 except Exception as e:
                     logging.warning(f"Error scraping comments for {link}: {e}")
+                    raise
 
     @staticmethod
     def _first_text(root, selectors):
@@ -379,58 +384,127 @@ class ShopeeScraper:
                 logging.warning(f"Skipping item due to error: {e}")
         return result
 
+    def _capture_login_diagnostics(self):
+        """Record page structure without collecting field values or cookies."""
+        try:
+            details = self.driver.execute_script("""
+                const describe = element => element ? {
+                    tag: element.tagName,
+                    role: element.getAttribute('role'),
+                    disabled: Boolean(element.disabled),
+                    inert: Boolean(element.closest('[inert]')),
+                    pointerEvents: getComputedStyle(element).pointerEvents,
+                    visibility: getComputedStyle(element).visibility,
+                    display: getComputedStyle(element).display,
+                    position: getComputedStyle(element).position,
+                    zIndex: getComputedStyle(element).zIndex
+                } : null;
+                const inspectControl = element => {
+                    const rect = element.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+                    const hit = document.elementFromPoint(x, y);
+                    return {...describe(element),
+                        rect: {x: rect.x, y: rect.y, width: rect.width, height: rect.height},
+                        covered: Boolean(hit && hit !== element && !element.contains(hit)),
+                        hit: describe(hit),
+                        ancestors: Array.from((function* () {
+                            for (let parent = element.parentElement; parent; parent = parent.parentElement)
+                                yield parent;
+                        })()).slice(0, 8).map(describe)
+                    };
+                };
+                return {
+                    readyState: document.readyState,
+                    hasFocus: document.hasFocus(),
+                    activeElement: describe(document.activeElement),
+                    inputHitTests: Array.from(document.querySelectorAll('input'))
+                        .slice(0, 10).map(inspectControl),
+                    centerStack: document.elementsFromPoint(innerWidth / 2, innerHeight / 2)
+                        .slice(0, 6).map(describe),
+                    controls: Array.from(document.querySelectorAll('input,button,a,iframe'))
+                        .slice(0, 60).map(describe)
+                };
+            """)
+            os.makedirs("debug", exist_ok=True)
+            with open("debug/shopee_ph_login_state.json", "w", encoding="utf-8") as file:
+                json.dump(details, file, indent=2)
+            logging.info("Saved login page structure to debug/shopee_ph_login_state.json")
+        except Exception:
+            logging.warning("Could not inspect login page structure.", exc_info=True)
+
     def _check_captcha(self):
         """Check for captcha and wait if detected"""
-        blacklist = ["login", "captcha","verify","security","check","auth","error"]
         current_url = self.driver.current_url
         if isinstance(current_url, bytes):
             current_url = current_url.decode("utf-8", errors="replace")
-        if any(x in current_url.lower() for x in blacklist):
+        if self._is_verification_url(current_url):
             logging.info("Captcha/Login detected! Please solve it...")
+            self._capture_login_diagnostics()
             try:
-                page_text = self.driver.find_element(By.TAG_NAME, "body").text.casefold()
+                page_text = self._verification_page_text()
             except Exception:
                 page_text = ""
             if "try again later" in page_text or "verification can't be completed" in page_text:
-                raise TimeoutException(
-                    "SHOPEE_VERIFICATION_BLOCKED: Shopee could not complete verification"
+                logging.warning(
+                    "Shopee could not complete verification. Chrome will stay open for manual recovery; "
+                    "no automated retries will be made."
                 )
-            if self.no_prompt:
+            if not self.no_prompt:
+                input("Complete login/CAPTCHA in Chrome, then press Enter to resume...")
+            if self.no_prompt or self._is_verification_url(self.driver.current_url):
                 deadline = time.monotonic() + self.verification_timeout
+                diagnostic_time = time.monotonic() + 10
                 while time.monotonic() < deadline:
+                    if diagnostic_time is not None and time.monotonic() >= diagnostic_time:
+                        self._capture_login_diagnostics()
+                        diagnostic_time = None
                     current_url = self.driver.current_url
                     if isinstance(current_url, bytes):
                         current_url = current_url.decode("utf-8", errors="replace")
-                    try:
-                        page_text = self.driver.find_element(By.TAG_NAME, "body").text.casefold()
-                    except Exception:
-                        page_text = ""
-                    if "try again later" in page_text or "verification can't be completed" in page_text:
-                        raise TimeoutException(
-                            "SHOPEE_VERIFICATION_BLOCKED: Shopee could not complete verification"
-                        )
-                    if not any(x in current_url.lower() for x in blacklist):
+                    parts = urlsplit(str(current_url or ""))
+                    if (parts.hostname or "").lower() in {"shopee.ph", "www.shopee.ph"} and not self._is_verification_url(current_url):
                         break
                     time.sleep(1)
                 else:
                     raise TimeoutError(
                         f"Shopee verification was not completed within {self.verification_timeout} seconds"
                     )
-            else:
-                input("Press Enter after solving the captcha...")
             time.sleep(5)  # Wait for page to settle after captcha
             return True
         return False
+
+    @staticmethod
+    def _is_verification_url(value):
+        if isinstance(value, bytes):
+            value = value.decode("utf-8", errors="replace")
+        parts = urlsplit(str(value or ""))
+        if (parts.hostname or "").lower() not in {"shopee.ph", "www.shopee.ph"}:
+            return False
+        return bool(re.match(r"^/(?:buyer/login|login|verify|captcha|security|auth)(?:/|$)", parts.path, re.I))
+
+    def _verification_page_text(self):
+        """Avoid WebDriver's recursive visible-text algorithm on the whole page."""
+        text = self.driver.execute_script(
+            "return document.body ? document.body.innerText : '';"
+        )
+        return str(text or "").casefold()
 
     def _safe_get(self, url):
         """Wrapper for driver.get() with captcha checking"""
         self.driver.get(url)
         time.sleep(5)  # Wait for page to load
-        while self._check_captcha():
-            logging.info("Retrying after captcha...")
-            self.driver.get(url)
-            time.sleep(5)  # Wait for page to load
-            self._check_captcha()
+        if self._check_captcha():
+            current = urlsplit(str(self.driver.current_url or ""))
+            expected = urlsplit(url)
+            if (current.hostname, current.path) != (expected.hostname, expected.path):
+                logging.info("Returning to the requested page after verification.")
+                self.driver.get(url)
+                time.sleep(5)
+                if self._check_captcha():
+                    current = urlsplit(str(self.driver.current_url or ""))
+                    if (current.hostname, current.path) != (expected.hostname, expected.path):
+                        raise RuntimeError("SHOPEE_COLLECTION_FAILED: Verification did not return to the requested page.")
             self.driver.implicitly_wait(3)
 
     def _scrape_page(self):
@@ -693,7 +767,12 @@ class ShopeeScraper:
                     product["comments"] = self._collect_reviews(self.review_limit)
         except Exception as e:
             logging.warning(f"Shopee PH detail scrape failed for {product.get('link')}: {e}")
-            product.setdefault("comments", [])
+            if isinstance(e, (InvalidSessionIdException, NoSuchWindowException)):
+                raise RuntimeError(
+                    "SHOPEE_BROWSER_CLOSED: Chrome closed or disconnected before collection completed. "
+                    "Start a fresh scan and keep the scraper window open through login and collection."
+                ) from e
+            raise
 
     def _reviews_from_current_page(self):
         """Read Shopee's hashed review markup using stable structure and attributes."""
@@ -881,51 +960,94 @@ class ShopeeScraper:
                     break
         return collected_reviews
 
+    @staticmethod
+    def _cached_driver(chrome_major):
+        """Reuse a verified matching driver instead of downloading on every scan."""
+        if not chrome_major:
+            return None
+        path = os.path.join(uc.Patcher.data_path, "undetected_chromedriver.exe" if sys.platform.startswith("win") else "undetected_chromedriver")
+        if not os.path.isfile(path):
+            return None
+        try:
+            result = subprocess.run(
+                [path, "--version"], capture_output=True, text=True, timeout=5,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0,
+            )
+            match = re.search(r"ChromeDriver (\d+)\.", result.stdout)
+            if result.returncode == 0 and match and int(match.group(1)) == chrome_major:
+                return path
+        except (OSError, subprocess.SubprocessError):
+            logging.warning("Could not verify the cached Chrome driver.")
+        return None
+
     def execute(self):
         sys.excepthook = self._handle_exception
-        chrome_kwargs = {
-            "options": self.options,
-            "enable_cdp_events": False,
-            "headless": False,
-        }
         chrome_major = self._detect_chrome_major()
         if chrome_major:
-            chrome_kwargs["version_main"] = chrome_major
             logging.info("Starting Chrome with matching major version %s.", chrome_major)
-        self.driver = uc.Chrome(**chrome_kwargs)
+        cached_driver = self._cached_driver(chrome_major)
+        if cached_driver:
+            logging.info("Using the cached matching Chrome driver.")
+        else:
+            logging.info("Preparing Chrome driver; a download may be required.")
+        previous_timeout = socket.getdefaulttimeout()
+        try:
+            socket.setdefaulttimeout(30)
+            if not cached_driver:
+                patcher = uc.Patcher(version_main=chrome_major or 0)
+                patcher.auto()
+                cached_driver = patcher.executable_path
+            # Let ChromeDriver own browser startup. UC's browser launcher leaves
+            # Chrome stdout/stderr pipes unread and adds extra browser flags.
+            self.driver = webdriver.Chrome(
+                service=Service(executable_path=cached_driver, log_output=subprocess.DEVNULL),
+                options=self.options,
+            )
+            self.driver.set_page_load_timeout(45)
+        except Exception as exc:
+            raise RuntimeError(
+                "Chrome could not start. Driver setup or browser startup failed. "
+                "Check your connection, then retry the scan. Details: " + str(exc)
+            ) from exc
+        finally:
+            socket.setdefaulttimeout(previous_timeout)
         _position_scraper_window(self.driver)
 
-        # Run the missing comments scraper if we have existing data
-        if self.output_data:
-            self._scrape_missing_comments()
-
-        products = []
         try:
+            # Discard link-only placeholders left by older failed runs.
+            self.output_data = {
+                link: product for link, product in self.output_data.items()
+                if str(product.get("name") or "").strip() or product.get("comments")
+            }
+            if self.output_data:
+                self._scrape_missing_comments()
             if self.product_urls:
                 logging.info("Loading Shopee Philippines for direct product collection...")
                 products = [self._product_from_url(url) for url in self.product_urls]
             else:
                 products = self._scrape_page()
-        except Exception as e:
-            logging.error(f"Error scraping: {e}")
-        final_list = []
-        try:
             if not products:
-                return
+                raise RuntimeError("SHOPEE_COLLECTION_FAILED: No products were collected.")
             for prod in _progress(products, desc="Processing products"):
                 link = prod["link"]
                 if link in self.output_data:
-                    final_list.append(self.output_data[link])
                     continue
-                if not self.index_only:
+                if not self.index_only or self.product_urls:
                     self._scrape_details(prod)
-                final_list.append(prod)
+                if not str(prod.get("name") or "").strip() and not prod.get("comments"):
+                    raise RuntimeError(
+                        "SHOPEE_COLLECTION_FAILED: Shopee did not return product details or reviews. "
+                        "Complete login or verification and try a fresh scan."
+                    )
                 self.output_data[link] = prod
                 # Periodic save after each product
                 self._periodic_save()
         finally:
             logging.info("Quitting driver...")
-            self.driver.quit()
+            try:
+                self.driver.quit()
+            except Exception:
+                logging.warning("Chrome was already disconnected during cleanup.")
 
         # Final save (redundant but safe)
         self._periodic_save()

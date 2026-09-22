@@ -1,0 +1,166 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "power",
+  "minimum_collected_reviews": 200,
+  "products_checked": 8,
+  "status_counts": {
+    "eligible": 1,
+    "insufficient_written_reviews": 4,
+    "not_collected": 3
+  },
+  "products": [
+    {
+      "name": "Anker Laptop Power Bank, 25,000mAh Portable Charger with Triple 100W USB-C Ports for Multi-Device Charging, Built-in and Retractable Cables, for iPhone 17/16/15 Series, MacBook, Samsung, and More A1695",
+      "link": "https://www.lazada.com.ph/products/pdp-i4975340062.html",
+      "reported_review_count": 4320,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 116,
+      "collected_by_star": {
+        "1": 24,
+        "2": 8,
+        "3": 22,
+        "4": 22,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "【3C Certification】Vention 45W 20000mAh Powerbank Fast Charging with Built in USB C Cable for iPhone 16 15 pro Max Huawei Mate 40 60 Pro Samsung S24 Ultra S23 MacBook Air iPad Apple Watch AirPods Portable Power Bank",
+      "link": "https://www.lazada.com.ph/products/pdp-i5184191214.html",
+      "reported_review_count": 1795,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 66,
+      "collected_by_star": {
+        "1": 10,
+        "2": 4,
+        "3": 1,
+        "4": 11,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "UGREEN 20000mAh 25000mAh Powerbank PD 145W Fast Charging Powerbank 10000mAh PD 20W for Dell Lenovo MacBook Air SAMSUNG s24 s25 Ultra xiaomi iPhone 17 16 pro max Mobile Phones Power Adapter",
+      "link": "https://www.lazada.com.ph/products/pdp-i2310520201.html",
+      "reported_review_count": 11279,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 170,
+      "collected_by_star": {
+        "1": 36,
+        "2": 22,
+        "3": 32,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "UGREEN 20000mAh Powerbank 22.5W PD20W 74Wh Fast Charging with Built-in 2 Cable 3 Output 2 Input LED Display Portable Power bank Original",
+      "link": "https://www.lazada.com.ph/products/pdp-i4870327065.html",
+      "reported_review_count": 1322,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 2,
+      "collected_by_star": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "complete",
+      "stop_reason": "empty_review_page",
+      "filter_warning": "Lazada did not return verified 2-star reviews; balanced collection stopped to prevent mislabeled data"
+    },
+    {
+      "name": "KC15 20000mah Fast Charging Power Bank with LED Light Display Light & Small Travel PowerBank",
+      "link": "https://www.lazada.com.ph/products/pdp-i15395024722.html",
+      "reported_review_count": 724,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "BLUESKY 10000mah Magnetic Powerbank Original 20W fast charging Portable Wireless Charging PowerBank for iPhone11/12/13/14plus/15pro/16promax",
+      "link": "https://www.lazada.com.ph/products/pdp-i4975131258.html",
+      "reported_review_count": 926,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "Fast Charging KC58 20000mAh Battery Capacity Power Bank with Multi Cable and Digital LED Display Macaron Powerbank",
+      "link": "https://www.lazada.com.ph/products/pdp-i4693560169.html",
+      "reported_review_count": 6347,
+      "stratum": "power",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Fast Power Bank Super Charging Built-in 4 Fast Charging Cables Charge4 Devices Simultaneously LED Power Display Suitablefor Headphones all Mobile Devices",
+      "link": "https://www.lazada.com.ph/products/pdp-i5318084739.html",
+      "reported_review_count": 88,
+      "stratum": "power",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T10:20:01"
+}

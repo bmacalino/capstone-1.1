@@ -1,0 +1,894 @@
+{
+  "dataset": "complete_manual_marketplace_reviews (1).csv",
+  "audit": {
+    "source_rows": 498,
+    "nonempty_rows": 498,
+    "unique_review_ids": 498,
+    "unique_casefolded_texts": 498,
+    "duplicate_review_ids": 0,
+    "duplicate_casefolded_texts": 0,
+    "product_count": 15,
+    "platform_counts": {
+      "lazada": 173,
+      "temu": 325
+    },
+    "adjudicated_label_counts": {
+      "negative": 363,
+      "mixed": 28,
+      "neutral": 18,
+      "positive": 89
+    },
+    "blank_annotator_ids": 498
+  },
+  "evaluation_policy": {
+    "included_labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "excluded_rows": 28,
+    "excluded_label_counts": {
+      "mixed": 28
+    },
+    "primary_metric": "macro_f1"
+  },
+  "results": {
+    "jjjardev/tagasenti_model": {
+      "model": "jjjardev/tagasenti_model",
+      "overall": {
+        "sample_count": 470,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.834,
+        "precision": 0.6677,
+        "recall": 0.7819,
+        "f1": 0.68,
+        "per_class": {
+          "negative": {
+            "precision": 0.9833,
+            "recall": 0.8127,
+            "f1": 0.8899,
+            "support": 363
+          },
+          "neutral": {
+            "precision": 0.1408,
+            "recall": 0.5556,
+            "f1": 0.2247,
+            "support": 18
+          },
+          "positive": {
+            "precision": 0.8788,
+            "recall": 0.9775,
+            "f1": 0.9255,
+            "support": 89
+          }
+        },
+        "matrix": [
+          [
+            295,
+            60,
+            8
+          ],
+          [
+            4,
+            10,
+            4
+          ],
+          [
+            1,
+            1,
+            87
+          ]
+        ]
+      },
+      "by_platform": {
+        "lazada": {
+          "sample_count": 167,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.8862,
+          "precision": 0.696,
+          "recall": 0.7781,
+          "f1": 0.7192,
+          "per_class": {
+            "negative": {
+              "precision": 0.9703,
+              "recall": 0.875,
+              "f1": 0.9202,
+              "support": 112
+            },
+            "neutral": {
+              "precision": 0.2308,
+              "recall": 0.5,
+              "f1": 0.3158,
+              "support": 6
+            },
+            "positive": {
+              "precision": 0.8868,
+              "recall": 0.9592,
+              "f1": 0.9216,
+              "support": 49
+            }
+          },
+          "matrix": [
+            [
+              98,
+              9,
+              5
+            ],
+            [
+              2,
+              3,
+              1
+            ],
+            [
+              1,
+              1,
+              47
+            ]
+          ]
+        },
+        "temu": {
+          "sample_count": 303,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.8053,
+          "precision": 0.6601,
+          "recall": 0.7894,
+          "f1": 0.6686,
+          "per_class": {
+            "negative": {
+              "precision": 0.9899,
+              "recall": 0.7849,
+              "f1": 0.8756,
+              "support": 251
+            },
+            "neutral": {
+              "precision": 0.1207,
+              "recall": 0.5833,
+              "f1": 0.2,
+              "support": 12
+            },
+            "positive": {
+              "precision": 0.8696,
+              "recall": 1.0,
+              "f1": 0.9302,
+              "support": 40
+            }
+          },
+          "matrix": [
+            [
+              197,
+              51,
+              3
+            ],
+            [
+              2,
+              7,
+              3
+            ],
+            [
+              0,
+              0,
+              40
+            ]
+          ]
+        }
+      },
+      "mean_confidence": 0.872068,
+      "errors": [
+        {
+          "review_id": "local-0001-lazada_ph_direct-parehong-for-right-ear-ang-bud-j",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.688225,
+          "review_text": "parehong for right ear ang bud. joke time ata ito. paano mo gagamitin."
+        },
+        {
+          "review_id": "local-0007-lazada_ph_direct-functionality-hnd-gumagana-wlang",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.939051,
+          "review_text": "Functionality:hnd gumagana..wlang kwenta!!!!"
+        },
+        {
+          "review_id": "local-0009-lazada_ph_direct-madali-nasira-lol",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.404692,
+          "review_text": "madali nasira lol"
+        },
+        {
+          "review_id": "local-0015-lazada_ph_direct-sira-yaan-na-mura-lang-naman",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.890669,
+          "review_text": "sira 😅 yaan na mura lang naman"
+        },
+        {
+          "review_id": "local-0029-lazada_ph_direct-defective-devicedefective-device",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4983206125-s29079712739.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.503556,
+          "review_text": "Defective deviceDefective deviceDefective deviceDefective deviceDefective deviceDefective device"
+        },
+        {
+          "review_id": "local-0031-lazada_ph_direct-hind-po-gumagana-hindi-po-nadede",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4983206125-s29079712739.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.592747,
+          "review_text": "Hind po gumagana hindi po nadedetect sa blueooth po"
+        },
+        {
+          "review_id": "local-0042-lazada_ph_direct-battery-life-bilis-malowbat",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4983206125-s29079712739.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.813486,
+          "review_text": "🔋Battery Life:bilis malowbat"
+        },
+        {
+          "review_id": "local-0045-lazada_ph_direct-earbuds-not-charging",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4983206125-s29079712739.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.793262,
+          "review_text": "Earbuds not charging"
+        },
+        {
+          "review_id": "local-0060-lazada_ph_direct-no-bubble-wrap-kaya-may-damage-u",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.711233,
+          "review_text": "no bubble wrap kaya may damage ung LCD hyst di ko na na picturan"
+        },
+        {
+          "review_id": "local-0073-lazada_ph_direct-quality-the-item-is-kinda-bit-da",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.77215,
+          "review_text": "Quality:the item is kinda bit damage it has a little light in the that is too bright i dont know if its in the cover of lcd or the pixel itself"
+        },
+        {
+          "review_id": "local-0104-lazada_ph_direct-pointer-movement-not-smooth-smal",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.864837,
+          "review_text": "pointer movement not smooth, smaller than standard mouse, not that great to use. Now i know why it's cheap."
+        },
+        {
+          "review_id": "local-0110-lazada_ph_direct-kaya-pala-mura-ang-cute-pala",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.912157,
+          "review_text": "kaya pala mura ang cute pala.. 🤣😂"
+        },
+        {
+          "review_id": "local-0117-lazada_ph_direct-mouse-is-not-working-properly-cu",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.772624,
+          "review_text": "mouse is not working properly. curser sensor moves but left and right click doesn't work."
+        },
+        {
+          "review_id": "local-0123-lazada_ph_direct-wasak-ang-kahon-niya-di-naka-bub",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.77536,
+          "review_text": "Wasak ang kahon niya di naka bubble rap.. sana ayusin naman yung packaging.."
+        },
+        {
+          "review_id": "local-0128-lazada_ph_direct-clear-voice-pickup-pero-magaan-l",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.563285,
+          "review_text": "Clear voice pickup, pero magaan lang xea"
+        },
+        {
+          "review_id": "local-0145-lazada_ph_earpho-sound-quality-mahina-nmn-ang-tun",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5014079183.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.659346,
+          "review_text": "🎧Sound Quality:MAHINA nmn Ang tunog nya"
+        },
+        {
+          "review_id": "local-0153-lazada_ph_earpho-charging-box-is-working-while-th",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5014079183.html",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.936018,
+          "review_text": "charging box is working while the headset is not working and no light appearing while on charging. Bluetooth name didn't reflect on my phone while searching."
+        },
+        {
+          "review_id": "local-0154-lazada_ph_test_f-ok-namann-cya-pero-di-ko-pa-natr",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.821799,
+          "review_text": "Ok namann cya. Pero di ko pa natry. Ang liit ng wire🥺"
+        },
+        {
+          "review_id": "local-0171-lazada_ph_test_f-compatibility-10",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.722606,
+          "review_text": "♋Compatibility:10"
+        },
+        {
+          "review_id": "local-0182-temu_ph_direct_1-you-can-t-hear-one-of-them",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100344333196",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.917896,
+          "review_text": "You can't hear one of them"
+        },
+        {
+          "review_id": "local-0187-temu_ph_direct_1-it-connected-but-there-s-some-no",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100344333196",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.866513,
+          "review_text": "It connected, but there's some noise in the signal."
+        },
+        {
+          "review_id": "local-0189-temu_ph_direct_1-it-gets-stuck-and-it-wears-out-q",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.58592,
+          "review_text": "It gets stuck, and it wears out quickly"
+        },
+        {
+          "review_id": "local-0190-temu_ph_direct_1-when-i-m-talking-the-volume-auto",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.841368,
+          "review_text": "When I'm talking, the volume automatically goes down⤵️."
+        },
+        {
+          "review_id": "local-0192-temu_ph_direct_1-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.883494,
+          "review_text": "🤔👎"
+        },
+        {
+          "review_id": "local-0197-temu_ph_direct_1-it-cannot-be-connected-to-a-sams",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.934859,
+          "review_text": "It cannot be connected to a Samsung A34 5G."
+        },
+        {
+          "review_id": "local-0205-temu_ph_direct_1-the-item-is-not-charging",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.937778,
+          "review_text": "the item is not charging"
+        },
+        {
+          "review_id": "local-0210-temu_ph_direct_1-don-t-buy-it",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.919479,
+          "review_text": "Don't buy it"
+        },
+        {
+          "review_id": "local-0233-temu_ph_direct_5-one-of-the-headphones-arrived-de",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=605886403728740",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.764002,
+          "review_text": "One of the headphones arrived defective"
+        },
+        {
+          "review_id": "local-0249-temu_ph_direct_5-the-left-earbud-isn-t-working",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100261015054",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.92299,
+          "review_text": "The left earbud isn't working"
+        },
+        {
+          "review_id": "local-0256-temu_ph_direct_6-they-disconnect-after-a-while-or",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.910047,
+          "review_text": "They disconnect after a while or stop producing sound"
+        },
+        {
+          "review_id": "local-0260-temu_ph_direct_6-the-sound-seems-to-be-echoing-ma",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.942049,
+          "review_text": "The sound seems to be echoing, making it sound like it's coming from two sources"
+        },
+        {
+          "review_id": "local-0265-temu_ph_direct_6-one-of-the-earbuds-isn-t-working",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.854287,
+          "review_text": "One of the earbuds isn't working properly."
+        },
+        {
+          "review_id": "local-0283-temu_ph_direct_6-i-can-t-get-it-to-connect-via-bl",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.802032,
+          "review_text": "I can't get it to connect via Bluetooth."
+        },
+        {
+          "review_id": "local-0284-temu_ph_direct_6-works-sometimes-not-always",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.91717,
+          "review_text": "Works sometimes not always"
+        },
+        {
+          "review_id": "local-0290-temu_ph_direct_6-wireless-charging-doesn-t-work",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.923598,
+          "review_text": "Wireless charging doesn't work"
+        },
+        {
+          "review_id": "local-0292-temu_ph_direct_6-the-earbud-will-only-last-2-hour",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.895707,
+          "review_text": "the earbud will only last 2 hours of continues low volume music"
+        },
+        {
+          "review_id": "local-0301-temu_ph_direct_6-my-parcel-hasn-t-arrived-but-the",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.892631,
+          "review_text": "My parcel hasn't arrived, but the courier charged me for it even though I didn't receive it"
+        },
+        {
+          "review_id": "local-0305-temu_ph_direct_6-it-has-issues-every-now-and-then",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.641867,
+          "review_text": "It has issues every now and then; after just one week of daily use, one of them stopped working"
+        },
+        {
+          "review_id": "local-0310-temu_ph_direct_6-the-battery-doesn-t-last-long",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.899325,
+          "review_text": "The battery doesn't last long"
+        },
+        {
+          "review_id": "local-0315-temu_ph_direct_6-third-class",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.893934,
+          "review_text": "Third class"
+        },
+        {
+          "review_id": "local-0318-temu_ph_direct_6-i-can-t-make-a-call",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.949602,
+          "review_text": "I can't make a call"
+        },
+        {
+          "review_id": "local-0319-temu_ph_direct_6-one-earphone-isn-t-producing-any",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.955519,
+          "review_text": "One earphone isn't producing any sound"
+        },
+        {
+          "review_id": "local-0323-temu_ph_direct_6-one-of-the-earphones-arrived-def",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.746688,
+          "review_text": "One of the earphones arrived defective"
+        },
+        {
+          "review_id": "local-0324-temu_ph_direct_6-disposable",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.788634,
+          "review_text": "Disposable"
+        },
+        {
+          "review_id": "local-0325-temu_ph_direct_6-there-s-quite-a-bit-of-noise-be-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.891829,
+          "review_text": "There's quite a bit of noise. Be prepared for that when you buy it"
+        },
+        {
+          "review_id": "local-0326-temu_ph_direct_6-ok",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.570063,
+          "review_text": "ok"
+        },
+        {
+          "review_id": "local-0333-temu_ph_direct_6-i-thought-the-actual-price-was-1",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.607552,
+          "review_text": "I thought the actual price was $126 and that they were JBL :( but I saw them for $3 in reality. I don't know if they're good, but don't put prices that aren't accurate."
+        },
+        {
+          "review_id": "local-0341-temu_ph_direct_6-the-battery-drains-quickly",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.930664,
+          "review_text": "The battery drains quickly."
+        },
+        {
+          "review_id": "local-0348-temu_ph_direct_6-the-text-in-the-instructions-is-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.905574,
+          "review_text": "The text in the instructions is too small to read, and the Bluetooth doesn't work."
+        },
+        {
+          "review_id": "local-0349-temu_ph_direct_6-i-haven-t-received-the-item-yet",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.882916,
+          "review_text": "I haven't received the item yet."
+        },
+        {
+          "review_id": "local-0353-temu_ph_direct_6-i-haven-t-received-it",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.921097,
+          "review_text": "I haven't received it"
+        },
+        {
+          "review_id": "local-0358-temu_ph_direct_6-not-as-described",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.629069,
+          "review_text": "Not as described"
+        },
+        {
+          "review_id": "local-0362-temu_ph_direct_6-you-get-what-you-pay-for-the-sou",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.940354,
+          "review_text": "You get what you pay for. The sound quality is almost the same as that of 100 yen store wireless earphones, so they're worth about 400 yen. Well, I guess that's reasonable."
+        },
+        {
+          "review_id": "local-0368-temu_ph_direct_6-one-earphone-is-not-working",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.769731,
+          "review_text": "One earphone is not working."
+        },
+        {
+          "review_id": "local-0376-temu_ph_direct_6-first-it-charged-up-to-50-then-i",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.798502,
+          "review_text": "First, it charged up to 50%, then it stopped charging."
+        },
+        {
+          "review_id": "local-0378-temu_ph_direct_6-a-right-earbud-with-a-tear",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.935382,
+          "review_text": "A right earbud with a tear"
+        },
+        {
+          "review_id": "local-0381-temu_ph_direct_6-it-s-noticeable-because-it-s-lis",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.511176,
+          "review_text": "It's noticeable because it's listed as an offer for 8 soles, and supposedly its price is 500 soles. It only works for listening, not for answering calls or changing music."
+        },
+        {
+          "review_id": "local-0383-temu_ph_direct_6-no-problem-it-just-doesn-t-charg",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.446978,
+          "review_text": "No problem, it just doesn't charge."
+        },
+        {
+          "review_id": "local-0384-temu_ph_direct_6-the-product-is-exactly-as-in-the",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.907315,
+          "review_text": "The product is exactly as in the photo. It's quite ordinary for the price."
+        },
+        {
+          "review_id": "local-0387-temu_ph_direct_6-dont-buy-very-trash",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.522398,
+          "review_text": "Dont buy very trash"
+        },
+        {
+          "review_id": "local-0388-temu_ph_direct_6-the-iphone-hasn-t-arrived-yet",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.916642,
+          "review_text": "The iPhone hasn't arrived yet."
+        },
+        {
+          "review_id": "local-0405-temu_ph_direct_6-they-don-t-work-when-plugged-int",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.56132,
+          "review_text": "They don't work when plugged into the power outlet."
+        },
+        {
+          "review_id": "local-0409-temu_ph_direct_6-only-one-is-working-the-left-one",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.498142,
+          "review_text": "Only one is working the left one is broken"
+        },
+        {
+          "review_id": "local-0412-temu_ph_direct_6-the-little-box-won-t-turn-on",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.869927,
+          "review_text": "The little box won't turn on."
+        },
+        {
+          "review_id": "local-0414-temu_ph_direct_6-the-left-side-of-the-headphones-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.780373,
+          "review_text": "The left side of the headphones is faulty; they connect and disconnect within seconds, and there is an intermittent sound."
+        },
+        {
+          "review_id": "local-0423-temu_ph_direct_6-faster-lowbat",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.687292,
+          "review_text": "faster lowbat"
+        },
+        {
+          "review_id": "local-0424-temu_ph_direct_6-they-cannot-be-connected",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.932295,
+          "review_text": "They cannot be connected"
+        },
+        {
+          "review_id": "local-0429-temu_ph_direct_6-the-left-earbud-only-charges-up-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.935423,
+          "review_text": "The left earbud only charges up to 60%."
+        },
+        {
+          "review_id": "local-0432-temu_ph_direct_6-left-ear-bud-are-not-the-same-vo",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.853393,
+          "review_text": "left ear bud are not the same volume of sound to right ebud"
+        },
+        {
+          "review_id": "local-0434-temu_ph_direct_6-they-re-hard-to-connect",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.79076,
+          "review_text": "They're hard to connect."
+        },
+        {
+          "review_id": "local-0437-temu_ph_direct_6-ear-buds-battery-flat-easily-whi",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.726497,
+          "review_text": "Ear buds battery flat easily which unable stand more than 1 hr"
+        },
+        {
+          "review_id": "local-0439-temu_ph_direct_6-poor-connection-seems-to-disconn",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.602021,
+          "review_text": "poor connection seems to disconnect easily"
+        },
+        {
+          "review_id": "local-0443-temu_ph_direct_6-the-microphone-has-poor-sound-qu",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.910618,
+          "review_text": "The microphone has poor sound quality"
+        },
+        {
+          "review_id": "local-0447-temu_ph_direct_6-the-screen-seems-to-be-malfuncti",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.820365,
+          "review_text": "The screen seems to be malfunctioning... How much charge is left?"
+        },
+        {
+          "review_id": "local-0448-temu_ph_direct_6-the-left-earbud-seems-to-have-a-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.951553,
+          "review_text": "The left earbud seems to have a crackling sound."
+        },
+        {
+          "review_id": "local-0452-temu_ph_direct_6-my-ears-started-to-hurt",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.484798,
+          "review_text": "My ears started to hurt"
+        },
+        {
+          "review_id": "local-0453-temu_ph_direct_6-the-device-takes-a-long-time-to-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.947373,
+          "review_text": "The device takes a long time to start up, and the battery drains quickly"
+        },
+        {
+          "review_id": "local-0497-temu_ph_direct_6-they-download-quickly",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099715489226",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.543731,
+          "review_text": "They download quickly."
+        }
+      ]
+    }
+  }
+}

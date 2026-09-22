@@ -1,0 +1,459 @@
+{
+  "metadata": {
+    "model_version": "defaketive-marketplace-v2-0.1.0-candidate",
+    "created_at": "2026-09-12T11:56:00.780253+00:00",
+    "sklearn_version": "1.9.0",
+    "qualified_for_integration": false,
+    "gates": {
+      "sentiment_macro_f1_at_least_0_75": false,
+      "sentiment_beats_incumbent_by_0_02": true,
+      "neutral_f1_at_least_0_60": false,
+      "risk_recall_at_least_0_80": true,
+      "risk_macro_f1_at_least_0_75": true,
+      "category_macro_f1_at_least_0_65": false,
+      "severity_weighted_kappa_at_least_0_65": false
+    },
+    "random_state": 42,
+    "marketplace_file": "lazada_round1_all.csv",
+    "marketplace_sha256": "a6bbbd9282feecb3b7cc0ee885aa62fcf0fd9581b0a868b1598620e7b7dbd564",
+    "firecs_train_file": "FiReCS_train_set.csv",
+    "firecs_train_sha256": "9ca5ef80b8f93836f5966a1db8d017ebbd474e4b615468269cb0ba9d3778eb39",
+    "mixed_sentiment_policy": "excluded from three-class sentiment only; retained for risk tasks",
+    "category_policy": "pipe- or comma-delimited multilabel categories",
+    "category_probability_threshold": 0.4,
+    "split_policy": "Locked split column supplied by the dataset; product leakage validated"
+  },
+  "dataset": {
+    "rows": 907,
+    "products": 24,
+    "platforms": {
+      "lazada": 907
+    },
+    "sentiment": {
+      "mixed": 215,
+      "negative": 303,
+      "neutral": 86,
+      "positive": 303
+    },
+    "blank_annotator_ids": 0
+  },
+  "splits": {
+    "train": {
+      "rows": 636,
+      "products": 11,
+      "platforms": {
+        "lazada": 636
+      },
+      "sentiment": {
+        "mixed": 152,
+        "negative": 206,
+        "neutral": 65,
+        "positive": 213
+      },
+      "product_ids": [
+        "1676918812",
+        "1994197909",
+        "3041489531",
+        "3646051280",
+        "3999327536",
+        "4584110073",
+        "4946943100",
+        "5037745180",
+        "5211290661",
+        "527362407",
+        "650518893"
+      ]
+    },
+    "validation": {
+      "rows": 138,
+      "products": 6,
+      "platforms": {
+        "lazada": 138
+      },
+      "sentiment": {
+        "mixed": 36,
+        "negative": 44,
+        "neutral": 12,
+        "positive": 46
+      },
+      "product_ids": [
+        "15411207559",
+        "2386662601",
+        "3075012546",
+        "3401407254",
+        "4363184044",
+        "4983206125"
+      ]
+    },
+    "test": {
+      "rows": 133,
+      "products": 7,
+      "platforms": {
+        "lazada": 133
+      },
+      "sentiment": {
+        "mixed": 27,
+        "negative": 53,
+        "neutral": 9,
+        "positive": 44
+      },
+      "product_ids": [
+        "3034831887",
+        "4227077318",
+        "4507172427",
+        "5166282734",
+        "5256422305",
+        "5381386541",
+        "5384903372"
+      ]
+    }
+  },
+  "training": {
+    "sentiment_rows": 7824,
+    "sentiment_local_rows": 484,
+    "sentiment_firecs_rows": 7340,
+    "risk_detection_rows": 636,
+    "risk_category_rows": 357,
+    "risk_severity_rows": 357
+  },
+  "validation": {
+    "sentiment": {
+      "sample_count": 102,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.6863,
+      "precision": 0.5947,
+      "recall": 0.5791,
+      "f1": 0.5812,
+      "per_class": {
+        "negative": {
+          "precision": 0.8158,
+          "recall": 0.7045,
+          "f1": 0.7561,
+          "support": 44
+        },
+        "neutral": {
+          "precision": 0.15,
+          "recall": 0.25,
+          "f1": 0.1875,
+          "support": 12
+        },
+        "positive": {
+          "precision": 0.8182,
+          "recall": 0.7826,
+          "f1": 0.8,
+          "support": 46
+        }
+      },
+      "matrix": [
+        [
+          31,
+          9,
+          4
+        ],
+        [
+          5,
+          3,
+          4
+        ],
+        [
+          2,
+          8,
+          36
+        ]
+      ]
+    },
+    "risk_detection": {
+      "sample_count": 138,
+      "accuracy": 0.7246,
+      "macro_f1": 0.7175,
+      "no_risk": {
+        "precision": 0.6724,
+        "recall": 0.6724,
+        "f1": 0.6724,
+        "support": 58
+      },
+      "risk": {
+        "precision": 0.7625,
+        "recall": 0.7625,
+        "f1": 0.7625,
+        "support": 80
+      }
+    },
+    "risk_category": {
+      "sample_count": 79,
+      "classes": [
+        "defect",
+        "delivery",
+        "other",
+        "performance",
+        "quality",
+        "seller_service",
+        "wrong_item"
+      ],
+      "exact_match_accuracy": 0.5949,
+      "macro_f1": 0.5269,
+      "micro_f1": 0.6707,
+      "hamming_loss": 0.0995,
+      "per_class": {
+        "defect": {
+          "precision": 0.625,
+          "recall": 0.7143,
+          "f1": 0.6667,
+          "support": 14
+        },
+        "delivery": {
+          "precision": 0.4444,
+          "recall": 0.5714,
+          "f1": 0.5,
+          "support": 7
+        },
+        "other": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "performance": {
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "support": 4
+        },
+        "quality": {
+          "precision": 0.6667,
+          "recall": 0.8824,
+          "f1": 0.7595,
+          "support": 34
+        },
+        "seller_service": {
+          "precision": 0.6154,
+          "recall": 0.5333,
+          "f1": 0.5714,
+          "support": 15
+        },
+        "wrong_item": {
+          "precision": 0.5,
+          "recall": 0.25,
+          "f1": 0.3333,
+          "support": 4
+        }
+      },
+      "unknown_category_rows_excluded": 1,
+      "probability_threshold": 0.4
+    },
+    "risk_severity": {
+      "sample_count": 80,
+      "accuracy": 0.775,
+      "macro_f1": 0.624,
+      "weighted_kappa": 0.4878,
+      "mean_absolute_error": 0.2375
+    }
+  },
+  "test": {
+    "sentiment": {
+      "sample_count": 106,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.7075,
+      "precision": 0.6096,
+      "recall": 0.6,
+      "f1": 0.5881,
+      "per_class": {
+        "negative": {
+          "precision": 0.8302,
+          "recall": 0.8302,
+          "f1": 0.8302,
+          "support": 53
+        },
+        "neutral": {
+          "precision": 0.15,
+          "recall": 0.3333,
+          "f1": 0.2069,
+          "support": 9
+        },
+        "positive": {
+          "precision": 0.8485,
+          "recall": 0.6364,
+          "f1": 0.7273,
+          "support": 44
+        }
+      },
+      "matrix": [
+        [
+          44,
+          7,
+          2
+        ],
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          6,
+          10,
+          28
+        ]
+      ]
+    },
+    "incumbent_sentiment": {
+      "sample_count": 106,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.6604,
+      "precision": 0.588,
+      "recall": 0.5634,
+      "f1": 0.5502,
+      "per_class": {
+        "negative": {
+          "precision": 0.8113,
+          "recall": 0.8113,
+          "f1": 0.8113,
+          "support": 53
+        },
+        "neutral": {
+          "precision": 0.125,
+          "recall": 0.3333,
+          "f1": 0.1818,
+          "support": 9
+        },
+        "positive": {
+          "precision": 0.8276,
+          "recall": 0.5455,
+          "f1": 0.6575,
+          "support": 44
+        }
+      },
+      "matrix": [
+        [
+          43,
+          7,
+          3
+        ],
+        [
+          4,
+          3,
+          2
+        ],
+        [
+          6,
+          14,
+          24
+        ]
+      ]
+    },
+    "risk_detection": {
+      "sample_count": 133,
+      "accuracy": 0.8421,
+      "macro_f1": 0.8296,
+      "no_risk": {
+        "precision": 0.8636,
+        "recall": 0.717,
+        "f1": 0.7835,
+        "support": 53
+      },
+      "risk": {
+        "precision": 0.8315,
+        "recall": 0.925,
+        "f1": 0.8757,
+        "support": 80
+      }
+    },
+    "incumbent_risk_detection": {
+      "sample_count": 133,
+      "accuracy": 0.594,
+      "macro_f1": 0.5765,
+      "no_risk": {
+        "precision": 0.4953,
+        "recall": 1.0,
+        "f1": 0.6625,
+        "support": 53
+      },
+      "risk": {
+        "precision": 1.0,
+        "recall": 0.325,
+        "f1": 0.4906,
+        "support": 80
+      }
+    },
+    "risk_category": {
+      "sample_count": 80,
+      "classes": [
+        "defect",
+        "delivery",
+        "other",
+        "performance",
+        "quality",
+        "seller_service",
+        "wrong_item"
+      ],
+      "exact_match_accuracy": 0.675,
+      "macro_f1": 0.6289,
+      "micro_f1": 0.7529,
+      "hamming_loss": 0.075,
+      "per_class": {
+        "defect": {
+          "precision": 0.7895,
+          "recall": 0.7895,
+          "f1": 0.7895,
+          "support": 19
+        },
+        "delivery": {
+          "precision": 0.6,
+          "recall": 0.9,
+          "f1": 0.72,
+          "support": 10
+        },
+        "other": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "performance": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "quality": {
+          "precision": 0.7333,
+          "recall": 0.8919,
+          "f1": 0.8049,
+          "support": 37
+        },
+        "seller_service": {
+          "precision": 0.625,
+          "recall": 0.5556,
+          "f1": 0.5882,
+          "support": 9
+        },
+        "wrong_item": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "support": 2
+        }
+      },
+      "unknown_category_rows_excluded": 0,
+      "probability_threshold": 0.4
+    },
+    "risk_severity": {
+      "sample_count": 80,
+      "accuracy": 0.7125,
+      "macro_f1": 0.63,
+      "weighted_kappa": 0.5979,
+      "mean_absolute_error": 0.2875
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "created_at": "2026-09-14T15:46:26.449810+00:00",
+    "train_dataset": "lazada_round1_train.csv",
+    "train_dataset_sha256": "8e20e62cfc2aa92ad95e91455e9c8e43d4048e1d80632bc131c74990bfb4827c",
+    "validation_dataset": "lazada_round1_validation_adjudicated.csv",
+    "validation_dataset_sha256": "919e19a3b3bb48eae24431571ef4841e27d443471b46004ad502c0b60e685cb1",
+    "base_artifact": "lazada_risk_heads_v3_candidate.joblib",
+    "base_artifact_sha256": "eee410bd9c58a645545b8fab82e5683bc559199f86b79346d0fa7c52c5f0988b",
+    "candidate_artifact": "lazada_risk_heads_v4_candidate.joblib",
+    "candidate_artifact_sha256": "a6e42386f8bb719abdfd51c08d047aaca0880ba794e2c02d98250c09e5f40b97",
+    "selection_policy": "Category thresholds jointly selected on adjudicated validation for supported-macro F1, micro-F1, exact match, and hamming loss; locked test labels were not read.",
+    "test_predictions_computed": false,
+    "train_rows": 357,
+    "validation_rows": 73,
+    "training_classes": [
+      "defect",
+      "delivery",
+      "other",
+      "performance",
+      "quality",
+      "seller_service",
+      "wrong_item"
+    ],
+    "canonical_classes": [
+      "damage",
+      "defect",
+      "delivery",
+      "other",
+      "performance",
+      "quality",
+      "seller_service",
+      "wrong_item"
+    ]
+  },
+  "validation": {
+    "risk_category": {
+      "sample_count": 73,
+      "classes": [
+        "damage",
+        "defect",
+        "delivery",
+        "other",
+        "performance",
+        "quality",
+        "seller_service",
+        "wrong_item"
+      ],
+      "exact_match_accuracy": 0.1918,
+      "macro_f1": 0.4203,
+      "micro_f1": 0.4433,
+      "hamming_loss": 0.1935,
+      "per_class": {
+        "damage": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3
+        },
+        "defect": {
+          "precision": 0.8571,
+          "recall": 0.3,
+          "f1": 0.4444,
+          "support": 20
+        },
+        "delivery": {
+          "precision": 0.5,
+          "recall": 0.2,
+          "f1": 0.2857,
+          "support": 5
+        },
+        "other": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "performance": {
+          "precision": 0.4667,
+          "recall": 0.6364,
+          "f1": 0.5385,
+          "support": 33
+        },
+        "quality": {
+          "precision": 0.1515,
+          "recall": 0.5,
+          "f1": 0.2326,
+          "support": 10
+        },
+        "seller_service": {
+          "precision": 0.4545,
+          "recall": 0.3846,
+          "f1": 0.4167,
+          "support": 13
+        },
+        "wrong_item": {
+          "precision": 0.5714,
+          "recall": 0.3636,
+          "f1": 0.4444,
+          "support": 11
+        }
+      },
+      "supported_macro_f1": 0.4803,
+      "probability_thresholds": {
+        "damage": 0.2,
+        "defect": 0.7,
+        "delivery": 0.5,
+        "other": 0.7,
+        "performance": 0.05,
+        "quality": 0.5,
+        "seller_service": 0.3,
+        "wrong_item": 0.15
+      },
+      "unknown_category_rows_excluded": 0
+    }
+  }
+}

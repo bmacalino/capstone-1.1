@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "computer_peripherals",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Vention Cat 6 Ethernet Cable Lan Cable 20 10 Meter UTP Cat6 RJ45 Internet Cable Wire Patch Cord for Wifi Router Laptop TV box Switch Digital Printer RJ45 Network Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i1120920366-s3883420275.html",
+      "reported_review_count": 9327,
+      "stratum": "computer_peripherals",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 123,
+      "collected_by_star": {
+        "1": 23,
+        "2": 11,
+        "3": 13,
+        "4": 36,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T16:50:29"
+}

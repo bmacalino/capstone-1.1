@@ -1,0 +1,51 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "smart_home",
+  "minimum_collected_reviews": 100,
+  "products_checked": 2,
+  "status_counts": {
+    "eligible": 1,
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Original Genuine A9 IP Security CCTV camera connect cellphone 1080P Ultra HD wireless mini camera no need internet no need wifi with 360°panoramic Infrared Security Camera Motion Detection cctv small hidden spy Security Monitoring Camera smallest",
+      "link": "https://www.lazada.com.ph/products/pdp-i5381386541-s32234823319.html",
+      "reported_review_count": 629,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 32,
+      "collected_by_star": {
+        "1": 27,
+        "2": 1,
+        "3": 4,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "complete",
+      "stop_reason": "empty_review_page",
+      "filter_warning": "Lazada did not return verified 4-star reviews; balanced collection stopped to prevent mislabeled data"
+    },
+    {
+      "name": "【Local Stock & 360° Phone View】V380 PRO 100% Original dual lens CCTV camera connect to cellphone cctv camera wifi connect 360 ip security cameras needed 8MP Two-Way Audio Night Vision waterproof with audio and speaker cctv security small cameras",
+      "link": "https://www.lazada.com.ph/products/pdp-i5037745180-s133372094930.html",
+      "reported_review_count": 2941,
+      "stratum": "smart_home",
+      "status": "eligible",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 123,
+      "collected_by_star": {
+        "1": 29,
+        "2": 15,
+        "3": 18,
+        "4": 21,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T13:46:30"
+}

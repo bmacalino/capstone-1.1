@@ -1,0 +1,125 @@
+# Taglish spelling and affix variants, mapped to a single lemma token.
+#
+# WHY THIS FILE EXISTS
+# Tagalog marks verbs with affixes, so one root appears in many surface forms:
+# "uminit", "umiinit", "nag-init" and "mainit" are four unrelated tokens to a
+# word n-gram model even though all four report heat. With roughly 100-140 true
+# safety reviews in the whole project, splitting the evidence across four tokens
+# would leave none of them above the minimum support threshold. Mapping them to
+# one lemma concentrates the evidence.
+#
+# WHY A TABLE AND NOT A STEMMER
+# There is no maintained Tagalog stemmer for Python, and a general one would
+# also collapse pairs that must stay apart (see the "sabog" note below). A table
+# is auditable, a native speaker can extend it without touching code, and it is
+# hashed into the round manifest so a change after labelling is detectable.
+#
+# COLUMNS  variant <TAB> lemma <TAB> kind <TAB> language <TAB> added_by <TAB> added_at
+#   kind = spelling | affix | abbreviation | elongation_exception
+# Matching is per whitespace token, after elongation collapse and casefolding.
+# Multi-word phrases are NOT handled here; they belong in the smoke-term list.
+#
+# DELIBERATE OMISSIONS - do not add these without re-reading the note:
+#   sabog / sumabog   Kept apart on purpose. "sumabog" means exploded, but bare
+#                     "sabog" in these reviews usually means scattered or muddy,
+#                     as in "sabog ang sound". Merging them would import a known
+#                     false friend straight into the safety class.
+#   d -> hindi        Real Filipino SMS shorthand, but bare "d" also appears in
+#                     English review text ("vitamin d", "type d"). The existing
+#                     clean_risk_text() makes this mapping; it is not repeated
+#                     here because the precision cost outweighs the recall gain.
+#   mainit            IS mapped, even though "mainit sa balat" is a false friend
+#                     for cosmetics. That is a hazard-context problem, solved by
+#                     the context-token requirement, not a morphology problem.
+#
+variant	lemma	kind	language	added_by	added_at
+hnd	hindi	spelling	tl	migrated_from_model.py	2026-09-21
+hndi	hindi	spelling	tl	migrated_from_model.py	2026-09-21
+ndi	hindi	spelling	tl	migrated_from_model.py	2026-09-21
+wlang	walang	spelling	tl	migrated_from_model.py	2026-09-21
+sobranggg	sobrang	spelling	tl	migrated_from_model.py	2026-09-21
+dizapoytedd	disappointed	spelling	taglish	migrated_from_model.py	2026-09-21
+wla	wala	spelling	tl	seed_list	2026-09-21
+nmn	naman	spelling	tl	seed_list	2026-09-21
+lng	lang	spelling	tl	seed_list	2026-09-21
+tlga	talaga	spelling	tl	seed_list	2026-09-21
+tlaga	talaga	spelling	tl	seed_list	2026-09-21
+sbrang	sobrang	spelling	tl	seed_list	2026-09-21
+nasunug	sunog	spelling	tl	seed_list	2026-09-21
+deffective	defective	spelling	en	seed_list	2026-09-21
+defectiv	defective	spelling	en	seed_list	2026-09-21
+uminit	init	affix	tl	seed_list	2026-09-21
+umiinit	init	affix	tl	seed_list	2026-09-21
+iinit	init	affix	tl	seed_list	2026-09-21
+naginit	init	affix	tl	seed_list	2026-09-21
+nagiinit	init	affix	tl	seed_list	2026-09-21
+nainit	init	affix	tl	seed_list	2026-09-21
+mainit	init	affix	tl	seed_list	2026-09-21
+napainit	init	affix	tl	seed_list	2026-09-21
+nasunog	sunog	affix	tl	seed_list	2026-09-21
+nasusunog	sunog	affix	tl	seed_list	2026-09-21
+masunog	sunog	affix	tl	seed_list	2026-09-21
+nagsunog	sunog	affix	tl	seed_list	2026-09-21
+sumunog	sunog	affix	tl	seed_list	2026-09-21
+nakuryente	kuryente	affix	tl	seed_list	2026-09-21
+nangkuryente	kuryente	affix	tl	seed_list	2026-09-21
+kinuryente	kuryente	affix	tl	seed_list	2026-09-21
+namaga	maga	affix	tl	seed_list	2026-09-21
+namamaga	maga	affix	tl	seed_list	2026-09-21
+nagmaga	maga	affix	tl	seed_list	2026-09-21
+lumobo	lobo	affix	tl	seed_list	2026-09-21
+lumolobo	lobo	affix	tl	seed_list	2026-09-21
+naglobo	lobo	affix	tl	seed_list	2026-09-21
+umumbok	umbok	affix	tl	seed_list	2026-09-21
+umuumbok	umbok	affix	tl	seed_list	2026-09-21
+namumbok	umbok	affix	tl	seed_list	2026-09-21
+umuusok	usok	affix	tl	seed_list	2026-09-21
+umusok	usok	affix	tl	seed_list	2026-09-21
+nagusok	usok	affix	tl	seed_list	2026-09-21
+napaso	paso	affix	tl	seed_list	2026-09-21
+napapaso	paso	affix	tl	seed_list	2026-09-21
+nagliyab	liyab	affix	tl	seed_list	2026-09-21
+nagliliyab	liyab	affix	tl	seed_list	2026-09-21
+nagspark	spark	affix	taglish	seed_list	2026-09-21
+nagsspark	spark	affix	taglish	seed_list	2026-09-21
+nagshort	short	affix	taglish	seed_list	2026-09-21
+nagsshort	short	affix	taglish	seed_list	2026-09-21
+nasira	sira	affix	tl	seed_list	2026-09-21
+nasisira	sira	affix	tl	seed_list	2026-09-21
+masira	sira	affix	tl	seed_list	2026-09-21
+sumira	sira	affix	tl	seed_list	2026-09-21
+sirang	sira	affix	tl	seed_list	2026-09-21
+nabasag	basag	affix	tl	seed_list	2026-09-21
+mabasag	basag	affix	tl	seed_list	2026-09-21
+basagin	basag	affix	tl	seed_list	2026-09-21
+naoverheat	overheat	affix	taglish	seed_list	2026-09-21
+nagoverheat	overheat	affix	taglish	seed_list	2026-09-21
+naooverheat	overheat	affix	taglish	seed_list	2026-09-21
+overheated	overheat	affix	en	seed_list	2026-09-21
+overheating	overheat	affix	en	seed_list	2026-09-21
+naexplode	explode	affix	taglish	seed_list	2026-09-21
+nagexplode	explode	affix	taglish	seed_list	2026-09-21
+exploded	explode	affix	en	seed_list	2026-09-21
+exploding	explode	affix	en	seed_list	2026-09-21
+swelling	swell	affix	en	seed_list	2026-09-21
+swollen	swell	affix	en	seed_list	2026-09-21
+swelled	swell	affix	en	seed_list	2026-09-21
+bloated	bloat	affix	en	seed_list	2026-09-21
+bloating	bloat	affix	en	seed_list	2026-09-21
+sparking	spark	affix	en	seed_list	2026-09-21
+sparked	spark	affix	en	seed_list	2026-09-21
+sparks	spark	affix	en	seed_list	2026-09-21
+burned	burn	affix	en	seed_list	2026-09-21
+burnt	burn	affix	en	seed_list	2026-09-21
+burning	burn	affix	en	seed_list	2026-09-21
+smoking	smoke	affix	en	seed_list	2026-09-21
+smoked	smoke	affix	en	seed_list	2026-09-21
+icharge	charge	affix	taglish	seed_list	2026-09-21
+nagcharge	charge	affix	taglish	seed_list	2026-09-21
+nagchacharge	charge	affix	taglish	seed_list	2026-09-21
+nagchcharge	charge	affix	taglish	seed_list	2026-09-21
+charging	charge	affix	en	seed_list	2026-09-21
+charged	charge	affix	en	seed_list	2026-09-21
+pb	powerbank	abbreviation	taglish	seed_list	2026-09-21
+powerbank	powerbank	abbreviation	taglish	seed_list	2026-09-21
+chrgr	charger	abbreviation	taglish	seed_list	2026-09-21

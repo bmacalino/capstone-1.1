@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "computer_peripherals",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "DualShock 4 Wireless Gamepad Controller",
+      "link": "https://www.lazada.com.ph/products/pdp-i3889798299-s20829210524.html",
+      "reported_review_count": 4662,
+      "stratum": "computer_peripherals",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "review_widget_missing",
+      "stop_reason": "review_widget_missing",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T09:06:36"
+}

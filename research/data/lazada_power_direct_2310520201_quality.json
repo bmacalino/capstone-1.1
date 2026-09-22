@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "power",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "UGREEN 20000mAh 25000mAh Powerbank PD 145W Fast Charging Powerbank 10000mAh PD 20W for Dell Lenovo MacBook Air SAMSUNG s24 s25 Ultra xiaomi iPhone 17 16 pro max Mobile Phones Power Adapter",
+      "link": "https://www.lazada.com.ph/products/pdp-i2310520201-s24895520153.html",
+      "reported_review_count": 11279,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 174,
+      "collected_by_star": {
+        "1": 40,
+        "2": 22,
+        "3": 32,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T11:07:46"
+}

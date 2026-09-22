@@ -1,0 +1,25 @@
+{
+  "dataset": "lazada_round1_all.csv",
+  "artifact": "lazada_round1_marketplace_v2_baseline.joblib",
+  "test_rows": 133,
+  "evaluated": {
+    "sentiment": 106,
+    "risk_detection": 133,
+    "risk_category": 80,
+    "risk_severity": 80
+  },
+  "error_counts": {
+    "risk_category": 26,
+    "risk_detection": 21,
+    "risk_severity": 23,
+    "sentiment": 31
+  },
+  "sentiment_confusions": {
+    "negative -> neutral": 7,
+    "negative -> positive": 2,
+    "neutral -> negative": 3,
+    "neutral -> positive": 3,
+    "positive -> negative": 6,
+    "positive -> neutral": 10
+  }
+}

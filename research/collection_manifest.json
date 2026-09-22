@@ -1,0 +1,14 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "target_products_per_stratum": 6,
+  "target_reviews_per_product": 100,
+  "minimum_combined_one_two_star_reviews": 10,
+  "reviews_per_star_collection_cap": 40,
+  "strata": [
+    {"id": "audio", "queries": ["wireless earbuds", "bluetooth earphones", "bluetooth speaker", "wireless microphone", "direct product i4471484698", "direct product i3252473210", "direct product i4082179379"], "status": "complete", "candidates_checked": 31, "eligible_products": 12, "target_products": 6, "target_reviews": 100},
+    {"id": "power", "queries": ["power bank fast charger", "USB-C charger cable", "direct product batch 1", "direct product i3408401105", "direct product i2310520201", "mobile-search power-bank batch", "direct universal AC adapter i1676918812"], "status": "complete", "candidates_checked": 26, "eligible_products": 8, "target_products": 6, "target_reviews": 100},
+    {"id": "mobile_accessories", "display_name": "mobile electronics", "queries": ["phone case tempered glass", "direct product i4578043495", "direct stylus batch", "phone cooler/controller/USB batch", "direct wireless charger i4584110073", "writing-tablet screening i394848395"], "status": "collecting", "candidates_checked": 18, "eligible_products": 3, "excluded_wrong_product_type": 1, "target_products": 6, "target_reviews": 100},
+    {"id": "computer_peripherals", "queries": ["computer keyboard mouse", "direct product i4495459414", "direct product i2531734184", "direct product i4153633764", "direct product i1120920366", "direct PS4 controller batch"], "status": "complete", "candidates_checked": 7, "eligible_products": 6, "target_products": 6, "target_reviews": 100},
+    {"id": "smart_home", "queries": ["smart home gadgets", "direct CCTV batch 1", "individual CCTV retries"], "status": "collecting", "candidates_checked": 3, "eligible_products": 2, "target_products": 6, "target_reviews": 100}
+  ]
+}

@@ -8,6 +8,7 @@ from .model import (
     ModelSetupError,
 )
 from .trained import TrainedModelError, TrainedSentimentClassifier
+from .manuscript import HybridManuscriptRiskModel, ManuscriptRiskModel
 
 __all__ = [
     "MODEL_VERSION",
@@ -15,6 +16,8 @@ __all__ = [
     "VADER_MODEL_VERSION",
     "DefaketiveSentimentModel",
     "ModelSetupError",
+    "ManuscriptRiskModel",
+    "HybridManuscriptRiskModel",
     "TrainedModelError",
     "TrainedSentimentClassifier",
 ]

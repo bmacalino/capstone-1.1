@@ -1,0 +1,204 @@
+# mining_seeds_v1.tsv  --  version: mining-seeds-1.0.0  frozen: 2026-09-22
+#
+# WHAT THIS IS FOR, AND WHAT IT IS NOT FOR.
+#
+# These terms select which reviews go into the LABELLING POOL. They are a
+# net for finding candidate examples of rare categories, nothing more.
+#
+# They are NOT a classifier and must never be reported as one. Rows found
+# by these seeds carry stratum=seed_hit, and any recall number measured on
+# them is circular by construction: the seeds found them, so of course the
+# seeds match them. Recall is reported on the stratum=random_all rows only.
+# See research/RISK_SCORING_MODEL_PLAN.md and the sampling note in the
+# round manifest.
+#
+# Sources: the vocabulary lists in research/HAZARD_SENTENCE_TAGGING_GUIDE.md
+# section 2, which were themselves read off real reviews in this project's
+# own scrapes; plus the safety regex already used in
+# research/annotate_firecs_risk_round2.py line 52.
+#
+# Columns: term <TAB> category <TAB> subtype <TAB> language
+#   category: safety | counterfeit | defect | BLOCK
+#   subtype:  for safety only, a hazard_taxonomy subtype; "-" otherwise
+#   BLOCK rows are false friends. Any BLOCK phrase found in a review is
+#   masked out BEFORE seed matching, so "not legit dual shock 4" does not
+#   count as a shock hazard. Section 6 of the tagging guide lists these.
+#
+# Matching is done on the normalized text (text_norm.normalize_text) with
+# word boundaries, so "init" does not fire inside "initial".
+#
+term	category	subtype	language
+# ---------- SAFETY: fire / explosion / swelling ----------
+nasunog	safety	fire_explosion_swelling	tl
+masunog	safety	fire_explosion_swelling	tl
+nagliyab	safety	fire_explosion_swelling	tl
+sumabog	safety	fire_explosion_swelling	tl
+pumutok	safety	fire_explosion_swelling	tl
+umumbok	safety	fire_explosion_swelling	tl
+namaga	safety	fire_explosion_swelling	tl
+lumobo	safety	fire_explosion_swelling	tl
+nag-swell	safety	fire_explosion_swelling	taglish
+caught fire	safety	fire_explosion_swelling	en
+on fire	safety	fire_explosion_swelling	en
+exploded	safety	fire_explosion_swelling	en
+explode	safety	fire_explosion_swelling	en
+swollen	safety	fire_explosion_swelling	en
+swelling	safety	fire_explosion_swelling	en
+bloated battery	safety	fire_explosion_swelling	en
+battery bloated	safety	fire_explosion_swelling	en
+burnt	safety	fire_explosion_swelling	en
+burned	safety	fire_explosion_swelling	en
+# ---------- SAFETY: shock / spark / short ----------
+nakuryente	safety	shock_spark_short	tl
+nangunguryente	safety	shock_spark_short	tl
+kuryente	safety	shock_spark_short	tl
+# NOT "nagshort" or "nag-short": the normalizer strips the affix and leaves
+# the bare word "short", which then fires on "short na damit", "short delay"
+# and "short battery life". It produced 37 matches, nearly all junk. Reviews
+# that really describe a short usually also say sunog/usok/spark, so they are
+# still caught. Keep the unambiguous forms only.
+nag short circuit	safety	shock_spark_short	taglish
+nag-spark	safety	shock_spark_short	taglish
+short circuit	safety	shock_spark_short	en
+shorted	safety	shock_spark_short	en
+sparks	safety	shock_spark_short	en
+sparking	safety	shock_spark_short	en
+spark	safety	shock_spark_short	en
+electric shock	safety	shock_spark_short	en
+grounded	safety	shock_spark_short	en
+kinuryente	safety	shock_spark_short	tl
+# ---------- SAFETY: overheat / burn ----------
+uminit	safety	overheat_burn	tl
+umiinit	safety	overheat_burn	tl
+sobrang init	safety	overheat_burn	tl
+ang init	safety	overheat_burn	tl
+napaso	safety	overheat_burn	tl
+nakakapaso	safety	overheat_burn	tl
+overheat	safety	overheat_burn	en
+overheating	safety	overheat_burn	en
+overheated	safety	overheat_burn	en
+too hot	safety	overheat_burn	en
+very hot	safety	overheat_burn	en
+gets hot	safety	overheat_burn	en
+burning hot	safety	overheat_burn	en
+# ---------- SAFETY: smoke / smell ----------
+umusok	safety	smoke_smell	tl
+umuusok	safety	smoke_smell	tl
+nag-usok	safety	smoke_smell	taglish
+amoy sunog	safety	smoke_smell	tl
+amoy keso	safety	smoke_smell	tl
+burning smell	safety	smoke_smell	en
+smell of burning	safety	smoke_smell	en
+smoking	safety	smoke_smell	en
+smoke	safety	smoke_smell	en
+# ---------- COUNTERFEIT ----------
+peke	counterfeit	-	tl
+pekeng	counterfeit	-	tl
+mukhang peke	counterfeit	-	tl
+hindi original	counterfeit	-	taglish
+di original	counterfeit	-	taglish
+di orig	counterfeit	-	taglish
+hindi orig	counterfeit	-	taglish
+not original	counterfeit	-	en
+not genuine	counterfeit	-	en
+not authentic	counterfeit	-	en
+not legit	counterfeit	-	en
+fake	counterfeit	-	en
+counterfeit	counterfeit	-	en
+replica	counterfeit	-	en
+imitation	counterfeit	-	en
+class a	counterfeit	-	en
+class b	counterfeit	-	en
+knockoff	counterfeit	-	en
+knock off	counterfeit	-	en
+iba sa picture	counterfeit	-	tl
+iba sa litrato	counterfeit	-	tl
+hindi tugma	counterfeit	-	tl
+# ---------- DEFECT ----------
+sira	defect	-	tl
+sirang	defect	-	tl
+nasira	defect	-	tl
+basag	defect	-	tl
+basag na	defect	-	tl
+hindi gumagana	defect	-	tl
+di gumagana	defect	-	tl
+ayaw gumana	defect	-	tl
+hindi umaandar	defect	-	tl
+walang power	defect	-	taglish
+hindi nag-charge	defect	-	taglish
+ayaw mag-charge	defect	-	taglish
+di nagcha-charge	defect	-	taglish
+hindi nagcharge	defect	-	taglish
+dead on arrival	defect	-	en
+doa	defect	-	en
+stopped working	defect	-	en
+not working	defect	-	en
+does not work	defect	-	en
+doesnt work	defect	-	en
+defective	defect	-	en
+broken	defect	-	en
+malfunction	defect	-	en
+no power	defect	-	en
+wont turn on	defect	-	en
+will not turn on	defect	-	en
+mabilis maubos	defect	-	tl
+mabilis maubos ang battery	defect	-	tl
+drains fast	defect	-	en
+# The normalizer strips affixes but keeps the particle "na", so "hindi na
+# nag-charge" does not match the seed "hindi nag-charge". These variants
+# exist because of that, not because they are different complaints.
+hindi na nag-charge	defect	-	taglish
+ayaw na mag-charge	defect	-	taglish
+hindi na gumagana	defect	-	tl
+di na gumagana	defect	-	tl
+hindi na gumana	defect	-	tl
+ayaw na gumana	defect	-	tl
+hindi na umaandar	defect	-	tl
+# ---------- BLOCK: false friends (guide section 6) ----------
+dual shock	BLOCK	-	en
+dualshock	BLOCK	-	en
+dual-shock	BLOCK	-	en
+shock absorber	BLOCK	-	en
+shockproof	BLOCK	-	en
+shock proof	BLOCK	-	en
+sabog ang sound	BLOCK	-	taglish
+sabog ang tunog	BLOCK	-	taglish
+sabog ung sound	BLOCK	-	taglish
+sabog yung sound	BLOCK	-	taglish
+sabog lang po ung sounds	BLOCK	-	taglish
+fake nails	BLOCK	-	en
+fake eyelashes	BLOCK	-	en
+fake plant	BLOCK	-	en
+fake plants	BLOCK	-	en
+fake fur	BLOCK	-	en
+fake leather	BLOCK	-	en
+umuusok na sabaw	BLOCK	-	tl
+any text you copy	BLOCK	-	en
+will be saved here	BLOCK	-	en
+smoke gray	BLOCK	-	en
+smoke grey	BLOCK	-	en
+smoked glass	BLOCK	-	en
+water resistant	BLOCK	-	en
+fire stick	BLOCK	-	en
+firestick	BLOCK	-	en
+hot deals	BLOCK	-	en
+hot selling	BLOCK	-	en
+# Found by reading the first generated queue. "kuryente" on its own means
+# mains electricity far more often than an electric shock, and the pool
+# carries clothing as well as electronics, where "mainit" is a complaint
+# about a fabric and not a hazard.
+sa kuryente	BLOCK	-	tl
+walang kuryente	BLOCK	-	tl
+may kuryente	BLOCK	-	tl
+ng kuryente	BLOCK	-	tl
+mainit sa katawan	BLOCK	-	tl
+mainit sa balat	BLOCK	-	tl
+mainit suotin	BLOCK	-	tl
+mainit isuot	BLOCK	-	tl
+mainit ang tela	BLOCK	-	tl
+mainit ang material	BLOCK	-	taglish
+mainit ang panahon	BLOCK	-	tl
+burnt orange	BLOCK	-	en
+burnt sienna	BLOCK	-	en
+burnt umber	BLOCK	-	en
+burnt yellow	BLOCK	-	en

@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "POCO X8 Pro|8GB+256GB|8GB+512GB|12GB+512GB, Flagship Dimensity 8500-Ultra, 6500mAh (typ) battery with 100W HyperCharge, 1.5K 120Hz ultra-bright AMOLED display, 50MP Sony IMX882 with OIS, IP68 dust and water resistance",
+      "link": "https://www.lazada.com.ph/products/pdp-i15411207559-s132610669793.html",
+      "reported_review_count": 5046,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 6,
+      "collected_by_star": {
+        "1": 6,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "complete",
+      "stop_reason": "empty_review_page",
+      "filter_warning": "Lazada did not return verified 2-star reviews; balanced collection stopped to prevent mislabeled data"
+    }
+  ],
+  "generated_at": "2026-09-11T12:58:19"
+}

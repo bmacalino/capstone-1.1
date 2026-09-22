@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "smart_home",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Xiaomi Smart Camera C301 2K 3MP IP Security Camera 360° Pan Tilt AI Human Detection Night Vision Two Way Audio WiFi Indoor CCTV",
+      "link": "https://www.lazada.com.ph/products/pdp-i4474319488-s25490790848.html",
+      "reported_review_count": 3712,
+      "stratum": "smart_home",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 70,
+      "collected_by_star": {
+        "1": 6,
+        "2": 3,
+        "3": 5,
+        "4": 16,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T17:07:56"
+}

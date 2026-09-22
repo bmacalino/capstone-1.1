@@ -1,0 +1,107 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 200,
+  "products_checked": 5,
+  "status_counts": {
+    "insufficient_written_reviews": 5
+  },
+  "products": [
+    {
+      "name": "Mini Pocket 2000 - 5000mAH Power Bank Four LED Indicators With Bracket And Type C & IOS Build - In Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i4034782758-s23176345712.html",
+      "reported_review_count": 4150,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 193,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 36,
+        "4": 37,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "UGREEN 20000mAh Powerbank 22.5W PD20W 74Wh Fast Charging with Built-in 2 Cable 3 Output 2 Input LED Display Portable Power bank Original",
+      "link": "https://www.lazada.com.ph/products/pdp-i4870327065-s28276993074.html",
+      "reported_review_count": 1328,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 2,
+      "collected_by_star": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "complete",
+      "stop_reason": "empty_review_page",
+      "filter_warning": "Lazada did not return verified 2-star reviews; balanced collection stopped to prevent mislabeled data"
+    },
+    {
+      "name": "SPARAK Universal Active Stylus Pen Mobile Phone Rechargeable Capacitive Stylus Professional Sensitive Tablet Touch Pen for Android/iOS",
+      "link": "https://www.lazada.com.ph/products/pdp-i15454841724-s133012989096.html",
+      "reported_review_count": 123,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 2,
+      "collected_by_star": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "complete",
+      "stop_reason": "next_button_not_found",
+      "filter_warning": "Lazada did not return verified 2-star reviews; balanced collection stopped to prevent mislabeled data"
+    },
+    {
+      "name": "1/3pcs 2 in 1 Stylus Pen for IPhone IPad, Mobile Phone Tablet Thin Tip Capacitive Pen, Touch Screen Note Drawing Pencil, TouchPen",
+      "link": "https://www.lazada.com.ph/products/pdp-i4518150307-s25861127481.html",
+      "reported_review_count": 151,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "collecting",
+      "stop_reason": "empty_review_page",
+      "filter_warning": "Lazada did not return verified 1-star reviews; balanced collection stopped to prevent mislabeled data"
+    },
+    {
+      "name": "DANYCASE Stylus Pen 3 in 1 Universal Pencil for Mobile Android ios Phone iPad Xiaomi Samsung No Charging Tablet Accessories",
+      "link": "https://www.lazada.com.ph/products/pdp-i4438825585-s28647533233.html",
+      "reported_review_count": 876,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 71,
+      "collected_by_star": {
+        "1": 12,
+        "2": 5,
+        "3": 5,
+        "4": 9,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T17:38:31"
+}

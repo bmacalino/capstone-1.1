@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "computer_peripherals",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "eligible": 1
+  },
+  "products": [
+    {
+      "name": "DoubleShock Bluetooth Gamepad Exquisite Simulation Level and Trigger Ergonomic Design Suitable for PS 4 All Series",
+      "link": "https://www.lazada.com.ph/products/pdp-i3646051280-s19178250284.html",
+      "reported_review_count": 2354,
+      "stratum": "computer_peripherals",
+      "status": "eligible",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 107,
+      "collected_by_star": {
+        "1": 5,
+        "2": 11,
+        "3": 27,
+        "4": 24,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T09:10:29"
+}

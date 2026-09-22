@@ -26,6 +26,11 @@ SAMPLE_PRODUCT = {
 
 
 class TestWebApp(unittest.TestCase):
+    def test_verification_block_has_clear_message_without_traceback(self):
+        message = webapp._user_facing_failure("Traceback: SHOPEE_VERIFICATION_BLOCKED: failure")
+        self.assertIn("Wait before retrying", message)
+        self.assertNotIn("Traceback", message)
+
     def setUp(self):
         webapp._catalogs.clear()
         webapp._jobs.clear()
@@ -100,17 +105,17 @@ class TestWebApp(unittest.TestCase):
         script = script_response.get_data()
         script_response.close()
 
-        self.assertIn(b"Spot fake reviews<br>before you buy", page.data)
+        self.assertIn(b"Read the evidence<br>before you buy", page.data)
         self.assertIn(b'id="landing" class="view active landing-view new-landing"', page.data)
         self.assertIn(b'id="workspace-shell"', page.data)
         self.assertIn(b'data-view="home"', page.data)
         self.assertIn(b'data-signin>Sign In', page.data)
         self.assertIn(b'id="search-form"', page.data)
-        self.assertIn(b"12,847", page.data)
+        self.assertIn(b"COLLECT PUBLIC REVIEWS", page.data)
         self.assertIn(b'data-explore-tab="how-it-works"', page.data)
-        self.assertIn(b"From the Field", page.data)
-        self.assertIn(b"The Team", page.data)
-        self.assertIn(b"Start shopping smarter today.", page.data)
+        self.assertIn(b"What the report promises", page.data)
+        self.assertIn(b"The research team", page.data)
+        self.assertIn(b"Bring one listing.<br>Leave with the evidence.", page.data)
         self.assertIn(b"landing-eye.svg", page.data)
         self.assertIn(b"Recent analyses", page.data)
         self.assertIn(b'aria-label="Workspace navigation"', page.data)
@@ -165,9 +170,15 @@ class TestWebApp(unittest.TestCase):
 
         self.assertIn(b"Lower is better", script)
         self.assertIn(b"Higher is better", script)
-        self.assertIn(b"Reviews containing risk signals", script)
-        self.assertIn(b"Top reported issues", script)
+        self.assertIn(b"Negative sentiment", script)
+        self.assertIn(b"Detected-risk ratio", script)
+        self.assertIn(
+            b"Thirty percent comes from the negative-review ratio",
+            script,
+        )
+        self.assertIn(b"Supporting lexicon evidence", script)
         self.assertIn(b'data-review-filter="risk"', script)
+        self.assertIn(b'data-review-filter="uncertain"', script)
         self.assertIn(b'id="review-search"', script)
         self.assertIn(b"Duplicates excluded", script)
         self.assertNotIn(b"Active defect/fraud terms", script)

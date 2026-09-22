@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "computer_peripherals",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "eligible": 1
+  },
+  "products": [
+    {
+      "name": "【Fast Deliver】Original For PS4 DualShock Controller PS 4 Controller Wireless Controller Support PC",
+      "link": "https://www.lazada.com.ph/products/pdp-i3999327536-s21580063905.html",
+      "reported_review_count": 1767,
+      "stratum": "computer_peripherals",
+      "status": "eligible",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 118,
+      "collected_by_star": {
+        "1": 24,
+        "2": 14,
+        "3": 20,
+        "4": 20,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T09:12:43"
+}

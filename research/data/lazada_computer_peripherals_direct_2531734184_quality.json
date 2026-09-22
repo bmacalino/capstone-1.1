@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "computer_peripherals",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "eligible": 1
+  },
+  "products": [
+    {
+      "name": "New U24 Macaron Universal Headset with In-Line Multi-Function Answer/Call Button in-ear earphone with microphone / high quality 4 colors Huawei / millet / VIVO / mobile phone universal headphone cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i2531734184-s11692871562.html",
+      "reported_review_count": 11594,
+      "stratum": "computer_peripherals",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T10:49:24"
+}

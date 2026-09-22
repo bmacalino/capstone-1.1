@@ -37,6 +37,62 @@ class TestShopeeScraper(unittest.TestCase):
         self.assertEqual(self.scraper.out_file, "shopee_ph_test.json")
         self.assertIn("--window-size=900,700", self.scraper.options.arguments)
         self.assertNotIn("--start-maximized", self.scraper.options.arguments)
+        self.assertNotIn("--disable-blink-features=AutomationControlled", self.scraper.options.arguments)
+        self.assertNotIn("--no-sandbox", self.scraper.options.arguments)
+
+    @patch("src.retriv.webdriver.Chrome")
+    @patch.object(ShopeeScraper, "_cached_driver", return_value="matching-driver.exe")
+    @patch.object(ShopeeScraper, "_detect_chrome_major", return_value=152)
+    @patch("src.retriv._position_scraper_window")
+    def test_standard_browser_uses_cache_and_closes_after_empty_search(self, position, major, cached, chrome):
+        self.scraper.output_data = {}
+        self.scraper._scrape_page = Mock(return_value=[])
+        with self.assertRaisesRegex(RuntimeError, "SHOPEE_COLLECTION_FAILED"):
+            self.scraper.execute()
+        kwargs = chrome.call_args.kwargs
+        self.assertEqual(kwargs["service"].path, "matching-driver.exe")
+        self.assertIs(kwargs["options"], self.scraper.options)
+        chrome.return_value.set_page_load_timeout.assert_called_once_with(45)
+        chrome.return_value.quit.assert_called_once()
+
+    def test_closed_browser_does_not_become_empty_success(self):
+        from selenium.common.exceptions import InvalidSessionIdException
+        self.scraper._safe_get = Mock(side_effect=InvalidSessionIdException("disconnected"))
+        product = {"link": "https://shopee.ph/product/1/2"}
+        with self.assertRaisesRegex(RuntimeError, "SHOPEE_BROWSER_CLOSED"):
+            self.scraper._scrape_details(product)
+        self.assertNotIn("comments", product)
+
+    @patch("src.retriv.webdriver.Chrome")
+    @patch.object(ShopeeScraper, "_cached_driver", return_value="matching-driver.exe")
+    @patch.object(ShopeeScraper, "_detect_chrome_major", return_value=152)
+    @patch("src.retriv._position_scraper_window")
+    def test_failed_details_are_not_saved_and_cleanup_preserves_error(self, position, major, cached, chrome):
+        self.scraper.output_data = {}
+        self.scraper.index_only = False
+        self.scraper._scrape_page = Mock(return_value=[{"link": "https://shopee.ph/product/1/2"}])
+        self.scraper._scrape_details = Mock(side_effect=RuntimeError("SHOPEE_BROWSER_CLOSED"))
+        self.scraper._periodic_save = Mock()
+        chrome.return_value.quit.side_effect = RuntimeError("already disconnected")
+        with self.assertRaisesRegex(RuntimeError, "SHOPEE_BROWSER_CLOSED"):
+            self.scraper.execute()
+        self.scraper._periodic_save.assert_not_called()
+        self.assertEqual(self.scraper.output_data, {})
+
+    @patch("src.retriv.os.path.isfile", return_value=True)
+    @patch("src.retriv.subprocess.run")
+    def test_cached_driver_requires_matching_major(self, run, _isfile):
+        run.return_value = Mock(returncode=0, stdout="ChromeDriver 152.0.7977.82")
+        self.assertIsNotNone(ShopeeScraper._cached_driver(152))
+        self.assertIsNone(ShopeeScraper._cached_driver(151))
+        run.return_value = Mock(returncode=1, stdout="ChromeDriver 152.0.7977.82")
+        self.assertIsNone(ShopeeScraper._cached_driver(152))
+
+    @patch("src.retriv.os.path.isfile", return_value=False)
+    @patch("src.retriv.subprocess.run")
+    def test_missing_cached_driver_uses_normal_setup(self, run, _isfile):
+        self.assertIsNone(ShopeeScraper._cached_driver(152))
+        run.assert_not_called()
 
     def test_scraper_window_leaves_dashboard_visible(self):
         driver = Mock()
@@ -54,7 +110,8 @@ class TestShopeeScraper(unittest.TestCase):
         self.scraper.driver = FakeDriver()
         self.assertFalse(self.scraper._check_captcha())
 
-    def test_terminal_verification_failure_stops_without_prompting(self):
+    @patch("src.retriv.time.sleep")
+    def test_terminal_verification_failure_allows_manual_completion(self, sleep):
         class Body:
             text = "Please Try Again Later. Verification can't be completed."
 
@@ -65,9 +122,48 @@ class TestShopeeScraper(unittest.TestCase):
             def find_element(_by, _value):
                 return Body()
 
+            @staticmethod
+            def execute_script(script):
+                if "document.body.innerText" in script:
+                    return Body.text
+                return {}
+
         self.scraper.driver = FakeDriver()
-        with self.assertRaisesRegex(TimeoutException, "SHOPEE_VERIFICATION_BLOCKED"):
-            self.scraper._check_captcha()
+        def complete(_message):
+            self.scraper.driver.current_url = "https://shopee.ph/product/1/2"
+        with patch("builtins.input", side_effect=complete) as prompt:
+            self.assertTrue(self.scraper._check_captcha())
+        prompt.assert_called_once()
+
+    @patch("src.retriv.time.sleep")
+    def test_dashboard_waits_through_failed_captcha_until_user_completes(self, sleep):
+        from unittest.mock import PropertyMock
+        self.scraper.no_prompt = True
+        self.scraper.driver = Mock()
+        type(self.scraper.driver).current_url = PropertyMock(side_effect=[
+            "https://shopee.ph/verify/captcha",
+            "https://shopee.ph/verify/captcha",
+            "https://shopee.ph/product/1/2",
+        ])
+        self.scraper._capture_login_diagnostics = Mock()
+        self.scraper._verification_page_text = Mock(return_value="verification can't be completed")
+        self.assertTrue(self.scraper._check_captcha())
+        self.scraper.driver.get.assert_not_called()
+
+    def test_manual_verification_still_has_a_timeout(self):
+        self.scraper.no_prompt = True
+        self.scraper.driver = Mock(current_url="https://shopee.ph/verify/captcha")
+        self.scraper._capture_login_diagnostics = Mock()
+        self.scraper._verification_page_text = Mock(return_value="")
+        with patch("src.retriv.time.monotonic", side_effect=[0, 0, 10000]):
+            with self.assertRaisesRegex(TimeoutError, "verification was not completed"):
+                self.scraper._check_captcha()
+
+    def test_verification_text_avoids_webdriver_full_page_text_extraction(self):
+        self.scraper.driver = Mock()
+        self.scraper.driver.execute_script.return_value = "Please Try Again Later"
+        self.assertEqual(self.scraper._verification_page_text(), "please try again later")
+        self.scraper.driver.find_element.assert_not_called()
 
     def test_detects_installed_chrome_major(self):
         major = self.scraper._detect_chrome_major()
@@ -225,6 +321,29 @@ class TestShopeeScraper(unittest.TestCase):
 
     def test_safe_get(self):
         self.assertTrue(hasattr(self.scraper, "_safe_get"))
+
+    def test_verification_detection_ignores_product_names_and_query_strings(self):
+        for value in (None, "", "https://shopee.ph/security-camera-auth-check-i.1.2", "https://shopee.ph/search?keyword=login+error", "https://example.com/verify"):
+            with self.subTest(value=value):
+                self.assertFalse(self.scraper._is_verification_url(value))
+        for value in ("https://shopee.ph/buyer/login?next=/product/1/2", b"https://shopee.ph/verify/captcha"):
+            self.assertTrue(self.scraper._is_verification_url(value))
+
+    @patch("src.retriv.time.sleep")
+    def test_verification_redirect_does_not_reload_product(self, sleep):
+        url = "https://shopee.ph/product/1/2"
+        self.scraper.driver = Mock(current_url=url)
+        self.scraper._check_captcha = Mock(return_value=True)
+        self.scraper._safe_get(url)
+        self.scraper.driver.get.assert_called_once_with(url)
+
+    @patch("src.retriv.time.sleep")
+    def test_verification_return_navigation_is_bounded(self, sleep):
+        self.scraper.driver = Mock(current_url="https://shopee.ph/")
+        self.scraper._check_captcha = Mock(return_value=True)
+        with self.assertRaisesRegex(RuntimeError, "SHOPEE_COLLECTION_FAILED"):
+            self.scraper._safe_get("https://shopee.ph/product/1/2")
+        self.assertEqual(self.scraper.driver.get.call_count, 2)
 
     def test_retrieve_products(self):
         self.assertTrue(hasattr(self.scraper, "_retrieve_products"))

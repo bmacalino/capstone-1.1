@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "computer_peripherals",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Buy 1 take 1 YS SAMSG Universal Headset with Microphone with mic In-Line Multi-Function Answer/Call Button handsfree portable audio headphone smart mobile cellphone accessories",
+      "link": "https://www.lazada.com.ph/products/pdp-i4495459414-s25675568835.html",
+      "reported_review_count": 2423,
+      "stratum": "computer_peripherals",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 107,
+      "collected_by_star": {
+        "1": 19,
+        "2": 20,
+        "3": 14,
+        "4": 14,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T10:38:41"
+}

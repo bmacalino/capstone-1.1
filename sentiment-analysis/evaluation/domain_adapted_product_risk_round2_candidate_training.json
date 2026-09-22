@@ -1,0 +1,1046 @@
+{
+  "metadata": {
+    "model_version": "defaketive-domain-adapted-product-risk-0.1.0-candidate",
+    "created_at": "2026-09-18T13:56:12.155454+00:00",
+    "sklearn_version": "1.9.0",
+    "deployment_status": "development_candidate",
+    "qualified_for_integration": false,
+    "qualified_for_new_locked_test": false,
+    "qualification_note": "Trained without the 133-row Lazada test split. A newly collected, product-disjoint locked test is required because the former test labels have now been inspected.",
+    "risk_policy": "binary product-only yes/no; no categories or severity",
+    "score_formula": "100 * (0.30 * negative_review_ratio + 0.70 * detected_risk_review_ratio)",
+    "random_state": 42,
+    "risk_detection_threshold": 0.48000000000000004,
+    "threshold_selection": "five-fold stratified grouped out-of-fold predictions on combined development data",
+    "training_rows": 2174,
+    "training_groups": 1417,
+    "domain_rows": {
+      "firecs": 1400,
+      "lazada": 774
+    },
+    "lazada_products": 17,
+    "excluded_lazada_test_rows": 133,
+    "excluded_lazada_test_products": 7,
+    "risk_distribution": {
+      "no_risk": 1043,
+      "risk": 1131
+    },
+    "sources": [
+      {
+        "path": "outputs\\firecs_risk_annotation_round_2_targeted\\firecs_product_only_combined_development.json",
+        "sha256": "d035175ee3aa694430ec14a83e5a97c020342a9ebaa1f14a8ac63f1325ca621c"
+      },
+      {
+        "path": "outputs\\firecs_risk_annotation_round_2_targeted\\FiReCS_Risk_Annotation_Round_2_Resolved.xlsx",
+        "sha256": "6f6038d5c3d11b52de02320f3b296b8a5ad94af89bc349fb81d25a404cbd018c"
+      },
+      {
+        "path": "outputs\\lazada_gold_test_v1\\lazada_round1_all_adjudicated.csv",
+        "sha256": "5b4f1d59d06aaf4570a8adacfd0089020ea5061132028ec761b1e2ae793b8e0c"
+      },
+      {
+        "path": "sentiment-analysis\\models\\hybrid_manuscript_v1.joblib",
+        "sha256": "a89200e884c86542998330441733ea3481601b8b904beb0446a9d7e71030bcf7",
+        "use": "sentiment pipeline only"
+      }
+    ]
+  },
+  "artifact": "sentiment-analysis\\models\\domain_adapted_product_risk_round2_candidate.joblib",
+  "artifact_sha256": "82fae53c85d65f5afa086ab44470c11c993afaf8eb9aa26585f56e11249e883c",
+  "nested_cross_validation": {
+    "overall": {
+      "sample_count": 2174,
+      "accuracy": 0.7608,
+      "balanced_accuracy": 0.7584,
+      "macro_f1": 0.7588,
+      "no_risk": {
+        "precision": 0.7797,
+        "recall": 0.6989,
+        "f1": 0.7371,
+        "support": 1043
+      },
+      "risk": {
+        "precision": 0.7466,
+        "recall": 0.8179,
+        "f1": 0.7806,
+        "support": 1131
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_risk",
+          "risk"
+        ],
+        "values": [
+          [
+            729,
+            314
+          ],
+          [
+            206,
+            925
+          ]
+        ]
+      },
+      "roc_auc": 0.841,
+      "average_precision": 0.8514,
+      "brier_score": 0.1626
+    },
+    "by_domain": {
+      "firecs": {
+        "sample_count": 1400,
+        "accuracy": 0.7686,
+        "balanced_accuracy": 0.769,
+        "macro_f1": 0.7681,
+        "no_risk": {
+          "precision": 0.8041,
+          "recall": 0.7153,
+          "f1": 0.7571,
+          "support": 706
+        },
+        "risk": {
+          "precision": 0.7396,
+          "recall": 0.8228,
+          "f1": 0.779,
+          "support": 694
+        },
+        "confusion_matrix": {
+          "labels": [
+            "no_risk",
+            "risk"
+          ],
+          "values": [
+            [
+              505,
+              201
+            ],
+            [
+              123,
+              571
+            ]
+          ]
+        },
+        "roc_auc": 0.8567,
+        "average_precision": 0.8524,
+        "brier_score": 0.1546
+      },
+      "lazada": {
+        "sample_count": 774,
+        "accuracy": 0.7468,
+        "balanced_accuracy": 0.7374,
+        "macro_f1": 0.7394,
+        "no_risk": {
+          "precision": 0.7296,
+          "recall": 0.6647,
+          "f1": 0.6957,
+          "support": 337
+        },
+        "risk": {
+          "precision": 0.758,
+          "recall": 0.8101,
+          "f1": 0.7832,
+          "support": 437
+        },
+        "confusion_matrix": {
+          "labels": [
+            "no_risk",
+            "risk"
+          ],
+          "values": [
+            [
+              224,
+              113
+            ],
+            [
+              83,
+              354
+            ]
+          ]
+        },
+        "roc_auc": 0.8108,
+        "average_precision": 0.8505,
+        "brier_score": 0.177
+      }
+    },
+    "folds": [
+      {
+        "fold": 1,
+        "train_rows": 1739,
+        "test_rows": 435,
+        "selected_threshold": 0.465,
+        "inner_threshold_selection": {
+          "macro_f1": 0.7409,
+          "risk_recall": 0.8
+        },
+        "overall": {
+          "sample_count": 435,
+          "accuracy": 0.7816,
+          "balanced_accuracy": 0.7794,
+          "macro_f1": 0.7799,
+          "no_risk": {
+            "precision": 0.8032,
+            "recall": 0.7225,
+            "f1": 0.7607,
+            "support": 209
+          },
+          "risk": {
+            "precision": 0.7652,
+            "recall": 0.8363,
+            "f1": 0.7992,
+            "support": 226
+          },
+          "confusion_matrix": {
+            "labels": [
+              "no_risk",
+              "risk"
+            ],
+            "values": [
+              [
+                151,
+                58
+              ],
+              [
+                37,
+                189
+              ]
+            ]
+          },
+          "roc_auc": 0.8517,
+          "average_precision": 0.8616,
+          "brier_score": 0.1564
+        },
+        "by_domain": {
+          "firecs": {
+            "sample_count": 292,
+            "accuracy": 0.7774,
+            "balanced_accuracy": 0.7791,
+            "macro_f1": 0.7773,
+            "no_risk": {
+              "precision": 0.8209,
+              "recall": 0.7285,
+              "f1": 0.7719,
+              "support": 151
+            },
+            "risk": {
+              "precision": 0.7405,
+              "recall": 0.8298,
+              "f1": 0.7826,
+              "support": 141
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  110,
+                  41
+                ],
+                [
+                  24,
+                  117
+                ]
+              ]
+            },
+            "roc_auc": 0.8523,
+            "average_precision": 0.839,
+            "brier_score": 0.1566
+          },
+          "lazada": {
+            "sample_count": 143,
+            "accuracy": 0.7902,
+            "balanced_accuracy": 0.777,
+            "macro_f1": 0.7799,
+            "no_risk": {
+              "precision": 0.7593,
+              "recall": 0.7069,
+              "f1": 0.7321,
+              "support": 58
+            },
+            "risk": {
+              "precision": 0.809,
+              "recall": 0.8471,
+              "f1": 0.8276,
+              "support": 85
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  41,
+                  17
+                ],
+                [
+                  13,
+                  72
+                ]
+              ]
+            },
+            "roc_auc": 0.8509,
+            "average_precision": 0.897,
+            "brier_score": 0.156
+          }
+        }
+      },
+      {
+        "fold": 2,
+        "train_rows": 1739,
+        "test_rows": 435,
+        "selected_threshold": 0.46,
+        "inner_threshold_selection": {
+          "macro_f1": 0.7389,
+          "risk_recall": 0.8031
+        },
+        "overall": {
+          "sample_count": 435,
+          "accuracy": 0.7977,
+          "balanced_accuracy": 0.7941,
+          "macro_f1": 0.7949,
+          "no_risk": {
+            "precision": 0.8409,
+            "recall": 0.7115,
+            "f1": 0.7708,
+            "support": 208
+          },
+          "risk": {
+            "precision": 0.7683,
+            "recall": 0.8767,
+            "f1": 0.8189,
+            "support": 227
+          },
+          "confusion_matrix": {
+            "labels": [
+              "no_risk",
+              "risk"
+            ],
+            "values": [
+              [
+                148,
+                60
+              ],
+              [
+                28,
+                199
+              ]
+            ]
+          },
+          "roc_auc": 0.8696,
+          "average_precision": 0.8755,
+          "brier_score": 0.1465
+        },
+        "by_domain": {
+          "firecs": {
+            "sample_count": 261,
+            "accuracy": 0.8161,
+            "balanced_accuracy": 0.8182,
+            "macro_f1": 0.8155,
+            "no_risk": {
+              "precision": 0.8839,
+              "recall": 0.7388,
+              "f1": 0.8049,
+              "support": 134
+            },
+            "risk": {
+              "precision": 0.7651,
+              "recall": 0.8976,
+              "f1": 0.8261,
+              "support": 127
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  99,
+                  35
+                ],
+                [
+                  13,
+                  114
+                ]
+              ]
+            },
+            "roc_auc": 0.8931,
+            "average_precision": 0.8832,
+            "brier_score": 0.1345
+          },
+          "lazada": {
+            "sample_count": 174,
+            "accuracy": 0.7701,
+            "balanced_accuracy": 0.7561,
+            "macro_f1": 0.7598,
+            "no_risk": {
+              "precision": 0.7656,
+              "recall": 0.6622,
+              "f1": 0.7101,
+              "support": 74
+            },
+            "risk": {
+              "precision": 0.7727,
+              "recall": 0.85,
+              "f1": 0.8095,
+              "support": 100
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  49,
+                  25
+                ],
+                [
+                  15,
+                  85
+                ]
+              ]
+            },
+            "roc_auc": 0.8309,
+            "average_precision": 0.8689,
+            "brier_score": 0.1646
+          }
+        }
+      },
+      {
+        "fold": 3,
+        "train_rows": 1739,
+        "test_rows": 435,
+        "selected_threshold": 0.41,
+        "inner_threshold_selection": {
+          "macro_f1": 0.7593,
+          "risk_recall": 0.863
+        },
+        "overall": {
+          "sample_count": 435,
+          "accuracy": 0.7241,
+          "balanced_accuracy": 0.7205,
+          "macro_f1": 0.72,
+          "no_risk": {
+            "precision": 0.7572,
+            "recall": 0.6268,
+            "f1": 0.6859,
+            "support": 209
+          },
+          "risk": {
+            "precision": 0.7023,
+            "recall": 0.8142,
+            "f1": 0.7541,
+            "support": 226
+          },
+          "confusion_matrix": {
+            "labels": [
+              "no_risk",
+              "risk"
+            ],
+            "values": [
+              [
+                131,
+                78
+              ],
+              [
+                42,
+                184
+              ]
+            ]
+          },
+          "roc_auc": 0.8215,
+          "average_precision": 0.8425,
+          "brier_score": 0.1743
+        },
+        "by_domain": {
+          "firecs": {
+            "sample_count": 290,
+            "accuracy": 0.7241,
+            "balanced_accuracy": 0.7271,
+            "macro_f1": 0.7231,
+            "no_risk": {
+              "precision": 0.7869,
+              "recall": 0.64,
+              "f1": 0.7059,
+              "support": 150
+            },
+            "risk": {
+              "precision": 0.6786,
+              "recall": 0.8143,
+              "f1": 0.7403,
+              "support": 140
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  96,
+                  54
+                ],
+                [
+                  26,
+                  114
+                ]
+              ]
+            },
+            "roc_auc": 0.8266,
+            "average_precision": 0.8227,
+            "brier_score": 0.1711
+          },
+          "lazada": {
+            "sample_count": 145,
+            "accuracy": 0.7241,
+            "balanced_accuracy": 0.7036,
+            "macro_f1": 0.7071,
+            "no_risk": {
+              "precision": 0.6863,
+              "recall": 0.5932,
+              "f1": 0.6364,
+              "support": 59
+            },
+            "risk": {
+              "precision": 0.7447,
+              "recall": 0.814,
+              "f1": 0.7778,
+              "support": 86
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  35,
+                  24
+                ],
+                [
+                  16,
+                  70
+                ]
+              ]
+            },
+            "roc_auc": 0.8037,
+            "average_precision": 0.8716,
+            "brier_score": 0.1808
+          }
+        }
+      },
+      {
+        "fold": 4,
+        "train_rows": 1740,
+        "test_rows": 434,
+        "selected_threshold": 0.47,
+        "inner_threshold_selection": {
+          "macro_f1": 0.7343,
+          "risk_recall": 0.8011
+        },
+        "overall": {
+          "sample_count": 434,
+          "accuracy": 0.7581,
+          "balanced_accuracy": 0.7556,
+          "macro_f1": 0.7561,
+          "no_risk": {
+            "precision": 0.7754,
+            "recall": 0.6971,
+            "f1": 0.7342,
+            "support": 208
+          },
+          "risk": {
+            "precision": 0.7449,
+            "recall": 0.8142,
+            "f1": 0.778,
+            "support": 226
+          },
+          "confusion_matrix": {
+            "labels": [
+              "no_risk",
+              "risk"
+            ],
+            "values": [
+              [
+                145,
+                63
+              ],
+              [
+                42,
+                184
+              ]
+            ]
+          },
+          "roc_auc": 0.8572,
+          "average_precision": 0.8735,
+          "brier_score": 0.1548
+        },
+        "by_domain": {
+          "firecs": {
+            "sample_count": 293,
+            "accuracy": 0.7816,
+            "balanced_accuracy": 0.7848,
+            "macro_f1": 0.7813,
+            "no_risk": {
+              "precision": 0.845,
+              "recall": 0.7124,
+              "f1": 0.773,
+              "support": 153
+            },
+            "risk": {
+              "precision": 0.7317,
+              "recall": 0.8571,
+              "f1": 0.7895,
+              "support": 140
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  109,
+                  44
+                ],
+                [
+                  20,
+                  120
+                ]
+              ]
+            },
+            "roc_auc": 0.8974,
+            "average_precision": 0.9004,
+            "brier_score": 0.1356
+          },
+          "lazada": {
+            "sample_count": 141,
+            "accuracy": 0.7092,
+            "balanced_accuracy": 0.6994,
+            "macro_f1": 0.6973,
+            "no_risk": {
+              "precision": 0.6207,
+              "recall": 0.6545,
+              "f1": 0.6372,
+              "support": 55
+            },
+            "risk": {
+              "precision": 0.7711,
+              "recall": 0.7442,
+              "f1": 0.7574,
+              "support": 86
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  36,
+                  19
+                ],
+                [
+                  22,
+                  64
+                ]
+              ]
+            },
+            "roc_auc": 0.7738,
+            "average_precision": 0.8349,
+            "brier_score": 0.1948
+          }
+        }
+      },
+      {
+        "fold": 5,
+        "train_rows": 1739,
+        "test_rows": 435,
+        "selected_threshold": 0.49,
+        "inner_threshold_selection": {
+          "macro_f1": 0.7637,
+          "risk_recall": 0.8011
+        },
+        "overall": {
+          "sample_count": 435,
+          "accuracy": 0.7425,
+          "balanced_accuracy": 0.7423,
+          "macro_f1": 0.7422,
+          "no_risk": {
+            "precision": 0.7299,
+            "recall": 0.7368,
+            "f1": 0.7333,
+            "support": 209
+          },
+          "risk": {
+            "precision": 0.7545,
+            "recall": 0.7478,
+            "f1": 0.7511,
+            "support": 226
+          },
+          "confusion_matrix": {
+            "labels": [
+              "no_risk",
+              "risk"
+            ],
+            "values": [
+              [
+                154,
+                55
+              ],
+              [
+                57,
+                169
+              ]
+            ]
+          },
+          "roc_auc": 0.806,
+          "average_precision": 0.8054,
+          "brier_score": 0.1808
+        },
+        "by_domain": {
+          "firecs": {
+            "sample_count": 264,
+            "accuracy": 0.7462,
+            "balanced_accuracy": 0.7486,
+            "macro_f1": 0.7454,
+            "no_risk": {
+              "precision": 0.6947,
+              "recall": 0.7712,
+              "f1": 0.7309,
+              "support": 118
+            },
+            "risk": {
+              "precision": 0.797,
+              "recall": 0.726,
+              "f1": 0.7599,
+              "support": 146
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  91,
+                  27
+                ],
+                [
+                  40,
+                  106
+                ]
+              ]
+            },
+            "roc_auc": 0.8205,
+            "average_precision": 0.8235,
+            "brier_score": 0.1753
+          },
+          "lazada": {
+            "sample_count": 171,
+            "accuracy": 0.7368,
+            "balanced_accuracy": 0.7399,
+            "macro_f1": 0.7368,
+            "no_risk": {
+              "precision": 0.7875,
+              "recall": 0.6923,
+              "f1": 0.7368,
+              "support": 91
+            },
+            "risk": {
+              "precision": 0.6923,
+              "recall": 0.7875,
+              "f1": 0.7368,
+              "support": 80
+            },
+            "confusion_matrix": {
+              "labels": [
+                "no_risk",
+                "risk"
+              ],
+              "values": [
+                [
+                  63,
+                  28
+                ],
+                [
+                  17,
+                  63
+                ]
+              ]
+            },
+            "roc_auc": 0.7964,
+            "average_precision": 0.7937,
+            "brier_score": 0.1891
+          }
+        }
+      }
+    ]
+  },
+  "lazada_product_level_oof": {
+    "product_count": 17,
+    "unweighted_mean_absolute_ratio_error": 0.092,
+    "unweighted_root_mean_squared_ratio_error": 0.1269,
+    "unweighted_mean_absolute_risk_contribution_error_points": 6.44,
+    "products": [
+      {
+        "product_id": "15411207559",
+        "review_count": 6,
+        "actual_risk_review_ratio": 1.0,
+        "predicted_risk_review_ratio": 0.6667,
+        "signed_ratio_error": -0.3333,
+        "absolute_ratio_error": 0.3333,
+        "actual_risk_contribution_points": 70.0,
+        "predicted_risk_contribution_points": 46.67,
+        "absolute_contribution_error_points": 23.33
+      },
+      {
+        "product_id": "1676918812",
+        "review_count": 30,
+        "actual_risk_review_ratio": 0.2667,
+        "predicted_risk_review_ratio": 0.2,
+        "signed_ratio_error": -0.0667,
+        "absolute_ratio_error": 0.0667,
+        "actual_risk_contribution_points": 18.67,
+        "predicted_risk_contribution_points": 14.0,
+        "absolute_contribution_error_points": 4.67
+      },
+      {
+        "product_id": "1994197909",
+        "review_count": 78,
+        "actual_risk_review_ratio": 0.7308,
+        "predicted_risk_review_ratio": 0.8077,
+        "signed_ratio_error": 0.0769,
+        "absolute_ratio_error": 0.0769,
+        "actual_risk_contribution_points": 51.15,
+        "predicted_risk_contribution_points": 56.54,
+        "absolute_contribution_error_points": 5.38
+      },
+      {
+        "product_id": "2386662601",
+        "review_count": 16,
+        "actual_risk_review_ratio": 0.25,
+        "predicted_risk_review_ratio": 0.1875,
+        "signed_ratio_error": -0.0625,
+        "absolute_ratio_error": 0.0625,
+        "actual_risk_contribution_points": 17.5,
+        "predicted_risk_contribution_points": 13.12,
+        "absolute_contribution_error_points": 4.38
+      },
+      {
+        "product_id": "3041489531",
+        "review_count": 23,
+        "actual_risk_review_ratio": 0.3478,
+        "predicted_risk_review_ratio": 0.6087,
+        "signed_ratio_error": 0.2609,
+        "absolute_ratio_error": 0.2609,
+        "actual_risk_contribution_points": 24.35,
+        "predicted_risk_contribution_points": 42.61,
+        "absolute_contribution_error_points": 18.26
+      },
+      {
+        "product_id": "3075012546",
+        "review_count": 30,
+        "actual_risk_review_ratio": 0.6333,
+        "predicted_risk_review_ratio": 0.5333,
+        "signed_ratio_error": -0.1,
+        "absolute_ratio_error": 0.1,
+        "actual_risk_contribution_points": 44.33,
+        "predicted_risk_contribution_points": 37.33,
+        "absolute_contribution_error_points": 7.0
+      },
+      {
+        "product_id": "3401407254",
+        "review_count": 25,
+        "actual_risk_review_ratio": 0.56,
+        "predicted_risk_review_ratio": 0.44,
+        "signed_ratio_error": -0.12,
+        "absolute_ratio_error": 0.12,
+        "actual_risk_contribution_points": 39.2,
+        "predicted_risk_contribution_points": 30.8,
+        "absolute_contribution_error_points": 8.4
+      },
+      {
+        "product_id": "3646051280",
+        "review_count": 72,
+        "actual_risk_review_ratio": 0.5417,
+        "predicted_risk_review_ratio": 0.6806,
+        "signed_ratio_error": 0.1389,
+        "absolute_ratio_error": 0.1389,
+        "actual_risk_contribution_points": 37.92,
+        "predicted_risk_contribution_points": 47.64,
+        "absolute_contribution_error_points": 9.72
+      },
+      {
+        "product_id": "3999327536",
+        "review_count": 86,
+        "actual_risk_review_ratio": 0.6628,
+        "predicted_risk_review_ratio": 0.6744,
+        "signed_ratio_error": 0.0116,
+        "absolute_ratio_error": 0.0116,
+        "actual_risk_contribution_points": 46.4,
+        "predicted_risk_contribution_points": 47.21,
+        "absolute_contribution_error_points": 0.81
+      },
+      {
+        "product_id": "4363184044",
+        "review_count": 31,
+        "actual_risk_review_ratio": 0.6452,
+        "predicted_risk_review_ratio": 0.6452,
+        "signed_ratio_error": 0.0,
+        "absolute_ratio_error": 0.0,
+        "actual_risk_contribution_points": 45.16,
+        "predicted_risk_contribution_points": 45.16,
+        "absolute_contribution_error_points": 0.0
+      },
+      {
+        "product_id": "4584110073",
+        "review_count": 35,
+        "actual_risk_review_ratio": 0.3429,
+        "predicted_risk_review_ratio": 0.4,
+        "signed_ratio_error": 0.0571,
+        "absolute_ratio_error": 0.0571,
+        "actual_risk_contribution_points": 24.0,
+        "predicted_risk_contribution_points": 28.0,
+        "absolute_contribution_error_points": 4.0
+      },
+      {
+        "product_id": "4946943100",
+        "review_count": 35,
+        "actual_risk_review_ratio": 0.5714,
+        "predicted_risk_review_ratio": 0.5714,
+        "signed_ratio_error": 0.0,
+        "absolute_ratio_error": 0.0,
+        "actual_risk_contribution_points": 40.0,
+        "predicted_risk_contribution_points": 40.0,
+        "absolute_contribution_error_points": 0.0
+      },
+      {
+        "product_id": "4983206125",
+        "review_count": 30,
+        "actual_risk_review_ratio": 0.5667,
+        "predicted_risk_review_ratio": 0.7,
+        "signed_ratio_error": 0.1333,
+        "absolute_ratio_error": 0.1333,
+        "actual_risk_contribution_points": 39.67,
+        "predicted_risk_contribution_points": 49.0,
+        "absolute_contribution_error_points": 9.33
+      },
+      {
+        "product_id": "5037745180",
+        "review_count": 86,
+        "actual_risk_review_ratio": 0.6163,
+        "predicted_risk_review_ratio": 0.6512,
+        "signed_ratio_error": 0.0349,
+        "absolute_ratio_error": 0.0349,
+        "actual_risk_contribution_points": 43.14,
+        "predicted_risk_contribution_points": 45.58,
+        "absolute_contribution_error_points": 2.44
+      },
+      {
+        "product_id": "5211290661",
+        "review_count": 40,
+        "actual_risk_review_ratio": 0.3,
+        "predicted_risk_review_ratio": 0.375,
+        "signed_ratio_error": 0.075,
+        "absolute_ratio_error": 0.075,
+        "actual_risk_contribution_points": 21.0,
+        "predicted_risk_contribution_points": 26.25,
+        "absolute_contribution_error_points": 5.25
+      },
+      {
+        "product_id": "527362407",
+        "review_count": 65,
+        "actual_risk_review_ratio": 0.5538,
+        "predicted_risk_review_ratio": 0.6462,
+        "signed_ratio_error": 0.0923,
+        "absolute_ratio_error": 0.0923,
+        "actual_risk_contribution_points": 38.77,
+        "predicted_risk_contribution_points": 45.23,
+        "absolute_contribution_error_points": 6.46
+      },
+      {
+        "product_id": "650518893",
+        "review_count": 86,
+        "actual_risk_review_ratio": 0.6395,
+        "predicted_risk_review_ratio": 0.6395,
+        "signed_ratio_error": 0.0,
+        "absolute_ratio_error": 0.0,
+        "actual_risk_contribution_points": 44.77,
+        "predicted_risk_contribution_points": 44.77,
+        "absolute_contribution_error_points": 0.0
+      }
+    ]
+  },
+  "final_threshold_selection": {
+    "threshold": 0.48,
+    "selection_macro_f1": 0.7623,
+    "selection_risk_recall": 0.8028,
+    "oof_metrics": {
+      "sample_count": 2174,
+      "accuracy": 0.7636,
+      "balanced_accuracy": 0.7619,
+      "macro_f1": 0.7623,
+      "no_risk": {
+        "precision": 0.7713,
+        "recall": 0.721,
+        "f1": 0.7453,
+        "support": 1043
+      },
+      "risk": {
+        "precision": 0.7573,
+        "recall": 0.8028,
+        "f1": 0.7794,
+        "support": 1131
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_risk",
+          "risk"
+        ],
+        "values": [
+          [
+            752,
+            291
+          ],
+          [
+            223,
+            908
+          ]
+        ]
+      },
+      "roc_auc": 0.841,
+      "average_precision": 0.8514,
+      "brier_score": 0.1626
+    },
+    "fold_counts": {
+      "1": 435,
+      "2": 435,
+      "3": 435,
+      "4": 434,
+      "5": 435
+    }
+  },
+  "integrity": {
+    "nested_fold_counts": {
+      "1": 435,
+      "2": 435,
+      "3": 435,
+      "4": 434,
+      "5": 435
+    },
+    "excluded_test_rows_used_for_training": 0,
+    "cross_domain_normalized_text_overlap": 0
+  },
+  "development_gates": {
+    "firecs_risk_recall_at_least_0_80": true,
+    "firecs_macro_f1_at_least_0_75": true,
+    "lazada_risk_recall_at_least_0_80": true,
+    "lazada_macro_f1_at_least_0_75": false
+  },
+  "passes_all_development_gates": false,
+  "deployment_changed": false,
+  "next_gate": "Collect and adjudicate new product-disjoint Lazada reviews."
+}

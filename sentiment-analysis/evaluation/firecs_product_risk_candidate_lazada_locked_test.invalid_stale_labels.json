@@ -1,0 +1,279 @@
+{
+  "metadata": {
+    "created_at": "2026-09-18T11:27:22.681183+00:00",
+    "evaluation_scope": "locked_lazada_product_disjoint_external_transfer_test",
+    "test_predictions_computed": true,
+    "test_dataset": "research\\data\\processed\\lazada_round1\\lazada_round1_test.csv",
+    "test_dataset_sha256": "565974304a00e130ab95744e267bc2a57572664371838495ff242be910a1b263",
+    "rows": 133,
+    "products": 7,
+    "risk_rows": 80,
+    "no_risk_rows": 53,
+    "product_overlap_with_lazada_development": 0,
+    "normalized_text_overlap_with_firecs_training": 0,
+    "selection_statement": "The FiReCS candidate architecture and threshold were frozen before this test. No Lazada test label was used to fit or tune it.",
+    "current_model_comparison_limitation": "The current hybrid artifact was trained on the combined Lazada gold set, so its result here is an in-sample diagnostic and not a fair external comparison with the FiReCS candidate.",
+    "score_scope": "Product metrics cover only the 70-point detected-risk contribution. The 30-point sentiment contribution is outside this risk-head test."
+  },
+  "candidate": {
+    "artifact": "sentiment-analysis\\models\\firecs_product_risk_candidate.joblib",
+    "artifact_sha256": "81927271b5dc9e38fa73a9ceaa85dd23dbb34736f0018264093e424895aaa5aa",
+    "model_version": "defaketive-firecs-product-risk-0.1.0-candidate",
+    "threshold": 0.47,
+    "review_level": {
+      "sample_count": 133,
+      "accuracy": 0.6015,
+      "balanced_accuracy": 0.5605,
+      "macro_f1": 0.5574,
+      "no_risk": {
+        "precision": 0.5,
+        "recall": 0.3585,
+        "f1": 0.4176,
+        "support": 53
+      },
+      "risk": {
+        "precision": 0.6421,
+        "recall": 0.7625,
+        "f1": 0.6971,
+        "support": 80
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_risk",
+          "risk"
+        ],
+        "values": [
+          [
+            19,
+            34
+          ],
+          [
+            19,
+            61
+          ]
+        ]
+      },
+      "roc_auc": 0.6873,
+      "average_precision": 0.8072,
+      "brier_score": 0.23
+    },
+    "product_level": {
+      "product_count": 7,
+      "unweighted_mean_absolute_ratio_error": 0.2336,
+      "unweighted_root_mean_squared_ratio_error": 0.3003,
+      "unweighted_mean_absolute_risk_contribution_error_points": 16.35,
+      "products": [
+        {
+          "product_id": "3034831887",
+          "review_count": 29,
+          "actual_risk_review_ratio": 0.4483,
+          "predicted_risk_review_ratio": 0.5862,
+          "signed_ratio_error": 0.1379,
+          "absolute_ratio_error": 0.1379,
+          "actual_risk_contribution_points": 31.38,
+          "predicted_risk_contribution_points": 41.03,
+          "absolute_contribution_error_points": 9.66
+        },
+        {
+          "product_id": "4227077318",
+          "review_count": 2,
+          "actual_risk_review_ratio": 1.0,
+          "predicted_risk_review_ratio": 0.5,
+          "signed_ratio_error": -0.5,
+          "absolute_ratio_error": 0.5,
+          "actual_risk_contribution_points": 70.0,
+          "predicted_risk_contribution_points": 35.0,
+          "absolute_contribution_error_points": 35.0
+        },
+        {
+          "product_id": "4507172427",
+          "review_count": 24,
+          "actual_risk_review_ratio": 0.4167,
+          "predicted_risk_review_ratio": 0.8333,
+          "signed_ratio_error": 0.4167,
+          "absolute_ratio_error": 0.4167,
+          "actual_risk_contribution_points": 29.17,
+          "predicted_risk_contribution_points": 58.33,
+          "absolute_contribution_error_points": 29.17
+        },
+        {
+          "product_id": "5166282734",
+          "review_count": 17,
+          "actual_risk_review_ratio": 0.2353,
+          "predicted_risk_review_ratio": 0.6471,
+          "signed_ratio_error": 0.4118,
+          "absolute_ratio_error": 0.4118,
+          "actual_risk_contribution_points": 16.47,
+          "predicted_risk_contribution_points": 45.29,
+          "absolute_contribution_error_points": 28.82
+        },
+        {
+          "product_id": "5256422305",
+          "review_count": 30,
+          "actual_risk_review_ratio": 0.7,
+          "predicted_risk_review_ratio": 0.5667,
+          "signed_ratio_error": -0.1333,
+          "absolute_ratio_error": 0.1333,
+          "actual_risk_contribution_points": 49.0,
+          "predicted_risk_contribution_points": 39.67,
+          "absolute_contribution_error_points": 9.33
+        },
+        {
+          "product_id": "5381386541",
+          "review_count": 28,
+          "actual_risk_review_ratio": 0.9643,
+          "predicted_risk_review_ratio": 0.9286,
+          "signed_ratio_error": -0.0357,
+          "absolute_ratio_error": 0.0357,
+          "actual_risk_contribution_points": 67.5,
+          "predicted_risk_contribution_points": 65.0,
+          "absolute_contribution_error_points": 2.5
+        },
+        {
+          "product_id": "5384903372",
+          "review_count": 3,
+          "actual_risk_review_ratio": 1.0,
+          "predicted_risk_review_ratio": 1.0,
+          "signed_ratio_error": 0.0,
+          "absolute_ratio_error": 0.0,
+          "actual_risk_contribution_points": 70.0,
+          "predicted_risk_contribution_points": 70.0,
+          "absolute_contribution_error_points": 0.0
+        }
+      ]
+    }
+  },
+  "current_in_sample_diagnostic": {
+    "artifact": "sentiment-analysis\\models\\hybrid_manuscript_v1.joblib",
+    "artifact_sha256": "a89200e884c86542998330441733ea3481601b8b904beb0446a9d7e71030bcf7",
+    "model_version": "defaketive-hybrid-manuscript-1.1.0-development",
+    "threshold": 0.57,
+    "review_level": {
+      "sample_count": 133,
+      "accuracy": 0.812,
+      "balanced_accuracy": 0.8087,
+      "macro_f1": 0.8057,
+      "no_risk": {
+        "precision": 0.75,
+        "recall": 0.7925,
+        "f1": 0.7706,
+        "support": 53
+      },
+      "risk": {
+        "precision": 0.8571,
+        "recall": 0.825,
+        "f1": 0.8408,
+        "support": 80
+      },
+      "confusion_matrix": {
+        "labels": [
+          "no_risk",
+          "risk"
+        ],
+        "values": [
+          [
+            42,
+            11
+          ],
+          [
+            14,
+            66
+          ]
+        ]
+      },
+      "roc_auc": 0.8901,
+      "average_precision": 0.9214,
+      "brier_score": 0.1407
+    },
+    "product_level": {
+      "product_count": 7,
+      "unweighted_mean_absolute_ratio_error": 0.1136,
+      "unweighted_root_mean_squared_ratio_error": 0.1993,
+      "unweighted_mean_absolute_risk_contribution_error_points": 7.95,
+      "products": [
+        {
+          "product_id": "3034831887",
+          "review_count": 29,
+          "actual_risk_review_ratio": 0.4483,
+          "predicted_risk_review_ratio": 0.4138,
+          "signed_ratio_error": -0.0345,
+          "absolute_ratio_error": 0.0345,
+          "actual_risk_contribution_points": 31.38,
+          "predicted_risk_contribution_points": 28.97,
+          "absolute_contribution_error_points": 2.41
+        },
+        {
+          "product_id": "4227077318",
+          "review_count": 2,
+          "actual_risk_review_ratio": 1.0,
+          "predicted_risk_review_ratio": 0.5,
+          "signed_ratio_error": -0.5,
+          "absolute_ratio_error": 0.5,
+          "actual_risk_contribution_points": 70.0,
+          "predicted_risk_contribution_points": 35.0,
+          "absolute_contribution_error_points": 35.0
+        },
+        {
+          "product_id": "4507172427",
+          "review_count": 24,
+          "actual_risk_review_ratio": 0.4167,
+          "predicted_risk_review_ratio": 0.5417,
+          "signed_ratio_error": 0.125,
+          "absolute_ratio_error": 0.125,
+          "actual_risk_contribution_points": 29.17,
+          "predicted_risk_contribution_points": 37.92,
+          "absolute_contribution_error_points": 8.75
+        },
+        {
+          "product_id": "5166282734",
+          "review_count": 17,
+          "actual_risk_review_ratio": 0.2353,
+          "predicted_risk_review_ratio": 0.2353,
+          "signed_ratio_error": 0.0,
+          "absolute_ratio_error": 0.0,
+          "actual_risk_contribution_points": 16.47,
+          "predicted_risk_contribution_points": 16.47,
+          "absolute_contribution_error_points": 0.0
+        },
+        {
+          "product_id": "5256422305",
+          "review_count": 30,
+          "actual_risk_review_ratio": 0.7,
+          "predicted_risk_review_ratio": 0.6,
+          "signed_ratio_error": -0.1,
+          "absolute_ratio_error": 0.1,
+          "actual_risk_contribution_points": 49.0,
+          "predicted_risk_contribution_points": 42.0,
+          "absolute_contribution_error_points": 7.0
+        },
+        {
+          "product_id": "5381386541",
+          "review_count": 28,
+          "actual_risk_review_ratio": 0.9643,
+          "predicted_risk_review_ratio": 0.9286,
+          "signed_ratio_error": -0.0357,
+          "absolute_ratio_error": 0.0357,
+          "actual_risk_contribution_points": 67.5,
+          "predicted_risk_contribution_points": 65.0,
+          "absolute_contribution_error_points": 2.5
+        },
+        {
+          "product_id": "5384903372",
+          "review_count": 3,
+          "actual_risk_review_ratio": 1.0,
+          "predicted_risk_review_ratio": 1.0,
+          "signed_ratio_error": 0.0,
+          "absolute_ratio_error": 0.0,
+          "actual_risk_contribution_points": 70.0,
+          "predicted_risk_contribution_points": 70.0,
+          "absolute_contribution_error_points": 0.0
+        }
+      ]
+    }
+  },
+  "qualification_gates": {
+    "risk_recall_at_least_0_80": false,
+    "risk_macro_f1_at_least_0_75": false
+  },
+  "qualified_for_integration": false
+}

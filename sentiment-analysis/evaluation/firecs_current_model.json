@@ -5,45 +5,45 @@
     "neutral",
     "positive"
   ],
-  "accuracy": 0.7436,
-  "precision": 0.7463,
-  "recall": 0.7473,
-  "f1": 0.737,
+  "accuracy": 0.8112,
+  "precision": 0.8164,
+  "recall": 0.8119,
+  "f1": 0.8137,
   "per_class": {
     "negative": {
-      "precision": 0.7762,
-      "recall": 0.7936,
-      "f1": 0.7848,
+      "precision": 0.8188,
+      "recall": 0.8053,
+      "f1": 0.812,
       "support": 1027
     },
     "neutral": {
-      "precision": 0.7474,
-      "recall": 0.5363,
-      "f1": 0.6245,
+      "precision": 0.7243,
+      "recall": 0.7709,
+      "f1": 0.7469,
       "support": 1087
     },
     "positive": {
-      "precision": 0.7153,
-      "recall": 0.9119,
-      "f1": 0.8017,
+      "precision": 0.9061,
+      "recall": 0.8596,
+      "f1": 0.8823,
       "support": 1033
     }
   },
   "matrix": [
     [
-      815,
-      131,
-      81
+      827,
+      192,
+      8
     ],
     [
-      210,
-      583,
-      294
+      165,
+      838,
+      84
     ],
     [
-      25,
-      66,
-      942
+      18,
+      127,
+      888
     ]
   ],
   "dataset": "FiReCS",
@@ -52,5 +52,5 @@
   "model_version": "defaketive-firecs-tfidf-0.2.0",
   "license": "CC BY 4.0",
   "source": "https://huggingface.co/datasets/ccosme/FiReCS",
-  "error_count": 807
+  "error_count": 594
 }

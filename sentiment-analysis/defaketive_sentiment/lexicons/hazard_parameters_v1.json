@@ -1,0 +1,136 @@
+{
+  "version": "hazard-parameters-1.0.0",
+  "created_at": "2026-09-21T00:00:00+00:00",
+  "_README": [
+    "Every tunable number in the badge pipeline lives here, in one file, so it",
+    "can be hashed into a round manifest and so a reader can audit the whole",
+    "parameter set without reading code.",
+    "",
+    "PROVENANCE. Most of these are PLACEHOLDER values chosen before any data was",
+    "collected. They are not published, not calibrated, and not defensible as",
+    "they stand. Each carries a 'basis' saying where it came from and, where it",
+    "is a placeholder, which experiment is supposed to replace it.",
+    "",
+    "FREEZING RULE. Values must be fixed BEFORE the frozen test split is scored,",
+    "and must not move afterwards. The temptation to nudge a threshold after",
+    "seeing a disappointing test number is exactly what the rule exists to stop."
+  ],
+
+  "n_min": {
+    "value": 30,
+    "basis": "PLACEHOLDER. Minimum usable reviews before any flag may fire; below this the verdict is insufficient_evidence. To be replaced by the split-half stability procedure: the smallest count at which two random halves of the same product's reviews agree on the verdict acceptably often. 0.7 agreement is the common convention.",
+    "replaced_by": "outputs/product_badges_round_1 split-half stability curve"
+  },
+
+  "alert": {
+    "independent_high_confidence_reports": {
+      "value": 2,
+      "basis": "DESIGN CHOICE. Two independent high-confidence severity-4 reports lift the safety tier to at least High regardless of rate. One report is too easy to produce by a single mistaken or malicious reviewer; three would miss real cases on low-volume listings. Sensitivity analysis must report the verdict changes at 1 and 3."
+    },
+    "minimum_severity": {
+      "value": 4,
+      "basis": "DESIGN CHOICE. Only fire/explosion/swelling and shock/spark reach severity 4, so only those can trigger the override. safety_unspecified is deliberately level 2 and cannot."
+    },
+    "independence_cosine_threshold": {
+      "value": 0.9,
+      "basis": "PLACEHOLDER. Two flagged reviews count as independent when the character 4-gram cosine similarity between their flagged sentences is below this. Guards against copy-pasted or templated reviews being counted twice. To be checked against the measured duplicate-pair distribution in the reference corpus."
+    },
+    "overrides_insufficient_evidence": {
+      "value": true,
+      "basis": "DELIBERATE DEVIATION from the first draft of the verdict order, which placed insufficient_evidence ahead of every other state. The alert is COUNT-based, not rate-based, so it does not need a denominator: two independent high-confidence reports of fire on a listing with 12 reviews is strong evidence, not weak evidence. Ordering insufficient_evidence first would suppress it, producing a false negative in the most severe category - and false-negative rate is this project's headline metric. Set to false to restore the original ordering and measure the difference."
+    }
+  },
+
+  "smoke_terms": {
+    "ngram_range": [1, 3],
+    "min_hazard_sentences": {
+      "safety": 2,
+      "defect": 3,
+      "counterfeit": 3,
+      "basis": "DESIGN CHOICE under a data constraint. A term must appear in at least this many in-class sentences to be kept. Safety is lowered to 2 only because the whole class has roughly 100-140 true rows; at 3 the retained vocabulary collapses. This is the single most sensitive filter, so training_report.json must report the retained term count at 2, 3, 4 and 5 for every category."
+    },
+    "redundancy_delta": {
+      "value": 0.5,
+      "basis": "PLACEHOLDER. An n-gram is dropped when its CC score does not exceed the best of its constituent shorter n-grams by at least this margin, which stops 'sobrang init ng' piling on top of 'sobrang init'. To be checked by inspecting the dropped list during curation."
+    },
+    "scoring_policy": "distinct_presence",
+    "scoring_policy_basis": "DEVIATION FROM ZAMAN ET AL., recorded deliberately. They sum term occurrences; this sums each distinct matched term once per segment. Marketplace reviews contain keyword-stuffed text, so an occurrence sum is inflatable by repetition. The deviation must be stated in the methods."
+  },
+
+  "cutoffs": {
+    "target_recall": {
+      "safety": 0.8,
+      "defect": 0.7,
+      "counterfeit": 0.7,
+      "basis": "DESIGN CHOICE, frozen before the run. The per-category cutoff is the largest threshold still achieving this recall on the VALIDATION split. Safety is set higher because a missed hazard is worse than a false alarm the reader can dismiss after seeing the highlighted sentence. Zaman et al.'s threshold of 10,000 is explicitly NOT used; their own paper calls it arbitrary."
+    },
+    "high_confidence_target_precision": {
+      "value": 0.9,
+      "floor": 0.8,
+      "basis": "DESIGN CHOICE. The high-confidence cutoff is the smallest threshold reaching 0.90 validation precision. If 0.90 is unreachable, the achieved value is recorded and the artifact fails its gates below the 0.80 floor, because the alert override shows a safety warning with no human in the loop."
+    }
+  },
+
+  "flags": {
+    "absolute_floor": {
+      "counterfeit": 0.02,
+      "defect": 0.03,
+      "basis": "PLACEHOLDER. A category is flagged when its Wilson lower bound exceeds BOTH the product-type baseline and this floor. The floor exists because a uniformly bad product type raises its own baseline until nothing is flagged - the known weakness of a peer-relative comparison. Values to be set from the observed rate distribution once the reference corpus exists, and their effect reported in the sensitivity analysis."
+    }
+  },
+
+  "reference_baselines": {
+    "minimum_products_per_type": {
+      "value": 20,
+      "basis": "PLACEHOLDER. Below this a product type is not emitted and products of that type fall to the no_baseline state rather than being compared against a rate built from too few peers."
+    },
+    "minimum_reviews_per_type": {
+      "value": 3000,
+      "basis": "PLACEHOLDER. As above, for total reviews across the type."
+    },
+    "likelihood_percentiles": {
+      "low_to_medium": 75,
+      "medium_to_high": 90,
+      "basis": "DESIGN CHOICE. Likelihood bin edges are percentiles of the per-product Wilson lower bound WITHIN a product type, so a bin means 'unusual relative to peers'. Note this is a different statistic from the flag baseline, which is a pooled rate; the two answer different questions and the methods must say so."
+    },
+    "leave_one_product_out": {
+      "value": true,
+      "basis": "REQUIRED, not tunable. When the scored product is itself in the reference corpus its own reviews are excluded from its type's baseline, or it silently sets its own bar."
+    },
+    "fallback_likelihood_bins": {
+      "safety": {"low": [0.0, 0.005], "medium": [0.005, 0.02], "high": [0.02, 1.0]},
+      "basis": "PLACEHOLDER, used ONLY when no reference baseline exists for the product type. Anchored loosely to the ~0.6% hazard-review prevalence Zaman et al. observed, so 'low' is around or below the published background rate. Whenever these are used the summary records likelihood_basis='absolute_fallback' rather than 'percentile_of_product_type', so a reader can tell which bin definition produced the tier."
+    }
+  },
+
+  "coverage": {
+    "completeness_tolerance": {
+      "value": 0.05,
+      "basis": "PLACEHOLDER. A scrape is marked partial when any star bucket is short of the listing's stated count by more than this fraction. A partial scrape forces insufficient_evidence, because a missing slice of low-star reviews is exactly where hazards live. Cannot detect reviews the platform itself hides."
+    },
+    "hard_review_ceiling": {
+      "value": 5000,
+      "basis": "DESIGN CHOICE. Upper bound on reviews collected for one product, so a single very large listing cannot exhaust the batch timeout. Hitting it sets scrape_completeness to partial."
+    },
+    "per_product_time_budget_seconds": {
+      "value": 480,
+      "basis": "DESIGN CHOICE. As above, in wall-clock terms."
+    }
+  },
+
+  "review_quality": {
+    "enabled": {
+      "value": false,
+      "basis": "SHIPS DISABLED. The 'reviews may be unreliable' verdict state is implemented but switched off until it is validated against human judgement. An unvalidated fake-review detector making a user-visible claim is a bigger risk than the state being absent."
+    },
+    "duplicate_ratio_threshold": 0.25,
+    "generic_ratio_threshold": 0.4
+  },
+
+  "sentiment": {
+    "used_for_risk_decisions": {
+      "value": false,
+      "basis": "REQUIRED, not tunable. Sentiment no longer feeds any badge. It is retained only for the displayed counts and for ranking recommended alternatives by the lower bound of the positive ratio. Keeping sentiment out of the risk path is what removes the double counting in the old 30/70 formula."
+    }
+  }
+}

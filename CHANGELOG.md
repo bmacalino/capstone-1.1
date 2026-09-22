@@ -9,6 +9,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- An isolated marketplace-v2 research pipeline with product-grouped evaluation,
+  validation-tuned risk-category thresholds, explicit deployment gates, and a
+  safe inference wrapper that rejects unqualified artifacts by default.
 - A reproducible FiReCS training pipeline that audits duplicates and cross-split
   overlap, compares four supervised candidates, and records held-out metrics.
 - A compact trained word/character TF-IDF sentiment artifact with probabilities
@@ -21,6 +24,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- Production analysis now uses the trained sentiment and binary-risk heads for
+  review decisions while retaining the manuscript's 30% negative-review plus
+  70% detected-risk product score; severity is excluded from production output
+  and scoring.
 - Sentiment labels now use the trained FiReCS classifier for ordinary review
   text while retaining explainable VADER/Taglish overrides and product-risk
   rules for explicit cases.

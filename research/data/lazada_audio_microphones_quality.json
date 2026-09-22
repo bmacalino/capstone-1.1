@@ -1,0 +1,127 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "audio",
+  "minimum_collected_reviews": 200,
+  "products_checked": 6,
+  "status_counts": {
+    "insufficient_written_reviews": 1,
+    "not_collected": 5
+  },
+  "products": [
+    {
+      "name": "Wireless Microphones 300M Range Stable Signal High Fidelity 5G Wireless Signal Includes Receiver Batteries Accessories",
+      "link": "https://www.lazada.com.ph/products/pdp-i15454858175.html",
+      "reported_review_count": 25,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "ACE AC-1000 Professional UHF Wireless Rechargeable Microphone",
+      "link": "https://www.lazada.com.ph/products/pdp-i4340186782.html",
+      "reported_review_count": 6623,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 144,
+      "collected_by_star": {
+        "1": 40,
+        "2": 16,
+        "3": 18,
+        "4": 30,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Wireless Handheld UHF Dynamic Microphone Rechargeable 50M Range For Karaoke Home KTV Party DJ Wedding",
+      "link": "https://www.lazada.com.ph/products/pdp-i15503014196.html",
+      "reported_review_count": 1,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "【3Years Warranty】Wireless Bluetooth Microphone With 2 Microphone Work Range 100m Professional UHF Wireless Rechargeable Microphone 100% Original Plug and Play",
+      "link": "https://www.lazada.com.ph/products/pdp-i4558170277.html",
+      "reported_review_count": 673,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "wireless microphone,original j.b.l/X9 branded,Karaoke Mic,UHF wireless mic",
+      "link": "https://www.lazada.com.ph/products/pdp-i15549473071.html",
+      "reported_review_count": 47,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    },
+    {
+      "name": "【Original+24hours delivery】DM-300S Rechargeable Dual Wireless Karaoke Microphone Heavy Duty with Receiver Box & Rechargeable Battery Set",
+      "link": "https://www.lazada.com.ph/products/pdp-i15493719604.html",
+      "reported_review_count": 21,
+      "stratum": "audio",
+      "status": "not_collected",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "not_qualified",
+      "stop_reason": "not_qualified",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T10:10:34"
+}

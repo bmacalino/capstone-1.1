@@ -1,0 +1,25 @@
+{
+  "model_version": "defaketive-risk-scoring-v1-0.1.0-candidate",
+  "evaluation_policy": "Five-fold stratified product-group out-of-fold evaluation on development data only.",
+  "risk_detection": {
+    "macro_f1": 0.7899363490034156,
+    "risk_recall": 0.8488372093023255,
+    "brier_score": 0.15272694342444673,
+    "expected_calibration_error_10_bins": 0.033932949789130216,
+    "threshold": 0.4750000000000001
+  },
+  "severity": {
+    "weighted_kappa": 0.6539931603299135,
+    "macro_f1": 0.7361987556333447,
+    "mean_absolute_error": 0.2558139534883721,
+    "threshold_ge2": 0.65,
+    "threshold_ge3": 0.375
+  },
+  "development_gates": {
+    "risk_recall_at_least_0_80": true,
+    "risk_macro_f1_at_least_0_75": true
+  },
+  "artifact": "sentiment-analysis\\models\\risk_scoring_v1_candidate.joblib",
+  "qualified_for_integration": false,
+  "next_gate": "Evaluate once on a newly frozen product-disjoint locked test set."
+}

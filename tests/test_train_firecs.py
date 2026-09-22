@@ -1,4 +1,5 @@
 import csv
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +10,7 @@ from train_firecs import (
     candidate_factories,
     load_sentitaglish,
     load_tagasenti,
+    load_lazada_filipino,
     normalized_text,
 )
 
@@ -43,6 +45,7 @@ class TestTrainFiReCS(unittest.TestCase):
                 "character_linear_svc",
                 "word_character_linear_svc",
                 "word_character_logistic_regression",
+                "word_character_logistic_regression_unweighted",
             },
         )
 
@@ -91,6 +94,32 @@ class TestTrainFiReCS(unittest.TestCase):
         self.assertTrue(
             all(record["source"] == "tagasenti_mixed_provenance" for record in records)
         )
+
+    def test_lazada_filipino_loader_maps_rating_bands(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "reviews.json"
+            path.write_text(
+                json.dumps(
+                    [
+                        {"review": "bad", "rating": 1},
+                        {"review": "still bad", "rating": 2},
+                        {"review": "okay", "rating": 3},
+                        {"review": "good", "rating": 4},
+                        {"review": "great", "rating": 5},
+                        {"review": "invalid", "rating": 9},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            records, audit = load_lazada_filipino(path)
+
+        self.assertEqual(
+            [record["label"] for record in records],
+            ["negative", "negative", "neutral", "positive", "positive"],
+        )
+        self.assertEqual(audit["invalid_rows_excluded"], 1)
+        self.assertEqual(audit["license"], "unknown")
 
 
 if __name__ == "__main__":

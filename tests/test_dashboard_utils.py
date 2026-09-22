@@ -246,10 +246,64 @@ class TestDashboardUtils(unittest.TestCase):
         self.assertAlmostEqual(breakdown["defect_points"], 7.0)
         self.assertAlmostEqual(breakdown["total_points"], 13.0)
 
+    def test_manuscript_breakdown_uses_sampling_weighted_ratios(self):
+        product = {"sentiment_summary": {
+            "review_count": 2,
+            "sentiment_counts": {"positive": 1, "uncertain": 0, "negative": 1},
+            "sentiment_ratios": {"positive": .75, "uncertain": 0, "negative": .25},
+            "risk_review_count": 1,
+            "keyword_failure_rate": .25,
+            "risk_score": 25,
+            "risk_score_method": "manuscript_vader_keyword_wsm",
+        }}
+        breakdown = weighted_risk_breakdown(product)
+        self.assertEqual(breakdown["method"], "manuscript_vader_keyword_wsm")
+        self.assertAlmostEqual(breakdown["negative_ratio"], .25)
+        self.assertAlmostEqual(breakdown["defect_review_ratio"], .25)
+        self.assertAlmostEqual(breakdown["total_points"], 25.0)
+
+    def test_hybrid_manuscript_breakdown_uses_sampling_weighted_ratios(self):
+        product = {"sentiment_summary": {
+            "review_count": 4,
+            "sentiment_counts": {"positive": 2, "uncertain": 1, "negative": 1},
+            "sentiment_ratios": {"positive": .625, "uncertain": .125, "negative": .25},
+            "risk_review_count": 2,
+            "keyword_failure_rate": .375,
+            "risk_score": 33.75,
+            "risk_score_method": "hybrid_classifier_manuscript_wsm",
+        }}
+        breakdown = weighted_risk_breakdown(product)
+        self.assertEqual(breakdown["method"], "hybrid_classifier_manuscript_wsm")
+        self.assertAlmostEqual(breakdown["negative_ratio"], .25)
+        self.assertAlmostEqual(breakdown["defect_review_ratio"], .375)
+        self.assertAlmostEqual(breakdown["total_points"], 33.75)
+
     def test_weighted_risk_breakdown_handles_no_reviews(self):
         breakdown = weighted_risk_breakdown({})
         self.assertEqual(breakdown["review_count"], 0)
         self.assertEqual(breakdown["total_points"], 0.0)
+
+    def test_weighted_risk_breakdown_supports_confidence_adjusted_scores(self):
+        product = {
+            "sentiment_summary": {
+                "review_count": 10,
+                "sentiment_counts": {"positive": 4, "uncertain": 3, "negative": 3},
+                "risk_review_count": 4,
+                "raw_risk_score": 52.0,
+                "evidence_confidence": 0.25,
+                "risk_prior": 0.15,
+                "risk_score": 24.25,
+                "risk_score_method": "confidence_severity_frequency_bayesian",
+                "average_risk_probability": 0.61,
+                "average_risk_severity": 2.25,
+            }
+        }
+        breakdown = weighted_risk_breakdown(product)
+        self.assertEqual(breakdown["method"], "confidence_severity_frequency_bayesian")
+        self.assertEqual(breakdown["risk_reviews"], 4)
+        self.assertAlmostEqual(breakdown["raw_risk_points"], 52.0)
+        self.assertAlmostEqual(breakdown["prior_points"], 11.25)
+        self.assertAlmostEqual(breakdown["total_points"], 24.25)
 
 
 if __name__ == "__main__":

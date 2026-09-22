@@ -1,0 +1,2 @@
+product_id,platform,stratum,review_id,review_text,annotator_id,sentiment_label,risk_detected,risk_category,risk_severity,negated,adjudicated_label
+example-product,lazada,audio,example-review-1,Example review text,A01,negative,true,performance,3,false,

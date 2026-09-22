@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "eligible": 1
+  },
+  "products": [
+    {
+      "name": "Terios T3 / X3 Wireless Bluetooth Joystick Controller with Phone Holder for Smartphone, Windows PC",
+      "link": "https://www.lazada.com.ph/products/pdp-i1994197909-s16736135959.html",
+      "reported_review_count": 3080,
+      "stratum": "mobile_accessories",
+      "status": "eligible",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 109,
+      "collected_by_star": {
+        "1": 40,
+        "2": 11,
+        "3": 28,
+        "4": 30,
+        "5": 0
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": "Lazada did not return verified 5-star reviews; balanced collection stopped to prevent mislabeled data"
+    }
+  ],
+  "generated_at": "2026-09-11T08:46:04"
+}

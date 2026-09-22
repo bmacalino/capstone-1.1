@@ -1,0 +1,962 @@
+"""Build the Round 1 sentence-labelling queue for the three annotators.
+
+Pulls candidate reviews from every source the project owns, splits them into
+sentences with the frozen segmenter, and writes one worksheet per annotator
+in the column format that research/HAZARD_SENTENCE_TAGGING_GUIDE.md describes.
+
+The sampling design is the point of this script, so it is stated here rather
+than buried:
+
+  seed_hit    reviews matching research/lexicons/mining_seeds_v1.tsv.
+              Enrichment only. Safety and counterfeit reports are roughly
+              0.6% of reviews, so a purely random pool would yield almost no
+              positives inside any budget a three-person team can afford.
+  low_star    1-3 star reviews (or FiReCS negative) that did NOT match a
+              seed. This is the anti-circularity stratum: it finds hazards
+              phrased in words the seed list does not contain, which is the
+              recall the seed list cannot measure about itself.
+  random_all  a uniform random sample across every star and every source.
+              This is the ONLY stratum on which prevalence and recall may be
+              reported. Rates measured on the other two are inflated by
+              construction.
+
+Every row carries its stratum and a sampling weight so the three can be
+recombined into an unbiased estimate later. The worksheets given to the
+annotators deliberately omit both columns: an annotator who can see that a
+row was selected for containing "nasunog" is no longer labelling blind.
+
+Usage:
+    python research/build_labelling_queue.py --annotators AAA,BBB,CCC
+    python research/build_labelling_queue.py --dry-run
+    python research/build_labelling_queue.py --shopee-hf path/to/shopee.csv
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+import random
+import re
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Iterable, Iterator, Sequence
+
+ROOT = Path(__file__).resolve().parents[1]
+SENTIMENT_ROOT = ROOT / "sentiment-analysis"
+for _path in (ROOT, SENTIMENT_ROOT):
+    if str(_path) not in sys.path:
+        sys.path.insert(0, str(_path))
+
+from defaketive_sentiment.text_norm import (  # noqa: E402
+    SEGMENTER_VERSION,
+    normalize_text,
+    segment_sentences,
+)
+
+QUEUE_VERSION = "labelling-queue-1.0.0"
+SEEDS_VERSION = "mining-seeds-1.0.0"
+GUIDE_VERSION = "1.0"
+
+SEEDS_PATH = ROOT / "research" / "lexicons" / "mining_seeds_v1.tsv"
+OUTPUT_DIR = ROOT / "outputs" / "labelling_queue_round_1"
+
+SCRAPE_DIRS = (ROOT / "research" / "data", ROOT)
+SCRAPE_GLOBS = ("lazada_*.json", "temu_*.json", "shopee_*.json")
+
+FIRECS_DIR = ROOT.parent
+FIRECS_FILES = ("FiReCS_train_set.csv", "FiReCS_test_set.csv")
+FIRECS_NEGATIVE_LABELS = {"0", "0.0", "negative"}
+
+# Anything whose text appears in one of these has already been through an
+# annotation round. Re-labelling it would contaminate a frozen split.
+EXCLUSION_FILES = (
+    ROOT / "outputs" / "lazada_gold_test_v1" / "lazada_round1_all_adjudicated.csv",
+    ROOT / "outputs" / "lazada_gold_test_v1" / "lazada_round1_gold_test_v1.csv",
+    ROOT / "FiReCS_Risk_Annotation_Round_1_Annotated.csv",
+    ROOT / "complete_manual_marketplace_reviews.csv",
+)
+TEXT_COLUMNS = ("review_text", "review", "text", "content")
+
+STRATA = ("seed_hit", "low_star", "random_all")
+DEFAULT_BUDGET = {"seed_hit": 380, "low_star": 240, "random_all": 280}
+DEFAULT_BLIND_RATE = 0.15
+DEFAULT_PRACTICE_SIZE = 30
+DEFAULT_SEED = 20260922
+
+# Most severe first: when a sentence matches two safety subtypes the guide
+# says to record the more severe one, and hazard_taxonomy orders them this way.
+SUBTYPE_PRIORITY = (
+    "fire_explosion_swelling",
+    "shock_spark_short",
+    "overheat_burn",
+    "smoke_smell",
+    "safety_unspecified",
+)
+
+# Columns the annotators actually see. Order matters: it is the reading order
+# in the spreadsheet, so the sentence sits next to the boxes to be filled.
+WORKSHEET_FIELDS = [
+    "row_id",
+    "review_id",
+    "rating",
+    "sentence_index",
+    "sentence_text",
+    "review_text_raw",
+    "is_blind",
+    "llm_safety",
+    "llm_defect",
+    "llm_counterfeit",
+    "llm_hazard_subtype",
+    "verifier_id",
+    "verifier_action",
+    "human_safety",
+    "human_defect",
+    "human_counterfeit",
+    "human_hazard_subtype",
+    "human_negated",
+    "human_notes",
+    "seconds_spent",
+]
+
+# The master keeps everything, including the columns withheld above.
+MASTER_FIELDS = WORKSHEET_FIELDS + [
+    "cohort",
+    "stratum",
+    "sampling_weight",
+    "source_file",
+    "product_id",
+    "product_name",
+    "category",
+    "matched_terms",
+    "blocked_terms",
+    "assigned_to",
+    "adjudicator",
+    "is_practice",
+]
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def text_key(value: str) -> str:
+    """Identity of a review for de-duplication and exclusion checks."""
+    normalized = re.sub(r"\s+", " ", normalize_text(value or "")).strip().casefold()
+    return hashlib.sha1(normalized.encode("utf-8")).hexdigest()
+
+
+# --------------------------------------------------------------------------
+# seeds
+# --------------------------------------------------------------------------
+
+
+def _normalized_term(term: str) -> str:
+    """Put a seed term through the same normalizer the review text goes through.
+
+    The Taglish normalizer strips affixes, so "nasunog" becomes "sunog" and
+    "umiinit" becomes "init" in the text being searched. A seed term written
+    the way a person writes it would therefore never match. Normalizing the
+    term at load time keeps the TSV readable by the annotators and correct at
+    the same time.
+    """
+    return re.sub(r"\s+", " ", normalize_text(term)).strip().casefold()
+
+
+def load_seeds(path: Path = SEEDS_PATH) -> tuple[list[dict[str, str]], list[str]]:
+    """Return (seed rows, block phrases), normalized for matching."""
+    seeds: list[dict[str, str]] = []
+    blocks: list[str] = []
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            line = line.rstrip("\n")
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            parts = line.split("\t")
+            if len(parts) < 4 or parts[0] == "term":
+                continue
+            term, category, subtype, language = (p.strip() for p in parts[:4])
+            match_form = _normalized_term(term)
+            if not match_form:
+                continue
+            if category == "BLOCK":
+                blocks.append(match_form)
+                continue
+            seeds.append(
+                {
+                    "term": term.casefold(),
+                    "match": match_form,
+                    "category": category,
+                    "subtype": subtype,
+                    "language": language,
+                }
+            )
+    if not seeds:
+        raise ValueError(f"No seed terms loaded from {path}")
+    # Affix stripping collapses some terms onto each other ("nasunog" and
+    # "masunog" both become "sunog"). Keep one entry per match form.
+    deduped: dict[str, dict[str, str]] = {}
+    for row in seeds:
+        deduped.setdefault(row["match"], row)
+    seeds = list(deduped.values())
+    # Longest first so "sobrang init" wins over "init" when both could fire.
+    seeds.sort(key=lambda row: len(row["match"]), reverse=True)
+    blocks = sorted(set(blocks), key=len, reverse=True)
+    return seeds, blocks
+
+
+def _boundary_pattern(term: str) -> re.Pattern[str]:
+    return re.compile(rf"(?<!\w){re.escape(term)}(?!\w)")
+
+
+class SeedMatcher:
+    """Matches seed terms on normalized text, after masking false friends."""
+
+    def __init__(self, seeds: Sequence[dict[str, str]], blocks: Sequence[str]) -> None:
+        self._seeds = [(row, _boundary_pattern(row["match"])) for row in seeds]
+        self._blocks = [(phrase, _boundary_pattern(phrase)) for phrase in blocks]
+
+    def mask_blocked(self, normalized: str) -> tuple[str, list[str]]:
+        hits: list[str] = []
+        masked = normalized
+        for phrase, pattern in self._blocks:
+            if pattern.search(masked):
+                hits.append(phrase)
+                # Replace with spaces so offsets stay put and nothing new joins up.
+                masked = pattern.sub(lambda match: " " * len(match.group(0)), masked)
+        return masked, hits
+
+    def match(self, text: str) -> dict[str, Any]:
+        normalized = _normalized_term(text or "")
+        masked, blocked = self.mask_blocked(normalized)
+        categories: set[str] = set()
+        subtypes: set[str] = set()
+        terms: list[str] = []
+        for row, pattern in self._seeds:
+            if pattern.search(masked):
+                terms.append(row["term"])
+                categories.add(row["category"])
+                if row["category"] == "safety" and row["subtype"] != "-":
+                    subtypes.add(row["subtype"])
+        subtype = ""
+        for candidate in SUBTYPE_PRIORITY:
+            if candidate in subtypes:
+                subtype = candidate
+                break
+        if "safety" in categories and not subtype:
+            subtype = "safety_unspecified"
+        return {
+            "categories": categories,
+            "subtype": subtype,
+            "terms": terms,
+            "blocked": blocked,
+        }
+
+
+# --------------------------------------------------------------------------
+# sources
+# --------------------------------------------------------------------------
+
+
+def _product_id(product: dict[str, Any]) -> str:
+    link = str(product.get("link") or "")
+    match = re.search(r"[-/]i(\d{6,})", link)
+    if match:
+        return match.group(1)
+    if link:
+        return hashlib.sha1(link.encode("utf-8")).hexdigest()[:12]
+    return ""
+
+
+def _iter_scrape_files() -> Iterator[Path]:
+    seen: set[Path] = set()
+    for directory in SCRAPE_DIRS:
+        if not directory.is_dir():
+            continue
+        for pattern in SCRAPE_GLOBS:
+            for path in sorted(directory.glob(pattern)):
+                resolved = path.resolve()
+                if resolved in seen or not path.is_file():
+                    continue
+                seen.add(resolved)
+                yield path
+
+
+def load_own_scrapes() -> tuple[list[dict[str, Any]], list[Path]]:
+    rows: list[dict[str, Any]] = []
+    used: list[Path] = []
+    for path in _iter_scrape_files():
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError, OSError):
+            continue
+        if not isinstance(payload, list):
+            continue
+        found = False
+        for product in payload:
+            if not isinstance(product, dict):
+                continue
+            comments = product.get("comments") or []
+            if not isinstance(comments, list) or not comments:
+                continue
+            product_id = _product_id(product)
+            research = product.get("research") or {}
+            category = ""
+            if isinstance(research, dict):
+                category = str(research.get("stratum") or "")
+            for comment in comments:
+                if not isinstance(comment, dict):
+                    continue
+                content = str(comment.get("content") or "").strip()
+                if not content:
+                    continue
+                found = True
+                rating_raw = comment.get("rating")
+                try:
+                    rating: int | str = int(rating_raw)
+                except (TypeError, ValueError):
+                    rating = ""
+                rows.append(
+                    {
+                        "cohort": "own_scrape",
+                        "platform": str(product.get("platform") or ""),
+                        "source_file": path.name,
+                        "product_id": product_id,
+                        "product_name": str(product.get("name") or ""),
+                        "category": category,
+                        "rating": rating,
+                        "review_text": content,
+                    }
+                )
+        if found:
+            used.append(path)
+    return rows, used
+
+
+def load_firecs() -> tuple[list[dict[str, Any]], list[Path]]:
+    rows: list[dict[str, Any]] = []
+    used: list[Path] = []
+    for name in FIRECS_FILES:
+        path = FIRECS_DIR / name
+        if not path.is_file():
+            continue
+        used.append(path)
+        with path.open(encoding="utf-8", errors="replace", newline="") as handle:
+            for record in csv.DictReader(handle):
+                text = str(record.get("review") or "").strip()
+                if not text:
+                    continue
+                label = str(record.get("label") or "").strip()
+                rows.append(
+                    {
+                        "cohort": "firecs",
+                        "platform": "",
+                        "source_file": name,
+                        # FiReCS ships no product identity, so these rows can
+                        # train the sentence tagger but can never take part in
+                        # a product-level rate.
+                        "product_id": "",
+                        "product_name": "",
+                        "category": "",
+                        "rating": "",
+                        "sentiment_label": label,
+                        "review_text": text,
+                    }
+                )
+    return rows, used
+
+
+def load_shopee_hf(path: Path | None) -> tuple[list[dict[str, Any]], list[Path]]:
+    """Load a local copy of scaredmeow/shopee-reviews-tl-stars (columns text,label)."""
+    if path is None:
+        return [], []
+    if not path.is_file():
+        raise FileNotFoundError(f"--shopee-hf given but not found: {path}")
+    rows: list[dict[str, Any]] = []
+    with path.open(encoding="utf-8", errors="replace", newline="") as handle:
+        for record in csv.DictReader(handle):
+            text = str(record.get("text") or record.get("review") or "").strip()
+            if not text:
+                continue
+            label = str(record.get("label") or "").strip()
+            try:
+                # The HF labels are 0-4 for 1-5 stars.
+                rating: int | str = int(float(label)) + 1
+            except (TypeError, ValueError):
+                rating = ""
+            rows.append(
+                {
+                    "cohort": "shopee_hf",
+                    "platform": "shopee",
+                    "source_file": path.name,
+                    "product_id": "",
+                    "product_name": "",
+                    "category": "",
+                    "rating": rating,
+                    "review_text": text,
+                }
+            )
+    return rows, [path]
+
+
+def load_exclusions() -> tuple[set[str], list[Path]]:
+    keys: set[str] = set()
+    used: list[Path] = []
+    for path in EXCLUSION_FILES:
+        if not path.is_file():
+            continue
+        used.append(path)
+        with path.open(encoding="utf-8-sig", errors="replace", newline="") as handle:
+            reader = csv.DictReader(handle)
+            columns = [c for c in (reader.fieldnames or []) if c in TEXT_COLUMNS]
+            if not columns:
+                continue
+            for record in reader:
+                for column in columns:
+                    value = str(record.get(column) or "").strip()
+                    if value:
+                        keys.add(text_key(value))
+    return keys, used
+
+
+# --------------------------------------------------------------------------
+# pool assembly
+# --------------------------------------------------------------------------
+
+
+def is_low_star(row: dict[str, Any]) -> bool:
+    rating = row.get("rating")
+    if isinstance(rating, int) and 1 <= rating <= 3:
+        return True
+    return str(row.get("sentiment_label") or "") in FIRECS_NEGATIVE_LABELS
+
+
+def build_pool(
+    rows: Iterable[dict[str, Any]],
+    matcher: SeedMatcher,
+    excluded: set[str],
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """De-duplicate, drop excluded rows, and assign every survivor a stratum."""
+    pool: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    counts = {"total": 0, "empty": 0, "duplicate": 0, "excluded": 0}
+    for row in rows:
+        counts["total"] += 1
+        text = str(row.get("review_text") or "").strip()
+        if len(text) < 3 or not re.search(r"[A-Za-z]", text):
+            counts["empty"] += 1
+            continue
+        key = text_key(text)
+        if key in excluded:
+            counts["excluded"] += 1
+            continue
+        if key in seen:
+            counts["duplicate"] += 1
+            continue
+        seen.add(key)
+        hit = matcher.match(text)
+        record = dict(row)
+        record["review_text"] = text
+        record["text_key"] = key
+        record["review_id"] = f"{row['cohort'][:4]}-{key[:12]}"
+        record["matched_terms"] = hit["terms"]
+        record["blocked_terms"] = hit["blocked"]
+        record["seed_categories"] = hit["categories"]
+        record["seed_subtype"] = hit["subtype"]
+        if hit["terms"]:
+            record["stratum"] = "seed_hit"
+        elif is_low_star(record):
+            record["stratum"] = "low_star"
+        else:
+            record["stratum"] = "random_all"
+        pool.append(record)
+    return pool, counts
+
+
+def sentences_for(text: str) -> list[str]:
+    out = []
+    for sentence in segment_sentences(text):
+        cleaned = sentence.strip()
+        if len(cleaned) < 3 or not re.search(r"[A-Za-z]", cleaned):
+            continue
+        out.append(cleaned)
+    return out
+
+
+SEED_CATEGORY_ORDER = ("safety", "counterfeit", "defect")
+
+
+def _seed_band(row: dict[str, Any]) -> str:
+    """Which category quota a seed-hit review is drawn against.
+
+    A review matching both safety and defect is counted against safety, the
+    rarer of the two. It still carries both labels for the annotator.
+    """
+    categories = row.get("seed_categories") or set()
+    for category in SEED_CATEGORY_ORDER:
+        if category in categories:
+            return category
+    return "defect"
+
+
+def _take_until_budget(
+    order: list[dict[str, Any]], sentence_budget: int
+) -> tuple[list[dict[str, Any]], int]:
+    """Take whole reviews in the given order until the budget is reached."""
+    chosen: list[dict[str, Any]] = []
+    used = 0
+    for row in order:
+        sentences = sentences_for(row["review_text"])
+        if not sentences:
+            continue
+        if used and used + len(sentences) > sentence_budget:
+            continue
+        row = dict(row)
+        row["sentences"] = sentences
+        chosen.append(row)
+        used += len(sentences)
+        if used >= sentence_budget:
+            break
+    return chosen, used
+
+
+def sample_stratum(
+    population: list[dict[str, Any]],
+    sentence_budget: int,
+    rng: random.Random,
+    prioritise_rare: bool = False,
+) -> list[dict[str, Any]]:
+    """Take whole reviews at random until the sentence budget is reached.
+
+    Reviews are never split across the budget line: a half-labelled review
+    cannot contribute to a per-review rollup.
+
+    With prioritise_rare, each of safety, counterfeit and defect gets its own
+    share of the budget rather than competing for it. Equal shares, not
+    proportional ones: this pool runs about 1,500 defect candidates to 87
+    counterfeit and 67 safety, so a proportional draw would hand the
+    annotators a queue of broken chargers and almost no hazards. Whatever a
+    category cannot fill rolls over to the others, so the budget is still
+    spent in full. The draw remains random inside each category.
+
+    This is a stratified draw and the manifest says so. Prevalence must not be
+    read off it.
+    """
+    if sentence_budget <= 0 or not population:
+        return []
+    order = list(population)
+    rng.shuffle(order)
+    if not prioritise_rare:
+        return _take_until_budget(order, sentence_budget)[0]
+
+    bands: dict[str, list[dict[str, Any]]] = {c: [] for c in SEED_CATEGORY_ORDER}
+    for row in order:
+        bands[_seed_band(row)].append(row)
+
+    chosen: list[dict[str, Any]] = []
+    taken_ids: set[str] = set()
+    remaining = sentence_budget
+    for index, category in enumerate(SEED_CATEGORY_ORDER):
+        left = len(SEED_CATEGORY_ORDER) - index
+        share = remaining if left == 1 else remaining // left
+        picked, used = _take_until_budget(
+            [r for r in bands[category] if r["review_id"] not in taken_ids], share
+        )
+        chosen.extend(picked)
+        taken_ids.update(r["review_id"] for r in picked)
+        remaining -= used
+        if remaining <= 0:
+            break
+    return chosen
+
+
+def prelabel(sentence: str, matcher: SeedMatcher) -> dict[str, str]:
+    """The 'computer guess' the annotators check.
+
+    This is the seed list applied at sentence level, and nothing more. It is
+    recorded as prelabel_source in the manifest so no reader mistakes it for
+    a trained model's prediction.
+    """
+    hit = matcher.match(sentence)
+    categories = hit["categories"]
+    return {
+        "llm_safety": "yes" if "safety" in categories else "no",
+        "llm_defect": "yes" if "defect" in categories else "no",
+        "llm_counterfeit": "yes" if "counterfeit" in categories else "no",
+        "llm_hazard_subtype": hit["subtype"],
+        "matched_terms": "|".join(hit["terms"]),
+        "blocked_terms": "|".join(hit["blocked"]),
+    }
+
+
+def blank_worksheet_fields() -> dict[str, str]:
+    return {
+        "verifier_id": "",
+        "verifier_action": "",
+        "human_safety": "",
+        "human_defect": "",
+        "human_counterfeit": "",
+        "human_hazard_subtype": "",
+        "human_negated": "",
+        "human_notes": "",
+        "seconds_spent": "",
+    }
+
+
+def expand_rows(
+    sampled: dict[str, list[dict[str, Any]]],
+    weights: dict[str, float],
+    matcher: SeedMatcher,
+    rng: random.Random,
+    blind_rate: float,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for stratum in STRATA:
+        for review in sampled.get(stratum, []):
+            for index, sentence in enumerate(review["sentences"], start=1):
+                guess = prelabel(sentence, matcher)
+                is_blind = rng.random() < blind_rate
+                row: dict[str, Any] = {
+                    "row_id": "",
+                    "review_id": review["review_id"],
+                    "rating": review.get("rating", ""),
+                    "sentence_index": index,
+                    "sentence_text": sentence,
+                    "review_text_raw": review["review_text"],
+                    "is_blind": "yes" if is_blind else "no",
+                    "llm_safety": "" if is_blind else guess["llm_safety"],
+                    "llm_defect": "" if is_blind else guess["llm_defect"],
+                    "llm_counterfeit": "" if is_blind else guess["llm_counterfeit"],
+                    "llm_hazard_subtype": "" if is_blind else guess["llm_hazard_subtype"],
+                    "cohort": review["cohort"],
+                    "stratum": stratum,
+                    "sampling_weight": f"{weights.get(stratum, 0.0):.4f}",
+                    "source_file": review.get("source_file", ""),
+                    "product_id": review.get("product_id", ""),
+                    "product_name": review.get("product_name", ""),
+                    "category": review.get("category", ""),
+                    "matched_terms": guess["matched_terms"],
+                    "blocked_terms": guess["blocked_terms"],
+                    "assigned_to": "",
+                    "adjudicator": "",
+                    "is_practice": "no",
+                }
+                row.update(blank_worksheet_fields())
+                rows.append(row)
+    return rows
+
+
+def build_practice_set(
+    pool: list[dict[str, Any]],
+    used_review_ids: set[str],
+    matcher: SeedMatcher,
+    size: int,
+    rng: random.Random,
+    annotators: Sequence[str],
+) -> list[dict[str, Any]]:
+    """A shared warm-up set all three label together before starting.
+
+    Drawn from the pool directly rather than carved out of the queue, and
+    deliberately over-weighted towards false friends: a sentence where a
+    hazard word appears and there is no hazard. Those are where annotators
+    disagree, and disagreeing over thirty sentences is cheaper than
+    disagreeing over six hundred.
+
+    Practice reviews are taken from outside the queue, so nothing gets
+    labelled twice under two different protocols.
+    """
+    false_friends: list[tuple[dict[str, Any], int, str]] = []
+    positives: list[tuple[dict[str, Any], int, str]] = []
+    plain: list[tuple[dict[str, Any], int, str]] = []
+
+    candidates = [r for r in pool if r["review_id"] not in used_review_ids]
+    rng.shuffle(candidates)
+    for review in candidates:
+        if len(false_friends) >= size and len(positives) >= size and len(plain) >= size:
+            break
+        for index, sentence in enumerate(sentences_for(review["review_text"]), start=1):
+            hit = matcher.match(sentence)
+            entry = (review, index, sentence)
+            if hit["blocked"]:
+                false_friends.append(entry)
+            elif hit["categories"]:
+                positives.append(entry)
+            elif len(sentence) > 20:
+                plain.append(entry)
+
+    wanted_friends = min(len(false_friends), size // 3)
+    wanted_positives = min(len(positives), size // 2)
+    picked = false_friends[:wanted_friends] + positives[:wanted_positives]
+    picked += plain[: max(0, size - len(picked))]
+    picked = picked[:size]
+
+    rows: list[dict[str, Any]] = []
+    for order, (review, index, sentence) in enumerate(picked, start=1):
+        guess = prelabel(sentence, matcher)
+        row: dict[str, Any] = {
+            "row_id": f"p1-{order:03d}",
+            "review_id": review["review_id"],
+            "rating": review.get("rating", ""),
+            "sentence_index": index,
+            "sentence_text": sentence,
+            "review_text_raw": review["review_text"],
+            "is_blind": "no",
+            "llm_safety": guess["llm_safety"],
+            "llm_defect": guess["llm_defect"],
+            "llm_counterfeit": guess["llm_counterfeit"],
+            "llm_hazard_subtype": guess["llm_hazard_subtype"],
+            "cohort": review["cohort"],
+            "stratum": "practice",
+            "sampling_weight": "",
+            "source_file": review.get("source_file", ""),
+            "product_id": review.get("product_id", ""),
+            "product_name": review.get("product_name", ""),
+            "category": review.get("category", ""),
+            "matched_terms": guess["matched_terms"],
+            "blocked_terms": guess["blocked_terms"],
+            "assigned_to": "|".join(annotators),
+            "adjudicator": "",
+            "is_practice": "yes",
+        }
+        row.update(blank_worksheet_fields())
+        rows.append(row)
+    rng.shuffle(rows)
+    for order, row in enumerate(rows, start=1):
+        row["row_id"] = f"p1-{order:03d}"
+    return rows
+
+
+def assign(rows: list[dict[str, Any]], annotators: Sequence[str]) -> None:
+    """Two annotators per row, third adjudicates, load spread evenly."""
+    if len(annotators) < 2:
+        raise ValueError("At least two annotators are required for agreement scoring.")
+    if len(annotators) == 2:
+        pairs = [(0, 1)]
+    else:
+        pairs = [(i, (i + 1) % len(annotators)) for i in range(len(annotators))]
+    for index, row in enumerate(rows):
+        if row["is_practice"] == "yes":
+            row["assigned_to"] = "|".join(annotators)
+            row["adjudicator"] = ""
+            continue
+        first, second = pairs[index % len(pairs)]
+        assigned = [annotators[first], annotators[second]]
+        row["assigned_to"] = "|".join(assigned)
+        rest = [a for a in annotators if a not in assigned]
+        row["adjudicator"] = rest[0] if rest else ""
+
+
+def write_csv(path: Path, fields: Sequence[str], rows: Iterable[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(fields), extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--annotators",
+        default="A1,A2,A3",
+        help="Comma-separated initials, e.g. CAB,MAC,RET. Re-run with the real "
+        "initials before the team starts; the initials go in the filenames.",
+    )
+    for stratum in STRATA:
+        parser.add_argument(
+            f"--budget-{stratum.replace('_', '-')}",
+            type=int,
+            default=DEFAULT_BUDGET[stratum],
+            dest=f"budget_{stratum}",
+            help=f"Sentence budget for the {stratum} stratum.",
+        )
+    parser.add_argument("--blind-rate", type=float, default=DEFAULT_BLIND_RATE)
+    parser.add_argument("--practice-size", type=int, default=DEFAULT_PRACTICE_SIZE)
+    parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument("--shopee-hf", type=Path, default=None)
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Report what the pool looks like and write nothing.",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = parse_args(argv)
+    annotators = [a.strip() for a in args.annotators.split(",") if a.strip()]
+    rng = random.Random(args.seed)
+
+    seeds, blocks = load_seeds()
+    matcher = SeedMatcher(seeds, blocks)
+
+    scrape_rows, scrape_files = load_own_scrapes()
+    firecs_rows, firecs_files = load_firecs()
+    shopee_rows, shopee_files = load_shopee_hf(args.shopee_hf)
+    excluded, exclusion_files = load_exclusions()
+
+    pool, drops = build_pool(scrape_rows + firecs_rows + shopee_rows, matcher, excluded)
+
+    by_stratum: dict[str, list[dict[str, Any]]] = {s: [] for s in STRATA}
+    for row in pool:
+        by_stratum[row["stratum"]].append(row)
+
+    budgets = {s: getattr(args, f"budget_{s}") for s in STRATA}
+    sampled = {
+        s: sample_stratum(
+            by_stratum[s], budgets[s], rng, prioritise_rare=(s == "seed_hit")
+        )
+        for s in STRATA
+    }
+    weights = {
+        s: (len(by_stratum[s]) / len(sampled[s])) if sampled[s] else 0.0 for s in STRATA
+    }
+
+    rows = expand_rows(sampled, weights, matcher, rng, args.blind_rate)
+    rng.shuffle(rows)  # interleave strata so the source of a row is not guessable
+    assign(rows, annotators)
+    for index, row in enumerate(rows, start=1):
+        row["row_id"] = f"r1-{index:05d}"
+
+    used_review_ids = {row["review_id"] for row in rows}
+    practice = build_practice_set(
+        pool, used_review_ids, matcher, args.practice_size, rng, annotators
+    )
+
+    cohort_counts: dict[str, int] = {}
+    for row in rows:
+        cohort_counts[row["cohort"]] = cohort_counts.get(row["cohort"], 0) + 1
+
+    # How many candidate positives each category actually got. The validation
+    # plan wants 20+ per category before that category is scored separately,
+    # and safety is the one at risk, so the number belongs in the manifest
+    # where it can be checked rather than assumed.
+    def _category_totals(source: dict[str, list[dict[str, Any]]]) -> dict[str, int]:
+        totals = {"safety": 0, "counterfeit": 0, "defect": 0}
+        for stratum_rows in source.values():
+            for review in stratum_rows:
+                for category in review.get("seed_categories") or set():
+                    if category in totals:
+                        totals[category] += 1
+        return totals
+
+    pool_by_category = _category_totals(by_stratum)
+    sampled_by_category = _category_totals(sampled)
+
+    summary: dict[str, Any] = {
+        "queue_version": QUEUE_VERSION,
+        "seeds_version": SEEDS_VERSION,
+        "segmenter_version": SEGMENTER_VERSION,
+        "tagging_guide_version": GUIDE_VERSION,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "random_seed": args.seed,
+        "annotators": annotators,
+        "prelabel_source": (
+            "mining_seeds_v1 applied at sentence level. This is a keyword "
+            "baseline, NOT a trained model and NOT an LLM prediction. It exists "
+            "so annotators verify rather than label from scratch, and so the "
+            "keyword baseline's error rate is measured as a by-product."
+        ),
+        "blind_rate_requested": args.blind_rate,
+        "blind_rows": sum(1 for r in rows if r["is_blind"] == "yes"),
+        "practice_rows": len(practice),
+        "practice_composition": {
+            "false_friends": sum(1 for r in practice if r["blocked_terms"]),
+            "seed_positives": sum(
+                1 for r in practice if r["matched_terms"] and not r["blocked_terms"]
+            ),
+            "plain": sum(
+                1 for r in practice if not r["matched_terms"] and not r["blocked_terms"]
+            ),
+        },
+        "practice_note": (
+            "Drawn from reviews outside the queue so nothing is labelled twice, "
+            "and over-weighted towards false friends on purpose. All three "
+            "annotators label these, independently, then compare before "
+            "starting their own worksheet."
+        ),
+        "sentence_rows": len(rows),
+        "reviews_sampled": {s: len(sampled[s]) for s in STRATA},
+        "sentences_by_stratum": {
+            s: sum(1 for r in rows if r["stratum"] == s) for s in STRATA
+        },
+        "sentences_by_cohort": cohort_counts,
+        "pool_by_stratum": {s: len(by_stratum[s]) for s in STRATA},
+        "seed_candidates_in_pool": pool_by_category,
+        "seed_candidates_sampled": sampled_by_category,
+        "seed_candidate_note": (
+            "Candidate counts, not confirmed positives. A candidate is a review "
+            "the seed list matched; the annotators decide whether it is real. "
+            "Expect attrition - 'without overheating' and 'walang kuryente' both "
+            "match and neither is a hazard. Within seed_hit the draw is ordered "
+            "safety, then counterfeit, then defect, so the rare categories are "
+            "not crowded out; this is a stratified draw, not a simple random one."
+        ),
+        "sampling_weights": {s: round(weights[s], 4) for s in STRATA},
+        "pool_size": len(pool),
+        "dropped": drops,
+        "budgets": budgets,
+        "reportable_prevalence_stratum": "random_all",
+        "sampling_note": (
+            "seed_hit and low_star are enrichment strata. Prevalence, recall "
+            "and any per-product rate must be computed on random_all, or on "
+            "all three with sampling_weight applied. Reporting a raw rate over "
+            "the whole queue would overstate hazard prevalence several-fold."
+        ),
+        "firecs_note": (
+            "firecs and shopee_hf rows carry no product_id. They train the "
+            "sentence tagger only and must be excluded from product-level "
+            "rollups and from any product-level evaluation."
+        ),
+        "inputs": {
+            "scrape_files": len(scrape_files),
+            "firecs_files": [p.name for p in firecs_files],
+            "shopee_hf": [p.name for p in shopee_files],
+            "exclusion_files": {p.name: sha256(p) for p in exclusion_files},
+            "excluded_text_keys": len(excluded),
+            "seeds_sha256": sha256(SEEDS_PATH),
+        },
+    }
+
+    if args.dry_run:
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    out = args.output_dir
+    write_csv(out / "queue_master.csv", MASTER_FIELDS, rows)
+    write_csv(out / "practice_set.csv", WORKSHEET_FIELDS, practice)
+    write_csv(out / "practice_set_master.csv", MASTER_FIELDS, practice)
+    worksheet_rows: dict[str, int] = {}
+    for annotator in annotators:
+        assigned = [r for r in rows if annotator in r["assigned_to"].split("|")]
+        write_csv(
+            out / f"worksheet_{annotator}.csv",
+            WORKSHEET_FIELDS,
+            ({**r, "verifier_id": annotator} for r in assigned),
+        )
+        worksheet_rows[annotator] = len(assigned)
+    summary["worksheet_rows"] = worksheet_rows
+
+    (out / "manifest.json").write_text(
+        json.dumps(summary, indent=2) + "\n", encoding="utf-8"
+    )
+
+    print(f"Wrote {len(rows)} sentence rows to {out}")
+    for annotator in annotators:
+        print(f"  worksheet_{annotator}.csv: {worksheet_rows[annotator]} rows")
+    print(f"  practice_set.csv: {len(practice)} rows (all three label these together)")
+    for stratum in STRATA:
+        print(
+            f"  {stratum}: {summary['sentences_by_stratum'][stratum]} sentences "
+            f"from {len(sampled[stratum])} reviews "
+            f"(pool {len(by_stratum[stratum])}, weight {weights[stratum]:.2f})"
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

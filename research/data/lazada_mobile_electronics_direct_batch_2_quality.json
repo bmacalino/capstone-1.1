@@ -1,0 +1,51 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 100,
+  "products_checked": 2,
+  "status_counts": {
+    "eligible": 1,
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Omni Adapter / Adaptor Plug Socket (Universal, w/ Switch, Swing Type, Octopus)",
+      "link": "https://www.lazada.com.ph/products/pdp-i1676918812-s7239250812.html",
+      "reported_review_count": 2722,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 58,
+      "collected_by_star": {
+        "1": 4,
+        "2": 2,
+        "3": 1,
+        "4": 11,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Ultra Thin 8.5 inch LCD Writing Tablet Smart Notebook One Button Erase With Pen Drawing Pad LCD Electronic Writing Board Handwriting Tablet Pads Board for Kids Gift",
+      "link": "https://www.lazada.com.ph/products/pdp-i394848395-s18218268464.html",
+      "reported_review_count": 15483,
+      "stratum": "out_of_scope",
+      "status": "excluded_wrong_product_type",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 135,
+      "collected_by_star": {
+        "1": 20,
+        "2": 8,
+        "3": 27,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T08:57:35"
+}

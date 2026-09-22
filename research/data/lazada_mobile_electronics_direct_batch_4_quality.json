@@ -1,0 +1,50 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 100,
+  "products_checked": 2,
+  "status_counts": {
+    "insufficient_written_reviews": 2
+  },
+  "products": [
+    {
+      "name": "TNW M01pro Smartphone Gimbal Stabilizer 3-Axis Phone Handheld Stabilizers Gimbal with Face/Object Tracking Fill Light for Vlogging YouTube TikTok Video",
+      "link": "https://www.lazada.com.ph/products/pdp-i4258309892-s23803435507.html",
+      "reported_review_count": 606,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "review_widget_missing",
+      "stop_reason": "review_widget_missing",
+      "filter_warning": ""
+    },
+    {
+      "name": "Essager PD 60W Fast Charging Type C Cable Audio Adapters Type C to 3.5mm Jack +Type-C AUX Headphone Adapter Support Listening To Music While Charging For iPhone16 15 Samsung Huawei Xiaomi Tablet Laptop Type C+3.5mm Jack Audio Interface Charge Cable",
+      "link": "https://www.lazada.com.ph/products/pdp-i4946943100-s28840192818.html",
+      "reported_review_count": 509,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 63,
+      "collected_by_star": {
+        "1": 4,
+        "2": 6,
+        "3": 9,
+        "4": 4,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T12:53:26"
+}

@@ -1,0 +1,253 @@
+{
+  "model_version": "defaketive-multisource-tfidf-0.3.0-candidate",
+  "selected_candidate": "word_character_logistic_regression",
+  "labels": [
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "expects_normalized_text": true,
+  "trained_at": "2026-09-11T14:45:06.225129+00:00",
+  "random_state": 42,
+  "sklearn_version": "1.9.0",
+  "training_audit": {
+    "original_train_rows": 8329,
+    "clean_train_rows": 8236,
+    "duplicate_train_rows_removed": 89,
+    "conflicting_duplicate_texts": 1,
+    "cross_split_train_rows_removed": 4,
+    "test_rows": 3147,
+    "clean_train_label_counts": {
+      "negative": 2704,
+      "neutral": 2661,
+      "positive": 2871
+    },
+    "test_label_counts": {
+      "negative": 1027,
+      "neutral": 1087,
+      "positive": 1033
+    },
+    "original_source_counts": {
+      "firecs_human": 7340,
+      "lazada_rating_weak": 989
+    },
+    "clean_source_counts": {
+      "firecs_human": 7334,
+      "lazada_rating_weak": 902
+    }
+  },
+  "auxiliary_datasets": [
+    {
+      "file": "lazada_review_filipino_reviews.json",
+      "sha256": "5966de67aa8eb05f0a80f8373c042336b9e43d242b16e6af3bf6f982cab635b8",
+      "usable_rows": 989,
+      "invalid_rows_excluded": 12,
+      "annotation_method": "weak labels derived from star ratings: 1-2 negative, 3 neutral, 4-5 positive",
+      "license": "unknown",
+      "source": "https://huggingface.co/datasets/SEACrowd/lazada_review_filipino"
+    }
+  ],
+  "validation": {
+    "random_state": 42,
+    "strategy": "repeated stratified cross-validation of cleaned training data",
+    "n_splits": 3,
+    "n_repeats": 2,
+    "selection_metric": "macro_f1",
+    "candidates": {
+      "word_linear_svc": {
+        "accuracy": 0.7794,
+        "precision": 0.778,
+        "recall": 0.7779,
+        "f1": 0.7777,
+        "fold_count": 6,
+        "fit_seconds": 6.069,
+        "per_class": {
+          "negative": {
+            "precision": 0.7824,
+            "recall": 0.8132,
+            "f1": 0.7975
+          },
+          "neutral": {
+            "precision": 0.6943,
+            "recall": 0.6875,
+            "f1": 0.6909
+          },
+          "positive": {
+            "precision": 0.8571,
+            "recall": 0.8328,
+            "f1": 0.8448
+          }
+        }
+      },
+      "character_linear_svc": {
+        "accuracy": 0.784,
+        "precision": 0.7824,
+        "recall": 0.7823,
+        "f1": 0.7822,
+        "fold_count": 6,
+        "fit_seconds": 23.214,
+        "per_class": {
+          "negative": {
+            "precision": 0.7868,
+            "recall": 0.8118,
+            "f1": 0.799
+          },
+          "neutral": {
+            "precision": 0.7016,
+            "recall": 0.6945,
+            "f1": 0.698
+          },
+          "positive": {
+            "precision": 0.8587,
+            "recall": 0.8408,
+            "f1": 0.8496
+          }
+        }
+      },
+      "word_character_linear_svc": {
+        "accuracy": 0.7864,
+        "precision": 0.7845,
+        "recall": 0.7846,
+        "f1": 0.7844,
+        "fold_count": 6,
+        "fit_seconds": 27.618,
+        "per_class": {
+          "negative": {
+            "precision": 0.7914,
+            "recall": 0.8182,
+            "f1": 0.8045
+          },
+          "neutral": {
+            "precision": 0.703,
+            "recall": 0.692,
+            "f1": 0.6974
+          },
+          "positive": {
+            "precision": 0.8591,
+            "recall": 0.8438,
+            "f1": 0.8513
+          }
+        }
+      },
+      "word_character_logistic_regression": {
+        "accuracy": 0.7967,
+        "precision": 0.796,
+        "recall": 0.7954,
+        "f1": 0.7954,
+        "fold_count": 6,
+        "fit_seconds": 35.005,
+        "per_class": {
+          "negative": {
+            "precision": 0.7995,
+            "recall": 0.829,
+            "f1": 0.8139
+          },
+          "neutral": {
+            "precision": 0.7124,
+            "recall": 0.7174,
+            "f1": 0.7149
+          },
+          "positive": {
+            "precision": 0.8761,
+            "recall": 0.8398,
+            "f1": 0.8575
+          }
+        }
+      },
+      "word_character_logistic_regression_unweighted": {
+        "accuracy": 0.7965,
+        "precision": 0.7955,
+        "recall": 0.7952,
+        "f1": 0.7951,
+        "fold_count": 6,
+        "fit_seconds": 36.894,
+        "per_class": {
+          "negative": {
+            "precision": 0.8001,
+            "recall": 0.8291,
+            "f1": 0.8143
+          },
+          "neutral": {
+            "precision": 0.7143,
+            "recall": 0.714,
+            "f1": 0.7141
+          },
+          "positive": {
+            "precision": 0.8722,
+            "recall": 0.8424,
+            "f1": 0.857
+          }
+        }
+      }
+    },
+    "selected_candidate": "word_character_logistic_regression"
+  },
+  "final_fit_seconds": 7.347,
+  "test_metrics": {
+    "sample_count": 3147,
+    "labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "accuracy": 0.8097,
+    "precision": 0.8119,
+    "recall": 0.8107,
+    "f1": 0.8113,
+    "per_class": {
+      "negative": {
+        "precision": 0.8212,
+        "recall": 0.814,
+        "f1": 0.8176,
+        "support": 1027
+      },
+      "neutral": {
+        "precision": 0.734,
+        "recall": 0.7489,
+        "f1": 0.7413,
+        "support": 1087
+      },
+      "positive": {
+        "precision": 0.8804,
+        "recall": 0.8693,
+        "f1": 0.8748,
+        "support": 1033
+      }
+    },
+    "matrix": [
+      [
+        836,
+        176,
+        15
+      ],
+      [
+        166,
+        814,
+        107
+      ],
+      [
+        16,
+        119,
+        898
+      ]
+    ],
+    "error_count": 599
+  },
+  "baseline_macro_f1": 0.4818,
+  "macro_f1_delta": 0.3295,
+  "minimum_required_improvement": 0.02,
+  "incumbent_macro_f1": 0.8138,
+  "macro_f1_delta_vs_incumbent": -0.0025,
+  "minimum_incumbent_improvement": 0.0,
+  "qualified_for_integration": false,
+  "train_file": "FiReCS_train_set.csv",
+  "train_sha256": "9ca5ef80b8f93836f5966a1db8d017ebbd474e4b615468269cb0ba9d3778eb39",
+  "test_file": "FiReCS_test_set.csv",
+  "test_sha256": "6c172b8a52ad5d320d445bcf2229557de103587673582767cc59f8fc42754875",
+  "license": "CC BY 4.0",
+  "source": "https://huggingface.co/datasets/ccosme/FiReCS",
+  "artifact_file": "lazada_filipino_candidate.joblib",
+  "artifact_sha256": "88b09ba08f15c6fc41a80acfc7c8fcda1c09b677d124f0610897be1106e8cb42",
+  "result_file": "lazada_filipino_candidate.json",
+  "errors_file": "lazada_filipino_candidate_errors.csv"
+}

@@ -1,0 +1,108 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "power",
+  "minimum_collected_reviews": 200,
+  "products_checked": 5,
+  "status_counts": {
+    "eligible": 1,
+    "insufficient_written_reviews": 4
+  },
+  "products": [
+    {
+      "name": "Orashare PNC03 3000mAh Super Mini Capsule Fast Charging Powerbank With TYPE-C/iPh Port Portable Power Bank for Andorid Samsung Redmi Xiaomi iPhone",
+      "link": "https://www.lazada.com.ph/products/pdp-i4719061313-s28618408375.html",
+      "reported_review_count": 16548,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 190,
+      "collected_by_star": {
+        "1": 40,
+        "2": 30,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Inplay Computer Power Supply 450W 550W 650W 750W PSU 80 PLUS Bronze Certified For PC Power",
+      "link": "https://www.lazada.com.ph/products/pdp-i2547980428-s132980732121.html",
+      "reported_review_count": 3534,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 98,
+      "collected_by_star": {
+        "1": 15,
+        "2": 6,
+        "3": 14,
+        "4": 23,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "DC12V 3A 5A CCTV Power Supply Adapter 12V Power Adaptor",
+      "link": "https://www.lazada.com.ph/products/pdp-i3729774469-s19664066045.html",
+      "reported_review_count": 1052,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 56,
+      "collected_by_star": {
+        "1": 8,
+        "2": 2,
+        "3": 4,
+        "4": 2,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Realme RAM-130 20000mAh Universal Compatibility Power Bank with LED Display - Multi-Color Pack",
+      "link": "https://www.lazada.com.ph/products/pdp-i2313989346-s10483987214.html",
+      "reported_review_count": 8531,
+      "stratum": "power",
+      "status": "eligible",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 200,
+      "collected_by_star": {
+        "1": 40,
+        "2": 40,
+        "3": 40,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Anker Zolo 10000mAh Magnetic Power Bank Wireless Portable Charger with 30W Max Fast Charging, Battery Pack with Built-in USB-C Cable and Adjustable Stand, A1685",
+      "link": "https://www.lazada.com.ph/products/pdp-i4738702087-s27393155968.html",
+      "reported_review_count": 920,
+      "stratum": "power",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 60,
+      "collected_by_star": {
+        "1": 4,
+        "2": 2,
+        "3": 7,
+        "4": 7,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T11:00:22"
+}

@@ -1,0 +1,433 @@
+{
+  "metadata": {
+    "created_at": "2026-09-18T10:58:09.014213+00:00",
+    "evaluation_status": "development_duplicate_grouped_nested_cross_validation",
+    "limitation": "FiReCS contains no product identifier. Exact normalized duplicate text is grouped to prevent direct duplicate leakage, but this is not a product-disjoint validation and must not support final production claims.",
+    "dataset": "outputs\\firecs_risk_annotation_final\\firecs_product_only_final.json",
+    "dataset_sha256": "40f17d371c8b04d248fbcd4332a09c31fea3ec0a8bcb55900ce29285bb826e22",
+    "source_workbook": "outputs\\firecs_risk_annotation_final\\FiReCS_Risk_Annotation_Round_1_Product_Only_Final.xlsx",
+    "source_workbook_sha256": "523cc50249b3e7911e7c2ee8a0f0260e28d5b21a4617741564ab1bf74019af13",
+    "random_state": 42,
+    "outer_folds": 5,
+    "inner_folds": 4,
+    "threshold_policy": "Selected from inner-fold predictions to maximize macro F1 while prioritizing risk recall of at least 0.80.",
+    "model": "word-and-character TF-IDF with class-balanced logistic regression"
+  },
+  "dataset": {
+    "rows": 1000,
+    "risk": 438,
+    "no_risk": 562,
+    "unique_normalized_reviews": 1000,
+    "duplicate_groups": 0,
+    "duplicate_rows_beyond_first": 0,
+    "conflicting_duplicate_label_groups": 0,
+    "sentiment_distribution": {
+      "negative": 334,
+      "neutral": 333,
+      "positive": 333
+    }
+  },
+  "nested_cross_validation": {
+    "sample_count": 1000,
+    "accuracy": 0.781,
+    "balanced_accuracy": 0.784,
+    "macro_f1": 0.7798,
+    "no_risk": {
+      "precision": 0.8356,
+      "recall": 0.7598,
+      "f1": 0.7959,
+      "support": 562
+    },
+    "risk": {
+      "precision": 0.7239,
+      "recall": 0.8082,
+      "f1": 0.7638,
+      "support": 438
+    },
+    "confusion_matrix": {
+      "labels": [
+        "no_risk",
+        "risk"
+      ],
+      "values": [
+        [
+          427,
+          135
+        ],
+        [
+          84,
+          354
+        ]
+      ]
+    },
+    "roc_auc": 0.8716,
+    "average_precision": 0.839,
+    "brier_score": 0.1455
+  },
+  "fold_variability": {
+    "macro_f1_mean": 0.7797,
+    "macro_f1_standard_deviation": 0.0186,
+    "risk_recall_mean": 0.8083,
+    "risk_recall_standard_deviation": 0.041
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "train_rows": 800,
+      "test_rows": 200,
+      "train_duplicate_groups": 800,
+      "test_duplicate_groups": 200,
+      "selected_threshold": 0.455,
+      "inner_threshold_selection": {
+        "macro_f1": 0.7704,
+        "risk_recall": 0.8114
+      },
+      "metrics": {
+        "sample_count": 200,
+        "accuracy": 0.805,
+        "balanced_accuracy": 0.8076,
+        "macro_f1": 0.8039,
+        "no_risk": {
+          "precision": 0.8544,
+          "recall": 0.7857,
+          "f1": 0.8186,
+          "support": 112
+        },
+        "risk": {
+          "precision": 0.7526,
+          "recall": 0.8295,
+          "f1": 0.7892,
+          "support": 88
+        },
+        "confusion_matrix": {
+          "labels": [
+            "no_risk",
+            "risk"
+          ],
+          "values": [
+            [
+              88,
+              24
+            ],
+            [
+              15,
+              73
+            ]
+          ]
+        },
+        "roc_auc": 0.8818,
+        "average_precision": 0.8456,
+        "brier_score": 0.1397
+      }
+    },
+    {
+      "fold": 2,
+      "train_rows": 800,
+      "test_rows": 200,
+      "train_duplicate_groups": 800,
+      "test_duplicate_groups": 200,
+      "selected_threshold": 0.455,
+      "inner_threshold_selection": {
+        "macro_f1": 0.7778,
+        "risk_recall": 0.8148
+      },
+      "metrics": {
+        "sample_count": 200,
+        "accuracy": 0.795,
+        "balanced_accuracy": 0.8001,
+        "macro_f1": 0.7941,
+        "no_risk": {
+          "precision": 0.86,
+          "recall": 0.7611,
+          "f1": 0.8075,
+          "support": 113
+        },
+        "risk": {
+          "precision": 0.73,
+          "recall": 0.8391,
+          "f1": 0.7807,
+          "support": 87
+        },
+        "confusion_matrix": {
+          "labels": [
+            "no_risk",
+            "risk"
+          ],
+          "values": [
+            [
+              86,
+              27
+            ],
+            [
+              14,
+              73
+            ]
+          ]
+        },
+        "roc_auc": 0.8888,
+        "average_precision": 0.8728,
+        "brier_score": 0.1361
+      }
+    },
+    {
+      "fold": 3,
+      "train_rows": 800,
+      "test_rows": 200,
+      "train_duplicate_groups": 800,
+      "test_duplicate_groups": 200,
+      "selected_threshold": 0.445,
+      "inner_threshold_selection": {
+        "macro_f1": 0.779,
+        "risk_recall": 0.8143
+      },
+      "metrics": {
+        "sample_count": 200,
+        "accuracy": 0.775,
+        "balanced_accuracy": 0.7808,
+        "macro_f1": 0.7745,
+        "no_risk": {
+          "precision": 0.8454,
+          "recall": 0.7321,
+          "f1": 0.7847,
+          "support": 112
+        },
+        "risk": {
+          "precision": 0.7087,
+          "recall": 0.8295,
+          "f1": 0.7644,
+          "support": 88
+        },
+        "confusion_matrix": {
+          "labels": [
+            "no_risk",
+            "risk"
+          ],
+          "values": [
+            [
+              82,
+              30
+            ],
+            [
+              15,
+              73
+            ]
+          ]
+        },
+        "roc_auc": 0.86,
+        "average_precision": 0.8417,
+        "brier_score": 0.1519
+      }
+    },
+    {
+      "fold": 4,
+      "train_rows": 800,
+      "test_rows": 200,
+      "train_duplicate_groups": 800,
+      "test_duplicate_groups": 200,
+      "selected_threshold": 0.495,
+      "inner_threshold_selection": {
+        "macro_f1": 0.7896,
+        "risk_recall": 0.8006
+      },
+      "metrics": {
+        "sample_count": 200,
+        "accuracy": 0.765,
+        "balanced_accuracy": 0.7696,
+        "macro_f1": 0.764,
+        "no_risk": {
+          "precision": 0.83,
+          "recall": 0.7345,
+          "f1": 0.7793,
+          "support": 113
+        },
+        "risk": {
+          "precision": 0.7,
+          "recall": 0.8046,
+          "f1": 0.7487,
+          "support": 87
+        },
+        "confusion_matrix": {
+          "labels": [
+            "no_risk",
+            "risk"
+          ],
+          "values": [
+            [
+              83,
+              30
+            ],
+            [
+              17,
+              70
+            ]
+          ]
+        },
+        "roc_auc": 0.867,
+        "average_precision": 0.8342,
+        "brier_score": 0.1503
+      }
+    },
+    {
+      "fold": 5,
+      "train_rows": 800,
+      "test_rows": 200,
+      "train_duplicate_groups": 800,
+      "test_duplicate_groups": 200,
+      "selected_threshold": 0.46,
+      "inner_threshold_selection": {
+        "macro_f1": 0.7949,
+        "risk_recall": 0.8171
+      },
+      "metrics": {
+        "sample_count": 200,
+        "accuracy": 0.765,
+        "balanced_accuracy": 0.7622,
+        "macro_f1": 0.7619,
+        "no_risk": {
+          "precision": 0.7928,
+          "recall": 0.7857,
+          "f1": 0.7892,
+          "support": 112
+        },
+        "risk": {
+          "precision": 0.7303,
+          "recall": 0.7386,
+          "f1": 0.7345,
+          "support": 88
+        },
+        "confusion_matrix": {
+          "labels": [
+            "no_risk",
+            "risk"
+          ],
+          "values": [
+            [
+              88,
+              24
+            ],
+            [
+              23,
+              65
+            ]
+          ]
+        },
+        "roc_auc": 0.8653,
+        "average_precision": 0.8221,
+        "brier_score": 0.1494
+      }
+    }
+  ],
+  "current_hybrid_external_diagnostic": {
+    "sample_count": 1000,
+    "accuracy": 0.522,
+    "balanced_accuracy": 0.5553,
+    "macro_f1": 0.5021,
+    "no_risk": {
+      "precision": 0.6765,
+      "recall": 0.2865,
+      "f1": 0.4025,
+      "support": 562
+    },
+    "risk": {
+      "precision": 0.4738,
+      "recall": 0.8242,
+      "f1": 0.6017,
+      "support": 438
+    },
+    "confusion_matrix": {
+      "labels": [
+        "no_risk",
+        "risk"
+      ],
+      "values": [
+        [
+          161,
+          401
+        ],
+        [
+          77,
+          361
+        ]
+      ]
+    },
+    "roc_auc": 0.5904,
+    "average_precision": 0.522,
+    "brier_score": 0.3392,
+    "threshold": 0.57,
+    "model_version": "defaketive-hybrid-manuscript-1.1.0-development+manuscript-wsm-1.0.0"
+  },
+  "manuscript_lexicon_baseline": {
+    "sample_count": 1000,
+    "accuracy": 0.629,
+    "balanced_accuracy": 0.5848,
+    "macro_f1": 0.5453,
+    "no_risk": {
+      "precision": 0.6101,
+      "recall": 0.9413,
+      "f1": 0.7404,
+      "support": 562
+    },
+    "risk": {
+      "precision": 0.7519,
+      "recall": 0.2283,
+      "f1": 0.3503,
+      "support": 438
+    },
+    "confusion_matrix": {
+      "labels": [
+        "no_risk",
+        "risk"
+      ],
+      "values": [
+        [
+          529,
+          33
+        ],
+        [
+          338,
+          100
+        ]
+      ]
+    },
+    "model_version": "defaketive-manuscript-vader-wsm-1.0.0"
+  },
+  "majority_baseline": {
+    "sample_count": 1000,
+    "accuracy": 0.562,
+    "balanced_accuracy": 0.5,
+    "macro_f1": 0.3598,
+    "no_risk": {
+      "precision": 0.562,
+      "recall": 1.0,
+      "f1": 0.7196,
+      "support": 562
+    },
+    "risk": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 438
+    },
+    "confusion_matrix": {
+      "labels": [
+        "no_risk",
+        "risk"
+      ],
+      "values": [
+        [
+          562,
+          0
+        ],
+        [
+          438,
+          0
+        ]
+      ]
+    }
+  },
+  "development_gates": {
+    "risk_recall_at_least_0_80": true,
+    "risk_macro_f1_at_least_0_75": true
+  },
+  "passes_all_development_gates": true
+}

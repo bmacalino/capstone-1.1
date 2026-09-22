@@ -14,8 +14,15 @@ debug/
 logs/
 *.db
 *.db-journal
+*.db.pre_*
 artifacts_*.png
 .env
 .env.*
 !.env.example
 .streamlit/secrets.toml
+
+# Generated research artifacts and tooling state (large; not versioned)
+outputs/
+.hallmark/
+node_modules/
+*.inspect.ndjson

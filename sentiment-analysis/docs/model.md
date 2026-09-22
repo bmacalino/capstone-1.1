@@ -1,40 +1,38 @@
 # DeFaketive sentiment model
 
-DeFaketive uses a local hybrid sentiment model for English, Filipino, and
-Taglish Philippine e-commerce reviews. It does not call an external AI service.
+DeFaketive uses a local manuscript-aligned sentiment and product-risk model for
+English, Filipino, and Taglish Philippine e-commerce reviews. It does not call
+an external AI service.
 
 ## Architecture
 
-The deployed `defaketive-firecs-tfidf-0.2.0` model combines:
+The deployed hybrid-manuscript model combines:
 
-1. A supervised logistic-regression classifier trained on human-labeled FiReCS
-   reviews using word and character TF-IDF features.
-2. NLTK VADER plus editable Filipino/Taglish lexicons for sentiment evidence.
-3. Narrow explainable overrides for explicit failures, strong negation,
-   emoji-only reviews, and severe product-risk phrases.
-4. An independent lexicon layer for defect, durability, counterfeit, safety,
-   completeness, and other product-risk evidence.
-5. A guarded one- or two-star rating tie-breaker for ambiguous marketplace text.
+1. A trained marketplace classifier for positive, negative, or uncertain
+   review sentiment.
+2. A separate trained binary classifier for review-level product risk.
+3. NLTK VADER and editable Filipino/Taglish lexicons as supporting evidence.
+4. Duplicate exclusion and a representative maximum of 100 reviews per product.
+5. A fixed weighted-sum score: 30% negative-review ratio plus 70%
+   detected-risk ratio.
 
-The trained classifier supplies the default sentiment label for ordinary review
-text. The rules remain authoritative only in the narrow cases above. If the
-trained artifact is missing or incompatible, analysis falls back to the VADER
-and Taglish rule model instead of preventing the app from starting.
+Each review contributes at most one count to the detected-risk numerator.
+Classifier confidence and severity do not change that binary count, and
+severity is absent from product scoring. The strict VADER/lexicon implementation
+remains available as the `manuscript` research baseline.
 
 ## Output fields
 
 Each review receives:
 
-- `label`: the final positive, neutral, or negative label;
+- `label`: the final positive, uncertain, or negative label;
 - `model_version` and `label_source`;
-- `classifier`: probabilities, confidence, and strongest active linear features;
-- `vader_label` and the original VADER score fields;
+- classifier probabilities plus the original VADER score fields;
 - matched sentiment terms and their lexicon values;
-- `hybrid_adjustment` when an explicit rule overrides the classifier;
-- `label_adjustment` when guarded star-rating context changes the label;
-- product-risk categories, severity, and matched evidence.
+- a binary `risk.detected` value and any matched, non-severity evidence;
+- the product-level negative and defect ratios and their weighted contributions.
 
-Risk detection is separate from sentiment. A review can be neutral in tone while
+Risk detection is separate from sentiment. A review can be uncertain in tone while
 still reporting a concrete performance or durability problem.
 
 The JSON workflow fingerprints normalized comments, marks duplicates, and
@@ -157,11 +155,36 @@ of every current Shopee, Lazada, or Temu review. Before making final in-domain
 claims, the project should annotate a separate local marketplace sample, report
 annotator agreement, and evaluate the frozen hybrid on that sample.
 
-The preliminary product-risk score remains:
+Nested five-fold product-group cross-validation was also run on all 907
+previously adjudicated Lazada reviews from 24 products. No product crossed a
+fold. The selected direct three-class sentiment model reached 0.6116 macro-F1
+and 0.4267 F1 for the unified uncertain class. The unchanged binary risk model
+reached 0.8194 risk recall and 0.7647 macro-F1. Across products, the calculated
+risk score had 9.51-point mean absolute error, 0.7139 Spearman rank correlation,
+and 83.33% Low/Moderate/High band agreement.
+
+The uncertain class combines mixed, neutral, and explicitly uncertain reviews.
+Its component recalls were 0.4149, 0.3377, and 0.7857 respectively, so most of
+the remaining sentiment error comes from distinguishing mixed and neutral text
+from clearly positive or negative text. Nested threshold tuning did not improve
+the direct classifier and was rejected.
+
+The deployed development artifact contains only the direct three-class
+sentiment classifier and binary risk classifier. It contains no severity or
+risk-category head. These are development estimates, not independent locked-test
+results, because the reviews were previously available.
+
+The product-risk aggregation remains:
 
 ```text
-100 * (0.30 * negative_review_ratio + 0.70 * keyword_failure_rate)
+100 * (0.30 * negative_review_ratio + 0.70 * detected_risk_ratio)
 ```
 
 These weights are not calibrated purchase probabilities and must be confirmed
 with the research advisers before being presented as validated product risk.
+
+Reproduce the selected artifact from the repository root with:
+
+```powershell
+.\.venv\Scripts\python.exe .\research\train_hybrid_manuscript.py
+```

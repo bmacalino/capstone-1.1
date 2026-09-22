@@ -1,0 +1,111 @@
+{
+  "status": "pilot_only",
+  "recommendation": null,
+  "pilot_candidate": 150,
+  "criteria": {
+    "p90_absolute_error_at_most": 5.0,
+    "risk_level_agreement_at_least": 0.9,
+    "minimum_products_for_recommendation": 30,
+    "minimum_platforms_for_recommendation": 3
+  },
+  "coverage": {
+    "products": 2,
+    "platforms": [
+      "lazada",
+      "temu"
+    ],
+    "unique_reviews": 281,
+    "reviews_per_product": [
+      231,
+      50
+    ],
+    "human_gold_labels": false
+  },
+  "results": [
+    {
+      "sample_size": 10,
+      "eligible_products": 2,
+      "simulations": 2000,
+      "median_absolute_error": 7.801,
+      "p90_absolute_error": 18.2,
+      "p95_absolute_error": 21.2,
+      "risk_level_agreement": 0.6935,
+      "pilot_pass": false
+    },
+    {
+      "sample_size": 20,
+      "eligible_products": 2,
+      "simulations": 2000,
+      "median_absolute_error": 5.199,
+      "p90_absolute_error": 13.2,
+      "p95_absolute_error": 15.301,
+      "risk_level_agreement": 0.7335,
+      "pilot_pass": false
+    },
+    {
+      "sample_size": 30,
+      "eligible_products": 2,
+      "simulations": 2000,
+      "median_absolute_error": 4.134,
+      "p90_absolute_error": 9.893,
+      "p95_absolute_error": 12.133,
+      "risk_level_agreement": 0.7675,
+      "pilot_pass": false
+    },
+    {
+      "sample_size": 50,
+      "eligible_products": 2,
+      "simulations": 2000,
+      "median_absolute_error": 3.4,
+      "p90_absolute_error": 8.02,
+      "p95_absolute_error": 9.6,
+      "risk_level_agreement": 0.761,
+      "pilot_pass": false
+    },
+    {
+      "sample_size": 75,
+      "eligible_products": 1,
+      "simulations": 1000,
+      "median_absolute_error": 2.599,
+      "p90_absolute_error": 6.199,
+      "p95_absolute_error": 7.268,
+      "risk_level_agreement": 1.0,
+      "pilot_pass": false
+    },
+    {
+      "sample_size": 100,
+      "eligible_products": 1,
+      "simulations": 1000,
+      "median_absolute_error": 2.201,
+      "p90_absolute_error": 5.301,
+      "p95_absolute_error": 6.401,
+      "risk_level_agreement": 1.0,
+      "pilot_pass": false
+    },
+    {
+      "sample_size": 150,
+      "eligible_products": 1,
+      "simulations": 1000,
+      "median_absolute_error": 1.868,
+      "p90_absolute_error": 4.334,
+      "p95_absolute_error": 5.199,
+      "risk_level_agreement": 1.0,
+      "pilot_pass": true
+    },
+    {
+      "sample_size": 200,
+      "eligible_products": 1,
+      "simulations": 1000,
+      "median_absolute_error": 1.501,
+      "p90_absolute_error": 3.701,
+      "p95_absolute_error": 4.351,
+      "risk_level_agreement": 1.0,
+      "pilot_pass": true
+    }
+  ],
+  "limitations": [
+    "Machine labels test score stability, not classifier or construct validity.",
+    "The captured review pool must be representative; more reviews do not remove selection bias.",
+    "A final recommendation requires human gold labels and an unseen-product holdout."
+  ]
+}

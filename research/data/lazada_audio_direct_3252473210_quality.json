@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "audio",
+  "minimum_collected_reviews": 200,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "PORTABLE MK-102 SUPER BASS BLUETOOTH WIRELESS SPEAKER WITH RGB LIGHT",
+      "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+      "reported_review_count": 3079,
+      "stratum": "audio",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 200,
+      "usable_written_reviews": 152,
+      "collected_by_star": {
+        "1": 40,
+        "2": 29,
+        "3": 27,
+        "4": 16,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-10T15:52:51"
+}

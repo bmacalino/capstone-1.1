@@ -4,10 +4,17 @@ This is the standalone sentiment-analysis component for DeFaketive. It reads
 review data produced by either the Shopee Philippines scraper or the Lazada
 Philippines scraper; neither scraper needs to contain or import this model.
 
-The hybrid model uses a supervised FiReCS word-and-character TF-IDF classifier
-for positive/neutral/negative labels. NLTK VADER and editable Filipino/Taglish
-lexicons continue to supply reviewable evidence, explicit safeguards, and
-independent product-risk categories. Analysis runs locally.
+The production path uses trained marketplace classifiers for the review's
+positive/negative/uncertain sentiment and its separate binary risk decision.
+Customized NLTK VADER and editable Filipino/Taglish lexicons remain available
+as supporting evidence. The product score follows the manuscript formula:
+`30% * negative-review ratio + 70% * detected-risk ratio`. Severity is not part
+of this score. Analysis runs locally.
+
+The default mode is `hybrid_manuscript`. Set
+`DEFAKETIVE_MODEL_MODE=manuscript` before starting the app to run the strict
+VADER/lexicon baseline, or `legacy_hybrid` to reproduce the former
+probability-and-severity research score.
 
 ## Setup on Windows PowerShell
 
@@ -56,9 +63,39 @@ Run from the repository root:
 .\.venv\Scripts\python.exe .\train_firecs.py
 ```
 
-The script audits duplicate and cross-split text, selects among four candidates
-using a stratified validation split, retrains the winner, and records the final
-held-out metrics. Do not tune future changes against the official test errors.
+The script audits duplicate and cross-split text, selects among five candidates
+using repeated stratified validation, including weighted and unweighted logistic
+regression, retrains the winner, and records the final held-out metrics. Do not
+tune future changes against the official test errors.
+
+## Reproduce the hybrid-manuscript model
+
+Run from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe .\research\train_hybrid_manuscript.py
+```
+
+This trains direct positive/negative/uncertain sentiment with FiReCS and all
+adjudicated Lazada reviews, trains binary risk only on the Lazada reviews, and
+selects the risk threshold from product-grouped out-of-fold predictions. The
+artifact intentionally contains no risk-category or severity head. It remains a
+development candidate until it is evaluated on newly collected, frozen product
+groups.
+
+## Reproduce the legacy risk-scoring candidate
+
+Run from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe .\research\train_risk_scoring_v1.py
+```
+
+This older research script trains risk detection and ordinal severity from the adjudicated Lazada
+development data using five-fold product-group cross-validation. It writes the
+candidate artifact to `models/risk_scoring_v1_candidate.joblib` and its metrics
+to `evaluation/risk_scoring_v1_cross_validation.json`. The candidate remains
+unqualified until it passes a newly frozen, product-disjoint locked test.
 
 ## Optional auxiliary datasets
 

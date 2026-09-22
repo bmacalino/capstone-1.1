@@ -1,0 +1,848 @@
+{
+  "dataset": "lazada_round1_test.csv",
+  "audit": {
+    "source_rows": 133,
+    "nonempty_rows": 133,
+    "unique_review_ids": 133,
+    "unique_casefolded_texts": 133,
+    "duplicate_review_ids": 0,
+    "duplicate_casefolded_texts": 0,
+    "product_count": 7,
+    "platform_counts": {
+      "lazada": 133
+    },
+    "adjudicated_label_counts": {
+      "positive": 44,
+      "negative": 53,
+      "mixed": 27,
+      "neutral": 9
+    },
+    "blank_annotator_ids": 0
+  },
+  "evaluation_policy": {
+    "included_labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "excluded_rows": 27,
+    "excluded_label_counts": {
+      "mixed": 27
+    },
+    "primary_metric": "macro_f1",
+    "dost_label_mapping": {
+      "LABEL_0": "negative",
+      "LABEL_1": "positive",
+      "LABEL_2": "neutral",
+      "status": "inferred; upstream config and model card do not document label names"
+    }
+  },
+  "results": {
+    "dost-asti/RoBERTa-tl-sentiment-analysis": {
+      "model": "dost-asti/RoBERTa-tl-sentiment-analysis",
+      "overall": {
+        "sample_count": 106,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.5849,
+        "precision": 0.5138,
+        "recall": 0.5221,
+        "f1": 0.5018,
+        "per_class": {
+          "negative": {
+            "precision": 0.7778,
+            "recall": 0.5283,
+            "f1": 0.6292,
+            "support": 53
+          },
+          "neutral": {
+            "precision": 0.2,
+            "recall": 0.3333,
+            "f1": 0.25,
+            "support": 9
+          },
+          "positive": {
+            "precision": 0.5636,
+            "recall": 0.7045,
+            "f1": 0.6263,
+            "support": 44
+          }
+        },
+        "matrix": [
+          [
+            28,
+            6,
+            19
+          ],
+          [
+            1,
+            3,
+            5
+          ],
+          [
+            7,
+            6,
+            31
+          ]
+        ]
+      },
+      "by_platform": {
+        "lazada": {
+          "sample_count": 106,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.5849,
+          "precision": 0.5138,
+          "recall": 0.5221,
+          "f1": 0.5018,
+          "per_class": {
+            "negative": {
+              "precision": 0.7778,
+              "recall": 0.5283,
+              "f1": 0.6292,
+              "support": 53
+            },
+            "neutral": {
+              "precision": 0.2,
+              "recall": 0.3333,
+              "f1": 0.25,
+              "support": 9
+            },
+            "positive": {
+              "precision": 0.5636,
+              "recall": 0.7045,
+              "f1": 0.6263,
+              "support": 44
+            }
+          },
+          "matrix": [
+            [
+              28,
+              6,
+              19
+            ],
+            [
+              1,
+              3,
+              5
+            ],
+            [
+              7,
+              6,
+              31
+            ]
+          ]
+        }
+      },
+      "mean_confidence": 0.965904,
+      "errors": [
+        {
+          "review_id": "lazada-r1-0045",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.986117,
+          "review_text": "Meh Waterproof design for outdoor use,"
+        },
+        {
+          "review_id": "lazada-r1-0047",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.984971,
+          "review_text": "50meter long ? only 10meter ir 20meter auto disconnected poor item"
+        },
+        {
+          "review_id": "lazada-r1-0072",
+          "platform": "lazada",
+          "product_id": "5166282734",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.729213,
+          "review_text": "Wala pa 1 month di na agad working yung fan. Minsan lang naman nagagamit yung fan pag naka 4hrs na gamit na yung laptop. Then pinakamatagal na gamit na 4hrs on yung fan. Unang gamit ko nga lang noon amoy sunog na kaya bihira ko din gamitin yung fan."
+        },
+        {
+          "review_id": "lazada-r1-0073",
+          "platform": "lazada",
+          "product_id": "5166282734",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.917535,
+          "review_text": "okay naman sakuhan lang yung fan hindi masyadong malakas. piro pwede na pag supurta."
+        },
+        {
+          "review_id": "lazada-r1-0079",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.994414,
+          "review_text": "I tried setting it up, activated the sim through my mobile device however when I tried to connect w/ the wifi and set it up, the router is not detecting the sim, tried to insert my phone smart sim and it is not being detected too. I just got the device for a few minutes"
+        },
+        {
+          "review_id": "lazada-r1-0130",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.731593,
+          "review_text": "Functional. Screen is small"
+        },
+        {
+          "review_id": "lazada-r1-0149",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.999595,
+          "review_text": "it doesn't work as expected, I'm not satisfied with this product, I was hoping it works with my front gate which is 6 meters away from my door. I'm returning it😞"
+        },
+        {
+          "review_id": "lazada-r1-0150",
+          "platform": "lazada",
+          "product_id": "5166282734",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.850253,
+          "review_text": "🔨Durability:okay naman ito"
+        },
+        {
+          "review_id": "lazada-r1-0172",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.999874,
+          "review_text": "Came with SIM already used. Impossible to make it work so had to return."
+        },
+        {
+          "review_id": "lazada-r1-0178",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.999721,
+          "review_text": "1 device connected, di man lang umabot 100 Mbps speed, location is bucal calamba, mabilis lang dumating"
+        },
+        {
+          "review_id": "lazada-r1-0192",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.993587,
+          "review_text": "𝚍𝚒 𝚔𝚘 𝚗𝚊 𝚛𝚎𝚛𝚎𝚝𝚞𝚛𝚗 𝚜𝚊𝚢𝚊𝚗𝚐 𝚕𝚊𝚗𝚐 𝚘𝚛𝚊𝚜 , 𝚙𝚎𝚛𝚘 𝚋𝚊𝚔𝚒𝚝 𝚐𝚊𝚗𝚞𝚗 𝚑𝚊𝚕𝚘𝚜 𝚠𝚊𝚕𝚊 𝚊𝚔𝚘𝚗𝚐 𝚖𝚊𝚛𝚒𝚗𝚒𝚐 𝚗𝚊𝚙𝚊𝚔𝚊𝚑𝚒𝚗𝚊 𝚔𝚊𝚑𝚒𝚝 𝚝𝚘𝚍𝚘 𝚗𝚊 𝚟𝚘𝚕𝚞𝚖𝚎 𝚔𝚘 𝚔𝚊𝚊𝚜𝚊𝚛 𝚜𝚊𝚢𝚊𝚗𝚐 𝚏𝚛𝚎𝚎 𝚜𝚑𝚒𝚙𝚙𝚒𝚗𝚐 𝚔𝚘 𝚜𝚊𝚗𝚊 𝚙𝚊𝚕𝚊 𝚜𝚊 𝚒𝚋𝚊 𝚔𝚘 𝚗𝚊𝚕𝚊𝚗𝚐 𝚐𝚒𝚗𝚊𝚖𝚒𝚝"
+        },
+        {
+          "review_id": "lazada-r1-0235",
+          "platform": "lazada",
+          "product_id": "5166282734",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.999406,
+          "review_text": "🔨Durability:seems durable"
+        },
+        {
+          "review_id": "lazada-r1-0244",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.989344,
+          "review_text": "Video /and pic are at very low / poor quality especially at night time or without good lighting. Not water proof also"
+        },
+        {
+          "review_id": "lazada-r1-0246",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.999901,
+          "review_text": "madaling mag lobat .."
+        },
+        {
+          "review_id": "lazada-r1-0257",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.997033,
+          "review_text": "Functionality:good"
+        },
+        {
+          "review_id": "lazada-r1-0269",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.999953,
+          "review_text": "Unable to register smart wifi in smart app. Hard to set up. Decent speed and stable connection. Delivered on time."
+        },
+        {
+          "review_id": "lazada-r1-0279",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.999629,
+          "review_text": "SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM SCAM"
+        },
+        {
+          "review_id": "lazada-r1-0284",
+          "platform": "lazada",
+          "product_id": "5384903372",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.739741,
+          "review_text": "cant connect to Bluetooth"
+        },
+        {
+          "review_id": "lazada-r1-0300",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.997649,
+          "review_text": "Easy remote home monitoring,"
+        },
+        {
+          "review_id": "lazada-r1-0312",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.999357,
+          "review_text": "Comfortable to wear for long periods, Comfortable to wear for long periods, High-quality materials used in construction,"
+        },
+        {
+          "review_id": "lazada-r1-0339",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.848021,
+          "review_text": "not useful for live monitoring. you can only use if the doorbell is press."
+        },
+        {
+          "review_id": "lazada-r1-0348",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.999743,
+          "review_text": "Pwede naman xia gamitin kaso di rin tumagal ang hina kasi ng wire and uncomfortable din suotin pero pwede na kung nagtitipid"
+        },
+        {
+          "review_id": "lazada-r1-0361",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.999946,
+          "review_text": "this is my honest review on the product Malakas sya sa 15 days nya na free unli hinintay ko lang matapos yung 15 na free unli tapos pag load ko lang ng 1299 unli sa unang load malakas pa pagkabukasan mahina na nasa 30-50 mbps tas may data capping pa so i give it a 3 star"
+        },
+        {
+          "review_id": "lazada-r1-0385",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.999944,
+          "review_text": "Hingi ko pa na gamit kasi di nsman pala with Cam saka need pa icharge akala ko di battery sayang ang money"
+        },
+        {
+          "review_id": "lazada-r1-0386",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.999881,
+          "review_text": "Love the macaron colors!,"
+        },
+        {
+          "review_id": "lazada-r1-0414",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.999949,
+          "review_text": "disappointed. low quality. can’t view live. only record pictures. never again! I thought it can record video. but no."
+        },
+        {
+          "review_id": "lazada-r1-0441",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.999509,
+          "review_text": "Sim card activation and usage is way difficult and lousy, miles miles away from being easy to use and customer friendly!"
+        },
+        {
+          "review_id": "lazada-r1-0458",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.508291,
+          "review_text": "Compatibility:Plug and play,"
+        },
+        {
+          "review_id": "lazada-r1-0461",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.999928,
+          "review_text": "Love the macaron colors!, Love the macaron colors!, Love the macaron colors!, Love the macaron colors!,"
+        },
+        {
+          "review_id": "lazada-r1-0470",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.845043,
+          "review_text": "The shooting is very clear. The shooting area is also large. Not bad, not bad, satisfied. A sense of security"
+        },
+        {
+          "review_id": "lazada-r1-0511",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.999932,
+          "review_text": "Fast and stable internet, Strong signal coverage, TERRIBLE phone app"
+        },
+        {
+          "review_id": "lazada-r1-0534",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.923889,
+          "review_text": "👎👎👎👎👎 not satisfied."
+        },
+        {
+          "review_id": "lazada-r1-0564",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.997228,
+          "review_text": "anhina sumagap ng cgnal"
+        },
+        {
+          "review_id": "lazada-r1-0574",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.999907,
+          "review_text": "my is CCTV why is memory card only"
+        },
+        {
+          "review_id": "lazada-r1-0604",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.746124,
+          "review_text": "Matagal dumating, ang mahal na compare sa nauna kong binili last Aug2025 (half ng price) same lang naman na unit. Now ang bagal up to 5mbps lang ang download and upload up to 2mbps lang. Naka unli data pa ako eh halos di ko rin magamit dahil sa bagal. Laging disconnnected pa. Worth it ba ito???? 4g ang nasasaganp dito sa area ko pero ganyan kabagal, hay naku sobrang disappointed!!!! Di pa umaabot ng 5 devices ang naka connect niyan, sobrang bagal."
+        },
+        {
+          "review_id": "lazada-r1-0654",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.999776,
+          "review_text": "not good it's difficult to match your phone"
+        },
+        {
+          "review_id": "lazada-r1-0682",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.971669,
+          "review_text": "not clear na cam."
+        },
+        {
+          "review_id": "lazada-r1-0754",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.937455,
+          "review_text": "Ok naman. la syang night vision. mura lang kasi. hirap din iset-up. manual isn't enough. ok lang naman si seller! fast shipping din."
+        },
+        {
+          "review_id": "lazada-r1-0775",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.999041,
+          "review_text": "Convenient wireless installation, Easy remote home monitoring, High-definition video capture,"
+        },
+        {
+          "review_id": "lazada-r1-0791",
+          "platform": "lazada",
+          "product_id": "5166282734",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.999462,
+          "review_text": "🔨Durability:sturdy"
+        },
+        {
+          "review_id": "lazada-r1-0798",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.784294,
+          "review_text": "SIRA PINADALA NYO!!!! SIRAAAAAA.... WAG NA KAYO BUMILI DTO. PAG NGPM SA INYO, D NYO NA INIINTNDI"
+        },
+        {
+          "review_id": "lazada-r1-0838",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.999955,
+          "review_text": "mali yung dumating memory card order ko ay camera"
+        },
+        {
+          "review_id": "lazada-r1-0910",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.811075,
+          "review_text": "Do not order. item is not as good as advertised. video is very poor quality. video is stretched and no way to fix or adjust. very short wire. difficult to position."
+        },
+        {
+          "review_id": "lazada-r1-0926",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.829533,
+          "review_text": "fake doesn't work the way they say it does, item was damaged seller doesn't cooperate. Don't buy this!"
+        }
+      ]
+    },
+    "jjjardev/tagasenti_model": {
+      "model": "jjjardev/tagasenti_model",
+      "overall": {
+        "sample_count": 106,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.7925,
+        "precision": 0.6388,
+        "recall": 0.6413,
+        "f1": 0.6359,
+        "per_class": {
+          "negative": {
+            "precision": 0.9333,
+            "recall": 0.7925,
+            "f1": 0.8571,
+            "support": 53
+          },
+          "neutral": {
+            "precision": 0.1667,
+            "recall": 0.2222,
+            "f1": 0.1905,
+            "support": 9
+          },
+          "positive": {
+            "precision": 0.8163,
+            "recall": 0.9091,
+            "f1": 0.8602,
+            "support": 44
+          }
+        },
+        "matrix": [
+          [
+            42,
+            7,
+            4
+          ],
+          [
+            2,
+            2,
+            5
+          ],
+          [
+            1,
+            3,
+            40
+          ]
+        ]
+      },
+      "by_platform": {
+        "lazada": {
+          "sample_count": 106,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.7925,
+          "precision": 0.6388,
+          "recall": 0.6413,
+          "f1": 0.6359,
+          "per_class": {
+            "negative": {
+              "precision": 0.9333,
+              "recall": 0.7925,
+              "f1": 0.8571,
+              "support": 53
+            },
+            "neutral": {
+              "precision": 0.1667,
+              "recall": 0.2222,
+              "f1": 0.1905,
+              "support": 9
+            },
+            "positive": {
+              "precision": 0.8163,
+              "recall": 0.9091,
+              "f1": 0.8602,
+              "support": 44
+            }
+          },
+          "matrix": [
+            [
+              42,
+              7,
+              4
+            ],
+            [
+              2,
+              2,
+              5
+            ],
+            [
+              1,
+              3,
+              40
+            ]
+          ]
+        }
+      },
+      "mean_confidence": 0.878623,
+      "errors": [
+        {
+          "review_id": "lazada-r1-0101",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.856476,
+          "review_text": "🌙Night Vision:I think no need to connect to the wifi and internet. this unit if you have no wifi and internet its useless Thier is no motion detection."
+        },
+        {
+          "review_id": "lazada-r1-0130",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.894567,
+          "review_text": "Functional. Screen is small"
+        },
+        {
+          "review_id": "lazada-r1-0246",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.929162,
+          "review_text": "madaling mag lobat .."
+        },
+        {
+          "review_id": "lazada-r1-0257",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.772749,
+          "review_text": "Functionality:good"
+        },
+        {
+          "review_id": "lazada-r1-0269",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.952344,
+          "review_text": "Unable to register smart wifi in smart app. Hard to set up. Decent speed and stable connection. Delivered on time."
+        },
+        {
+          "review_id": "lazada-r1-0284",
+          "platform": "lazada",
+          "product_id": "5384903372",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.919875,
+          "review_text": "cant connect to Bluetooth"
+        },
+        {
+          "review_id": "lazada-r1-0312",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.949028,
+          "review_text": "Comfortable to wear for long periods, Comfortable to wear for long periods, High-quality materials used in construction,"
+        },
+        {
+          "review_id": "lazada-r1-0339",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.408049,
+          "review_text": "not useful for live monitoring. you can only use if the doorbell is press."
+        },
+        {
+          "review_id": "lazada-r1-0348",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.939786,
+          "review_text": "Pwede naman xia gamitin kaso di rin tumagal ang hina kasi ng wire and uncomfortable din suotin pero pwede na kung nagtitipid"
+        },
+        {
+          "review_id": "lazada-r1-0385",
+          "platform": "lazada",
+          "product_id": "4507172427",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.92259,
+          "review_text": "Hingi ko pa na gamit kasi di nsman pala with Cam saka need pa icharge akala ko di battery sayang ang money"
+        },
+        {
+          "review_id": "lazada-r1-0386",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.946712,
+          "review_text": "Love the macaron colors!,"
+        },
+        {
+          "review_id": "lazada-r1-0441",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.909303,
+          "review_text": "Sim card activation and usage is way difficult and lousy, miles miles away from being easy to use and customer friendly!"
+        },
+        {
+          "review_id": "lazada-r1-0458",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.839637,
+          "review_text": "Compatibility:Plug and play,"
+        },
+        {
+          "review_id": "lazada-r1-0461",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.940819,
+          "review_text": "Love the macaron colors!, Love the macaron colors!, Love the macaron colors!, Love the macaron colors!,"
+        },
+        {
+          "review_id": "lazada-r1-0511",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.836187,
+          "review_text": "Fast and stable internet, Strong signal coverage, TERRIBLE phone app"
+        },
+        {
+          "review_id": "lazada-r1-0574",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.800312,
+          "review_text": "my is CCTV why is memory card only"
+        },
+        {
+          "review_id": "lazada-r1-0644",
+          "platform": "lazada",
+          "product_id": "5256422305",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.74054,
+          "review_text": "I can't enroll the sim card to giga life smart app"
+        },
+        {
+          "review_id": "lazada-r1-0682",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.723921,
+          "review_text": "not clear na cam."
+        },
+        {
+          "review_id": "lazada-r1-0700",
+          "platform": "lazada",
+          "product_id": "3034831887",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.900453,
+          "review_text": "Impressive build-in microphone, Impressive build-in microphone, Impressive build-in microphone,"
+        },
+        {
+          "review_id": "lazada-r1-0754",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.959864,
+          "review_text": "Ok naman. la syang night vision. mura lang kasi. hirap din iset-up. manual isn't enough. ok lang naman si seller! fast shipping din."
+        },
+        {
+          "review_id": "lazada-r1-0838",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.534902,
+          "review_text": "mali yung dumating memory card order ko ay camera"
+        },
+        {
+          "review_id": "lazada-r1-0858",
+          "platform": "lazada",
+          "product_id": "5381386541",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.683036,
+          "review_text": "hindi nmn gumgana"
+        }
+      ]
+    }
+  }
+}

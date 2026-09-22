@@ -1,0 +1,88 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 100,
+  "products_checked": 4,
+  "status_counts": {
+    "insufficient_written_reviews": 4
+  },
+  "products": [
+    {
+      "name": "Portable Rechargeable Phone Cooler For Gaming Cooler Quick Cooling Wireless Phone Cooling Fan With Light",
+      "link": "https://www.lazada.com.ph/products/pdp-i4119937324-s22838491173.html",
+      "reported_review_count": 364,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 0,
+      "collected_by_star": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "review_status": "review_widget_missing",
+      "stop_reason": "review_widget_missing",
+      "filter_warning": ""
+    },
+    {
+      "name": "HUABAO | Wireless Lapel Clip-on Microphone Amplifier",
+      "link": "https://www.lazada.com.ph/products/pdp-i5211290661-s30884518178.html",
+      "reported_review_count": 713,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 90,
+      "collected_by_star": {
+        "1": 3,
+        "2": 2,
+        "3": 5,
+        "4": 40,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "Ring light 18 inches With 3*Cellphone holder LED Fill Light photography dimmable 45cm self timer fill lighting with remote 250cm tripod stand for vlogging【With bag】",
+      "link": "https://www.lazada.com.ph/products/pdp-i3401407254-s19465854553.html",
+      "reported_review_count": 569,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 53,
+      "collected_by_star": {
+        "1": 6,
+        "2": 2,
+        "3": 2,
+        "4": 3,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    },
+    {
+      "name": "【Local seller +COD】3D Movies/Games VR Box Immersive Virtual Reality glasses Headset with Remote Controller Built-in HD Aspherical Lens for 4.7- 6.7 Smart Phone iPhone Android",
+      "link": "https://www.lazada.com.ph/products/pdp-i527362407-s7642718627.html",
+      "reported_review_count": 536,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 95,
+      "collected_by_star": {
+        "1": 15,
+        "2": 7,
+        "3": 14,
+        "4": 19,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T12:47:00"
+}

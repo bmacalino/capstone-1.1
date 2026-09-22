@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -10,6 +11,35 @@ import numpy as np
 
 
 DEFAULT_ARTIFACT = Path(__file__).resolve().parents[1] / "models" / "firecs_sentiment.joblib"
+
+FEATURE_MARKERS = {
+    "contrast": re.compile(r"(?<!\w)(?:but|pero|kaso|subalit|ngunit|however)(?!\w)"),
+    "functionality": re.compile(
+        r"(?<!\w)(?:work|works|working|function|functional|charge|charging|power|gumana|gumagana|sira|sirang)(?!\w)"
+    ),
+    "quality": re.compile(
+        r"(?<!\w)(?:quality|durable|durability|matibay|tibay|defect|defective|sira|basag)(?!\w)"
+    ),
+    "delivery": re.compile(
+        r"(?<!\w)(?:delivery|deliver|shipping|ship|dumating|nadeliver|courier)(?!\w)"
+    ),
+    "packaging": re.compile(
+        r"(?<!\w)(?:package|packaging|box|balot|parcel)(?!\w)"
+    ),
+    "order_accuracy": re.compile(
+        r"(?<!\w)(?:color|colour|size|kulay|mali|wrong|kulang|missing|complete)(?!\w)"
+    ),
+}
+
+
+def feature_text(normalized_text: str) -> str:
+    """Append sparse structural and aspect markers to the normalized review."""
+    markers = [
+        f"feature_{name}"
+        for name, pattern in FEATURE_MARKERS.items()
+        if pattern.search(normalized_text)
+    ]
+    return f"{normalized_text} {' '.join(markers)}".strip()
 
 
 class TrainedModelError(RuntimeError):
@@ -87,7 +117,7 @@ class TrainedSentimentClassifier:
         return evidence
 
     def predict(self, normalized_text: str) -> dict[str, Any]:
-        matrix = self.features.transform([normalized_text])
+        matrix = self.features.transform([feature_text(normalized_text)])
         label = str(self.classifier.predict(matrix)[0])
         probabilities: dict[str, float] = {}
         confidence = None

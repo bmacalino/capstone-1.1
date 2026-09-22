@@ -1,0 +1,751 @@
+{
+  "dataset": "complete_manual_marketplace_reviews (1).csv",
+  "audit": {
+    "source_rows": 498,
+    "nonempty_rows": 498,
+    "unique_review_ids": 498,
+    "unique_casefolded_texts": 498,
+    "duplicate_review_ids": 0,
+    "duplicate_casefolded_texts": 0,
+    "product_count": 15,
+    "platform_counts": {
+      "lazada": 173,
+      "temu": 325
+    },
+    "adjudicated_label_counts": {
+      "negative": 363,
+      "mixed": 28,
+      "neutral": 18,
+      "positive": 89
+    },
+    "blank_annotator_ids": 498
+  },
+  "evaluation_policy": {
+    "included_labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "excluded_rows": 28,
+    "excluded_label_counts": {
+      "mixed": 28
+    },
+    "primary_metric": "macro_f1",
+    "dost_label_mapping": {
+      "LABEL_0": "negative",
+      "LABEL_1": "positive",
+      "LABEL_2": "neutral",
+      "status": "inferred; upstream config and model card do not document label names"
+    }
+  },
+  "results": {
+    "current": {
+      "model": "current",
+      "overall": {
+        "sample_count": 470,
+        "labels": [
+          "negative",
+          "neutral",
+          "positive"
+        ],
+        "accuracy": 0.8809,
+        "precision": 0.5993,
+        "recall": 0.5844,
+        "f1": 0.5913,
+        "per_class": {
+          "negative": {
+            "precision": 0.9429,
+            "recall": 0.9559,
+            "f1": 0.9494,
+            "support": 363
+          },
+          "neutral": {
+            "precision": 0.05,
+            "recall": 0.0556,
+            "f1": 0.0526,
+            "support": 18
+          },
+          "positive": {
+            "precision": 0.8049,
+            "recall": 0.7416,
+            "f1": 0.7719,
+            "support": 89
+          }
+        },
+        "matrix": [
+          [
+            347,
+            2,
+            14
+          ],
+          [
+            15,
+            1,
+            2
+          ],
+          [
+            6,
+            17,
+            66
+          ]
+        ]
+      },
+      "by_platform": {
+        "lazada": {
+          "sample_count": 167,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.8862,
+          "precision": 0.6672,
+          "recall": 0.6346,
+          "f1": 0.6399,
+          "per_class": {
+            "negative": {
+              "precision": 0.9565,
+              "recall": 0.9821,
+              "f1": 0.9692,
+              "support": 112
+            },
+            "neutral": {
+              "precision": 0.0714,
+              "recall": 0.1667,
+              "f1": 0.1,
+              "support": 6
+            },
+            "positive": {
+              "precision": 0.9737,
+              "recall": 0.7551,
+              "f1": 0.8506,
+              "support": 49
+            }
+          },
+          "matrix": [
+            [
+              110,
+              1,
+              1
+            ],
+            [
+              5,
+              1,
+              0
+            ],
+            [
+              0,
+              12,
+              37
+            ]
+          ]
+        },
+        "temu": {
+          "sample_count": 303,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.8779,
+          "precision": 0.5319,
+          "recall": 0.5564,
+          "f1": 0.5437,
+          "per_class": {
+            "negative": {
+              "precision": 0.9368,
+              "recall": 0.9442,
+              "f1": 0.9405,
+              "support": 251
+            },
+            "neutral": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 12
+            },
+            "positive": {
+              "precision": 0.6591,
+              "recall": 0.725,
+              "f1": 0.6905,
+              "support": 40
+            }
+          },
+          "matrix": [
+            [
+              237,
+              1,
+              13
+            ],
+            [
+              10,
+              0,
+              2
+            ],
+            [
+              6,
+              5,
+              29
+            ]
+          ]
+        }
+      },
+      "mean_confidence": 0.752678,
+      "errors": [
+        {
+          "review_id": "local-0013-lazada_ph_direct-10pcs-inorder-ko-9pcs-lang-dumat",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.890819,
+          "review_text": "10pcs inorder ko 9pcs lang dumating"
+        },
+        {
+          "review_id": "local-0014-lazada_ph_direct-diko-pa-nasubukan-e-later-rate-k",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.669918,
+          "review_text": "Diko pa nasubukan e, later rate ko"
+        },
+        {
+          "review_id": "local-0015-lazada_ph_direct-sira-yaan-na-mura-lang-naman",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.488779,
+          "review_text": "sira 😅 yaan na mura lang naman"
+        },
+        {
+          "review_id": "local-0073-lazada_ph_direct-quality-the-item-is-kinda-bit-da",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.846479,
+          "review_text": "Quality:the item is kinda bit damage it has a little light in the that is too bright i dont know if its in the cover of lcd or the pixel itself"
+        },
+        {
+          "review_id": "local-0074-lazada_ph_direct-maganda-naman-staka-ayoss",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.841641,
+          "review_text": "maganda Naman staka ayoss"
+        },
+        {
+          "review_id": "local-0080-lazada_ph_direct-ease-of-use-easy-to-handle-user-",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.515567,
+          "review_text": "Ease of Use:Easy to handle, User-friendly,"
+        },
+        {
+          "review_id": "local-0084-lazada_ph_direct-ease-of-use-good",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.615387,
+          "review_text": "Ease of Use:good"
+        },
+        {
+          "review_id": "local-0089-lazada_ph_direct-the-touch-screen-is-very-respons",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.576415,
+          "review_text": "The touch screen is very responsive,"
+        },
+        {
+          "review_id": "local-0090-lazada_ph_direct-ease-of-use-touch-responsive-is-",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.779544,
+          "review_text": "Ease of Use:touch responsive is good"
+        },
+        {
+          "review_id": "local-0104-lazada_ph_direct-pointer-movement-not-smooth-smal",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.728877,
+          "review_text": "pointer movement not smooth, smaller than standard mouse, not that great to use. Now i know why it's cheap."
+        },
+        {
+          "review_id": "local-0107-lazada_ph_direct-the-new-study-is-part-of-a-broad",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.833164,
+          "review_text": "the new study is part of a broader effort in the study of the brain and the ability to teowowiwt"
+        },
+        {
+          "review_id": "local-0110-lazada_ph_direct-kaya-pala-mura-ang-cute-pala",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.743531,
+          "review_text": "kaya pala mura ang cute pala.. 🤣😂"
+        },
+        {
+          "review_id": "local-0128-lazada_ph_direct-clear-voice-pickup-pero-magaan-l",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.941851,
+          "review_text": "Clear voice pickup, pero magaan lang xea"
+        },
+        {
+          "review_id": "local-0130-lazada_ph_direct-cardioid-pattern-crystal-clear-s",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.824695,
+          "review_text": "Cardioid pattern, Crystal clear sound, Clear voice pickup, Clear voice pickup, fast delivery"
+        },
+        {
+          "review_id": "local-0157-lazada_ph_test_f-high-sensitivity-clear-voice-pic",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.530116,
+          "review_text": "High sensitivity, Clear voice pickup, Compact design, Fast shipping, Easy to use, Crystal clear sound,"
+        },
+        {
+          "review_id": "local-0165-lazada_ph_test_f-ayos-to-maganda-ang-sound-qualit",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.735813,
+          "review_text": "Ayos to! maganda ang sound quality. malakas ang pickup at walang feedback kahit malapit sa speaker. may ON/OFF switch din. may kasama pang libreng foam cover. medyo girlie lang kulay kasi pink yung cable at saka may pink din sa mic...hehe"
+        },
+        {
+          "review_id": "local-0167-lazada_ph_test_f-high-sensitivity-professional-co",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.564148,
+          "review_text": "High sensitivity, Professional connector, Clear voice pickup,"
+        },
+        {
+          "review_id": "local-0170-lazada_ph_test_f-professional-connector-clear-voi",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.609037,
+          "review_text": "Professional connector, Clear voice pickup, Anti-noise feature, Good for karaoke, High sensitivity, Cardioid pattern,"
+        },
+        {
+          "review_id": "local-0173-lazada_ph_test_f-fast-shipping-crystal-clear-soun",
+          "platform": "lazada",
+          "product_id": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.779174,
+          "review_text": "Fast shipping, Crystal clear sound, Clear voice pickup,"
+        },
+        {
+          "review_id": "local-0187-temu_ph_direct_1-it-connected-but-there-s-some-no",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100344333196",
+          "expected": "negative",
+          "predicted": "neutral",
+          "confidence": 0.812863,
+          "review_text": "It connected, but there's some noise in the signal."
+        },
+        {
+          "review_id": "local-0188-temu_ph_direct_1-the-item-is-ok",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100344333196",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.977009,
+          "review_text": "the item is ok"
+        },
+        {
+          "review_id": "local-0189-temu_ph_direct_1-it-gets-stuck-and-it-wears-out-q",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.674795,
+          "review_text": "It gets stuck, and it wears out quickly"
+        },
+        {
+          "review_id": "local-0192-temu_ph_direct_1-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.393702,
+          "review_text": "🤔👎"
+        },
+        {
+          "review_id": "local-0195-temu_ph_direct_1-great-the-battery-lasts-a-long-t",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.728708,
+          "review_text": "Great, the battery lasts a long time"
+        },
+        {
+          "review_id": "local-0210-temu_ph_direct_1-don-t-buy-it",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.457373,
+          "review_text": "Don't buy it"
+        },
+        {
+          "review_id": "local-0225-temu_ph_direct_4-too-much-time-spent-about-1-week",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099533822138",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.63115,
+          "review_text": "Too much time spent About 1 week to wait That's why I won't use it again"
+        },
+        {
+          "review_id": "local-0228-temu_ph_direct_4-i-should-have-paid-a-little-more",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099533822138",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.432754,
+          "review_text": "I should have paid a little more to get better quality"
+        },
+        {
+          "review_id": "local-0230-temu_ph_direct_4-i-ll-give-it-3-stars-as-it-s-som",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099533822138",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.767886,
+          "review_text": "I'll give it 3 stars, as it's somewhat good"
+        },
+        {
+          "review_id": "local-0232-temu_ph_direct_4-low-volume",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099533822138",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.63876,
+          "review_text": "low volume"
+        },
+        {
+          "review_id": "local-0238-temu_ph_direct_5-for-the-price-the-sound-is-okay-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=605886403728740",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.793074,
+          "review_text": "For the price, the sound is okay, but I would prefer more powerful bass"
+        },
+        {
+          "review_id": "local-0260-temu_ph_direct_6-the-sound-seems-to-be-echoing-ma",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.804997,
+          "review_text": "The sound seems to be echoing, making it sound like it's coming from two sources"
+        },
+        {
+          "review_id": "local-0274-temu_ph_direct_6-i-don-t-recommend-it-the-sound-q",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.860651,
+          "review_text": "I don't recommend it, the sound quality isn't good"
+        },
+        {
+          "review_id": "local-0288-temu_ph_direct_6-trying-them-on",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.716774,
+          "review_text": "trying them on"
+        },
+        {
+          "review_id": "local-0303-temu_ph_direct_6-it-won-t-connect-to-my-phone",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.458594,
+          "review_text": "It won't connect to my phone. 😢"
+        },
+        {
+          "review_id": "local-0325-temu_ph_direct_6-there-s-quite-a-bit-of-noise-be-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.398008,
+          "review_text": "There's quite a bit of noise. Be prepared for that when you buy it"
+        },
+        {
+          "review_id": "local-0326-temu_ph_direct_6-ok",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.954833,
+          "review_text": "ok"
+        },
+        {
+          "review_id": "local-0328-temu_ph_direct_6-the-battery-although-understanda",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.902642,
+          "review_text": "The battery, although understandable given the price"
+        },
+        {
+          "review_id": "local-0349-temu_ph_direct_6-i-haven-t-received-the-item-yet",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.659672,
+          "review_text": "I haven't received the item yet."
+        },
+        {
+          "review_id": "local-0353-temu_ph_direct_6-i-haven-t-received-it",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.846001,
+          "review_text": "I haven't received it"
+        },
+        {
+          "review_id": "local-0359-temu_ph_direct_6-roughly",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "positive",
+          "confidence": 0.393067,
+          "review_text": "Roughly"
+        },
+        {
+          "review_id": "local-0362-temu_ph_direct_6-you-get-what-you-pay-for-the-sou",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.784075,
+          "review_text": "You get what you pay for. The sound quality is almost the same as that of 100 yen store wireless earphones, so they're worth about 400 yen. Well, I guess that's reasonable."
+        },
+        {
+          "review_id": "local-0367-temu_ph_direct_6-no-they-re-not-ugly-i-liked-them",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.993782,
+          "review_text": "No, they're not ugly. I liked them."
+        },
+        {
+          "review_id": "local-0372-temu_ph_direct_6-it-hasn-t-arrived",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.668063,
+          "review_text": "It hasn't arrived"
+        },
+        {
+          "review_id": "local-0373-temu_ph_direct_6-it-serves-its-purpose-for-the-pr",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.774897,
+          "review_text": "It serves its purpose for the price, which is good."
+        },
+        {
+          "review_id": "local-0384-temu_ph_direct_6-the-product-is-exactly-as-in-the",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.843356,
+          "review_text": "The product is exactly as in the photo. It's quite ordinary for the price."
+        },
+        {
+          "review_id": "local-0401-temu_ph_direct_6-it-looks-like-it-won-t-last-long",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.776948,
+          "review_text": "It looks like it won't last long, so I won't order from you again, you bunch of scammers."
+        },
+        {
+          "review_id": "local-0441-temu_ph_direct_6-chinese-language",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.633126,
+          "review_text": "Chinese language"
+        },
+        {
+          "review_id": "local-0449-temu_ph_direct_6-there-s-no-problem-with-the-soun",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.526563,
+          "review_text": "There's no problem with the sound quality"
+        },
+        {
+          "review_id": "local-0451-temu_ph_direct_6-it-s-hard-to-take-out",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "neutral",
+          "predicted": "negative",
+          "confidence": 0.83074,
+          "review_text": "It's hard to take out"
+        },
+        {
+          "review_id": "local-0453-temu_ph_direct_6-the-device-takes-a-long-time-to-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100260215296",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.452295,
+          "review_text": "The device takes a long time to start up, and the battery drains quickly"
+        },
+        {
+          "review_id": "local-0454-temu_ph_direct_6-they-re-thinner-than-i-expected-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100935391760",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.455004,
+          "review_text": "They're thinner than I expected, but that's not really a problem. They sound great and start playing as soon as you connect them"
+        },
+        {
+          "review_id": "local-0456-temu_ph_direct_6-",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601100935391760",
+          "expected": "positive",
+          "predicted": "negative",
+          "confidence": 0.393702,
+          "review_text": "❤️❤️❤️"
+        },
+        {
+          "review_id": "local-0472-temu_ph_direct_6-this-is-garbage-made-in-china-co",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099715489226",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.563589,
+          "review_text": "This is garbage! Made in China, complete junk!"
+        },
+        {
+          "review_id": "local-0484-temu_ph_direct_6-no-good-voice",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099715489226",
+          "expected": "negative",
+          "predicted": "positive",
+          "confidence": 0.509038,
+          "review_text": "No good voice"
+        },
+        {
+          "review_id": "local-0494-temu_ph_direct_6-i-haven-t-used-it-yet-but-i-m-su",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099715489226",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.584619,
+          "review_text": "I haven't used it yet, but I'm sure I'll enjoy using it."
+        },
+        {
+          "review_id": "local-0498-temu_ph_test_fre-it-took-a-while-but-everything-a",
+          "platform": "temu",
+          "product_id": "https://www.temu.com/goods.html?goods_id=601099715489226",
+          "expected": "positive",
+          "predicted": "neutral",
+          "confidence": 0.827318,
+          "review_text": "It took a while, but everything arrived fine in the end"
+        }
+      ],
+      "risk": {
+        "detection": {
+          "sample_count": 492,
+          "labels": [
+            "no",
+            "yes"
+          ],
+          "accuracy": 0.4593,
+          "precision": 0.6241,
+          "recall": 0.6633,
+          "f1": 0.455,
+          "per_class": {
+            "no": {
+              "precision": 0.2556,
+              "recall": 0.9891,
+              "f1": 0.4062,
+              "support": 92
+            },
+            "yes": {
+              "precision": 0.9926,
+              "recall": 0.3375,
+              "f1": 0.5037,
+              "support": 400
+            }
+          },
+          "matrix": [
+            [
+              91,
+              1
+            ],
+            [
+              265,
+              135
+            ]
+          ]
+        },
+        "category": {
+          "sample_count": 400,
+          "exact_match_count": 65,
+          "exact_match_accuracy": 0.1625,
+          "policy": "gold category matches any category predicted for the review"
+        },
+        "severity": {
+          "sample_count": 398,
+          "exact_match_accuracy": 0.2839,
+          "mean_absolute_error": 1.5603,
+          "policy": "prediction is the maximum matched-evidence severity; zero means no evidence"
+        }
+      }
+    }
+  }
+}

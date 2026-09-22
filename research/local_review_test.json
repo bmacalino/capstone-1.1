@@ -1,0 +1,209 @@
+{
+  "model_version": "defaketive-firecs-tfidf-0.2.0",
+  "annotated": {
+    "file": "manual_mixed_review_annotations.csv",
+    "metrics": {
+      "sample_count": 10,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.6,
+      "precision": 0.5185,
+      "recall": 0.4444,
+      "f1": 0.4048,
+      "per_class": {
+        "negative": {
+          "precision": 1.0,
+          "recall": 0.3333,
+          "f1": 0.5,
+          "support": 3
+        },
+        "neutral": {
+          "precision": 0.5556,
+          "recall": 1.0,
+          "f1": 0.7143,
+          "support": 5
+        },
+        "positive": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        }
+      },
+      "matrix": [
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ]
+      ]
+    },
+    "predictions": [
+      {
+        "annotation_id": "mixed-001",
+        "expected": "neutral",
+        "predicted": "neutral",
+        "review": "Okay naman pero wrong color ang dumating."
+      },
+      {
+        "annotation_id": "mixed-002",
+        "expected": "neutral",
+        "predicted": "neutral",
+        "review": "Maganda naman siya kaso may leak, pero overall okay."
+      },
+      {
+        "annotation_id": "mixed-003",
+        "expected": "negative",
+        "predicted": "neutral",
+        "review": "Good packaging, but the item does not work."
+      },
+      {
+        "annotation_id": "mixed-004",
+        "expected": "neutral",
+        "predicted": "neutral",
+        "review": "Okay lang naman, may minor defect pero nagagamit pa."
+      },
+      {
+        "annotation_id": "mixed-005",
+        "expected": "neutral",
+        "predicted": "neutral",
+        "review": "Nice product, wrong size lang yung isa."
+      },
+      {
+        "annotation_id": "mixed-006",
+        "expected": "neutral",
+        "predicted": "neutral",
+        "review": "Maganda ang item pero mabilis masira."
+      },
+      {
+        "annotation_id": "mixed-007",
+        "expected": "negative",
+        "predicted": "neutral",
+        "review": "The packaging is good but there is a glitch while using the phone."
+      },
+      {
+        "annotation_id": "mixed-008",
+        "expected": "positive",
+        "predicted": "neutral",
+        "review": "Okay naman yung kulay pero hindi nasunod yung order ko."
+      },
+      {
+        "annotation_id": "mixed-009",
+        "expected": "negative",
+        "predicted": "negative",
+        "review": "Received on time, but the missing accessory was disappointing."
+      },
+      {
+        "annotation_id": "mixed-010",
+        "expected": "positive",
+        "predicted": "neutral",
+        "review": "Satisfied overall, although the material is thinner than expected."
+      }
+    ]
+  },
+  "scraped": {
+    "file_count": 40,
+    "unique_review_count": 500,
+    "by_platform": {
+      "lazada": {
+        "negative": 122,
+        "risk": 66,
+        "positive": 38,
+        "neutral": 14
+      },
+      "temu": {
+        "negative": 272,
+        "risk": 72,
+        "positive": 46,
+        "neutral": 8
+      }
+    },
+    "examples": [
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "False",
+        "review": "parehong for right ear ang bud. joke time ata ito. paano mo gagamitin."
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "For the first look, it reflects good, but I received this broken. Not also functioning the sounds even I did anything. So I give this seller one star for what I received, this he/she deserves. Grrrrrrrrr. No to buy again."
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "hindi gumagana earphones n nareceived ko, pwd po b ireturn tong item"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "not working yung isang earpiece. sayang pera. will not repurchase."
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "ang bilis nyang nasira. oneday ko lang nagamit amp"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "Sira naman yangpinadala nyo! sayang pera"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "Functionality:hnd gumagana..wlang kwenta!!!!"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "sira lahat ngpinadala"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "madali nasira lol"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "False",
+        "review": "😭😭not durable pero good for 9pesoz malakas lakas den may ibubuga pero nabalik agad😭😭😭😭"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "True",
+        "review": "mapapa putang*na ka talaga! FYI po hindi sira yung pera ko para ibigay nyo saken sira😡🤨"
+      },
+      {
+        "platform": "lazada",
+        "label": "negative",
+        "risk": "False",
+        "review": "ma'am/sir IBA PO YUNG NAGDELIVERAN NYO WLA PA SAKIN PANO YAN PO SAYANG BAYAD KO"
+      }
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="DeFaketive helps Filipino shoppers spot suspicious reviews and product-risk signals before they buy.">
     <meta property="og:type" content="website">
     <meta property="og:title" content="DeFaketive — Review Risk Intelligence">
@@ -12,9 +12,11 @@
     <title>DeFaketive — Review Risk Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/figma.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/overhaul.css') }}">
   </head>
   <body data-active-view="landing">
     <div class="aurora-layer" aria-hidden="true">
@@ -50,34 +52,34 @@
     <main class="site-main">
       <div id="landing" class="view active landing-view new-landing" data-view="landing">
         <section class="landing-hero" aria-labelledby="landing-title">
-          <p class="landing-eyebrow"><span>//</span> HOME</p>
+          <p class="landing-eyebrow"><span aria-hidden="true">●</span> REVIEW RISK INTELLIGENCE · PHILIPPINES</p>
           <div class="landing-hero-grid">
             <div class="landing-hero-copy">
-              <h1 id="landing-title">Spot fake reviews<br>before you buy — in<br>Taglish.</h1>
-              <p>DeFaketive gives every product a transparent Risk Score (0–1) based on what Filipino shoppers actually write.</p>
+              <h1 id="landing-title">Read the evidence<br>before you buy.</h1>
+              <p>DeFaketive examines public Shopee, Lazada, and Temu reviews for sentiment and product-risk signals—including the Taglish phrases other tools can miss.</p>
               <div class="landing-hero-actions">
-                <a class="landing-button primary" href="#search-query" data-focus-search>Try It Free</a>
-                <button class="landing-button secondary" type="button" data-signin>Sign In →</button>
+                <a class="landing-button primary" href="#search-query" data-focus-search>Analyze a product</a>
+                <a class="landing-button secondary" href="#how" data-scroll="how">See the method</a>
               </div>
-              <small>Free · 3 scans/day as guest — unlimited with a free account</small>
+              <small>Decision support, not proof of fraud or authenticity.</small>
             </div>
             <form id="guest-start-form" class="landing-search-card" data-start-analysis>
-              <div class="landing-search-head"><span>SCAN A PRODUCT</span><b>START HERE</b></div>
-              <p class="landing-search-help">Check a product before you buy. Paste a Shopee PH, Lazada PH, or Temu link.</p>
+              <div class="landing-search-head"><span>NEW ANALYSIS</span><b>01 / COLLECT</b></div>
+              <p class="landing-search-help">Paste a supported Philippine marketplace product link to begin an evidence review.</p>
               <label for="guest-product-query">Product link</label>
               <input id="guest-product-query" name="product-query" placeholder="Paste a product link..." autocomplete="off">
               <button class="primary-button" type="submit">Analyze product →</button>
-              <p class="landing-search-note">Next: review scan options and start your analysis.</p>
+              <p class="landing-search-note">Shopee PH · Lazada PH · Temu PH</p>
             </form>
           </div>
         </section>
 
-        <section class="landing-stats" aria-label="DeFaketive statistics">
-          <article><b>12,847</b><span>TOTAL USE</span></article><article><b>98,610</b><span>REVIEWS SCANNED</span></article><article><b>4,392</b><span>TOTAL USERS</span></article><article><b>4</b><span>PLATFORMS SUPPORTED</span></article>
+        <section class="landing-stats" aria-label="Analysis workflow">
+          <article><b>01</b><span>COLLECT PUBLIC REVIEWS</span></article><article><b>02</b><span>CLASSIFY SENTIMENT</span></article><article><b>03</b><span>INSPECT RISK SIGNALS</span></article><article><b>04</b><span>READ THE EVIDENCE</span></article>
         </section>
 
         <section id="how" class="landing-section landing-explore">
-          <header class="landing-section-head"><span>// 001 — BROWSE BY CATEGORY</span><h2>Explore</h2></header>
+          <header class="landing-section-head"><span>THE METHOD</span><h2>From listing to evidence</h2><p>Four stages keep the score connected to the reviews behind it.</p></header>
           <div class="landing-tabs" role="tablist" aria-label="Explore DeFaketive">
             <button class="active" type="button" role="tab" aria-selected="true" data-explore-tab="how-it-works">How It Works</button><button type="button" role="tab" aria-selected="false" data-explore-tab="what-we-detect">What We Detect</button><button type="button" role="tab" aria-selected="false" data-explore-tab="risk-score">Risk Score</button><button type="button" role="tab" aria-selected="false" data-explore-tab="built-different">Built Different</button>
           </div>
@@ -96,23 +98,23 @@
         </section>
 
         <section class="landing-section">
-          <header class="landing-section-head"><span>// 002 — USER TESTING · 565 SESSIONS</span><h2>From the Field</h2></header>
+          <header class="landing-section-head"><span>RESEARCH PRINCIPLES</span><h2>What the report promises</h2></header>
           <div class="landing-testimonials">
-            <article><blockquote>“I check DeFaketive before buying anything electronic now. It explained exactly why a charger I almost bought had bad reviews.”</blockquote><footer><b>A</b><span><strong>Ana R.</strong><small>@SHOPAHOLIC.ANR</small></span></footer></article>
-            <article><blockquote>“The Taglish keyword thing actually works — it picked up ‘sira’ and ‘peke’ from reviews I would've skimmed past.”</blockquote><footer><b>M</b><span><strong>Marco D.</strong><small>@TECHIE.MARCO</small></span></footer></article>
-            <article><blockquote>“Simple enough that I didn't need instructions — paste the link, read the score, done.”</blockquote><footer><b>J</b><span><strong>Julienne P.</strong><small>@JORTS.SHOPPER</small></span></footer></article>
+            <article><blockquote>The verdict never stands alone. Every concern leads back to the review language that triggered it.</blockquote><footer><b>01</b><span><strong>Evidence first</strong><small>TRACEABLE FINDINGS</small></span></footer></article>
+            <article><blockquote>Filipino, English, and Taglish expressions are treated as product evidence—not noise to be discarded.</blockquote><footer><b>02</b><span><strong>Language aware</strong><small>LOCAL CONTEXT</small></span></footer></article>
+            <article><blockquote>A risk score summarizes a collected sample. It does not declare a seller or product fraudulent.</blockquote><footer><b>03</b><span><strong>Careful claims</strong><small>DECISION SUPPORT</small></span></footer></article>
           </div>
         </section>
 
         <section id="faq" class="landing-section landing-faq-section">
-          <header class="landing-section-head"><span>// 003 — FAQ</span><h2>Common Questions</h2></header>
+          <header class="landing-section-head"><span>QUESTIONS</span><h2>Before you rely on a report</h2></header>
           <div class="landing-faq-list">
             <details><summary>Is DeFaketive really free to use?<span>+</span></summary><p>Yes. Guests get three scans per day, while a free account unlocks unlimited analyses.</p></details><details><summary>How accurate is the Risk Score?<span>+</span></summary><p>It summarizes sentiment and product-risk signals in the collected review sample. Use it as decision support, not proof.</p></details><details><summary>What's the difference between guest and signed-in?<span>+</span></summary><p>The workspace brings together product analysis, saved reports, and your wishlist.</p></details><details><summary>Which platforms are supported?<span>+</span></summary><p>DeFaketive supports product links from Shopee PH, Lazada PH, and Temu.</p></details><details><summary>What happens if a product scores high-risk?<span>+</span></summary><p>Review the highlighted evidence and compare lower-risk alternatives before deciding to buy.</p></details>
           </div>
         </section>
 
         <section id="about" class="landing-section landing-team-section">
-          <header class="landing-section-head"><span>// 004 — PANGASINAN STATE UNIVERSITY · URDANETA</span><h2>The Team</h2></header>
+          <header class="landing-section-head"><span>PANGASINAN STATE UNIVERSITY · URDANETA</span><h2>The research team</h2></header>
           <div class="landing-team-grid">
             <article class="landing-adviser"><span>CAPSTONE ADVISER</span><div class="landing-person"><b class="purple">KD</b><p><strong>Kathleen De Guzman</strong><small>Faculty Adviser</small></p></div></article>
             <article class="landing-team"><span>CAPSTONE TEAM</span><div><div class="landing-person"><b>MC</b><p><strong>Mark Rhean Caballero</strong><small>Capstone Leader</small></p></div><div class="landing-person"><b>BM</b><p><strong>Brian Macalino</strong><small>Programmer</small></p></div><div class="landing-person"><b>RR</b><p><strong>Ryan Rovic Retuya</strong><small>UI / UX</small></p></div><div class="landing-person"><b>PG</b><p><strong>Princethom Guyo</strong><small>Designer</small></p></div></div></article>
@@ -121,9 +123,9 @@
 
         <section class="landing-cta">
           <div class="landing-cta-brand"><span><img src="{{ url_for('static', filename='assets/figma/landing-eye.svg') }}" width="10" height="10" alt=""></span> DEFAKETIVE</div>
-          <h2>Start shopping smarter today.</h2><p>Create a free account for unlimited scans, scan history, and saved products — no credit card required.</p>
-          <div><button class="landing-cta-primary" type="button" data-signin>Sign Up Now — It's Free</button><a class="landing-cta-secondary" href="#search-query" data-focus-search>Try as Guest →</a></div>
-          <small>Free forever · No credit card · Unlimited scans</small>
+          <h2>Bring one listing.<br>Leave with the evidence.</h2><p>Analyze a supported product link, inspect the signals, and decide with the original review context in view.</p>
+          <div><a class="landing-cta-primary" href="#search-query" data-focus-search>Analyze a product</a></div>
+          <small>Shopee PH · Lazada PH · Temu PH</small>
         </section>
 
         <footer class="landing-footer">
@@ -140,12 +142,12 @@
         <button class="workspace-backdrop" type="button" aria-label="Close navigation" hidden></button>
         <aside id="workspace-sidebar" class="workspace-sidebar" aria-label="Workspace navigation">
           <a class="workspace-brand" href="#home" data-route="home"><span><img src="{{ url_for('static', filename='assets/figma/home-logo.svg') }}" width="16" height="12" alt=""></span><b>DeFaketive<small>SHOP WITH CONFIDENCE</small></b></a>
-          <p class="workspace-nav-label">WORKSPACE</p>
+          <p class="workspace-nav-label">EVIDENCE DESK</p>
           <nav class="workspace-nav">
-            <a href="#home" data-route="home"><span aria-hidden="true">⌂</span>Home</a>
-            <a href="#analyze" data-route="analyze"><span aria-hidden="true">＋</span>Analyze Product</a>
+            <a href="#home" data-route="home"><span aria-hidden="true">⌂</span>Overview</a>
+            <a href="#analyze" data-route="analyze"><span aria-hidden="true">＋</span>Analyze</a>
             <a href="#history" data-route="history"><span aria-hidden="true">◷</span>History</a>
-            <a href="#wishlist" data-route="wishlist"><span aria-hidden="true">♡</span>Wishlist</a>
+            <a href="#wishlist" data-route="wishlist"><span aria-hidden="true">♡</span>Saved</a>
             <a href="#settings" data-route="settings"><span aria-hidden="true">⚙</span>Settings</a>
           </nav>
           <div class="workspace-sidebar-tip"><b>A little context helps.</b><p>Read the flagged reviews alongside the risk score before deciding to buy.</p></div>
@@ -206,7 +208,7 @@
               </fieldset>
               <details id="advanced-options" class="advanced-options" hidden>
                 <summary><span class="advanced-icon" aria-hidden="true">⚙</span><span class="advanced-label"><b>Advanced options</b><small>Change product and review limits</small></span><span class="advanced-chevron" aria-hidden="true">⌄</span></summary>
-                <div class="search-options"><label id="product-count-field">Products <input id="product-count" type="number" min="1" max="30" value="6"></label><label>Reviews each <input id="review-count" type="number" min="1" max="200" value="30"></label></div>
+                <div class="search-options"><label id="product-count-field">Products <input id="product-count" type="number" min="1" max="30" value="6"></label><label>Reviews each <input id="review-count" type="number" min="1" max="100" value="100"></label></div>
               </details>
               <p id="scan-summary" class="scan-summary" hidden></p>
               <div class="search-actions"><button id="search-submit" class="primary-button" type="submit" data-search-intent="saved" disabled>Analyze</button><button id="fresh-search" class="secondary-button" type="submit" data-search-intent="live" hidden>Collect fresh reviews</button></div>

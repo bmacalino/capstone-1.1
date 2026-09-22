@@ -26,7 +26,7 @@ import numpy as np
 import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.svm import LinearSVC
 
@@ -36,6 +36,7 @@ if str(SENTIMENT_ROOT) not in sys.path:
     sys.path.insert(0, str(SENTIMENT_ROOT))
 
 from defaketive_sentiment.model import DefaketiveSentimentModel
+from defaketive_sentiment.trained import feature_text
 from evaluate_firecs import load_firecs
 from research_utils import evaluate_labels
 
@@ -52,6 +53,7 @@ DEFAULT_SENTITAGLISH = (
     / "SentiTaglish_ProductsAndServices.csv"
 )
 DEFAULT_TAGASENTI = SENTIMENT_ROOT / "data" / "tagasenti" / "tagasenti_dataset.csv"
+DEFAULT_LAZADA_FILIPINO = ROOT / "research" / "data" / "lazada_review_filipino_reviews.json"
 DEFAULT_MODEL = SENTIMENT_ROOT / "models" / "firecs_sentiment.joblib"
 DEFAULT_RESULT = SENTIMENT_ROOT / "evaluation" / "firecs_trained_model.json"
 DEFAULT_ERRORS = SENTIMENT_ROOT / "evaluation" / "firecs_trained_model_errors.csv"
@@ -61,7 +63,7 @@ DEFAULT_INCUMBENT = SENTIMENT_ROOT / "evaluation" / "firecs_trained_model.json"
 
 def normalized_text(value: Any) -> str:
     """Use the same stable text normalization as the runtime model."""
-    return DefaketiveSentimentModel.normalize(value)
+    return feature_text(DefaketiveSentimentModel.normalize(value))
 
 
 def audit_key(value: Any) -> str:
@@ -146,6 +148,39 @@ def load_tagasenti(path: Path) -> tuple[list[dict[str, str]], dict[str, Any]]:
         ),
         "license": "CC BY-SA 4.0",
         "source": "https://huggingface.co/datasets/jjjardev/tagasenti",
+    }
+
+
+def load_lazada_filipino(path: Path) -> tuple[list[dict[str, str]], dict[str, Any]]:
+    """Load weakly annotated Filipino Lazada reviews using star-rating bands."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    label_map = {1: "negative", 2: "negative", 3: "neutral", 4: "positive", 5: "positive"}
+    records: list[dict[str, str]] = []
+    invalid_rows = 0
+    for row in data:
+        if not isinstance(row, dict):
+            invalid_rows += 1
+            continue
+        review = str(row.get("review") or "").strip()
+        try:
+            rating = int(row.get("rating"))
+        except (TypeError, ValueError):
+            rating = 0
+        label = label_map.get(rating)
+        if not review or label is None:
+            invalid_rows += 1
+            continue
+        records.append(
+            {"review": review, "label": label, "source": "lazada_rating_weak"}
+        )
+    return records, {
+        "file": path.name,
+        "sha256": dataset_sha256(path),
+        "usable_rows": len(records),
+        "invalid_rows_excluded": invalid_rows,
+        "annotation_method": "weak labels derived from star ratings: 1-2 negative, 3 neutral, 4-5 positive",
+        "license": "unknown",
+        "source": "https://huggingface.co/datasets/SEACrowd/lazada_review_filipino",
     }
 
 
@@ -262,32 +297,75 @@ def candidate_factories() -> dict[str, Callable[[], Pipeline]]:
                 ),
             ]
         ),
+        "word_character_logistic_regression_unweighted": lambda: Pipeline(
+            [
+                ("features", combined_features()),
+                (
+                    "classifier",
+                    LogisticRegression(
+                        C=4.0,
+                        class_weight=None,
+                        max_iter=1_000,
+                        solver="lbfgs",
+                    ),
+                ),
+            ]
+        ),
     }
 
 
 def validation_experiment(
-    texts: list[str], labels: list[str], random_state: int
+    texts: list[str],
+    labels: list[str],
+    random_state: int,
+    validation_splits: int = 3,
+    validation_repeats: int = 2,
 ) -> tuple[str, dict[str, Any]]:
-    fit_texts, validation_texts, fit_labels, validation_labels = train_test_split(
-        texts,
-        labels,
-        test_size=0.20,
+    splitter = RepeatedStratifiedKFold(
+        n_splits=validation_splits,
+        n_repeats=validation_repeats,
         random_state=random_state,
-        stratify=labels,
     )
-    candidates: dict[str, Any] = {}
+    candidates: dict[str, dict[str, Any]] = {}
     for name, factory in candidate_factories().items():
+        fold_metrics: list[dict[str, Any]] = []
         started = time.perf_counter()
-        pipeline = factory()
-        pipeline.fit(fit_texts, fit_labels)
-        predictions = pipeline.predict(validation_texts)
-        metrics = evaluate_labels(validation_labels, predictions)
-        metrics["fit_seconds"] = round(time.perf_counter() - started, 3)
-        candidates[name] = metrics
+        for fit_indices, validation_indices in splitter.split(texts, labels):
+            fit_texts = [texts[index] for index in fit_indices]
+            fit_labels = [labels[index] for index in fit_indices]
+            validation_texts = [texts[index] for index in validation_indices]
+            validation_labels = [labels[index] for index in validation_indices]
+            pipeline = factory()
+            pipeline.fit(fit_texts, fit_labels)
+            fold_metrics.append(
+                evaluate_labels(validation_labels, pipeline.predict(validation_texts))
+            )
+
+        mean_metrics = {
+            "accuracy": round(sum(item["accuracy"] for item in fold_metrics) / len(fold_metrics), 4),
+            "precision": round(sum(item["precision"] for item in fold_metrics) / len(fold_metrics), 4),
+            "recall": round(sum(item["recall"] for item in fold_metrics) / len(fold_metrics), 4),
+            "f1": round(sum(item["f1"] for item in fold_metrics) / len(fold_metrics), 4),
+            "fold_count": len(fold_metrics),
+            "fit_seconds": round(time.perf_counter() - started, 3),
+            "per_class": {
+                label: {
+                    metric: round(
+                        sum(item["per_class"][label][metric] for item in fold_metrics)
+                        / len(fold_metrics),
+                        4,
+                    )
+                    for metric in ("precision", "recall", "f1")
+                }
+                for label in LABELS
+            },
+        }
+        candidates[name] = mean_metrics
         print(
-            f"{name}: macro F1={metrics['f1']:.4f}, "
-            f"accuracy={metrics['accuracy']:.4f}, "
-            f"fit={metrics['fit_seconds']:.1f}s",
+            f"{name}: macro F1={mean_metrics['f1']:.4f}, "
+            f"accuracy={mean_metrics['accuracy']:.4f}, "
+            f"folds={mean_metrics['fold_count']}, "
+            f"fit={mean_metrics['fit_seconds']:.1f}s",
             flush=True,
         )
 
@@ -297,9 +375,9 @@ def validation_experiment(
     )
     return selected, {
         "random_state": random_state,
-        "strategy": "stratified 80/20 split of cleaned training data",
-        "fit_rows": len(fit_texts),
-        "validation_rows": len(validation_texts),
+        "strategy": "repeated stratified cross-validation of cleaned training data",
+        "n_splits": validation_splits,
+        "n_repeats": validation_repeats,
         "selection_metric": "macro_f1",
         "candidates": candidates,
         "selected_candidate": selected,
@@ -351,10 +429,20 @@ def train_and_evaluate(args: argparse.Namespace) -> dict[str, Any]:
         records, source_audit = load_tagasenti(args.tagasenti.resolve())
         train_records.extend(records)
         auxiliary_audits.append(source_audit)
+    if args.include_lazada_filipino:
+        records, source_audit = load_lazada_filipino(args.lazada_filipino.resolve())
+        train_records.extend(records)
+        auxiliary_audits.append(source_audit)
 
     texts, labels, audit = audit_training_records(train_records, test_records)
 
-    selected, validation = validation_experiment(texts, labels, args.random_state)
+    selected, validation = validation_experiment(
+        texts,
+        labels,
+        args.random_state,
+        args.validation_splits,
+        args.validation_repeats,
+    )
     print(f"Selected {selected}; retraining on {len(texts)} cleaned rows.", flush=True)
     final_pipeline = candidate_factories()[selected]()
     final_started = time.perf_counter()
@@ -453,12 +541,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Add TagaSenti rows after duplicate/leakage filtering",
     )
     parser.add_argument("--tagasenti", type=Path, default=DEFAULT_TAGASENTI)
+    parser.add_argument("--include-lazada-filipino", action="store_true")
+    parser.add_argument("--lazada-filipino", type=Path, default=DEFAULT_LAZADA_FILIPINO)
     parser.add_argument("--model-output", type=Path, default=DEFAULT_MODEL)
     parser.add_argument("--result-output", type=Path, default=DEFAULT_RESULT)
     parser.add_argument("--errors-output", type=Path, default=DEFAULT_ERRORS)
     parser.add_argument("--baseline", type=Path, default=DEFAULT_BASELINE)
     parser.add_argument("--incumbent", type=Path, default=DEFAULT_INCUMBENT)
     parser.add_argument("--random-state", type=int, default=42)
+    parser.add_argument("--validation-splits", type=int, default=3)
+    parser.add_argument("--validation-repeats", type=int, default=2)
     parser.add_argument(
         "--minimum-improvement",
         type=float,

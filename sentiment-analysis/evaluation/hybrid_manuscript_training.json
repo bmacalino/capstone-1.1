@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "model_version": "defaketive-hybrid-manuscript-1.1.0-development",
+    "created_at": "2026-09-16T15:43:15.843103+00:00",
+    "sklearn_version": "1.9.0",
+    "deployment_status": "development_candidate",
+    "qualified_for_integration": false,
+    "qualified_for_risk_scoring_development": true,
+    "sentiment_development_gates_passed": false,
+    "qualification_note": "Risk gates passed product-grouped cross-validation. Sentiment gates did not pass, and a newly collected locked product test is still required.",
+    "sentiment_policy": "positive, negative, or uncertain; mixed and neutral map to uncertain",
+    "sentiment_strategy": "direct-three-class",
+    "risk_policy": "binary yes/no; no risk categories or severity",
+    "score_formula": "100 * (0.30 * negative_ratio + 0.70 * detected_risk_ratio)",
+    "random_state": 42,
+    "marketplace_rows": 907,
+    "marketplace_products": 24,
+    "firecs_rows_loaded": 7340,
+    "firecs_rows_used": 7340,
+    "sentiment_training_rows": 8247,
+    "risk_training_rows": 907,
+    "sentiment_distribution": {
+      "negative": 2703,
+      "uncertain": 2828,
+      "positive": 2716
+    },
+    "risk_distribution": {
+      "no_risk": 392,
+      "risk": 515
+    },
+    "sources": [
+      {
+        "path": "outputs\\lazada_gold_test_v1\\lazada_round1_all_adjudicated.csv",
+        "sha256": "5b4f1d59d06aaf4570a8adacfd0089020ea5061132028ec761b1e2ae793b8e0c"
+      },
+      {
+        "path": "sentiment-analysis\\data\\firecs\\FiReCS_train_set.csv",
+        "sha256": "9ca5ef80b8f93836f5966a1db8d017ebbd474e4b615468269cb0ba9d3778eb39"
+      },
+      {
+        "path": "sentiment-analysis\\evaluation\\hybrid_manuscript_three_class_grouped_cross_validation.json",
+        "sha256": "08743b95e18e5b75c11d769c58f1ab7727f4558747078db0e1bc6e4a9d542f82"
+      }
+    ]
+  },
+  "artifact": "sentiment-analysis\\models\\hybrid_manuscript_v1.joblib",
+  "artifact_sha256": "a89200e884c86542998330441733ea3481601b8b904beb0446a9d7e71030bcf7",
+  "risk_threshold_selection": {
+    "method": "five-fold stratified product-group out-of-fold predictions",
+    "threshold": 0.57,
+    "macro_f1": 0.7746,
+    "risk_recall": 0.8
+  },
+  "cross_validation": {
+    "report": "sentiment-analysis\\evaluation\\hybrid_manuscript_three_class_grouped_cross_validation.json",
+    "sentiment_macro_f1": 0.6116,
+    "uncertain_f1": 0.4267,
+    "risk_macro_f1": 0.7647,
+    "risk_recall": 0.8194,
+    "product_score_mae_points": 9.5062,
+    "product_band_accuracy": 0.8333
+  },
+  "next_gate": "Evaluate once on a newly frozen product-disjoint test set."
+}

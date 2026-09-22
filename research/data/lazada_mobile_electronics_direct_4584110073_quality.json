@@ -1,0 +1,31 @@
+{
+  "scope": "Lazada Philippines electronics and gadgets",
+  "stratum": "mobile_accessories",
+  "minimum_collected_reviews": 100,
+  "products_checked": 1,
+  "status_counts": {
+    "insufficient_written_reviews": 1
+  },
+  "products": [
+    {
+      "name": "Essager 2.5W Apple Watch Wireless Chargers Fast Charging Portable Zinc Alloy Type C +Lightning Twoport Wireless Charging Device For iWatch Apple Watch 2-9 Series SE Series Ultra Series Fast Charging Wireless Chargers",
+      "link": "https://www.lazada.com.ph/products/pdp-i4584110073-s26378214035.html",
+      "reported_review_count": 1318,
+      "stratum": "mobile_accessories",
+      "status": "insufficient_written_reviews",
+      "minimum_collected_reviews": 100,
+      "usable_written_reviews": 63,
+      "collected_by_star": {
+        "1": 5,
+        "2": 3,
+        "3": 7,
+        "4": 8,
+        "5": 40
+      },
+      "review_status": "complete",
+      "stop_reason": "target_reached",
+      "filter_warning": ""
+    }
+  ],
+  "generated_at": "2026-09-11T08:50:55"
+}

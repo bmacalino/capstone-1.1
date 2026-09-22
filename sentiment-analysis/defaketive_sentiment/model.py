@@ -19,6 +19,7 @@ try:
 except ImportError:  # pragma: no cover - exercised only in an incomplete install
     SentimentIntensityAnalyzer = None
 
+from .text_norm import LEGACY_VADER, normalize_text
 from .trained import DEFAULT_ARTIFACT, TrainedModelError, TrainedSentimentClassifier
 
 VADER_MODEL_VERSION = "defaketive-vader-seed-0.1.2"
@@ -49,6 +50,10 @@ FILIPINO_BOOSTERS = {
     "konti": -0.293,
 }
 
+# Superseded by lexicons/taglish_variants_v1.tsv, which the shared normalizer
+# reads. Kept here because `normalize` is expected to reproduce exactly these
+# six substitutions for the legacy profile, and because external code imports
+# the name. New variants go in the TSV, not here.
 SPELLING_NORMALIZATION = {
     "dizapoytedd": "disappointed",
     "hnd": "hindi",
@@ -178,24 +183,16 @@ class DefaketiveSentimentModel:
 
     @staticmethod
     def normalize(text: Any) -> str:
-        value = unicodedata.normalize("NFKC", str(text or ""))
-        value = value.replace("’", "'").replace("`", "'")
-        # Marketplace translations occasionally use a hyphen where a space is
-        # expected (for example, "poor-quality"). VADER keeps that as one
-        # unknown token, so normalize word-joining hyphens before matching.
-        value = re.sub(r"(?<=\w)[‐‑‒–—-](?=\w)", " ", value)
-        value = re.sub(r"\s+", " ", value).strip().casefold()
-        # Temu review translations sometimes confuse a capital I with a lower
-        # case L. VADER treats the standalone token "l" as positive slang.
-        value = re.sub(
-            r"(?<!\w)l(?=\s+(?:am|bought|can|could|did|do|have|ordered|received|was|will|would)\b)",
-            "i",
-            value,
-        )
-        parts = []
-        for part in re.split(r"(\W+)", value):
-            parts.append(SPELLING_NORMALIZATION.get(part, part))
-        return "".join(parts)
+        """Normalize review text for VADER and the lexicon matchers.
+
+        Delegates to the shared normalizer so this path and the hazard tagger
+        cannot drift apart the way `normalize` and `clean_risk_text` did. The
+        `legacy_vader` profile reproduces the original implementation byte for
+        byte; `test_text_norm.py` asserts that against curated cases and a
+        3,000-case fuzz, because this output is baked into every committed
+        artifact and every recorded evaluation result.
+        """
+        return normalize_text(text, profile=LEGACY_VADER)
 
     def fingerprint(self, text: Any) -> str:
         normalized = self.normalize(text)
@@ -402,19 +399,6 @@ class DefaketiveSentimentModel:
         max_severity = max((item["severity"] for item in active_risks), default=0)
 
         hybrid_adjustment = None
-        if self.trained_classifier is not None:
-            override_reason = self._rule_override(
-                normalized, vader_label, scores, sentiment_evidence, active_risks
-            )
-            if override_reason is not None and label != vader_label:
-                hybrid_adjustment = {
-                    "source": "explainable_rule_override",
-                    "classifier_label": label,
-                    "rule_label": vader_label,
-                    "reason": override_reason,
-                }
-                label = vader_label
-                label_source = "explainable_rule_override"
 
         # Text remains the primary signal, but a one- or two-star rating is a
         # useful tie-breaker for terse complaints that VADER cannot understand
