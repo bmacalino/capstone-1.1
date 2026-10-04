@@ -14,7 +14,8 @@ const NO_VIEW = {available: false, state: "not_analyzed", tone: "unknown", headl
 const view = (product) => product?.badge_view || NO_VIEW;
 const tone = (product) => view(product).tone || "unknown";
 const counts = (product) => ({safety: 0, counterfeit: 0, defect: 0, ...(view(product).counts || {})});
-const reviewCount = (product) => Number(view(product).reviews_analyzed || product?.comments?.length || 0) || 0;
+// Lists arrive without the reviews themselves; reviews_collected carries their number.
+const reviewCount = (product) => Number(view(product).reviews_analyzed || product?.comments?.length || product?.reviews_collected || 0) || 0;
 // Most concerning first. A safety report outranks fake and defect reports
 // even when there are too few reviews for a verdict: one fire report on a
 // four-review listing matters more than several "peke" reports.

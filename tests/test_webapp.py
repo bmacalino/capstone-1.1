@@ -361,6 +361,60 @@ class TestWebApp(unittest.TestCase):
         self.assertEqual(detail.status_code, 200)
         self.assertEqual(detail.json["product"]["name"], "Sample gadget")
 
+    def test_product_lists_are_sent_without_their_reviews(self):
+        # One product's reviews run to ~150 KB. A card shows a verdict and a
+        # count, so a list carries how many reviews there are; only a report
+        # carries the reviews themselves.
+        target = fire_product()
+        clean = {
+            **SAMPLE_PRODUCT,
+            "link": "https://shopee.ph/clean-i.1.4",
+            "name": "UGREEN power bank",
+            "comments": [
+                {"author": "A", "rating": 5, "content": "Good"},
+                {"author": "B", "rating": 5, "content": "Sulit"},
+            ],
+            "sentiment_summary": {
+                **SAMPLE_PRODUCT["sentiment_summary"],
+                "verdict": {"state": "no_warning_signs", "detail": ""},
+                "usable_review_count": 40,
+                "positive_ratio_lower_bound": 0.8,
+            },
+        }
+        webapp._catalogs["webapp-test"] = [target, clean]
+
+        listed = self.client.get("/api/products").json["products"]
+        found = self.client.post("/api/search", json={"query": "UGREEN power bank", "live": False}).json["products"]
+        with patch.object(webapp, "load_saved_products", return_value=[]):
+            report = self.client.get("/api/products/detail", query_string={"link": target["link"]}).json
+
+        for cards in (listed, found, report["recommendations"]):
+            self.assertTrue(cards)
+            for card in cards:
+                self.assertNotIn("comments", card)
+                self.assertIn("badge_view", card)
+        self.assertEqual(
+            {card["link"]: card["reviews_collected"] for card in listed},
+            {target["link"]: 1, clean["link"]: 2},
+        )
+        self.assertEqual([card["link"] for card in report["recommendations"]], [clean["link"]])
+        # The report still carries the reviews it shows.
+        self.assertEqual(len(report["product"]["comments"]), 1)
+
+    def test_an_uploaded_file_is_listed_without_its_reviews(self):
+        with patch.object(webapp, "_set_products", side_effect=lambda products: products), patch.object(webapp, "save_products") as save:
+            response = self.client.post(
+                "/api/upload",
+                data={"file": (BytesIO(json.dumps([SAMPLE_PRODUCT]).encode("utf-8")), "results.json")},
+                content_type="multipart/form-data",
+            )
+        self.assertEqual(response.status_code, 200)
+        card = response.json["products"][0]
+        self.assertNotIn("comments", card)
+        self.assertEqual(card["reviews_collected"], 1)
+        # What is saved still has every review.
+        self.assertEqual(len(save.call_args.args[0][0]["comments"]), 1)
+
     def test_lazada_live_search_uses_clean_browser_session(self):
         command, _target = webapp._command_for_scrape("earphones", "lazada", 1, 1)
 

@@ -203,6 +203,14 @@ await check("History filters and Home numbers use real records and meaningful em
   app.evaluate("renderWorkspace()");
   assert.match(app.ids.get("history-list").innerHTML, /No reports match/);
 });
+await check("A listed product without a verdict count shows how many reviews were collected", () => {
+  // Lists arrive without the reviews themselves: only their number.
+  const app = harness();
+  const {comments, ...listed} = product("https://shopee.ph/unchecked-i.5.6", "Not yet analyzed");
+  app.state.catalogProducts = [{...listed, badge_view: {...listed.badge_view, reviews_analyzed: 0}, reviews_collected: 7}];
+  app.evaluate('go("home")');
+  assert.match(app.ids.get("home-stats").innerHTML, /<b>7<\/b><span>Reviews analyzed/);
+});
 await check("Report URLs restore the exact product after refresh; bare report URLs are not blank", async () => {
   const hash = "#analysis?" + new URLSearchParams({product: first.link, from: "home"});
   const app = harness(new Map(), hash);

@@ -166,8 +166,18 @@ def _merged_catalog() -> list[dict[str, Any]]:
 
 
 def _card(product: dict[str, Any]) -> dict[str, Any]:
-    """A product for a list card: its verdict, without the full review list."""
-    return {key: value for key, value in with_badge_view(product).items() if key != "comments"}
+    """A product for a list card: its verdict and how many reviews were
+    collected, without the full review list."""
+    comments = product.get("comments")
+    card = {key: value for key, value in with_badge_view(product).items() if key != "comments"}
+    card["reviews_collected"] = len(comments) if isinstance(comments, list) else 0
+    return card
+
+
+def _cards(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Products for a list. A product's reviews are sent only with its own
+    report (/api/products/detail): one product's reviews are ~150 KB."""
+    return [_card(product) for product in products]
 
 
 def _prepare(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -228,11 +238,6 @@ def _set_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     with _lock:
         _catalogs[_catalog_key()] = prepared
     return prepared
-
-
-def _viewed(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Attach the display view the browser renders badges from."""
-    return [with_badge_view(product) for product in products]
 
 
 def _product_for(link: str, products: list[dict[str, Any]] | None = None) -> dict[str, Any] | None:
@@ -395,7 +400,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     @app.get("/api/products")
     def products_api() -> Response:
         products = _products()
-        return jsonify({"products": _viewed(products), "count": len(products)})
+        return jsonify({"products": _cards(products), "count": len(products)})
 
     @app.post("/api/search")
     def search_api() -> Response:
@@ -424,7 +429,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
                 raise
             return jsonify({"job": job, "guest": _guest_status() if guest else None}), 202
         matches = cached_product_matches(_products(), query, limit=MAX_PRODUCTS)
-        return jsonify({"products": _viewed(matches), "count": len(matches), "mode": "saved"})
+        return jsonify({"products": _cards(matches), "count": len(matches), "mode": "saved"})
 
     @app.get("/api/jobs/<job_id>")
     def job_api(job_id: str) -> Response:
@@ -449,7 +454,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             raise
         except Exception as exc:
             return jsonify({"error": f"Could not load file: {exc}"}), 400
-        return jsonify({"products": _viewed(products), "count": len(products)})
+        return jsonify({"products": _cards(products), "count": len(products)})
 
     @app.get("/api/products/detail")
     def product_detail_api() -> Response:
@@ -460,7 +465,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         catalog = _merged_catalog()
         recommendations = rank_recommendations(product, catalog, limit=3)
         return jsonify(
-            {"product": with_badge_view(product), "recommendations": _viewed(recommendations)}
+            {"product": with_badge_view(product), "recommendations": _cards(recommendations)}
         )
 
     @app.get("/api/export/products.csv")
