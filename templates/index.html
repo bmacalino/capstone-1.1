@@ -55,12 +55,6 @@
           </div>
         </footer>
     {%- endmacro %}
-    <div class="aurora-layer" aria-hidden="true">
-      <img class="aurora aurora-one" src="{{ url_for('static', filename='assets/figma/aurora-1.png') }}" alt="">
-      <img class="aurora aurora-two" src="{{ url_for('static', filename='assets/figma/aurora-2.png') }}" alt="">
-      <img class="aurora aurora-three" src="{{ url_for('static', filename='assets/figma/aurora-3.png') }}" alt="">
-      <img class="aurora aurora-four" src="{{ url_for('static', filename='assets/figma/aurora-4.png') }}" alt="">
-    </div>
 
     <header class="pub-header">
       <a class="pub-logo" href="#landing" data-route="landing" aria-label="DeFaketive home">
@@ -500,7 +494,6 @@
     </dialog>
 
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
   </body>
 </html>
