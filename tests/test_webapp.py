@@ -1,11 +1,12 @@
 import json
+import os
 import re
 import subprocess
 import tempfile
 import unittest
 from io import BytesIO
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import webapp
 
@@ -543,7 +544,7 @@ class TestModelUnavailable(unittest.TestCase):
         # used to re-analyse the same file.
         webapp._analysed_files.clear()
         self.addCleanup(webapp._analysed_files.clear)
-        with patch.object(webapp, "result_files", return_value=[self.results_file()]),                 patch.object(webapp, "sentiment_model_version", return_value="v-test"),                 patch.object(webapp, "analysis_is_current", return_value=False),                 patch.object(webapp, "analyze_products", side_effect=lambda products: products) as analyze:
+        with patch.object(webapp, "result_files", return_value=[self.results_file()]),                 patch.object(webapp, "sentiment_model_version", return_value="v-test"),                 patch.object(webapp, "analysis_is_current", return_value=False),                 patch.object(webapp, "save_products"),                 patch.object(webapp, "analyze_products", side_effect=lambda products: products) as analyze:
             for key in ("session-a", "session-b"):
                 with self.client.session_transaction() as state:
                     state["catalog_key"] = key
@@ -556,6 +557,115 @@ class TestModelUnavailable(unittest.TestCase):
         script.close()
         self.assertIn(b"Review analysis is unavailable", data)
         self.assertIn(b"model_unavailable", data)
+
+
+class TestAnalysisIsKept(unittest.TestCase):
+    """An analysis costs the model seconds per product. It is made once per
+    source and model version, and kept on disk so that closing and starting the
+    app again does not repeat it."""
+
+    def setUp(self):
+        webapp._catalogs.clear()
+        webapp._analysed_files.clear()
+        self.addCleanup(webapp._catalogs.clear)
+        self.addCleanup(webapp._analysed_files.clear)
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.cache = Path(folder.name) / "cache"
+        self.results = Path(folder.name) / "results.json"
+        self.results.write_bytes(json.dumps([SAMPLE_PRODUCT]).encode("utf-8"))
+        self.version = "model-1"
+        self.analyze = Mock(
+            side_effect=lambda products: [{**product, "analysed_by": self.version} for product in products]
+        )
+        stand_ins = {
+            "result_files": lambda: [self.results],
+            "load_saved_products": lambda: [],
+            # Never the real database: the catalog loader saves what it loads.
+            "save_products": Mock(),
+            "sentiment_model_version": lambda: self.version,
+            "analysis_is_current": lambda products: bool(products)
+            and all(product.get("analysed_by") == self.version for product in products),
+            "analyze_products": self.analyze,
+        }
+        for name, stand_in in stand_ins.items():
+            patcher = patch.object(webapp, name, stand_in)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        environment = patch.dict(os.environ, {"DEFAKETIVE_ANALYSIS_CACHE": str(self.cache)})
+        environment.start()
+        self.addCleanup(environment.stop)
+        self.client = webapp.create_app({"TESTING": True, "SECRET_KEY": "test"}).test_client()
+
+    def catalog(self, session):
+        with self.client.session_transaction() as state:
+            state["catalog_key"] = session
+        return self.client.get("/api/products").json
+
+    def restart(self):
+        """Closing and starting the app again: memory is lost, the disk is not."""
+        webapp._catalogs.clear()
+        webapp._analysed_files.clear()
+
+    def kept(self):
+        return sorted(self.cache.glob("*.json")) if self.cache.exists() else []
+
+    def test_a_restart_does_not_repeat_the_analysis(self):
+        self.assertEqual(self.catalog("before")["count"], 1)
+        self.restart()
+        self.assertEqual(self.catalog("after")["count"], 1)
+        self.assertEqual(self.analyze.call_count, 1)
+        self.assertEqual(len(self.kept()), 1)
+
+    def test_a_new_model_version_analyses_again_and_drops_the_old_copy(self):
+        self.catalog("before")
+        old = self.kept()
+        self.version = "model-2"
+        self.restart()
+        self.catalog("after")
+        self.assertEqual(self.analyze.call_count, 2)
+        self.assertEqual(len(self.kept()), 1)
+        self.assertNotEqual(self.kept(), old)
+
+    def test_a_changed_results_file_is_analysed_again(self):
+        self.catalog("before")
+        other = {**SAMPLE_PRODUCT, "link": "https://shopee.ph/other-i.1.9", "name": "Another gadget"}
+        self.results.write_bytes(json.dumps([SAMPLE_PRODUCT, other]).encode("utf-8"))
+        self.restart()
+        self.assertEqual(self.catalog("after")["count"], 2)
+        self.assertEqual(self.analyze.call_count, 2)
+
+    def test_a_damaged_copy_is_ignored_and_replaced(self):
+        self.catalog("before")
+        self.kept()[0].write_bytes(b"{not json")
+        self.restart()
+        self.assertEqual(self.catalog("after")["count"], 1)
+        self.assertEqual(self.analyze.call_count, 2)
+        self.restart()
+        self.catalog("later")
+        self.assertEqual(self.analyze.call_count, 2)
+
+    def test_an_analysis_that_is_already_current_is_not_copied(self):
+        current = {**SAMPLE_PRODUCT, "analysed_by": self.version}
+        self.results.write_bytes(json.dumps([current]).encode("utf-8"))
+        self.assertEqual(self.catalog("only")["count"], 1)
+        self.analyze.assert_not_called()
+        self.assertEqual(self.kept(), [])
+
+    def test_a_cache_folder_that_cannot_be_used_does_not_break_the_page(self):
+        self.cache.write_bytes(b"a file where the folder should be")
+        self.assertEqual(self.catalog("first")["count"], 1)
+        self.assertEqual(self.catalog("second")["count"], 1)
+        self.assertEqual(self.analyze.call_count, 1)
+
+    def test_saved_products_are_analysed_once_when_there_is_no_results_file(self):
+        # This path re-analysed every saved product for every browser session.
+        with patch.object(webapp, "result_files", return_value=[]),                 patch.object(webapp, "load_saved_products", return_value=[SAMPLE_PRODUCT]):
+            self.assertEqual(self.catalog("first")["count"], 1)
+            self.assertEqual(self.catalog("second")["count"], 1)
+            self.restart()
+            self.assertEqual(self.catalog("after")["count"], 1)
+        self.assertEqual(self.analyze.call_count, 1)
 
 
 if __name__ == "__main__":

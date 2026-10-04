@@ -295,6 +295,12 @@ marketplace JSON, and the SQLite database are excluded from Git. They stay on
 the computer running the app. Do not commit account cookies, credentials, or
 private datasets.
 
+The app keeps each finished review analysis in `instance/analysis_cache/`, so
+it is not repeated every time the app starts. A copy is used only for the same
+source and the same model version; copies from other model versions are removed
+automatically. Delete the folder to force a fresh analysis. Set
+`DEFAKETIVE_ANALYSIS_CACHE` to keep it somewhere else.
+
 Use the scrapers responsibly, keep request volumes low, and follow each
 marketplace's applicable terms and local law.
 

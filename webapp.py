@@ -15,6 +15,7 @@ import sys
 import threading
 import time
 from collections import Counter
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -186,22 +187,82 @@ def _prepare(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return products
 
 
-# Result files analysed with the current model, keyed by file identity and
-# model version. Every new browser session loads the catalog; without this the
-# transformer re-analysed the same file for each one (~19 s per 100 reviews).
-# The files themselves are not rewritten: some are training-set sources whose
-# SHA-256 is recorded in a manifest.
-_analysed_files: dict[tuple[str, int, int, str], list[dict[str, Any]]] = {}
+# Analyses made with the current model, keyed by their source (a result file,
+# or the saved products) and the model version. Every new browser session loads
+# the catalog; without this the transformer re-analysed the same reviews for
+# each one (~13 s per 100 reviews). They are kept in memory for this run and on
+# disk for the next: a restart used to repeat the analysis. The result files
+# themselves are not rewritten: some are training-set sources whose SHA-256 is
+# recorded in a manifest. Deleting the cache folder forces a fresh analysis.
+_analysed_files: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+
+
+def _digest(value: Any) -> str:
+    data = value if isinstance(value, bytes) else str(value).encode("utf-8")
+    return hashlib.sha256(data).hexdigest()
+
+
+def _analysis_cache_file(key: tuple[Any, ...]) -> Path:
+    folder = Path(os.environ.get("DEFAKETIVE_ANALYSIS_CACHE") or ROOT / "instance" / "analysis_cache")
+    # The model version leads the name, so another version's files are easy to find.
+    return folder / f"{_digest(key[-1])[:12]}-{_digest(key)[:32]}.json"
+
+
+def _stored_analysis(key: tuple[Any, ...]) -> list[dict[str, Any]] | None:
+    """The analysis kept on disk for this source and model version, if usable."""
+    try:
+        products = load_products(_analysis_cache_file(key))
+    except (OSError, ValueError):
+        return None
+    return products if analysis_is_current(products) else None
+
+
+def _store_analysis(key: tuple[Any, ...], products: list[dict[str, Any]]) -> None:
+    """Keep an analysis for the next run. The cache only saves time, so
+    failing to write it is not an error."""
+    target = _analysis_cache_file(key)
+    this_version = target.name.split("-", 1)[0]
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        for other in target.parent.glob("*.json"):
+            if other.name.split("-", 1)[0] != this_version:
+                other.unlink()
+        # Written whole, then renamed: a half-written file is never read.
+        partial = target.with_suffix(".tmp")
+        partial.write_bytes(json_bytes(products))
+        partial.replace(target)
+    except OSError:
+        pass
+
+
+def _analysed(key: tuple[Any, ...], load: Callable[[], list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    """`load()`'s products, analysed at most once per source and model version."""
+    with _lock:
+        cached = _analysed_files.get(key)
+        if cached is None:
+            products = load()
+            if products and not analysis_is_current(products):
+                stored = _stored_analysis(key)
+                if stored is None:
+                    stored = analyze_products(products)
+                    _store_analysis(key, stored)
+                products = stored
+            cached = _analysed_files[key] = products
+        return copy.deepcopy(cached)
 
 
 def _prepare_file(path: Path) -> list[dict[str, Any]]:
     stat = path.stat()
     key = (str(path), stat.st_mtime_ns, stat.st_size, sentiment_model_version())
-    with _lock:
-        cached = _analysed_files.get(key)
-        if cached is None:
-            cached = _analysed_files[key] = _prepare(load_products(path))
-        return copy.deepcopy(cached)
+    return _analysed(key, lambda: load_products(path))
+
+
+def _prepare_saved() -> list[dict[str, Any]]:
+    """The saved products, for when no result file is usable. They used to be
+    re-analysed for every browser session (108 s for 27 products)."""
+    saved = load_saved_products()
+    key = ("saved products", _digest(json_bytes(saved)), sentiment_model_version())
+    return _analysed(key, lambda: saved)
 
 
 def _load_initial_catalog() -> list[dict[str, Any]]:
@@ -218,7 +279,7 @@ def _load_initial_catalog() -> list[dict[str, Any]]:
         except Exception:
             continue
     try:
-        return _prepare(load_saved_products())
+        return _prepare_saved()
     except ModelUnavailableError:
         raise
     except Exception:

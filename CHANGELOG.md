@@ -40,11 +40,22 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   filters, and interface wording around clear shopping decisions.
 - Live scraper browsers now open in an adaptive right-side window so the app's
   collection progress remains visible.
+- Product lists (catalog, saved search, upload, and a report's similar
+  products) are sent without their review lists; a product's reviews come
+  only with its own report. The list for one product drops from about
+  155 KB to 9 KB.
+- Finished review analyses are kept in `instance/analysis_cache/` and reused
+  after a restart. The first page load no longer re-analyses the newest
+  result file each time the app starts, and saved products are no longer
+  re-analysed for every browser session when no result file exists.
 
 ### Fixed
 
 - Prevented a manually selected marketplace from conflicting with the
   marketplace detected from a supported product URL.
+- The page-script honesty test no longer mistakes the elapsed-time
+  arithmetic (`/ 1000`) for a `/ 100` score.
+- A catalog test no longer saves its sample product into the real database.
 
 ### Removed
 
