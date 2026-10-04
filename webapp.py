@@ -1,7 +1,6 @@
 """DeFaketive's HTML/CSS/JavaScript web application.
 
 Run locally with ``python webapp.py`` and open http://127.0.0.1:5000.
-The original Streamlit dashboard remains available in app.py during migration.
 """
 
 from __future__ import annotations

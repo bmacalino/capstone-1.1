@@ -1,14 +1,12 @@
-"""Data helpers shared by the Streamlit dashboard and its tests."""
+"""Data helpers shared by the web app and its tests."""
 
 from __future__ import annotations
 
 import copy
-from collections import Counter
 import csv
 import io
 import json
 import math
-import os
 import re
 import sys
 from pathlib import Path
@@ -25,38 +23,6 @@ def search_slug(keyword: str) -> str:
 
 
 PLATFORM_NAMES = {"shopee": "Shopee PH", "lazada": "Lazada PH", "temu": "Temu PH"}
-
-PRODUCT_IMAGE_FIELDS = (
-    "img",
-    "image",
-    "image_url",
-    "imageUrl",
-    "thumbnail",
-    "thumbnail_url",
-    "thumbnailUrl",
-    "picture",
-    "picture_url",
-    "images",
-    "pictures",
-    "media",
-)
-
-NESTED_IMAGE_FIELDS = (
-    "url",
-    "secure_url",
-    "src",
-    "image",
-    "image_url",
-    "imageUrl",
-    "original",
-    "large",
-    "main",
-    "thumbnail",
-    "thumbnail_url",
-    "thumbnailUrl",
-    "images",
-    "pictures",
-)
 
 RECOMMENDATION_STOP_WORDS = {
     "a", "an", "and", "for", "from", "in", "more", "new", "of", "on",
@@ -108,58 +74,6 @@ def product_platform(product: dict[str, Any]) -> str:
 
 def platform_name(product: dict[str, Any]) -> str:
     return PLATFORM_NAMES[product_platform(product)]
-
-
-def product_image_url(product: dict[str, Any]) -> str:
-    """Return the first valid web image URL found in common product fields.
-
-    Marketplace exports are inconsistent: an image may be a string, a
-    protocol-relative URL, a list, or a nested mapping such as
-    ``{"image": {"url": "..."}}``. Local paths and non-web schemes are not
-    safe for browser image markup, so they deliberately resolve to an empty
-    string.
-    """
-    if not isinstance(product, dict):
-        return ""
-    for field in PRODUCT_IMAGE_FIELDS:
-        if field not in product:
-            continue
-        resolved = _resolve_product_image_value(product[field], set())
-        if resolved:
-            return resolved
-    return ""
-
-
-def _resolve_product_image_value(value: Any, seen: set[int]) -> str:
-    if isinstance(value, str):
-        candidate = value.strip()
-        if candidate.startswith("//"):
-            candidate = f"https:{candidate}"
-        if not candidate or any(character in candidate for character in "\r\n\t"):
-            return ""
-        parsed = urlsplit(candidate)
-        if parsed.scheme.casefold() not in {"http", "https"} or not parsed.netloc:
-            return ""
-        return candidate
-
-    if not isinstance(value, (dict, list, tuple)):
-        return ""
-    identity = id(value)
-    if identity in seen:
-        return ""
-    seen.add(identity)
-
-    if isinstance(value, dict):
-        ordered_values = [value[field] for field in NESTED_IMAGE_FIELDS if field in value]
-        ordered_fields = set(NESTED_IMAGE_FIELDS)
-        ordered_values.extend(item for field, item in value.items() if field not in ordered_fields)
-    else:
-        ordered_values = value
-    for item in ordered_values:
-        resolved = _resolve_product_image_value(item, seen)
-        if resolved:
-            return resolved
-    return ""
 
 
 def output_path(keyword: str, platform: str = "shopee") -> Path:
@@ -263,23 +177,6 @@ def merge_product_catalogs(*catalogs: list[dict[str, Any]]) -> list[dict[str, An
             seen.add(identity)
             merged.append(product)
     return merged
-
-
-def recommendation_search_query(product: dict[str, Any]) -> str:
-    """Build a compact marketplace query for finding comparable products."""
-    name = re.sub(r"\s+", " ", str(product.get("name") or "").strip().casefold())
-    brand = _recommendation_brand(product)
-    for variants, label, _canonical in RECOMMENDATION_PRODUCT_TYPES:
-        if any(variant in name for variant in variants):
-            return " ".join(part for part in (brand, label) if part).strip()
-    terms = [
-        term
-        for term in re.findall(r"[a-z0-9]+", name)
-        if term not in RECOMMENDATION_STOP_WORDS
-    ]
-    if brand and (not terms or terms[0] != brand.casefold()):
-        terms.insert(0, brand)
-    return " ".join(terms[:4]) or brand or "similar product"
 
 
 def _recommendation_brand(product: dict[str, Any]) -> str:
@@ -391,118 +288,6 @@ def rank_recommendations(
     return [item[-1] for item in ranked[:limit]]
 
 
-# --- Legacy Streamlit prototype (app.py) ------------------------------------
-# The prototype still renders the retired 0-100 score. These two keep it working
-# on score-era data until it is converted or removed; the web app does not use
-# them.
-
-def legacy_rank_recommendations(
-    product: dict[str, Any],
-    products: list[dict[str, Any]],
-    limit: int = 3,
-    min_reliability: float = 60.0,
-    min_positive_ratio: float = 0.55,
-    min_review_count: int = 5,
-) -> list[dict[str, Any]]:
-    """Rank by the retired 0-100 risk score. Legacy Streamlit prototype only.
-
-    Kept verbatim so the prototype behaves as it did on score-era data. The
-    web app uses rank_recommendations, which ranks on badges instead.
-    """
-    if limit <= 0:
-        return []
-    target_terms = _recommendation_terms(product)
-    target_type = _recommendation_type(product)
-    target_category = str(product.get("category") or "").strip().casefold()
-    target_brand = _recommendation_brand(product).casefold()
-    target_risk = product_risk_percent(product)
-    ranked: list[tuple[float, float, float, int, int, dict[str, Any]]] = []
-    for index, candidate in enumerate(products):
-        if candidate.get("link") == product.get("link") or not candidate.get("sentiment_summary"):
-            continue
-        if product_risk_level(candidate) != "Low":
-            continue
-        if product_risk_percent(candidate) >= target_risk:
-            continue
-        summary = candidate.get("sentiment_summary") or {}
-        positive = float((summary.get("sentiment_ratios") or {}).get("positive") or 0)
-        if positive > 1:
-            positive /= 100
-        reliability = product_reliability(candidate)
-        review_count = int(summary.get("review_count") or len(candidate.get("comments") or []))
-        rating = rating_value(candidate.get("rating"))
-        if (
-            reliability < min_reliability
-            or positive < min_positive_ratio
-            or review_count < min_review_count
-            or (rating is not None and rating < 4.0)
-        ):
-            continue
-
-        candidate_terms = _recommendation_terms(candidate)
-        candidate_type = _recommendation_type(candidate)
-        if target_type and candidate_type and target_type != candidate_type:
-            continue
-        overlap = target_terms & candidate_terms
-        candidate_category = str(candidate.get("category") or "").strip().casefold()
-        category_match = bool(target_category and target_category == candidate_category)
-        type_match = bool(target_type and target_type == candidate_type)
-        lexical_similarity = len(overlap) / max(1, min(len(target_terms), len(candidate_terms)))
-        if not category_match and not type_match and (
-            len(overlap) < 3 or lexical_similarity < 0.35
-        ):
-            continue
-        brand_match = bool(
-            target_brand and target_brand == _recommendation_brand(candidate).casefold()
-        )
-        similarity = min(
-            1.0,
-            lexical_similarity + (0.25 if category_match else 0) + (0.08 if brand_match else 0),
-        )
-        evidence = min(1.0, math.log10(review_count + 1) / 2)
-        recommendation_score = (
-            0.55 * similarity
-            + 0.25 * (reliability / 100)
-            + 0.15 * positive
-            + 0.05 * evidence
-        )
-        ranked.append((recommendation_score, reliability, positive, review_count, -index, candidate))
-    ranked.sort(key=lambda item: item[:5], reverse=True)
-    return [item[-1] for item in ranked[:limit]]
-
-
-def legacy_product_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Score-era columns for the legacy Streamlit prototype only.
-
-    A badge summary has no score, so its Risk level reads "Not scored"
-    rather than the "Low" a missing score used to default to.
-    """
-    rows = []
-    for product in products:
-        comments = product.get("comments")
-        summary = product.get("sentiment_summary") or {}
-        rows.append(
-            {
-                "Image": product.get("img", ""),
-                "Product": product.get("name", ""),
-                "Price": str(product.get("price", "")).replace("â‚±", "₱"),
-                "Price (PHP)": price_value(product.get("price")),
-                "Rating": rating_value(product.get("rating")),
-                "Reviews": len(comments) if isinstance(comments, list) else 0,
-                "Total ratings": int(product.get("total_rating") or 0),
-                "Location": product.get("location", ""),
-                "Platform": platform_name(product),
-                "Risk score": risk_score_percent(
-                    summary.get("risk_score"), summary.get("risk_score_scale")
-                ),
-                "Risk level": product_risk_level(product),
-                "Reliability score": product_reliability(product),
-                "Link": product.get("link", ""),
-            }
-        )
-    return rows
-
-
 def price_value(value: Any) -> float | None:
     text = str(value or "").replace("â‚±", "₱")
     numbers = re.findall(r"\d[\d,]*(?:\.\d+)?", text)
@@ -567,20 +352,6 @@ def normalized_risk_score(value: Any, scale: Any | None = None) -> float:
     return min(1.0, max(0.0, score))
 
 
-def risk_score_percent(value: Any, scale: Any | None = None) -> float:
-    """Return a bounded risk score on the dashboard's 0..100 display scale."""
-    return round(100 * normalized_risk_score(value, scale), 2)
-
-
-def risk_level(value: Any, scale: Any | None = None) -> str:
-    score = normalized_risk_score(value, scale)
-    if score >= 0.61:
-        return "High"
-    if score >= 0.31:
-        return "Moderate"
-    return "Low"
-
-
 def reliability_score(
     risk: Any,
     positive_ratio: Any | None = None,
@@ -611,22 +382,6 @@ def product_reliability(product: dict[str, Any]) -> float:
     )
 
 
-def product_risk_percent(product: dict[str, Any]) -> float:
-    summary = product.get("sentiment_summary") or {}
-    return risk_score_percent(
-        summary.get("risk_score"), summary.get("risk_score_scale")
-    )
-
-
-def product_risk_level(product: dict[str, Any]) -> str:
-    summary = product.get("sentiment_summary") or {}
-    if is_badge_summary(summary):
-        # Badge summaries carry no risk score. Reading one as a score used to
-        # default to 0, so a product with fire reports displayed "Low risk".
-        return NOT_SCORED
-    return risk_level(summary.get("risk_score"), summary.get("risk_score_scale"))
-
-
 # ---------------------------------------------------------------------------
 # Badge presentation (summary schema 2.0)
 #
@@ -639,7 +394,6 @@ def product_risk_level(product: dict[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 
 BADGE_SCHEMA_PREFIX = "defaketive-summary-2"
-NOT_SCORED = "Not scored"
 EVIDENCE_SHOWN_PER_BADGE = 5
 
 # Held-out figures for the shipped safety check (keyword checker 0.3.0 with the
@@ -900,165 +654,6 @@ def badge_view(product: dict[str, Any]) -> dict[str, Any]:
 def with_badge_view(product: dict[str, Any]) -> dict[str, Any]:
     """Return a shallow copy of a product carrying its display view."""
     return {**product, "badge_view": badge_view(product)}
-
-
-def risk_keyword_counts(product: dict[str, Any]) -> dict[str, int]:
-    """Count unique sampled reviews containing each active risk term."""
-    counts: Counter[str] = Counter()
-    for review in product.get("comments") or []:
-        if review.get("is_duplicate"):
-            continue
-        analysis = review.get("sentiment_analysis") or {}
-        review_terms = {
-            str(evidence["term"]).strip().casefold()
-            for evidence in (analysis.get("risk") or {}).get("evidence") or []
-            if evidence.get("term") and not evidence.get("negated")
-        }
-        counts.update(term for term in review_terms if term)
-    return dict(counts.most_common())
-
-
-def review_signal_counts(product: dict[str, Any]) -> dict[str, int]:
-    """Count active sentiment-language signals once per unique review.
-
-    These terms are a descriptive fallback for the dashboard when no defect or
-    fraud terms are present. They must not be presented as risk evidence.
-    """
-    counts: Counter[str] = Counter()
-    for review in product.get("comments") or []:
-        if review.get("is_duplicate"):
-            continue
-        analysis = review.get("sentiment_analysis") or {}
-        review_terms = {
-            str(evidence["term"]).strip().casefold()
-            for evidence in analysis.get("sentiment_evidence") or []
-            if evidence.get("term") and not evidence.get("negated")
-        }
-        counts.update(term for term in review_terms if term)
-    return dict(counts.most_common())
-
-
-def weighted_risk_breakdown(product: dict[str, Any]) -> dict[str, Any]:
-    """Return the WSM inputs and their contributions on a 0..100 scale."""
-    summary = product.get("sentiment_summary") or {}
-    probability_methods = {
-        "confidence_severity_frequency_bayesian",
-        "calibrated_probability_expected_severity",
-    }
-    if summary.get("risk_score_method") in probability_methods:
-        review_count = max(0, int(summary.get("review_count") or 0))
-        risk_reviews = max(0, int(summary.get("risk_review_count") or 0))
-        evidence_confidence = min(
-            1.0, max(0.0, float(summary.get("evidence_confidence") or 0))
-        )
-        raw_points = min(100.0, max(0.0, float(summary.get("raw_risk_score") or 0)))
-        prior = min(1.0, max(0.0, float(summary.get("risk_prior") or 0)))
-        evidence_points = evidence_confidence * raw_points
-        prior_points = (1 - evidence_confidence) * prior * 100
-        return {
-            "method": summary.get("risk_score_method"),
-            "review_count": review_count,
-            "negative_reviews": int(
-                (summary.get("sentiment_counts") or {}).get("negative") or 0
-            ),
-            "risk_reviews": risk_reviews,
-            "negative_ratio": 0.0,
-            "defect_review_ratio": risk_reviews / review_count if review_count else 0.0,
-            "negative_weight": 0.0,
-            "defect_weight": 0.0,
-            "negative_points": 0.0,
-            "defect_points": evidence_points,
-            "raw_risk_points": raw_points,
-            "evidence_confidence": evidence_confidence,
-            "prior_points": prior_points,
-            "average_risk_probability": float(
-                summary.get("average_risk_probability") or 0
-            ),
-            "average_risk_severity": float(
-                summary.get("average_risk_severity") or 0
-            ),
-            "total_points": evidence_points + prior_points,
-        }
-    unique_reviews = [
-        review
-        for review in product.get("comments") or []
-        if isinstance(review, dict) and not review.get("is_duplicate")
-    ]
-    try:
-        review_count = max(0, int(summary.get("review_count")))
-    except (TypeError, ValueError):
-        review_count = len(unique_reviews)
-    if not review_count:
-        review_count = len(unique_reviews)
-
-    sentiment_counts = summary.get("sentiment_counts") or {}
-    ratios = summary.get("sentiment_ratios") or {}
-
-    def bounded_ratio(value: Any) -> float:
-        try:
-            return min(1.0, max(0.0, float(value)))
-        except (TypeError, ValueError):
-            return 0.0
-
-    negative_count_value = sentiment_counts.get("negative")
-    try:
-        negative_reviews = max(0, int(negative_count_value))
-    except (TypeError, ValueError):
-        negative_reviews = sum(
-            1
-            for review in unique_reviews
-            if (review.get("sentiment_analysis") or {}).get("label") == "negative"
-        )
-    negative_reviews = min(review_count, negative_reviews) if review_count else 0
-    manuscript_method = summary.get("risk_score_method") in {
-        "manuscript_vader_keyword_wsm",
-        "hybrid_classifier_manuscript_wsm",
-    }
-    if manuscript_method and "negative" in ratios:
-        negative_ratio = bounded_ratio(ratios.get("negative"))
-    elif negative_count_value is not None and review_count:
-        negative_ratio = negative_reviews / review_count
-    elif "negative" in ratios:
-        negative_ratio = bounded_ratio(ratios.get("negative"))
-    else:
-        negative_ratio = negative_reviews / review_count if review_count else 0.0
-
-    risk_review_value = summary.get("risk_review_count")
-    try:
-        risk_reviews = max(0, int(risk_review_value))
-    except (TypeError, ValueError):
-        risk_reviews = sum(
-            1
-            for review in unique_reviews
-            if ((review.get("sentiment_analysis") or {}).get("risk") or {}).get("detected")
-        )
-    risk_reviews = min(review_count, risk_reviews) if review_count else 0
-    if manuscript_method and "detected_risk_ratio" in summary:
-        defect_review_ratio = bounded_ratio(summary.get("detected_risk_ratio"))
-    elif manuscript_method and "keyword_failure_rate" in summary:
-        defect_review_ratio = bounded_ratio(summary.get("keyword_failure_rate"))
-    elif risk_review_value is not None and review_count:
-        defect_review_ratio = risk_reviews / review_count
-    elif "keyword_failure_rate" in summary:
-        defect_review_ratio = bounded_ratio(summary.get("keyword_failure_rate"))
-    else:
-        defect_review_ratio = risk_reviews / review_count if review_count else 0.0
-
-    negative_points = 30.0 * negative_ratio
-    defect_points = 70.0 * defect_review_ratio
-    return {
-        "method": summary.get("risk_score_method"),
-        "review_count": review_count,
-        "negative_reviews": negative_reviews,
-        "risk_reviews": risk_reviews,
-        "negative_ratio": negative_ratio,
-        "defect_review_ratio": defect_review_ratio,
-        "negative_weight": 0.30,
-        "defect_weight": 0.70,
-        "negative_points": negative_points,
-        "defect_points": defect_points,
-        "total_points": negative_points + defect_points,
-    }
 
 
 def review_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:

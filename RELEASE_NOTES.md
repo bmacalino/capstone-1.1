@@ -6,7 +6,7 @@
 
 DeFaketive 1.2.0 introduces a responsive Flask interface for the existing
 scraping, storage, and explainable Taglish sentiment-analysis workflows. The
-original Streamlit app remains available during the transition.
+original Streamlit app was kept during the transition and has since been removed.
 
 ## Highlights
 
@@ -42,8 +42,6 @@ original Streamlit app remains available during the transition.
    ```
 
 3. Open `http://127.0.0.1:5000`.
-
-The legacy interface can still be started with `streamlit run app.py`.
 
 ## Compatibility and known limitations
 

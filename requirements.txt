@@ -2,10 +2,8 @@ undetected-chromedriver
 selenium
 tqdm
 Flask>=3.0,<4
-streamlit>=1.44,<2
 pandas>=2.2,<3
 openpyxl>=3.1,<4
-plotly>=5.24,<7
 nltk>=3.9,<4
 setuptools>=70
 scikit-learn==1.9.0

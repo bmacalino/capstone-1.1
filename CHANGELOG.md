@@ -46,6 +46,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Prevented a manually selected marketplace from conflicting with the
   marketplace detected from a supported product URL.
 
+### Removed
+
+- The legacy Streamlit prototype (`app.py`), its tests, the score-era helper
+  functions only it used, and the `streamlit` and `plotly` requirements. The
+  Flask web app (`webapp.py`) is the only interface.
+
 ## [1.2.0] - 2026-09-01
 
 ### Added

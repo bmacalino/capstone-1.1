@@ -298,15 +298,6 @@ private datasets.
 Use the scrapers responsibly, keep request volumes low, and follow each
 marketplace's applicable terms and local law.
 
-## Legacy Streamlit app
-
-The original Streamlit prototype remains available during the HTML/CSS/JavaScript
-migration:
-
-```powershell
-.\.venv\Scripts\python.exe -m streamlit run app.py
-```
-
 ## Tests
 
 Run the main test suite:

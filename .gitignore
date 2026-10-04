@@ -19,7 +19,6 @@ artifacts_*.png
 .env
 .env.*
 !.env.example
-.streamlit/secrets.toml
 
 # Generated research artifacts and tooling state (large; not versioned)
 outputs/

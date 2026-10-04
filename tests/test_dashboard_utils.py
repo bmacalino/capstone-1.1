@@ -2,7 +2,6 @@ import json
 import unittest
 
 from dashboard_utils import (
-    NOT_SCORED,
     analysis_is_current,
     badge_view,
     cached_product_matches,
@@ -14,22 +13,13 @@ from dashboard_utils import (
     normalized_risk_score,
     price_value,
     platform_name,
-    product_image_url,
     product_rows,
     product_reliability,
-    product_risk_level,
-    product_risk_percent,
     rank_recommendations,
-    recommendation_search_query,
     reliability_score,
-    review_signal_counts,
     review_rows,
-    risk_keyword_counts,
-    risk_level,
-    risk_score_percent,
     search_slug,
     sentiment_model_version,
-    weighted_risk_breakdown,
 )
 
 
@@ -82,12 +72,6 @@ def fire_reports(count):
 
 
 class TestBadgeView(unittest.TestCase):
-    def test_a_badge_summary_is_never_read_as_low_risk(self):
-        # Regression: badge summaries have no risk_score, and reading one as a
-        # score defaulted to 0, so a product with fire reports showed "Low risk".
-        product = {"sentiment_summary": badge_summary("safety_warning", safety=fire_reports(3))}
-        self.assertEqual(product_risk_level(product), NOT_SCORED)
-
     def test_safety_warning_says_what_reviewers_report(self):
         view = badge_view(
             {"sentiment_summary": badge_summary("safety_warning", safety=fire_reports(3))}
@@ -309,7 +293,6 @@ class TestDashboardUtils(unittest.TestCase):
         )
 
         self.assertEqual([item["link"] for item in recommendations], ["good"])
-        self.assertEqual(recommendation_search_query(target), "Anker power bank")
 
     def test_merge_product_catalogs_normalizes_tracking_links(self):
         current = {"name": "Current", "link": "https://www.lazada.com.ph/products/item-i1.html?tracking=1"}
@@ -335,27 +318,6 @@ class TestDashboardUtils(unittest.TestCase):
         with self.assertRaises(ValueError):
             detect_marketplace("https://example.com/item")
 
-    def test_product_image_url_normalizes_common_nested_fields(self):
-        self.assertEqual(
-            product_image_url({"img": "//img.lazcdn.com/product.jpg"}),
-            "https://img.lazcdn.com/product.jpg",
-        )
-        self.assertEqual(
-            product_image_url(
-                {
-                    "image": {"src": "", "original": [None, {"url": "https://cdn.example/item.png"}]},
-                    "thumbnail": "https://cdn.example/fallback.png",
-                }
-            ),
-            "https://cdn.example/item.png",
-        )
-
-    def test_product_image_url_rejects_non_web_and_invalid_values(self):
-        self.assertEqual(product_image_url({"img": "C:\\downloads\\product.jpg"}), "")
-        self.assertEqual(product_image_url({"image": "javascript:alert(1)"}), "")
-        self.assertEqual(product_image_url({"images": [None, "", "/relative/image.jpg"]}), "")
-        self.assertEqual(product_image_url({"img": "", "thumbnail_url": "https://cdn.example/valid.jpg"}), "https://cdn.example/valid.jpg")
-
     def test_price_value_uses_range_midpoint(self):
         self.assertEqual(price_value("₱1,000 - ₱1,500"), 1250.0)
         self.assertEqual(price_value("â‚±299"), 299.0)
@@ -374,17 +336,11 @@ class TestDashboardUtils(unittest.TestCase):
         self.assertEqual(normalized_risk_score(0.4), 0.4)
         self.assertEqual(normalized_risk_score(1.0, "percent"), 0.01)
         self.assertEqual(normalized_risk_score(1.0, "ratio"), 1.0)
-        self.assertEqual(risk_score_percent(1.0, "percent"), 1.0)
-        self.assertEqual(risk_level(30), "Low")
-        self.assertEqual(risk_level(31), "Moderate")
-        self.assertEqual(risk_level(61), "High")
-        self.assertEqual(risk_level(1.0, "percent"), "Low")
-        self.assertEqual(risk_level(1.0, "ratio"), "High")
         self.assertEqual(reliability_score(61), 39.0)
         self.assertEqual(reliability_score(20, 0.75), 55.0)
         self.assertEqual(reliability_score(1.0, 0.6667, "percent"), 65.7)
 
-    def test_product_risk_helpers_respect_explicit_percent_scale(self):
+    def test_product_reliability_respects_explicit_percent_scale(self):
         product = {
             "sentiment_summary": {
                 "risk_score": 1.0,
@@ -392,117 +348,11 @@ class TestDashboardUtils(unittest.TestCase):
                 "sentiment_ratios": {"positive": 0.6667},
             }
         }
-        self.assertEqual(product_risk_percent(product), 1.0)
-        self.assertEqual(product_risk_level(product), "Low")
         self.assertEqual(product_reliability(product), 65.7)
 
     def test_product_reliability(self):
         same_category = {"link": "same", "category": "Audio", "sentiment_summary": {"risk_score": 10, "sentiment_ratios": {"positive": .7}, "review_count": 5}}
         self.assertEqual(product_reliability(same_category), 60.0)
-
-    def test_keyword_counts_ignore_negated_evidence(self):
-        product = {"comments": [
-            {"sentiment_analysis": {"risk": {"evidence": [
-                {"term": "Sira", "negated": False},
-                {"term": "peke", "negated": True},
-                {"term": "sira", "negated": False},
-            ]}}},
-            {"is_duplicate": True, "sentiment_analysis": {"risk": {"evidence": [
-                {"term": "scam", "negated": False},
-            ]}}},
-        ]}
-        self.assertEqual(risk_keyword_counts(product), {"sira": 1})
-
-    def test_review_signal_counts_once_per_unique_review(self):
-        product = {"comments": [
-            {"sentiment_analysis": {"sentiment_evidence": [
-                {"term": "Good", "negated": False},
-                {"term": "good", "negated": False},
-                {"term": "nice", "negated": True},
-            ]}},
-            {"sentiment_analysis": {"sentiment_evidence": [
-                {"term": "good", "negated": False},
-                {"term": "sulit", "negated": False},
-            ]}},
-            {"is_duplicate": True, "sentiment_analysis": {"sentiment_evidence": [
-                {"term": "excellent", "negated": False},
-            ]}},
-        ]}
-        self.assertEqual(review_signal_counts(product), {"good": 2, "sulit": 1})
-
-    def test_weighted_risk_breakdown_uses_point_contributions(self):
-        product = {"sentiment_summary": {
-            "review_count": 10,
-            "sentiment_counts": {"positive": 7, "neutral": 1, "negative": 2},
-            "sentiment_ratios": {"positive": .7, "neutral": .1, "negative": .2},
-            "risk_review_count": 1,
-            "keyword_failure_rate": .1,
-        }}
-        breakdown = weighted_risk_breakdown(product)
-        self.assertEqual(breakdown["negative_reviews"], 2)
-        self.assertEqual(breakdown["risk_reviews"], 1)
-        self.assertAlmostEqual(breakdown["negative_points"], 6.0)
-        self.assertAlmostEqual(breakdown["defect_points"], 7.0)
-        self.assertAlmostEqual(breakdown["total_points"], 13.0)
-
-    def test_manuscript_breakdown_uses_sampling_weighted_ratios(self):
-        product = {"sentiment_summary": {
-            "review_count": 2,
-            "sentiment_counts": {"positive": 1, "uncertain": 0, "negative": 1},
-            "sentiment_ratios": {"positive": .75, "uncertain": 0, "negative": .25},
-            "risk_review_count": 1,
-            "keyword_failure_rate": .25,
-            "risk_score": 25,
-            "risk_score_method": "manuscript_vader_keyword_wsm",
-        }}
-        breakdown = weighted_risk_breakdown(product)
-        self.assertEqual(breakdown["method"], "manuscript_vader_keyword_wsm")
-        self.assertAlmostEqual(breakdown["negative_ratio"], .25)
-        self.assertAlmostEqual(breakdown["defect_review_ratio"], .25)
-        self.assertAlmostEqual(breakdown["total_points"], 25.0)
-
-    def test_hybrid_manuscript_breakdown_uses_sampling_weighted_ratios(self):
-        product = {"sentiment_summary": {
-            "review_count": 4,
-            "sentiment_counts": {"positive": 2, "uncertain": 1, "negative": 1},
-            "sentiment_ratios": {"positive": .625, "uncertain": .125, "negative": .25},
-            "risk_review_count": 2,
-            "keyword_failure_rate": .375,
-            "risk_score": 33.75,
-            "risk_score_method": "hybrid_classifier_manuscript_wsm",
-        }}
-        breakdown = weighted_risk_breakdown(product)
-        self.assertEqual(breakdown["method"], "hybrid_classifier_manuscript_wsm")
-        self.assertAlmostEqual(breakdown["negative_ratio"], .25)
-        self.assertAlmostEqual(breakdown["defect_review_ratio"], .375)
-        self.assertAlmostEqual(breakdown["total_points"], 33.75)
-
-    def test_weighted_risk_breakdown_handles_no_reviews(self):
-        breakdown = weighted_risk_breakdown({})
-        self.assertEqual(breakdown["review_count"], 0)
-        self.assertEqual(breakdown["total_points"], 0.0)
-
-    def test_weighted_risk_breakdown_supports_confidence_adjusted_scores(self):
-        product = {
-            "sentiment_summary": {
-                "review_count": 10,
-                "sentiment_counts": {"positive": 4, "uncertain": 3, "negative": 3},
-                "risk_review_count": 4,
-                "raw_risk_score": 52.0,
-                "evidence_confidence": 0.25,
-                "risk_prior": 0.15,
-                "risk_score": 24.25,
-                "risk_score_method": "confidence_severity_frequency_bayesian",
-                "average_risk_probability": 0.61,
-                "average_risk_severity": 2.25,
-            }
-        }
-        breakdown = weighted_risk_breakdown(product)
-        self.assertEqual(breakdown["method"], "confidence_severity_frequency_bayesian")
-        self.assertEqual(breakdown["risk_reviews"], 4)
-        self.assertAlmostEqual(breakdown["raw_risk_points"], 52.0)
-        self.assertAlmostEqual(breakdown["prior_points"], 11.25)
-        self.assertAlmostEqual(breakdown["total_points"], 24.25)
 
 
 if __name__ == "__main__":
