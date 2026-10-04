@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 import tempfile
 import unittest
@@ -261,8 +262,11 @@ class TestWebApp(unittest.TestCase):
         # content: no final score, no score table, no invented aspect scores,
         # no "safe to buy" or "avoid", and no reviewer name the data never had.
         for invented in (b"Final risk score", b"Score Components", b"Safe to buy", b"Aspect Scores",
-                         b"Verified shopper", b"/ 100", b"Recommended Alternatives", b"Confidence", b"AiAssistant"):
+                         b"Verified shopper", b"Recommended Alternatives", b"Confidence", b"AiAssistant"):
             self.assertNotIn(invented, script)
+        # No "72 / 100" score. A pattern, not plain text: the elapsed-time
+        # arithmetic divides milliseconds by 1000, which is not a score.
+        self.assertIsNone(re.search(rb"/\s?100(?!\d)", script))
         for honest in (b"How DeFaketive Labels a Product", b"Warning words found", b"What the check looks for",
                        b"Duplicates excluded", b"No warning signs", b"function warningWords", b"term.negated"):
             self.assertIn(honest, script)
