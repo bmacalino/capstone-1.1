@@ -669,6 +669,10 @@ class TestLazadaScraper(unittest.TestCase):
             def find_elements(_by, _selector):
                 return []
 
+            @staticmethod
+            def get_cookie(name):
+                return {"name": name, "value": "x"}
+
         self.scraper.driver = FakeDriver()
         self.assertFalse(self.scraper._login_required())
 

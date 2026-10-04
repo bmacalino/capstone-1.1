@@ -132,6 +132,75 @@ class TestFalseFriends(unittest.TestCase):
                 self.assertNotIn("safety", self.model.analyze(text)["review_tags"])
 
 
+class TestTagalogHazardVocabulary(unittest.TestCase):
+    """Hazards two annotators confirmed in round 1 that model 0.1.0 missed.
+
+    The 0.1.0 lexicon had 15 safety terms and none of the Tagalog words
+    reviewers actually use for fire, smoke or shocks.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tagger = LexiconHazardTagger()
+
+    def test_confirmed_hazards_are_now_tagged(self):
+        for text in (
+            "Smell burnt.",
+            "overheats delivery took 20 days",
+            "umusok agad sya pagka gamit ko",
+            "nakuryente ako habang naka charge",
+            "nagliyab yung charger kagabi",
+            "pumutok yung charger",
+        ):
+            with self.subTest(text=text):
+                self.assertIn("safety", self.tagger.tag_sentence(text)["tags"])
+
+
+class TestHeatContextFilter(unittest.TestCase):
+    """A mild heat word is not a hazard when the sentence is about comfort,
+    weather or a product whose job is heat. Sentences are from round 1, where
+    both annotators judged them not to be safety reports."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tagger = LexiconHazardTagger()
+        cls.unfiltered = LexiconHazardTagger(false_friends=False)
+
+    def test_comfort_weather_and_heat_features_are_not_hazards(self):
+        for text, cue_class in (
+            ("hindi ok ung tela ito ung mainit eh look at the picture", "apparel"),
+            ("pero pwede na pag sa tag init ewan ko lang pag tag ulan", "ambient"),
+            (
+                "mganda ung tumbler mgagamit ng anak ko s skul lalo n ngaung sobrang init",
+                "heat_feature",
+            ),
+        ):
+            with self.subTest(text=text):
+                tagged = self.tagger.tag_sentence(text)
+                self.assertNotIn("safety", tagged["tags"])
+                self.assertEqual(tagged["suppressed"], {"safety": cue_class})
+                # The matched heat term is kept so the decision can be audited.
+                self.assertTrue(any(term["category"] == "safety" for term in tagged["terms"]))
+
+    def test_heat_in_an_electrical_context_is_still_a_hazard(self):
+        self.assertIn("safety", self.tagger.tag_sentence("umiinit pa yung charger")["tags"])
+
+    def test_strong_evidence_is_never_filtered(self):
+        # "tela" and "plantsa" are both cues, but a fire report outranks context.
+        tagged = self.tagger.tag_sentence("yung tela nasunog habang nagpaplantsa")
+        self.assertIn("safety", tagged["tags"])
+        self.assertEqual(tagged["suppressed"], {})
+
+    def test_cues_match_whole_words_only(self):
+        # "tela" must not fire inside "botelang": a cue matching inside an
+        # unrelated word would silently drop a real hazard.
+        self.assertIn("safety", self.tagger.tag_sentence("botelang umiinit ng sobra")["tags"])
+
+    def test_the_filter_can_be_disabled_for_measurement(self):
+        text = "hindi ok ung tela ito ung mainit eh look at the picture"
+        self.assertIn("safety", self.unfiltered.tag_sentence(text)["tags"])
+
+
 class TestSubtypes(unittest.TestCase):
     def test_subtype_is_the_most_severe_match(self):
         self.assertEqual(hazard_subtype(["init", "sunog"]), "fire_explosion_swelling")

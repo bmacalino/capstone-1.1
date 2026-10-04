@@ -6,6 +6,7 @@ The original Streamlit dashboard remains available in app.py during migration.
 
 from __future__ import annotations
 
+import copy
 import csv
 import hashlib
 import os
@@ -13,19 +14,22 @@ import secrets
 import subprocess
 import sys
 import threading
+import time
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
 import pandas as pd
-from flask import Flask, Response, jsonify, render_template, request, session
+from flask import Flask, Response, current_app, jsonify, render_template, request, session
 
+import accounts
 from dashboard_utils import (
     ROOT,
     analysis_is_current,
     analyze_products,
+    badge_view,
     cached_product_matches,
     csv_bytes,
     detect_marketplace,
@@ -33,12 +37,15 @@ from dashboard_utils import (
     json_bytes,
     load_products,
     merge_product_catalogs,
+    model_unavailable_error,
     output_path,
-    product_risk_level,
     product_rows,
     rank_recommendations,
+    require_model,
+    sentiment_model_version,
     result_files,
     review_rows,
+    with_badge_view,
 )
 from data_store import database_counts, load_saved_products, save_evaluation_run, save_products, save_survey_response
 from research_utils import evaluate_labels, score_sus, score_umux
@@ -48,10 +55,20 @@ MANUAL_VERIFICATION_TIMEOUT = 900
 SCRAPER_PROCESS_TIMEOUT = MANUAL_VERIFICATION_TIMEOUT + 300
 MAX_PRODUCTS = 30
 MAX_REVIEWS = 100
+# Lazada scans read up to this many written reviews from each star level; the
+# analysis weights each level back to the listing's star mix.
+LAZADA_REVIEWS_PER_STAR = 60
+MARKETPLACE_NAMES = ("Shopee PH", "Lazada PH", "Temu PH")
 
 _catalogs: dict[str, list[dict[str, Any]]] = {}
 _jobs: dict[str, dict[str, Any]] = {}
 _lock = threading.RLock()
+
+ModelUnavailableError = model_unavailable_error()
+MODEL_UNAVAILABLE_MESSAGE = (
+    "Review analysis is unavailable: the model is not installed on this server, "
+    "so no report can be produced. Nothing was analyzed with a substitute model."
+)
 
 NETWORK_ACCESS_DENIED_MESSAGE = (
     "Chrome was denied network access (ERR_NETWORK_ACCESS_DENIED). "
@@ -77,23 +94,124 @@ def _catalog_key() -> str:
     return str(key)
 
 
+# Failed sign-ins per email, kept in memory: five wrong passwords in fifteen
+# minutes pause sign-in for that email.
+LOGIN_FAILURE_LIMIT = 5
+LOGIN_FAILURE_WINDOW = 15 * 60
+_login_failures: dict[str, list[float]] = {}
+GUEST_LIMIT_MESSAGE = (
+    "You've used your 3 free scans today. Sign in or create a free account for unlimited scans."
+)
+
+
+def _persistent_secret_key(folder: Path) -> str:
+    """Keep one signing key across restarts, so sign-ins survive a restart."""
+    path = folder / "secret_key"
+    try:
+        stored = path.read_text(encoding="utf-8").strip()
+        if stored:
+            return stored
+    except OSError:
+        pass
+    key = secrets.token_urlsafe(48)
+    folder.mkdir(parents=True, exist_ok=True)
+    path.write_text(key, encoding="utf-8")
+    return key
+
+
+def _accounts_db() -> str:
+    return str(current_app.config["ACCOUNTS_DB"])
+
+
+def _current_user() -> dict[str, Any] | None:
+    user_id = session.get("user_id")
+    if user_id is None:
+        return None
+    user = accounts.get_user(_accounts_db(), user_id)
+    if user is None:
+        # The account was deleted, perhaps in another browser.
+        session.pop("user_id", None)
+    return user
+
+
+def _guest_status() -> dict[str, int]:
+    used = accounts.guest_scans_used(_accounts_db(), _catalog_key(), accounts.manila_day())
+    return {"limit": accounts.GUEST_DAILY_SCANS, "left": max(0, accounts.GUEST_DAILY_SCANS - used)}
+
+
+def _me() -> dict[str, Any]:
+    user = _current_user()
+    shown = {"name": user["name"], "email": user["email"]} if user else None
+    return {"user": shown, "guest": None if user else _guest_status()}
+
+
+def _json_body() -> dict[str, Any] | None:
+    """The request's JSON object. Requiring JSON keeps other websites from
+    submitting these forms: a cross-site JSON request needs CORS approval."""
+    if not request.is_json:
+        return None
+    payload = request.get_json(silent=True)
+    return payload if isinstance(payload, dict) else {}
+
+
+def _recent_failures(email: str) -> list[float]:
+    cutoff = time.monotonic() - LOGIN_FAILURE_WINDOW
+    with _lock:
+        failures = [moment for moment in _login_failures.get(email, []) if moment > cutoff]
+        _login_failures[email] = failures
+        return failures
+
+
+def _merged_catalog() -> list[dict[str, Any]]:
+    return merge_product_catalogs(_products(), load_saved_products())
+
+
+def _card(product: dict[str, Any]) -> dict[str, Any]:
+    """A product for a list card: its verdict, without the full review list."""
+    return {key: value for key, value in with_badge_view(product).items() if key != "comments"}
+
+
 def _prepare(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     if products and not analysis_is_current(products):
         products = analyze_products(products)
     return products
 
 
+# Result files analysed with the current model, keyed by file identity and
+# model version. Every new browser session loads the catalog; without this the
+# transformer re-analysed the same file for each one (~19 s per 100 reviews).
+# The files themselves are not rewritten: some are training-set sources whose
+# SHA-256 is recorded in a manifest.
+_analysed_files: dict[tuple[str, int, int, str], list[dict[str, Any]]] = {}
+
+
+def _prepare_file(path: Path) -> list[dict[str, Any]]:
+    stat = path.stat()
+    key = (str(path), stat.st_mtime_ns, stat.st_size, sentiment_model_version())
+    with _lock:
+        cached = _analysed_files.get(key)
+        if cached is None:
+            cached = _analysed_files[key] = _prepare(load_products(path))
+        return copy.deepcopy(cached)
+
+
 def _load_initial_catalog() -> list[dict[str, Any]]:
     for path in result_files():
         try:
-            products = _prepare(load_products(path))
+            products = _prepare_file(Path(path))
             if has_usable_products(products):
                 save_products(products, source=str(path))
                 return products
+        except ModelUnavailableError:
+            # Not a problem with this file: every file would fail the same way,
+            # and an empty catalog would hide the reason from the user.
+            raise
         except Exception:
             continue
     try:
         return _prepare(load_saved_products())
+    except ModelUnavailableError:
+        raise
     except Exception:
         return []
 
@@ -113,6 +231,11 @@ def _set_products(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return prepared
 
 
+def _viewed(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Attach the display view the browser renders badges from."""
+    return [with_badge_view(product) for product in products]
+
+
 def _product_for(link: str, products: list[dict[str, Any]] | None = None) -> dict[str, Any] | None:
     products = products if products is not None else _products()
     return next((product for product in products if str(product.get("link") or "") == link), None)
@@ -127,7 +250,7 @@ def _command_for_scrape(keyword: str, platform: str, product_count: int, review_
         command = [sys.executable, str(ROOT / "src" / "retriv.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-prompt", "--verification-timeout", str(MANUAL_VERIFICATION_TIMEOUT)]
         command.extend(["--product-url", keyword] if direct_url else ["-k", keyword])
     elif platform == "lazada":
-        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600"]
+        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--all-star-types", "--star-limit-per-type", str(LAZADA_REVIEWS_PER_STAR), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600"]
         command.extend(["--product-url", keyword] if direct_url else [keyword])
     else:
         profile = ROOT / ".browser_profiles" / platform
@@ -218,6 +341,9 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
                     stage_label="Stopped",
                     message="Marketplace verification timed out. Start a new scan when you are ready.",
                 )
+        except ModelUnavailableError as exc:
+            with _lock:
+                job.update(state="error", stage_label="Stopped", message=f"{MODEL_UNAVAILABLE_MESSAGE} {exc}")
         except Exception as exc:
             with _lock:
                 job.update(
@@ -241,39 +367,27 @@ def _lexicon_rows(filename: str, columns: list[str]) -> list[dict[str, str]]:
 
 
 def _main_product_issue(product: dict[str, Any]) -> str:
-    """Return the most frequently detected risk category for a product."""
-    issues: Counter[str] = Counter()
-    comments = product.get("comments")
-    if not isinstance(comments, list):
+    """Name the category reviewers reported most, or say there is none."""
+    view = badge_view(product)
+    reported = [badge for badge in view["badges"] if badge["mentions"]]
+    if not reported:
         return "No dominant issue"
-
-    for comment in comments:
-        if not isinstance(comment, dict) or comment.get("is_duplicate"):
-            continue
-        risk = (comment.get("sentiment_analysis") or {}).get("risk") or {}
-        evidence = risk.get("evidence") or []
-        categories = {
-            str(item.get("category") or "").strip().lower()
-            for item in evidence
-            if isinstance(item, dict) and not item.get("negated")
-        }
-        if not categories:
-            categories = {
-                str(category).strip().lower()
-                for category in (risk.get("categories") or [])
-            }
-        issues.update(category for category in categories if category)
-
-    if not issues:
-        return "No dominant issue"
-    return issues.most_common(1)[0][0].replace("_", " ").title()
+    return max(reported, key=lambda badge: badge["mentions"])["label"]
 
 
 def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     app = Flask(__name__)
-    app.config.update(SECRET_KEY=os.environ.get("DEFAKETIVE_SECRET_KEY") or secrets.token_urlsafe(32), MAX_CONTENT_LENGTH=10 * 1024 * 1024)
+    instance = Path(app.instance_path)
+    app.config.update(
+        MAX_CONTENT_LENGTH=10 * 1024 * 1024,
+        SESSION_COOKIE_SAMESITE="Lax",
+        PERMANENT_SESSION_LIFETIME=timedelta(days=30),
+        ACCOUNTS_DB=os.environ.get("DEFAKETIVE_ACCOUNTS_DB") or str(instance / "accounts.db"),
+    )
     if test_config:
         app.config.update(test_config)
+    if not app.config.get("SECRET_KEY"):
+        app.config["SECRET_KEY"] = os.environ.get("DEFAKETIVE_SECRET_KEY") or _persistent_secret_key(instance)
 
     @app.get("/")
     def index() -> str:
@@ -281,7 +395,8 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     @app.get("/api/products")
     def products_api() -> Response:
-        return jsonify({"products": _products(), "count": len(_products())})
+        products = _products()
+        return jsonify({"products": _viewed(products), "count": len(products)})
 
     @app.post("/api/search")
     def search_api() -> Response:
@@ -295,10 +410,22 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
         if bool(payload.get("live")):
-            job = _start_job(_catalog_key(), query, platform, _integer(payload.get("product_count"), 6, 1, MAX_PRODUCTS), _integer(payload.get("review_count"), 100, 1, MAX_REVIEWS))
-            return jsonify({"job": job}), 202
+            require_model()
+            guest = _current_user() is None
+            day = accounts.manila_day()
+            # Only collecting new reviews counts as a scan; looking up a
+            # product that was already checked is free for everyone.
+            if guest and not accounts.reserve_guest_scan(_accounts_db(), _catalog_key(), day):
+                return jsonify({"error": GUEST_LIMIT_MESSAGE, "limit_reached": True, "guest": _guest_status()}), 429
+            try:
+                job = _start_job(_catalog_key(), query, platform, _integer(payload.get("product_count"), 6, 1, MAX_PRODUCTS), _integer(payload.get("review_count"), 100, 1, MAX_REVIEWS))
+            except Exception:
+                if guest:
+                    accounts.release_guest_scan(_accounts_db(), _catalog_key(), day)
+                raise
+            return jsonify({"job": job, "guest": _guest_status() if guest else None}), 202
         matches = cached_product_matches(_products(), query, limit=MAX_PRODUCTS)
-        return jsonify({"products": matches, "count": len(matches), "mode": "saved"})
+        return jsonify({"products": _viewed(matches), "count": len(matches), "mode": "saved"})
 
     @app.get("/api/jobs/<job_id>")
     def job_api(job_id: str) -> Response:
@@ -319,9 +446,11 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
                 raise ValueError("The JSON does not contain usable product data.")
             products = _set_products(products)
             save_products(products, source=uploaded.filename)
+        except ModelUnavailableError:
+            raise
         except Exception as exc:
             return jsonify({"error": f"Could not load file: {exc}"}), 400
-        return jsonify({"products": products, "count": len(products)})
+        return jsonify({"products": _viewed(products), "count": len(products)})
 
     @app.get("/api/products/detail")
     def product_detail_api() -> Response:
@@ -329,8 +458,11 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         product = _product_for(link)
         if not product:
             return jsonify({"error": "Product not found in the current catalog."}), 404
-        catalog = merge_product_catalogs(_products(), load_saved_products())
-        return jsonify({"product": product, "recommendations": rank_recommendations(product, catalog, limit=3)})
+        catalog = _merged_catalog()
+        recommendations = rank_recommendations(product, catalog, limit=3)
+        return jsonify(
+            {"product": with_badge_view(product), "recommendations": _viewed(recommendations)}
+        )
 
     @app.get("/api/export/products.csv")
     def export_products() -> Response:
@@ -343,20 +475,16 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     @app.get("/api/admin/overview")
     def overview_api() -> Response:
         products = _products()
-        distribution = {"Low": 0, "Moderate": 0, "High": 0}
-        for product in products:
-            level = product_risk_level(product)
-            if level in distribution:
-                distribution[level] += 1
+        views = [badge_view(product) for product in products]
         rows = product_rows(products)
-        for product, row in zip(products, rows):
-            row["Main issue"] = _main_product_issue(product)
-        flagged = [row for row in rows if str(row.get("Risk level")) == "High"][:10]
-        sampled_reviews = sum(int(row.get("Reviews") or 0) for row in rows)
-        average_reliability = (
-            sum(float(row.get("Reliability score") or 0) for row in rows) / len(rows)
-            if rows
-            else 0.0
+        verdicts: Counter[str] = Counter(view["state"] for view in views)
+        flagged = []
+        for product, view, row in zip(products, views, rows):
+            if view["tone"] in {"high", "moderate"}:
+                flagged.append({**row, "Main issue": _main_product_issue(product)})
+        # Safety warnings first, then by how many safety reports they carry.
+        flagged.sort(
+            key=lambda row: (row["Verdict"] != "Reviewers report safety problems", -row["Safety reports"])
         )
         marketplaces = {
             str(row.get("Platform") or "").strip()
@@ -365,12 +493,15 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         }
         summary = {
             "products": len(rows),
-            "reviews": sampled_reviews,
-            "average_reliability": round(average_reliability, 1),
-            "high_risk": distribution["High"],
+            "reviews": sum(int(row.get("Reviews") or 0) for row in rows),
+            "safety_warnings": verdicts.get("safety_warning", 0),
+            "with_safety_reports": sum(1 for view in views if view["counts"]["safety"]),
+            "not_analyzed": verdicts.get("not_analyzed", 0),
             "marketplaces": len(marketplaces),
         }
-        return jsonify({"summary": summary, "risk_distribution": distribution, "flagged": flagged})
+        return jsonify(
+            {"summary": summary, "verdicts": dict(sorted(verdicts.items())), "flagged": flagged[:10]}
+        )
 
     @app.get("/api/admin/database")
     def database_api() -> Response:
@@ -425,6 +556,187 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             return jsonify(result)
         except Exception as exc:
             return jsonify({"error": f"Evaluation could not run: {exc}"}), 400
+
+    # --- Accounts -----------------------------------------------------------
+
+    def json_required() -> tuple[Response, int]:
+        return jsonify({"error": "Send this request as JSON."}), 415
+
+    def field_error(error: accounts.AccountError, status: int = 400) -> tuple[Response, int]:
+        return jsonify({"error": error.message, "fields": {error.field: error.message}}), status
+
+    def sign_in(user: dict[str, Any]) -> None:
+        catalog_key = session.get("catalog_key")
+        session.clear()
+        if catalog_key:
+            session["catalog_key"] = catalog_key
+        session["user_id"] = user["id"]
+        session.permanent = True
+
+    @app.get("/api/auth/me")
+    def me_api() -> Response:
+        return jsonify(_me())
+
+    @app.post("/api/auth/signup")
+    def signup_api() -> Response | tuple[Response, int]:
+        payload = _json_body()
+        if payload is None:
+            return json_required()
+        errors = accounts.signup_errors(
+            payload.get("full_name"), payload.get("email"), payload.get("password"),
+            payload.get("confirm"), payload.get("agree"),
+        )
+        if errors:
+            return jsonify({"error": next(iter(errors.values())), "fields": errors}), 400
+        try:
+            user = accounts.create_user(_accounts_db(), payload["full_name"], payload["email"], payload["password"])
+        except accounts.EmailTaken as error:
+            return field_error(error, 409)
+        sign_in(user)
+        return jsonify(_me()), 201
+
+    @app.post("/api/auth/login")
+    def login_api() -> Response | tuple[Response, int]:
+        payload = _json_body()
+        if payload is None:
+            return json_required()
+        email = str(payload.get("email") or "").strip().lower()
+        if len(_recent_failures(email)) >= LOGIN_FAILURE_LIMIT:
+            return jsonify({"error": "Too many tries. Wait a few minutes, then try again."}), 429
+        user = accounts.authenticate(_accounts_db(), email, payload.get("password"))
+        if user is None:
+            with _lock:
+                _login_failures.setdefault(email, []).append(time.monotonic())
+            return jsonify({"error": "Email or password is incorrect."}), 401
+        with _lock:
+            _login_failures.pop(email, None)
+        sign_in(user)
+        return jsonify(_me())
+
+    @app.post("/api/auth/logout")
+    def logout_api() -> Response:
+        session.pop("user_id", None)
+        return jsonify(_me())
+
+    @app.patch("/api/auth/account")
+    def update_account_api() -> Response | tuple[Response, int]:
+        payload = _json_body()
+        if payload is None:
+            return json_required()
+        user = _current_user()
+        if user is None:
+            return jsonify({"error": "Sign in first."}), 401
+        try:
+            accounts.update_user(
+                _accounts_db(), user["id"], payload.get("current_password"),
+                full_name=payload.get("full_name"), email=payload.get("email"),
+                new_password=payload.get("new_password"),
+            )
+        except accounts.EmailTaken as error:
+            return field_error(error, 409)
+        except accounts.WrongPassword as error:
+            return field_error(error, 403)
+        except accounts.AccountError as error:
+            return field_error(error)
+        return jsonify(_me())
+
+    @app.delete("/api/auth/account")
+    def delete_account_api() -> Response | tuple[Response, int]:
+        payload = _json_body()
+        if payload is None:
+            return json_required()
+        user = _current_user()
+        if user is None:
+            return jsonify({"error": "Sign in first."}), 401
+        try:
+            accounts.delete_user(_accounts_db(), user["id"], payload.get("current_password"))
+        except accounts.WrongPassword as error:
+            return field_error(error, 403)
+        session.pop("user_id", None)
+        return jsonify(_me())
+
+    # --- A signed-in user's history and wishlist ---------------------------
+
+    def signed_in_payload() -> tuple[dict[str, Any] | None, dict[str, Any] | None, tuple[Response, int] | None]:
+        payload = _json_body() if request.method != "GET" else {}
+        if payload is None:
+            return None, None, json_required()
+        user = _current_user()
+        if user is None:
+            return None, None, (jsonify({"error": "Sign in to save to your account."}), 401)
+        return user, payload, None
+
+    @app.get("/api/me/library")
+    def library_api() -> Response | tuple[Response, int]:
+        user, _, problem = signed_in_payload()
+        if problem:
+            return problem
+        return jsonify(accounts.library(_accounts_db(), user["id"]))
+
+    @app.put("/api/me/activity")
+    def activity_api() -> Response | tuple[Response, int]:
+        user, payload, problem = signed_in_payload()
+        if problem:
+            return problem
+        try:
+            accounts.record_activity(_accounts_db(), user["id"], payload.get("link"), payload.get("product"), payload.get("openedAt"))
+        except accounts.AccountError as error:
+            return field_error(error)
+        return jsonify({"saved": True})
+
+    @app.delete("/api/me/activity")
+    def clear_activity_api() -> Response | tuple[Response, int]:
+        user, _, problem = signed_in_payload()
+        if problem:
+            return problem
+        accounts.clear_activity(_accounts_db(), user["id"])
+        return jsonify(accounts.library(_accounts_db(), user["id"]))
+
+    @app.route("/api/me/wishlist", methods=["PUT", "DELETE"])
+    def wishlist_api() -> Response | tuple[Response, int]:
+        user, payload, problem = signed_in_payload()
+        if problem:
+            return problem
+        try:
+            accounts.set_wishlist(_accounts_db(), user["id"], payload.get("link"), request.method == "PUT")
+        except accounts.AccountError as error:
+            return field_error(error)
+        return jsonify({"saved": request.method == "PUT"})
+
+    @app.post("/api/me/import")
+    def import_api() -> Response | tuple[Response, int]:
+        user, payload, problem = signed_in_payload()
+        if problem:
+            return problem
+        imported = accounts.import_library(_accounts_db(), user["id"], payload.get("activity"), payload.get("wishlist"))
+        return jsonify({"imported": imported, **accounts.library(_accounts_db(), user["id"])})
+
+    # --- Public numbers for the sign-in page and the Wishlist page ----------
+
+    @app.get("/api/stats/public")
+    def public_stats_api() -> Response:
+        counts = database_counts()
+        return jsonify({"products": counts.get("products", 0), "reviews": counts.get("reviews", 0), "marketplaces": len(MARKETPLACE_NAMES)})
+
+    @app.get("/api/picks")
+    def picks_api() -> Response:
+        clean = [product for product in _merged_catalog() if badge_view(product).get("state") == "no_warning_signs"]
+        clean.sort(key=lambda product: -int(badge_view(product).get("reviews_analyzed") or 0))
+        return jsonify({"products": [_card(product) for product in clean[:12]]})
+
+    @app.get("/api/wishlist/popular")
+    def popular_api() -> Response:
+        by_link = {str(product.get("link") or ""): product for product in _merged_catalog()}
+        popular = [
+            {"product": _card(by_link[link]), "saves": saves}
+            for link, saves in accounts.popular_wishlist(_accounts_db())
+            if link in by_link
+        ]
+        return jsonify({"products": popular})
+
+    @app.errorhandler(ModelUnavailableError)
+    def model_unavailable(error: Exception) -> tuple[Response, int]:
+        return jsonify({"error": MODEL_UNAVAILABLE_MESSAGE, "detail": str(error), "model_unavailable": True}), 503
 
     @app.errorhandler(413)
     def too_large(_: Any) -> tuple[Response, int]:

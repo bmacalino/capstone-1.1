@@ -1,0 +1,132 @@
+# term	category	severity	language
+# Severity: 1=minor concern, 2=material failure, 3=critical/fraud/safety concern.
+ayaw gumana	performance	3	tl
+basag	defect	3	tl
+battery draining	performance	2	en
+battery is draining	performance	2	en
+bilis masira	durability	3	taglish
+bloated battery	safety	3	en
+broke after	durability	2	en
+broken	defect	3	en
+burning smell	safety	3	en
+cheap material	quality	2	en
+cheaply made	quality	2	en
+class a	counterfeit	2	taglish
+counterfeit	counterfeit	3	en
+crack	defect	2	en
+cracked	defect	2	en
+damaged	defect	2	en
+dead on arrival	performance	3	en
+defect	defect	2	en
+defective	defect	3	en
+delikado	safety	3	tl
+di gumagana	performance	3	tl
+disconnecting	performance	2	en
+does not work	performance	3	en
+drains fast	performance	2	en
+electric shock	safety	3	en
+exploded	safety	3	en
+fake	counterfeit	3	en
+flimsy	quality	2	en
+gasgas	defect	1	tl
+glitch	performance	2	en
+glitching	performance	2	en
+grounded	safety	3	taglish
+hindi gumagana	performance	3	tl
+hindi original	counterfeit	3	taglish
+imitation	counterfeit	3	en
+intermittent	performance	2	en
+kulang	defect	2	tl
+lag	performance	2	taglish
+low quality	quality	2	en
+lumobo battery	safety	3	taglish
+mabagal	performance	2	tl
+madaling masira	durability	3	tl
+mahina signal	performance	2	taglish
+maiksi battery life	performance	2	taglish
+maluwag	defect	1	tl
+mabilis malowbat	performance	3	taglish
+mabilis masira	durability	3	tl
+missing parts	defect	2	en
+mukhang peke	counterfeit	3	tl
+nasira agad	durability	3	tl
+nasira	durability	3	tl
+nasusunog	safety	3	tl
+no power	performance	3	en
+no sound	performance	2	en
+not charging	performance	3	en
+not original	counterfeit	3	en
+not working	performance	3	en
+overheat	safety	3	en
+overheating	safety	3	en
+on fire	safety	3	en
+palpak	quality	2	tl
+peke	counterfeit	3	tl
+poor quality	quality	2	en
+replica	counterfeit	3	en
+sablay	quality	2	tl
+scam	counterfeit	3	taglish
+scratched	defect	1	en
+sira	defect	3	tl
+sirain	durability	2	tl
+smoke	safety	3	en
+spark	safety	3	en
+stopped working	performance	3	en
+substandard	quality	2	en
+sumabog	safety	3	tl
+umiinit	safety	2	tl
+walang tunog	performance	2	tl
+won't charge	performance	3	en
+won't turn on	performance	3	en
+
+# ---------- safety terms added in risk-lexicon 2.0 (2026-09-26) ----------
+# The shipped list had 15 safety terms and no Tagalog hazard vocabulary.
+# These 42 were already vetted in research/lexicons/mining_seeds_v1.tsv.
+# Round 1 human labels: safety recall 0.593 -> 0.741 (in-sample; see
+# research/hazard_tagger_measurement.json). Mild heat terms stay severity 2 so
+# safety_false_friends_v1.tsv can suppress them in comfort/feature contexts.
+uminit	safety	2	taglish
+ang init	safety	2	taglish
+sobrang init	safety	2	taglish
+too hot	safety	2	taglish
+very hot	safety	2	taglish
+gets hot	safety	2	taglish
+burning hot	safety	2	taglish
+nasunog	safety	3	taglish
+masunog	safety	3	taglish
+burnt	safety	3	taglish
+burned	safety	3	taglish
+nagliyab	safety	3	taglish
+caught fire	safety	3	taglish
+explode	safety	3	taglish
+pumutok	safety	3	taglish
+amoy sunog	safety	3	taglish
+amoy keso	safety	3	taglish
+smell of burning	safety	3	taglish
+umusok	safety	3	taglish
+umuusok	safety	3	taglish
+nag-usok	safety	3	taglish
+smoking	safety	3	taglish
+overheated	safety	3	taglish
+napaso	safety	3	taglish
+nakakapaso	safety	3	taglish
+kuryente	safety	3	taglish
+nakuryente	safety	3	taglish
+kinuryente	safety	3	taglish
+nangunguryente	safety	3	taglish
+nag short circuit	safety	3	taglish
+short circuit	safety	3	taglish
+shorted	safety	3	taglish
+sparking	safety	3	taglish
+sparks	safety	3	taglish
+nag-spark	safety	3	taglish
+namaga	safety	3	taglish
+umumbok	safety	3	taglish
+nag-swell	safety	3	taglish
+swelling	safety	3	taglish
+swollen	safety	3	taglish
+lumobo	safety	3	taglish
+battery bloated	safety	3	taglish
+# Completes the overheat/overheated/overheating family. Added after round 1
+# showed "overheats" missed; disclosed as an in-sample addition.
+overheats	safety	3	en

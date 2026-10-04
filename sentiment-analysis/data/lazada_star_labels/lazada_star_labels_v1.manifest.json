@@ -1,0 +1,474 @@
+{
+  "generated_at": "2026-09-26T12:33:32+00:00",
+  "output": "lazada_star_labels_v1.csv",
+  "output_sha256": "8b6080782c20bc9c9ea7280a19e080e578e86b9c6a6d3915079ec3b936b194a8",
+  "version": "lazada-star-labels-1.0.0",
+  "label_rule": {
+    "1-2 stars": "negative",
+    "4-5 stars": "positive",
+    "3 stars": "dropped"
+  },
+  "label_type": "weak supervision: the reviewer's own star rating, not a sentiment annotation",
+  "star_agreement_with_human_labels": {
+    "1-2": {
+      "treated_as": "negative",
+      "reviews": 380,
+      "human_agrees": 353,
+      "agreement": 0.9289,
+      "human_labels": {
+        "negative": 353,
+        "neutral": 15,
+        "positive": 12
+      }
+    },
+    "3": {
+      "treated_as": "neutral",
+      "reviews": 19,
+      "human_agrees": 2,
+      "agreement": 0.1053,
+      "human_labels": {
+        "negative": 8,
+        "neutral": 2,
+        "positive": 9
+      }
+    },
+    "4-5": {
+      "treated_as": "positive",
+      "reviews": 71,
+      "human_agrees": 68,
+      "agreement": 0.9577,
+      "human_labels": {
+        "negative": 2,
+        "neutral": 1,
+        "positive": 68
+      }
+    }
+  },
+  "rule_selection_disclosure": "Dropping 3-star reviews was decided after seeing the agreement figures, which are computed on the marketplace test set.",
+  "exclusions": {
+    "already_in_firecs_train": 2,
+    "duplicate": 994,
+    "marketplace_test_product": 127,
+    "marketplace_test_text": 494,
+    "no_text_or_rating": 7,
+    "three_star_dropped": 962
+  },
+  "marketplace_test_products_excluded": 15,
+  "rows": 5026,
+  "label_counts": {
+    "negative": 1921,
+    "positive": 3105
+  },
+  "platform_counts": {
+    "lazada": 5026
+  },
+  "products": 60,
+  "rows_without_product_id": 0,
+  "sources": [
+    {
+      "file": "lazada_ph_computer_accessories_three_star_first.json",
+      "sha256": "270feabce1938a40affb124edbcd68fb6869e35ae7ca9742a3f853b85ee760f5",
+      "reviews": 60
+    },
+    {
+      "file": "lazada_ph_direct_03a1698945d4.json",
+      "sha256": "9515fec1e74cfefed553fe7cb078124bcd903ef57bcf0a4dd5acc9e55f53a559",
+      "reviews": 15
+    },
+    {
+      "file": "lazada_ph_direct_2670576a1287.json",
+      "sha256": "448bb8fc06074df3f4bc91a0273452547cc4a9ecd64c5543dd2edab1069d95f5",
+      "reviews": 100
+    },
+    {
+      "file": "lazada_ph_direct_33c2a8429279.json",
+      "sha256": "d185823a0481e87713d0cc788507b6cc8b68801b7591a0dd574c25b45a7734c4",
+      "reviews": 30
+    },
+    {
+      "file": "lazada_ph_direct_40f974921dd2.json",
+      "sha256": "9c07f9c96ac2f3a495a77d15fafb9b86bf676ff792c7b9de984b2ce1aff8c615",
+      "reviews": 0
+    },
+    {
+      "file": "lazada_ph_direct_c3a84b5bbc3a.json",
+      "sha256": "ddf53f7401f0c2428b5a4b031be880335998718108e2a7ad97a60d8841a8d799",
+      "reviews": 50
+    },
+    {
+      "file": "lazada_ph_direct_c709355f3315.json",
+      "sha256": "9a06b9c046e058535829d04b6bce8922600fb207be562f949b25c6f9a3c01462",
+      "reviews": 30
+    },
+    {
+      "file": "lazada_ph_direct_ccbf5f697ec4.json",
+      "sha256": "f18486184acf97f5c6f248c0d7f4f36ae2a91a7c1d4723e59e51733142e09023",
+      "reviews": 10
+    },
+    {
+      "file": "lazada_ph_earphones.json",
+      "sha256": "fdea2f60d182fc1368b337b4bdf72d282c15b5742ef6aea1d960bf2c4211b347",
+      "reviews": 20
+    },
+    {
+      "file": "lazada_ph_failed_links_three_star_retry.json",
+      "sha256": "6ee4b0b2fc2e7d0a2e28cc8f5ca58a9312481564901a59e8518c4110949120fc",
+      "reviews": 60
+    },
+    {
+      "file": "lazada_ph_i4983206125_three_star_retry.json",
+      "sha256": "f14e2aed66470f1ea9ffe7ed626e50cd6285600667fae22b376d716a213d3e72",
+      "reviews": 30
+    },
+    {
+      "file": "lazada_ph_manual_earphones.json",
+      "sha256": "02e35c276cbce317d787f87d424707eb8dc5c01717392ef239f623f2981cf58f",
+      "reviews": 1
+    },
+    {
+      "file": "lazada_ph_previous_links_three_star_first.json",
+      "sha256": "4ce33c3aa9092163ae7233cc5019ec946d43c7a264aec5b48e74c1fc5b56b0f9",
+      "reviews": 120
+    },
+    {
+      "file": "lazada_ph_smart_home_three_star_first.json",
+      "sha256": "94fade97e699853cf46aa00508b8d13d2b12a3bf39a36e839e31c31f4c541dd8",
+      "reviews": 32
+    },
+    {
+      "file": "lazada_ph_smoke_fix.json",
+      "sha256": "554e12a0c3c2f01bdbb93aa00a28e93b0d0f10768536f82691c49ddfc0230a36",
+      "reviews": 1
+    },
+    {
+      "file": "lazada_ph_test_fresh.json",
+      "sha256": "4ecccafaece87889fe597c6915591f6291757ba66a21fd78acac5d81c81b83f5",
+      "reviews": 0
+    },
+    {
+      "file": "lazada_ph_test_fresh_retry.json",
+      "sha256": "a95add920e29c0b9f1d34d9663c1c3394b2b557da34ea2830ffaed408940bda9",
+      "reviews": 30
+    },
+    {
+      "file": "lazada_audio.json",
+      "sha256": "7e3cc2a05c4a201c990864d99f32f9b38e8f3581dfbb7ac002d5eca3bd3e5ff1",
+      "reviews": 58
+    },
+    {
+      "file": "lazada_audio_direct_3252473210.json",
+      "sha256": "a57e989072d29eda64247895c8c6bf9511a9b8a8c9c72a4b0faf508f1ba59795",
+      "reviews": 152
+    },
+    {
+      "file": "lazada_audio_direct_4471484698.json",
+      "sha256": "6a8e764222ad190e6a0b9fd29c79de2afbd8583d8f20f364301468fde6978fe8",
+      "reviews": 158
+    },
+    {
+      "file": "lazada_audio_direct_batch_2.json",
+      "sha256": "6c48820e5fcbfb052983b2fd65489215549b47a1ee636e1fa22d3e2108163f73",
+      "reviews": 215
+    },
+    {
+      "file": "lazada_audio_high_volume.json",
+      "sha256": "1acd11537a29133a374cfce8e32a57cc0fca470e5f8810e9699d7f33c7bd2703",
+      "reviews": 930
+    },
+    {
+      "file": "lazada_audio_microphones.json",
+      "sha256": "47bde0d5f6af205621b4c7f873d297778e5b30a5b25280d8fd05109bef4aff52",
+      "reviews": 144
+    },
+    {
+      "file": "lazada_audio_speakers.json",
+      "sha256": "a222dbd5d28702eba6d7df1061de3315eb80b5fdd96b7a7794e606f36b9ca3ae",
+      "reviews": 693
+    },
+    {
+      "file": "lazada_computer_peripherals_direct_1120920366.json",
+      "sha256": "4c3b3f9cc5bfe930e6ab5473d93d75729c453993c5f32234fc8ea88f3d19f1b4",
+      "reviews": 123
+    },
+    {
+      "file": "lazada_computer_peripherals_direct_2531734184.json",
+      "sha256": "428ec8675196ca2e5c3bb9caab28eb10281c7e3cea46ddb72bcaf182a5739f08",
+      "reviews": 200
+    },
+    {
+      "file": "lazada_computer_peripherals_direct_4153633764.json",
+      "sha256": "08db9350a331d21d314499d20fc67e480988ed9572e411622bfe3aa123871acb",
+      "reviews": 159
+    },
+    {
+      "file": "lazada_computer_peripherals_direct_4495459414.json",
+      "sha256": "c8a5dafc87fb18f3ce435459277da3b02b3785d8393884fe1a276bcd8a36492c",
+      "reviews": 107
+    },
+    {
+      "file": "lazada_mobile_accessories.json",
+      "sha256": "25e436e2391a8f1827cca38f76637169d7f8bf439da5cc0ff6a256443dc4eb46",
+      "reviews": 0
+    },
+    {
+      "file": "lazada_mobile_accessories_direct_4578043495.json",
+      "sha256": "ca16df580fdbe1a6ff6f8c4231995df808e8cc6d04454daa0e52cb61df060c47",
+      "reviews": 121
+    },
+    {
+      "file": "lazada_mobile_accessories_direct_batch_2.json",
+      "sha256": "e8e9a626e28e32ad2ab4ad4d420bec34460a86b6db7c4a9c465a9062d292710e",
+      "reviews": 268
+    },
+    {
+      "file": "lazada_mobile_electronics_controller_3646051280.json",
+      "sha256": "4e51599d6a7546527e3065ff7a4410993831d662b6fa40ddc5d82e95875966ec",
+      "reviews": 107
+    },
+    {
+      "file": "lazada_mobile_electronics_controller_3889798299.json",
+      "sha256": "f5ec443b70020920743f91fad0e1107019671d9fd2a1e8b732c62caaeb4a194c",
+      "reviews": 0
+    },
+    {
+      "file": "lazada_mobile_electronics_controller_3999327536.json",
+      "sha256": "dc0821ec02595889ea759e68cea2ba281759040c79a7b4dd3fd4ca025b8c7156",
+      "reviews": 118
+    },
+    {
+      "file": "lazada_mobile_electronics_controllers_batch_1.json",
+      "sha256": "631d5c3f50acf59773ba7cf9ca9d5ad21f247ac773c4851949f696d4eed53de4",
+      "reviews": 0
+    },
+    {
+      "file": "lazada_mobile_electronics_direct_15411207559.json",
+      "sha256": "d566ce1df6467c4ba45eb4536d9d93b78934a0f22bb9b8c533f27f74b3cca10c",
+      "reviews": 6
+    },
+    {
+      "file": "lazada_mobile_electronics_direct_1994197909.json",
+      "sha256": "cebfdc6265f11fb4f25589fd7cdc5fe1d58f5ab56a06ecfcbdf235146f8e8995",
+      "reviews": 109
+    },
+    {
+      "file": "lazada_mobile_electronics_direct_4584110073.json",
+      "sha256": "e913d9c65b66e3b8ed9c483255e59d96205a30ae7933738820372ec6231e2246",
+      "reviews": 63
+    },
+    {
+      "file": "lazada_mobile_electronics_direct_batch_1.json",
+      "sha256": "f860d23b339fc626d6aa3ac38d323dd865a80d956cdaec45a8fcce9ff41fd18f",
+      "reviews": 149
+    },
+    {
+      "file": "lazada_mobile_electronics_direct_batch_2.json",
+      "sha256": "6f1dfe703a2896a88de683039b5d30aa9e5b65d2e9ee213ca5a5da0bd40f9402",
+      "reviews": 193
+    },
+    {
+      "file": "lazada_mobile_electronics_direct_batch_3.json",
+      "sha256": "157a186e618897a004ab855298f90d21dee9b4f105bd2ff7e83800ed34682b6a",
+      "reviews": 238
+    },
+    {
+      "file": "lazada_mobile_electronics_direct_batch_4.json",
+      "sha256": "2c36386e8315fd813ccd73101488ca81dbf332256a2cf0b8997dcb52ee699880",
+      "reviews": 63
+    },
+    {
+      "file": "lazada_power.json",
+      "sha256": "96ba14ce7c2442582988f22c1145899de07e65278a5325d10b6da379fb6dbe52",
+      "reviews": 554
+    },
+    {
+      "file": "lazada_power_cables.json",
+      "sha256": "28e82ad1015b70b4324cb76d04c3a52c866c792b8a7ca1e92393722ea302fc94",
+      "reviews": 183
+    },
+    {
+      "file": "lazada_power_direct_2310520201.json",
+      "sha256": "36808c959fcdf2a90210160ddbe7fe2998288dde6f026d9661e4860a60ba6cb8",
+      "reviews": 174
+    },
+    {
+      "file": "lazada_power_direct_3408401105.json",
+      "sha256": "b8eb5f2b5c1b2730ead046735b0b3c03baf7ff8da43a3c8dce92341bff5822b6",
+      "reviews": 64
+    },
+    {
+      "file": "lazada_power_direct_batch_1.json",
+      "sha256": "0a7c93c3b729b79e890a96f1846c8f7493b932ec66d4777cc71e204f553425b7",
+      "reviews": 604
+    },
+    {
+      "file": "lazada_review_filipino_reviews.json",
+      "sha256": "5966de67aa8eb05f0a80f8373c042336b9e43d242b16e6af3bf6f982cab635b8",
+      "reviews": 0
+    },
+    {
+      "file": "lazada_smart_home_direct_3075012546.json",
+      "sha256": "14a6eee47862ef0c3d11bf5795216ed451d467a14062e35330aa90c24c5964be",
+      "reviews": 58
+    },
+    {
+      "file": "lazada_smart_home_direct_3626751806.json",
+      "sha256": "787fb35ec6314c8b755c3e9b17b5f4540423b46d4bdabdf62238c30a9e6b9f4b",
+      "reviews": 125
+    },
+    {
+      "file": "lazada_smart_home_direct_4371692812.json",
+      "sha256": "d05fe226a72241434c1682227db88d6dbebd59400d9ce4c19dcf93b989537b30",
+      "reviews": 0
+    },
+    {
+      "file": "lazada_smart_home_direct_4474319488.json",
+      "sha256": "654925ed2b1d7b2a3ff1cea49603adcd188002b6853b8516df45684e4e2b685f",
+      "reviews": 70
+    },
+    {
+      "file": "lazada_smart_home_direct_4547888367.json",
+      "sha256": "16441509f3d273ef5de6de8fa6b02f1a3b682b01d767994ae666d6d13052a81e",
+      "reviews": 119
+    },
+    {
+      "file": "lazada_smart_home_direct_batch_1.json",
+      "sha256": "d26f3d61ba6054b317e75666fa078f0805f0e2d3b86010512892a4fc0026c179",
+      "reviews": 24
+    },
+    {
+      "file": "lazada_smart_home_direct_batch_2.json",
+      "sha256": "7b2b6c102e777b2b36750349c9fd9ecc6339c3aada66112c5ccdd622c8ad960c",
+      "reviews": 155
+    },
+    {
+      "file": "lazada_smart_home_doorbells_batch_1.json",
+      "sha256": "96a1c889af81636e42acdf58704a9944890d6594b5ffbbfe34e2613c6ea62d74",
+      "reviews": 111
+    },
+    {
+      "file": "shopee_ph_direct_019a46ee62e0.json",
+      "sha256": "3f6a14ed98af940b7efc8f8fbc9dc3383fa655bc9d3b3f4b64cf3b94aa91811f",
+      "reviews": 0
+    },
+    {
+      "file": "shopee_ph_direct_359a7db0a0ea.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "reviews": 0
+    },
+    {
+      "file": "shopee_ph_direct_c23998a9b554.json",
+      "sha256": "b4a948fba80430ea990502f8b439d6d3ff34ec0ff78a8938a44da950b1745187",
+      "reviews": 0
+    },
+    {
+      "file": "shopee_ph_direct_dbbd4e945753.json",
+      "sha256": "5bfbb381a4a5d99d4cb11ec1929898571a2b8431e8ff0ef9f88e8a33e4cc811b",
+      "reviews": 0
+    },
+    {
+      "file": "shopee_ph_direct_e0db181b766d.json",
+      "sha256": "5cdb12d7f68bedf6dbf3115b00bf232ea431488a31bbc2acf226e248731033f3",
+      "reviews": 0
+    },
+    {
+      "file": "shopee_ph_lenovo_ea166_10_reviews.json",
+      "sha256": "154393de8958e76eb9644b93d5c43eb69dd9b34520373e7e4e097e65dfc87449",
+      "reviews": 0
+    },
+    {
+      "file": "shopee_ph_manual_baseus_mc2.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "reviews": 0
+    },
+    {
+      "file": "shopee_ph_manual_test.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "reviews": 0
+    },
+    {
+      "file": "temu_ph_direct_148f0f092204.json",
+      "sha256": "6c28f57dc81024e2d564135a78d8a8cb1d1b5a4d8173d258ddcf887a14013399",
+      "reviews": 15
+    },
+    {
+      "file": "temu_ph_direct_15b1e2e24b88.json",
+      "sha256": "6037285cc8448a0c0487c95786db745ba328530e1b1d06f41513bedb18b6bef2",
+      "reviews": 29
+    },
+    {
+      "file": "temu_ph_direct_42a219435fb9.json",
+      "sha256": "24dfc6c2c62daa6701ca430423eaa76cde4ed84f66b2e9b3a2c9b04540be35a5",
+      "reviews": 15
+    },
+    {
+      "file": "temu_ph_direct_51b4ed9dfad9.json",
+      "sha256": "a53cfeb07387db41a1f40b06c0e02d8c17897c886bed78d272c32c0994277ef4",
+      "reviews": 13
+    },
+    {
+      "file": "temu_ph_direct_51d42f1b2df4.json",
+      "sha256": "95a9081a11e382136a41348263ed4988cda94e20c986ac2c8a8c2e5cd3fa7bd0",
+      "reviews": 6
+    },
+    {
+      "file": "temu_ph_direct_601100260215296.json",
+      "sha256": "6c53af6fb9289f55448c1a18818858bf3185a8c7f900caaa961d2b02afef5fe5",
+      "reviews": 232
+    },
+    {
+      "file": "temu_ph_direct_601100261015054.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "reviews": 0
+    },
+    {
+      "file": "temu_ph_direct_601100935391760.json",
+      "sha256": "ab484b20ce8b3e0548db1a44a2d78bc86ed38fc6bf9e60589406a82c0f348275",
+      "reviews": 10
+    },
+    {
+      "file": "temu_ph_direct_606514626540267.json",
+      "sha256": "522a71d27f253035e6c9f358d8e8608fad1a6b278eff353b399115386d42d562",
+      "reviews": 7
+    },
+    {
+      "file": "temu_ph_direct_6bcb50ace542.json",
+      "sha256": "fa0a70fb5466d97927ea351b9a57ad9aea7d5c1d51193b30453fd8bc5858933c",
+      "reviews": 27
+    },
+    {
+      "file": "temu_ph_direct_81a6b2adb307.json",
+      "sha256": "91007074851543648d60ffc05f9899b898d9bf6a1206c92549aaf023f1400453",
+      "reviews": 0
+    },
+    {
+      "file": "temu_ph_direct_ffea5b61ab40.json",
+      "sha256": "5948981e98b7d4d79c8b711527aedacea1ec9f15a754199e0aa4a8187e7da5f6",
+      "reviews": 0
+    },
+    {
+      "file": "temu_ph_direct_manual_test.json",
+      "sha256": "4c47c69dd7ebb04dde751fb1ffb6083758f31fcbbe9807d4df5157cd54490a1d",
+      "reviews": 0
+    },
+    {
+      "file": "temu_ph_direct_manual_test_601099715489226.json",
+      "sha256": "22b88b875477bdd1ce291084ca68eff654b88d9211f1c5b89413fa9e3e74b628",
+      "reviews": 0
+    },
+    {
+      "file": "temu_ph_direct_manual_test_visible.json",
+      "sha256": "9560be6173678ec96eb4ee8bcde48aee893559ed8ac2400d4cbcc775fc024586",
+      "reviews": 27
+    },
+    {
+      "file": "temu_ph_test_fresh.json",
+      "sha256": "c57802cd3d75de74ce3c5f5df1e4f6ffee65bc3e694d0833d9a74769e6c67de8",
+      "reviews": 0
+    },
+    {
+      "file": "temu_ph_test_fresh_retry.json",
+      "sha256": "6a50e669a381ddf32fc1bbac6874f0392e166942c1a6549cbd8d7d253d546a60",
+      "reviews": 27
+    }
+  ]
+}

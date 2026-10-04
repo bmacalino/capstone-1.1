@@ -83,6 +83,17 @@ class LazadaScraper:
     # with the other underrepresented middle ratings before the abundant
     # one- and five-star extremes.
     RATING_COLLECTION_ORDER = (3, 2, 4, 1, 5)
+    # Set by Lazada only after a login. The page header is NOT a login signal:
+    # measured on 27 Sept 2026, it shows "LOGIN" at the top of the page even
+    # with a restored session and hides it once the page scrolls.
+    SESSION_COOKIES = ("lzd_uid", "lzd_sid")
+    # The feed the product page itself loads. Its `ratings.scores` lists the
+    # number of ratings per star level, from 5 stars down to 1.
+    REVIEW_FEED_URL = (
+        "https://my.lazada.com.ph/pdp/review/getReviewList"
+        "?itemId={item_id}&pageSize=5&filter=0&sort=0&pageNo=1"
+    )
+    REVIEWS_PER_PAGE = 5
     PRODUCT_CARD_SELECTORS = (
         '[data-qa-locator="product-item"]',
         '[data-item-id]',
@@ -229,6 +240,14 @@ class LazadaScraper:
         # Falling back to TCP/TLS avoids that browser-level failure.
         self.options.add_argument("--disable-quic")
         self.options.add_argument("--disable-blink-features=AutomationControlled")
+        # Keep the page live when another window covers it. Otherwise Windows
+        # reports the covered page as hidden, Chrome pauses rendering, and
+        # Lazada's scroll-triggered review section never loads until someone
+        # brings the window forward and scrolls it.
+        self.options.add_argument("--disable-backgrounding-occluded-windows")
+        self.options.add_argument("--disable-renderer-backgrounding")
+        self.options.add_argument("--disable-background-timer-throttling")
+        self.options.add_argument("--disable-features=CalculateNativeWinOcclusion")
         self.options.add_argument("--window-size=900,700")
         self.options.add_argument("--lang=en-PH")
         self.options.add_argument("--no-first-run")
@@ -470,26 +489,27 @@ class LazadaScraper:
             logging.warning("Could not load Lazada cookies: %s", exc)
             return False
 
+    def _has_session(self):
+        try:
+            return all(self.driver.get_cookie(name) for name in self.SESSION_COOKIES)
+        except Exception:
+            return False
+
     def _login_required(self):
+        """Whether the scan must stop for a login.
+
+        Only a login page, or a browser with no Lazada session at all, counts.
+        The header's LOGIN link used to count too, and Lazada shows it at the
+        top of the page even with a restored session, so every scan waited
+        until someone scrolled it out of view. Reviews load either way.
+        """
         current_url = self.driver.current_url
         if isinstance(current_url, bytes):
             current_url = current_url.decode("utf-8", errors="replace")
         path = urlsplit(str(current_url or "")).path.casefold()
         if "/login" in path:
             return True
-        selectors = (
-            '#anonLogin',
-            'a[href*="/user/login"]',
-            'a[href*="login"]',
-            '[data-spm-anchor-id*="login"]',
-        )
-        for selector in selectors:
-            try:
-                if any(element.is_displayed() for element in self.driver.find_elements(By.CSS_SELECTOR, selector)):
-                    return True
-            except Exception:
-                continue
-        return False
+        return not self._has_session()
 
     def _wait_for_verification_clear(self, detector, label):
         if self.verification_timeout <= 0:
@@ -521,6 +541,10 @@ class LazadaScraper:
         if not login_needed:
             return True
         if not self.pause_for_verification:
+            logging.info(
+                "Lazada is signed out. Log in in the opened Chrome window; "
+                "the scan continues by itself once you are logged in."
+            )
             if self._wait_for_verification_clear(self._login_required, "login"):
                 self._cookies_loaded = True
                 return True
@@ -961,8 +985,12 @@ class LazadaScraper:
 
     def _prepare_session(self):
         """Restore saved authentication before waiting on Lazada login gates."""
+        started = time.perf_counter()
         self._safe_get(self.BASE_URL, check_verification=False)
-        return self._restore_or_request_login()
+        logging.info("Step: Lazada home page opened (%.1f s)", time.perf_counter() - started)
+        ready = self._restore_or_request_login()
+        logging.info("Step: session ready (%.1f s)", time.perf_counter() - started)
+        return ready
 
     def _product_link_from_card(self, card):
         try:
@@ -1154,6 +1182,7 @@ class LazadaScraper:
                                 """
                             )
                         )
+                        logging.info("Step: review section loaded")
                         return True
                     except TimeoutException:
                         logging.warning(
@@ -1271,6 +1300,15 @@ class LazadaScraper:
                 }
             )
         return reviews
+
+    def _page_has_only_unwritten_reviews(self):
+        """Review items are on the page, but none has any text."""
+        if self.include_empty:
+            return False
+        records = self.driver.execute_script(self._review_javascript()) or []
+        return bool(records) and not any(
+            self._clean_text(record.get("content", "")) for record in records
+        )
 
     def _current_review_signature(self):
         records = self.driver.execute_script(self._review_javascript()) or []
@@ -1428,6 +1466,148 @@ class LazadaScraper:
             ),
         )
 
+    @staticmethod
+    def _item_id(url):
+        match = re.search(r"-i(\d{5,})(?:-s\d+)?\.html", str(url or ""))
+        return match.group(1) if match else ""
+
+    @staticmethod
+    def _star_distribution_from_feed(ratings, reported_total):
+        """Per-star rating counts from the review feed, or None if implausible."""
+        if not isinstance(ratings, dict):
+            return None
+        scores = ratings.get("scores")
+        if not isinstance(scores, list) or len(scores) != 5:
+            return None
+        try:
+            counts = [int(value) for value in scores]
+        except (TypeError, ValueError):
+            return None
+        if any(count < 0 for count in counts):
+            return None
+        try:
+            reported = int(reported_total or ratings.get("rateCount") or 0)
+        except (TypeError, ValueError):
+            reported = 0
+        if reported and abs(sum(counts) - reported) > 0.05 * reported:
+            return None
+        # The feed lists 5 stars first.
+        return {str(star): counts[5 - star] for star in range(1, 6)}
+
+    def _read_star_distribution(self, product):
+        """Record how many ratings each star level has, for sampling weights."""
+        item_id = self._item_id(product.get("link", ""))
+        if not item_id:
+            logging.warning("No Lazada item id in %s; per-star counts unavailable", product.get("link"))
+            return None
+        script = r"""
+        const done = arguments[arguments.length - 1];
+        fetch(arguments[0], {credentials: 'include'})
+          .then(response => response.json())
+          .then(body => done(JSON.stringify(((body || {}).model || {}).ratings || null)))
+          .catch(error => done(JSON.stringify({error: String(error)})));
+        """
+        try:
+            raw = self.driver.execute_async_script(
+                script, self.REVIEW_FEED_URL.format(item_id=item_id)
+            )
+            ratings = json.loads(raw or "null")
+        except Exception as exc:
+            logging.warning("Could not read Lazada per-star counts: %s", exc)
+            return None
+        distribution = self._star_distribution_from_feed(ratings, product.get("total_rating"))
+        if distribution is None:
+            logging.warning(
+                "Lazada per-star counts were missing or did not add up to the "
+                "listing total; the report will treat the sample as partial"
+            )
+            return None
+        product["review_star_distribution"] = distribution
+        product["review_star_distribution_source"] = "lazada_review_feed"
+        logging.info(
+            "Step: ratings per star 1-5: %s",
+            ", ".join(str(distribution[str(star)]) for star in range(1, 6)),
+        )
+        return distribution
+
+    def _collect_by_star(self, product):
+        """Collect up to `star_limit_per_type` written reviews per star level.
+
+        Records, for every star level, how many were collected and whether
+        that level is complete: its quota was reached, or its list ran out.
+        The analysis uses this and the per-star counts to weight each level
+        back to its share of the listing.
+        """
+        distribution = self._read_star_distribution(product)
+        reviews = []
+        applied_filters = []
+        star_collection = {}
+        for star in self.RATING_COLLECTION_ORDER:
+            listed = (distribution or {}).get(str(star))
+            if listed == 0:
+                # Nothing to collect; an empty filter only waits out the
+                # pagination timeout.
+                applied_filters.append(star)
+                star_collection[str(star)] = {
+                    "listed": 0, "collected": 0, "stop_reason": "none_listed", "complete": True,
+                }
+                continue
+            logging.info("Step: collecting %s-star reviews", star)
+            if not self._click_rating_filter(star):
+                product["review_filter_warning"] = (
+                    f"Could not identify or apply the {star}-star Lazada filter"
+                )
+                break
+            before = product.get("review_checkpoint")
+            star_reviews = self._collect_reviews(
+                self.star_limit_per_type, product=product, source_filter=star, listed=listed
+            )
+            if star_reviews and not self._reviews_match_rating_filter(star_reviews, star):
+                product["review_filter_warning"] = (
+                    f"Lazada did not return verified {star}-star reviews; "
+                    "balanced collection stopped to prevent mislabeled data"
+                )
+                break
+            # _collect_reviews writes a fresh checkpoint for this star unless the
+            # review widget was missing; never read the previous star's reason.
+            checkpoint = product.get("review_checkpoint")
+            stop_reason = (
+                checkpoint.get("stop_reason", "")
+                if isinstance(checkpoint, dict) and checkpoint is not before
+                else "review_widget_missing"
+            )
+            # A single page of results may show no pagination at all.
+            single_page = (
+                stop_reason == "next_button_not_found"
+                and listed is not None
+                and listed <= self.REVIEWS_PER_PAGE
+            )
+            applied_filters.append(star)
+            for review in star_reviews:
+                review["source_rating_filter"] = star
+            reviews.extend(star_reviews)
+            star_collection[str(star)] = {
+                "listed": listed,
+                "collected": len(star_reviews),
+                "stop_reason": stop_reason,
+                "complete": stop_reason in {"target_reached", "next_button_disabled", "single_page"}
+                or single_page,
+            }
+        product["applied_rating_filters"] = applied_filters
+        product["star_collection"] = star_collection
+        product["sampling_method"] = "stratified_by_star"
+        product["star_quota"] = self.star_limit_per_type
+        product["review_order"] = "marketplace_default_within_star"
+        if applied_filters:
+            product["comments"] = self._order_reviews_low_to_high(reviews)
+            product["review_status"] = "complete"
+        else:
+            product.setdefault(
+                "review_filter_warning",
+                "No star filters were identified in the rendered Lazada review widget",
+            )
+            product["comments"] = []
+
     def _collect_reviews_lowest_first(self, product, max_reviews):
         """Fill a review sample from verified 3-star feedback first."""
         if max_reviews <= 0:
@@ -1469,7 +1649,13 @@ class LazadaScraper:
         product["applied_rating_filters"] = applied_filters
         return self._order_reviews_low_to_high(reviews)[:max_reviews]
 
-    def _collect_reviews(self, max_reviews, product=None, source_filter=None):
+    def _collect_reviews(self, max_reviews, product=None, source_filter=None, listed=None):
+        """Collect up to `max_reviews` written reviews from the current list.
+
+        `listed` is how many ratings the list holds, when known. A list that
+        fits on one page is not paged: there is no next button to find, and
+        looking for one cost about six seconds of retries per star level.
+        """
         if max_reviews <= 0 or self._review_container() is None:
             return []
         existing_reviews = list(product.get("comments", [])) if product else []
@@ -1506,7 +1692,10 @@ class LazadaScraper:
             while len(collected) < max_reviews and page_number < self.max_review_pages:
                 page_number += 1
                 page_reviews = self._reviews_from_current_page()
-                if not page_reviews:
+                # A page of rating-only reviews has nothing to collect but is
+                # not the end: Lazada lists them after the written ones, and
+                # stopping there left star levels short of their last pages.
+                if not page_reviews and not self._page_has_only_unwritten_reviews():
                     try:
                         WebDriverWait(
                             self.driver,
@@ -1545,6 +1734,9 @@ class LazadaScraper:
                     )
                 if len(collected) >= max_reviews:
                     stop_reason = "target_reached"
+                    break
+                if listed is not None and listed <= self.REVIEWS_PER_PAGE:
+                    stop_reason = "single_page"
                     break
                 signature = self._current_review_signature()
                 if not signature:
@@ -1601,7 +1793,9 @@ class LazadaScraper:
     def _scrape_details(self, product):
         product.pop("review_filter_warning", None)
         product.pop("review_collection_warning", None)
+        started = time.perf_counter()
         self._safe_get(product["link"])
+        logging.info("Step: product page opened (%.1f s)", time.perf_counter() - started)
         product["name"] = self._first_text(
             self.driver, ('h1.pdp-mod-product-badge-title', 'h1[data-qa-locator="product-title"]', 'h1')
         ) or product.get("name", "")
@@ -1635,7 +1829,15 @@ class LazadaScraper:
         )
         product["img"] = product.get("img") or self._product_image_url(self.driver)
 
-        if not self._scroll_to_reviews():
+        reviews_loaded = self._scroll_to_reviews()
+        if not reviews_loaded:
+            # Lazada's review list intermittently shows a loading spinner that
+            # never resolves (seen 27 Sept 2026 on a listing that loaded fine
+            # minutes earlier and later). Reload once before giving up.
+            logging.info("Reviews did not load; reloading the product page once")
+            self._safe_get(product["link"])
+            reviews_loaded = self._scroll_to_reviews()
+        if not reviews_loaded:
             logging.warning("Review section not found for %s", product["link"])
             self._save_debug_artifacts("reviews")
             total_text = self._first_text(
@@ -1687,37 +1889,7 @@ class LazadaScraper:
             return
         product["review_status"] = "collecting"
         if self.all_star_types:
-            reviews = []
-            applied_filters = []
-            for star in self.RATING_COLLECTION_ORDER:
-                if not self._click_rating_filter(star):
-                    product["review_filter_warning"] = (
-                        f"Could not identify or apply the {star}-star Lazada filter"
-                    )
-                    break
-                star_reviews = self._collect_reviews(
-                    self.star_limit_per_type, product=product, source_filter=star
-                )
-                if not self._reviews_match_rating_filter(star_reviews, star):
-                    product["review_filter_warning"] = (
-                        f"Lazada did not return verified {star}-star reviews; "
-                        "balanced collection stopped to prevent mislabeled data"
-                    )
-                    break
-                applied_filters.append(star)
-                for review in star_reviews:
-                    review["source_rating_filter"] = star
-                reviews.extend(star_reviews)
-            product["applied_rating_filters"] = applied_filters
-            if applied_filters:
-                product["comments"] = self._order_reviews_low_to_high(reviews)
-                product["review_status"] = "complete"
-            else:
-                product.setdefault(
-                    "review_filter_warning",
-                    "No star filters were identified in the rendered Lazada review widget",
-                )
-                product["comments"] = []
+            self._collect_by_star(product)
             return
         if self.rating is not None:
             if not self._click_rating_filter(self.rating):

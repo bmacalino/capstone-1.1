@@ -44,6 +44,11 @@ class TestNoSilentFallback(unittest.TestCase):
     model's verdict with nothing to indicate it had happened.
     """
 
+    def setUp(self):
+        # A cached model would hide the patched constructor below.
+        registry.clear_cache()
+        self.addCleanup(registry.clear_cache)
+
     def test_a_load_failure_raises_rather_than_substituting(self):
         with mock.patch(
             "defaketive_sentiment.hazard_model.HazardBadgeModel",
@@ -61,6 +66,54 @@ class TestNoSilentFallback(unittest.TestCase):
             with self.assertRaises(registry.ModelUnavailableError) as caught:
                 registry.load_model(registry.MANUSCRIPT)
         self.assertIn("manuscript", str(caught.exception))
+
+    def test_a_missing_transformer_refuses_with_instructions(self):
+        from defaketive_sentiment import transformer_sentiment
+
+        with mock.patch.object(transformer_sentiment, "DEFAULT_MODEL_DIR", transformer_sentiment.MODELS_ROOT / "absent"):
+            with self.assertRaises(registry.ModelUnavailableError) as caught:
+                registry.load_model(registry.HAZARD_BADGES, sentiment=registry.XLMR_SENTIMENT)
+        self.assertIn("slim_sentiment_model.py", str(caught.exception))
+
+    def test_a_failed_load_is_not_cached(self):
+        # Installing the missing model and retrying must work without a restart.
+        with mock.patch(
+            "defaketive_sentiment.hazard_model.HazardBadgeModel",
+            side_effect=OSError("artifact missing"),
+        ):
+            with self.assertRaises(registry.ModelUnavailableError):
+                registry.load_model(registry.HAZARD_BADGES)
+        self.assertTrue(registry.load_model(registry.HAZARD_BADGES).model_version)
+
+    def test_an_unknown_sentiment_model_is_refused(self):
+        with self.assertRaises(registry.ModelUnavailableError) as caught:
+            registry.load_model(registry.HAZARD_BADGES, sentiment="bert")
+        self.assertIn(registry.SENTIMENT_ENVIRONMENT_VARIABLE, str(caught.exception))
+
+
+class TestCaching(unittest.TestCase):
+    def test_the_same_model_instance_is_shared(self):
+        # The catalog asks for the model version on every load; each call used
+        # to rebuild the whole model.
+        self.assertIs(registry.load_model(registry.HAZARD_BADGES), registry.load_model(registry.HAZARD_BADGES))
+
+    def test_the_sentiment_choice_is_part_of_the_cache_key(self):
+        with mock.patch.object(registry, "_build", side_effect=lambda mode, sentiment, hazard=None: object()):
+            registry.clear_cache()
+            self.addCleanup(registry.clear_cache)
+            first = registry.load_model(registry.HAZARD_BADGES, sentiment="tfidf")
+            second = registry.load_model(registry.HAZARD_BADGES, sentiment="xlmr")
+        self.assertIsNot(first, second)
+
+    def test_the_default_sentiment_model_is_the_transformer(self):
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop(registry.SENTIMENT_ENVIRONMENT_VARIABLE, None)
+            self.assertEqual(registry.configured_sentiment(), registry.XLMR_SENTIMENT)
+
+    def test_the_badge_version_names_the_sentiment_model(self):
+        version = registry.model_version(registry.HAZARD_BADGES, sentiment=registry.TFIDF_SENTIMENT)
+        self.assertIn("hazard-lexicon", version)
+        self.assertIn("firecs-tfidf", version)
 
 
 class TestVersionAgreement(unittest.TestCase):

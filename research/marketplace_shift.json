@@ -1,0 +1,554 @@
+{
+  "generated_at": "2026-09-26T12:01:45+00:00",
+  "dataset": {
+    "file": "complete_manual_marketplace_reviews (1).csv",
+    "reviews_scored": 470,
+    "label_counts": {
+      "negative": 363,
+      "neutral": 18,
+      "positive": 89
+    },
+    "platform_counts": {
+      "lazada": 167,
+      "temu": 303
+    },
+    "excluded": "mixed or unlabelled reviews",
+    "overlap_with_firecs_training": 0,
+    "label_provenance": "human (outputs/legacy_label_provenance_audit/summary.md: 0% machine-labelled)"
+  },
+  "firecs_macro_f1_for_comparison": {
+    "deployed_tfidf": 0.8138,
+    "finetuned_xlm_roberta": 0.8461,
+    "finetuned_dost_asti": 0.8025
+  },
+  "results": {
+    "deployed_tfidf": {
+      "sample_count": 470,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.7298,
+      "precision": 0.5718,
+      "recall": 0.6452,
+      "f1": 0.5627,
+      "per_class": {
+        "negative": {
+          "precision": 0.964,
+          "recall": 0.7383,
+          "f1": 0.8362,
+          "support": 363
+        },
+        "neutral": {
+          "precision": 0.0879,
+          "recall": 0.4444,
+          "f1": 0.1468,
+          "support": 18
+        },
+        "positive": {
+          "precision": 0.6634,
+          "recall": 0.7528,
+          "f1": 0.7053,
+          "support": 89
+        }
+      },
+      "matrix": [
+        [
+          268,
+          64,
+          31
+        ],
+        [
+          7,
+          8,
+          3
+        ],
+        [
+          3,
+          19,
+          67
+        ]
+      ],
+      "macro_f1_ci": {
+        "macro_f1": 0.5627,
+        "ci_lower": 0.5198,
+        "ci_upper": 0.6082,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "by_platform": {
+        "lazada": {
+          "sample_count": 167,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.8503,
+          "precision": 0.6776,
+          "recall": 0.7219,
+          "f1": 0.6619,
+          "per_class": {
+            "negative": {
+              "precision": 0.9714,
+              "recall": 0.9107,
+              "f1": 0.9401,
+              "support": 112
+            },
+            "neutral": {
+              "precision": 0.1364,
+              "recall": 0.5,
+              "f1": 0.2143,
+              "support": 6
+            },
+            "positive": {
+              "precision": 0.925,
+              "recall": 0.7551,
+              "f1": 0.8315,
+              "support": 49
+            }
+          },
+          "matrix": [
+            [
+              102,
+              7,
+              3
+            ],
+            [
+              3,
+              3,
+              0
+            ],
+            [
+              0,
+              12,
+              37
+            ]
+          ]
+        },
+        "temu": {
+          "sample_count": 303,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.6634,
+          "precision": 0.5079,
+          "recall": 0.6093,
+          "f1": 0.5002,
+          "per_class": {
+            "negative": {
+              "precision": 0.9595,
+              "recall": 0.6614,
+              "f1": 0.783,
+              "support": 251
+            },
+            "neutral": {
+              "precision": 0.0725,
+              "recall": 0.4167,
+              "f1": 0.1235,
+              "support": 12
+            },
+            "positive": {
+              "precision": 0.4918,
+              "recall": 0.75,
+              "f1": 0.5941,
+              "support": 40
+            }
+          },
+          "matrix": [
+            [
+              166,
+              57,
+              28
+            ],
+            [
+              4,
+              5,
+              3
+            ],
+            [
+              3,
+              7,
+              30
+            ]
+          ]
+        }
+      },
+      "positive_read_as_negative": 3,
+      "rating_rule": {
+        "reviews_flagged_uncertain": 46,
+        "flagged_that_were_wrong": 35,
+        "flagged_that_were_right": 11,
+        "total_errors_before": 127,
+        "errors_caught_share": 0.2756,
+        "coverage_after": 0.9021,
+        "accuracy_on_kept": 0.783,
+        "macro_f1_on_kept": 0.6257
+      },
+      "seconds": 4.5
+    },
+    "finetuned_xlm_roberta": {
+      "sample_count": 470,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.8638,
+      "precision": 0.7151,
+      "recall": 0.8306,
+      "f1": 0.719,
+      "per_class": {
+        "negative": {
+          "precision": 0.9811,
+          "recall": 0.8595,
+          "f1": 0.9163,
+          "support": 363
+        },
+        "neutral": {
+          "precision": 0.1884,
+          "recall": 0.7222,
+          "f1": 0.2989,
+          "support": 18
+        },
+        "positive": {
+          "precision": 0.9759,
+          "recall": 0.9101,
+          "f1": 0.9419,
+          "support": 89
+        }
+      },
+      "matrix": [
+        [
+          312,
+          49,
+          2
+        ],
+        [
+          5,
+          13,
+          0
+        ],
+        [
+          1,
+          7,
+          81
+        ]
+      ],
+      "macro_f1_ci": {
+        "macro_f1": 0.719,
+        "ci_lower": 0.6703,
+        "ci_upper": 0.7652,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "by_platform": {
+        "lazada": {
+          "sample_count": 167,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.8982,
+          "precision": 0.7166,
+          "recall": 0.7764,
+          "f1": 0.722,
+          "per_class": {
+            "negative": {
+              "precision": 0.9623,
+              "recall": 0.9107,
+              "f1": 0.9358,
+              "support": 112
+            },
+            "neutral": {
+              "precision": 0.1875,
+              "recall": 0.5,
+              "f1": 0.2727,
+              "support": 6
+            },
+            "positive": {
+              "precision": 1.0,
+              "recall": 0.9184,
+              "f1": 0.9574,
+              "support": 49
+            }
+          },
+          "matrix": [
+            [
+              102,
+              10,
+              0
+            ],
+            [
+              3,
+              3,
+              0
+            ],
+            [
+              1,
+              3,
+              45
+            ]
+          ]
+        },
+        "temu": {
+          "sample_count": 303,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.8449,
+          "precision": 0.7089,
+          "recall": 0.8567,
+          "f1": 0.7126,
+          "per_class": {
+            "negative": {
+              "precision": 0.9906,
+              "recall": 0.8367,
+              "f1": 0.9071,
+              "support": 251
+            },
+            "neutral": {
+              "precision": 0.1887,
+              "recall": 0.8333,
+              "f1": 0.3077,
+              "support": 12
+            },
+            "positive": {
+              "precision": 0.9474,
+              "recall": 0.9,
+              "f1": 0.9231,
+              "support": 40
+            }
+          },
+          "matrix": [
+            [
+              210,
+              39,
+              2
+            ],
+            [
+              2,
+              10,
+              0
+            ],
+            [
+              0,
+              4,
+              36
+            ]
+          ]
+        }
+      },
+      "positive_read_as_negative": 1,
+      "rating_rule": {
+        "reviews_flagged_uncertain": 16,
+        "flagged_that_were_wrong": 2,
+        "flagged_that_were_right": 14,
+        "total_errors_before": 64,
+        "errors_caught_share": 0.0312,
+        "coverage_after": 0.966,
+        "accuracy_on_kept": 0.8634,
+        "macro_f1_on_kept": 0.7209
+      },
+      "seconds": 25.98,
+      "mcnemar_vs_deployed": {
+        "only_a_correct": 33,
+        "only_b_correct": 96,
+        "discordant": 129,
+        "statistic": 29.7984,
+        "p_value": 0.0,
+        "method": "chi_square_continuity_corrected",
+        "p_adjusted": 0.0,
+        "significant": true
+      }
+    },
+    "finetuned_dost_asti": {
+      "sample_count": 470,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.566,
+      "precision": 0.5824,
+      "recall": 0.621,
+      "f1": 0.5067,
+      "per_class": {
+        "negative": {
+          "precision": 0.9893,
+          "recall": 0.5096,
+          "f1": 0.6727,
+          "support": 363
+        },
+        "neutral": {
+          "precision": 0.0549,
+          "recall": 0.5556,
+          "f1": 0.1,
+          "support": 18
+        },
+        "positive": {
+          "precision": 0.703,
+          "recall": 0.7978,
+          "f1": 0.7474,
+          "support": 89
+        }
+      },
+      "matrix": [
+        [
+          185,
+          155,
+          23
+        ],
+        [
+          1,
+          10,
+          7
+        ],
+        [
+          1,
+          17,
+          71
+        ]
+      ],
+      "macro_f1_ci": {
+        "macro_f1": 0.5067,
+        "ci_lower": 0.4712,
+        "ci_upper": 0.5429,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "by_platform": {
+        "lazada": {
+          "sample_count": 167,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.7784,
+          "precision": 0.6619,
+          "recall": 0.7732,
+          "f1": 0.6451,
+          "per_class": {
+            "negative": {
+              "precision": 1.0,
+              "recall": 0.7143,
+              "f1": 0.8333,
+              "support": 112
+            },
+            "neutral": {
+              "precision": 0.1176,
+              "recall": 0.6667,
+              "f1": 0.2,
+              "support": 6
+            },
+            "positive": {
+              "precision": 0.8679,
+              "recall": 0.9388,
+              "f1": 0.902,
+              "support": 49
+            }
+          },
+          "matrix": [
+            [
+              80,
+              27,
+              5
+            ],
+            [
+              0,
+              4,
+              2
+            ],
+            [
+              0,
+              3,
+              46
+            ]
+          ]
+        },
+        "temu": {
+          "sample_count": 303,
+          "labels": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "accuracy": 0.4488,
+          "precision": 0.5142,
+          "recall": 0.5144,
+          "f1": 0.4099,
+          "per_class": {
+            "negative": {
+              "precision": 0.9813,
+              "recall": 0.4183,
+              "f1": 0.5866,
+              "support": 251
+            },
+            "neutral": {
+              "precision": 0.0405,
+              "recall": 0.5,
+              "f1": 0.075,
+              "support": 12
+            },
+            "positive": {
+              "precision": 0.5208,
+              "recall": 0.625,
+              "f1": 0.5682,
+              "support": 40
+            }
+          },
+          "matrix": [
+            [
+              105,
+              128,
+              18
+            ],
+            [
+              1,
+              6,
+              5
+            ],
+            [
+              1,
+              14,
+              25
+            ]
+          ]
+        }
+      },
+      "positive_read_as_negative": 1,
+      "rating_rule": {
+        "reviews_flagged_uncertain": 38,
+        "flagged_that_were_wrong": 29,
+        "flagged_that_were_right": 9,
+        "total_errors_before": 204,
+        "errors_caught_share": 0.1422,
+        "coverage_after": 0.9191,
+        "accuracy_on_kept": 0.5949,
+        "macro_f1_on_kept": 0.5576
+      },
+      "seconds": 9.56,
+      "mcnemar_vs_deployed": {
+        "only_a_correct": 122,
+        "only_b_correct": 45,
+        "discordant": 167,
+        "statistic": 34.5868,
+        "p_value": 0.0,
+        "method": "chi_square_continuity_corrected",
+        "p_adjusted": 0.0,
+        "significant": true
+      }
+    }
+  },
+  "qualified_for_integration": false
+}

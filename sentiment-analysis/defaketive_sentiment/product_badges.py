@@ -283,6 +283,12 @@ class ProductBadgeAggregator:
     # -- inputs -----------------------------------------------------------
 
     @staticmethod
+    def review_key(analysis: Mapping[str, Any], position: int = 0) -> str:
+        return str(
+            analysis.get("review_key") or analysis.get("review_id") or f"review-{position}"
+        )
+
+    @staticmethod
     def evidence_from_analysis(
         analysis: Mapping[str, Any], position: int = 0
     ) -> list[EvidenceSentence]:
@@ -293,9 +299,7 @@ class ProductBadgeAggregator:
         DISTINCT review keys, so without it every review would share one empty
         key and a product with fifty hazard reports would count as one.
         """
-        review_key = str(
-            analysis.get("review_key") or analysis.get("review_id") or f"review-{position}"
-        )
+        review_key = ProductBadgeAggregator.review_key(analysis, position)
         rating = analysis.get("rating")
         reviewed_at = analysis.get("reviewed_at")
         found: list[EvidenceSentence] = []
@@ -328,6 +332,39 @@ class ProductBadgeAggregator:
         interval = wilson_interval(flagged, total)
         return rate, interval, wilson_lower_bound(flagged, total)
 
+    @staticmethod
+    def effective_sample_size(weights: Iterable[float]) -> float:
+        """Kish's effective sample size, (sum w)^2 / sum w^2.
+
+        Unequal weights carry less information than the same number of equally
+        weighted reviews; this is the equally weighted sample worth as much.
+        """
+        values = [float(weight) for weight in weights]
+        squares = sum(value * value for value in values)
+        return (sum(values) ** 2 / squares) if squares else 0.0
+
+    def _rate(
+        self,
+        flagged_keys: set[str],
+        usable: int,
+        weight_by_key: Mapping[str, float] | None,
+    ) -> tuple[float, tuple[float, float], float]:
+        """Share of reviews flagged, with its Wilson interval.
+
+        Unweighted, this is exactly `_bounds`. Weighted (a per-star sample), the
+        share is weighted back to the listing's star mix and the interval uses
+        the effective sample size in place of the review count.
+        """
+        if not weight_by_key:
+            return self._bounds(len(flagged_keys), usable)
+        total = sum(weight_by_key.values())
+        if total <= 0:
+            return 0.0, (0.0, 1.0), 0.0
+        share = sum(weight_by_key.get(key, 0.0) for key in flagged_keys) / total
+        n_eff = self.effective_sample_size(weight_by_key.values())
+        interval = wilson_interval(min(n_eff, share * n_eff), n_eff)
+        return share, interval, interval[0]
+
     def _type_baselines(self, product_type: str | None) -> dict[str, Any]:
         if not product_type:
             return {}
@@ -359,7 +396,11 @@ class ProductBadgeAggregator:
         return "low", basis
 
     def _safety_badge(
-        self, evidence: Sequence[EvidenceSentence], usable: int, product_type: str | None
+        self,
+        evidence: Sequence[EvidenceSentence],
+        usable: int,
+        product_type: str | None,
+        weight_by_key: Mapping[str, float] | None = None,
     ) -> SafetyBadge:
         hazard = [item for item in evidence if item.category == SAFETY]
         flagged_reviews = {item.review_key for item in hazard}
@@ -368,8 +409,8 @@ class ProductBadgeAggregator:
 
         badge = SafetyBadge(flagged_reviews=len(flagged_reviews))
         badge.high_confidence_reviews = len(confident_reviews)
-        badge.rate, badge.rate_ci_95, badge.rate_lower_bound = self._bounds(
-            len(flagged_reviews), usable
+        badge.rate, badge.rate_ci_95, badge.rate_lower_bound = self._rate(
+            flagged_reviews, usable, weight_by_key
         )
         badge.likelihood_bin, badge.likelihood_basis = self._likelihood_bin(
             badge.rate_lower_bound, product_type
@@ -445,13 +486,14 @@ class ProductBadgeAggregator:
         evidence: Sequence[EvidenceSentence],
         usable: int,
         product_type: str | None,
+        weight_by_key: Mapping[str, float] | None = None,
     ) -> CategoryFlag:
         matching = [item for item in evidence if item.category == category]
         flagged_reviews = {item.review_key for item in matching}
 
         flag = CategoryFlag(category=category, flagged_reviews=len(flagged_reviews))
-        flag.rate, flag.rate_ci_95, flag.rate_lower_bound = self._bounds(
-            len(flagged_reviews), usable
+        flag.rate, flag.rate_ci_95, flag.rate_lower_bound = self._rate(
+            flagged_reviews, usable, weight_by_key
         )
         flag.n_min_met = usable >= self.n_min
         flag.evidence = [item.as_dict() for item in matching]
@@ -481,6 +523,36 @@ class ProductBadgeAggregator:
         return flag
 
     # -- verdict ----------------------------------------------------------
+
+    @staticmethod
+    def _warns(flag: CategoryFlag) -> bool:
+        """Whether a counterfeit or defect flag warrants a warning verdict.
+
+        With a product-type baseline, the flag's own state decides. Without
+        one, the flag stays NO_BASELINE -- it genuinely has no peer rate -- but
+        the absolute floor still applies on its own. Treating "no baseline" as
+        "nothing to report" made every product read "No warning signs found"
+        however many reviews called it fake, because no reference corpus
+        exists yet. The floor is the half of max(baseline, floor) that needs no
+        peers, so it is the rule the full comparison would also enforce.
+        """
+        if flag.state == FLAGGED:
+            return True
+        return (
+            flag.state == NO_BASELINE
+            and flag.n_min_met
+            and flag.absolute_floor is not None
+            and flag.rate_lower_bound > float(flag.absolute_floor)
+        )
+
+    @staticmethod
+    def _warning_reason(name: str, flag: CategoryFlag) -> str:
+        if flag.state == FLAGGED:
+            return f"{name} reports are above the typical rate for this product type"
+        return (
+            f"{name} reports exceed the {float(flag.absolute_floor):.0%} floor "
+            "(no product-type baseline yet)"
+        )
 
     def verdict_for(
         self,
@@ -523,11 +595,11 @@ class ProductBadgeAggregator:
             ),
             (
                 POSSIBLE_COUNTERFEIT_OR_DEFECT,
-                any(flag.state == FLAGGED for flag in flags.values()),
+                any(self._warns(flag) for flag in flags.values()),
                 ", ".join(
-                    f"{name} reports are above the typical rate for this product type"
+                    self._warning_reason(name, flag)
                     for name, flag in flags.items()
-                    if flag.state == FLAGGED
+                    if self._warns(flag)
                 ),
             ),
             (
@@ -573,9 +645,21 @@ class ProductBadgeAggregator:
             sentence_count += len(record.get("sentences") or [])
             evidence.extend(self.evidence_from_analysis(record, position))
 
-        safety = self._safety_badge(evidence, usable, product_type)
+        # A per-star sample carries a weight per review (analyze_reviews sets
+        # it); a census carries none, and every rate below is then unweighted.
+        weighted = any("sampling_weight" in record for record in records)
+        weight_by_key = (
+            {
+                self.review_key(record, position): float(record.get("sampling_weight") or 0.0)
+                for position, record in enumerate(records)
+            }
+            if weighted
+            else None
+        )
+
+        safety = self._safety_badge(evidence, usable, product_type, weight_by_key)
         flags = {
-            category: self._category_flag(category, evidence, usable, product_type)
+            category: self._category_flag(category, evidence, usable, product_type, weight_by_key)
             for category in FLAG_CATEGORIES
         }
 
@@ -595,11 +679,35 @@ class ProductBadgeAggregator:
             reviews_unreliable=reviews_unreliable,
         )
 
-        sentiment = Counter(
+        labels = [
             str(record.get("sentiment", {}).get("label") or record.get("label") or "")
             for record in records
-        )
+        ]
+        sentiment = Counter(labels)
         positive = sentiment.get("positive", 0)
+        positive_lower_bound = wilson_lower_bound(positive, usable)
+        weighting: dict[str, Any] = {}
+        if weight_by_key:
+            # Counts stay counts of reviews read; the shares and the bound used
+            # for recommendations describe the listing's real star mix.
+            weights = [float(record.get("sampling_weight") or 0.0) for record in records]
+            total = sum(weights)
+            n_eff = self.effective_sample_size(weights)
+            shares = Counter()
+            for label, weight in zip(labels, weights):
+                shares["uncertain" if label == "neutral" else label] += weight
+            positive_share = shares.get("positive", 0.0) / total if total else 0.0
+            positive_lower_bound = (
+                wilson_interval(min(n_eff, positive_share * n_eff), n_eff)[0] if n_eff else 0.0
+            )
+            weighting = {
+                "weighted": True,
+                "effective_sample_size": round(n_eff, 1),
+                "sentiment_shares": {
+                    name: round(shares.get(name, 0.0) / total, 6) if total else 0.0
+                    for name in ("positive", "uncertain", "negative")
+                },
+            }
 
         return {
             "schema_version": SCHEMA_VERSION,
@@ -619,8 +727,7 @@ class ProductBadgeAggregator:
                 "uncertain": sentiment.get("uncertain", 0) + sentiment.get("neutral", 0),
                 "negative": sentiment.get("negative", 0),
             },
-            "positive_ratio_lower_bound": round(
-                wilson_lower_bound(positive, usable), 6
-            ),
+            "positive_ratio_lower_bound": round(positive_lower_bound, 6),
+            **weighting,
             "limits_notice": LIMITS_NOTICE,
         }

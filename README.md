@@ -53,6 +53,35 @@ directory, commonly `%APPDATA%\nltk_data`. This is why it can appear outside the
 project folder. It is a third-party language resource, not project source code.
 Run the VADER download command once on each new computer or Windows account.
 
+### Install the sentiment model
+
+The app reads review sentiment with a fine-tuned XLM-RoBERTa model, slimmed to
+run on an ordinary CPU. The model files are not stored in GitHub. Copy the
+folder `sentiment-analysis\models\sentiment_onnx\xlmr_firecs_v1\` (it holds
+`model.onnx`, `tokenizer.json` and `manifest.json`) from the computer that
+built it, or rebuild it. Rebuilding needs an NVIDIA GPU, PyTorch with CUDA, and
+about an hour. GPU training is not bit-for-bit repeatable, so a rebuilt model
+gets a new version and must be re-measured:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-research.txt
+.\.venv\Scripts\python.exe .\research\finetune_transformer.py --model cardiffnlp/twitter-xlm-roberta-base-sentiment --text normalized --device cuda
+.\.venv\Scripts\python.exe .\research\slim_sentiment_model.py --checkpoint sentiment-analysis\models\transformers\cardiffnlp__twitter-xlm-roberta-base-sentiment --name xlmr_firecs_v1 --text raw
+```
+
+Without the model, the app does not substitute another one: it shows **Review
+analysis is unavailable** and analyzes nothing. The app also checks every file
+against the SHA-256 in `manifest.json`, so an edited or partial copy is refused.
+To run the older TF-IDF model instead (the research baseline), set
+`$env:DEFAKETIVE_SENTIMENT_MODEL = "tfidf"` before starting the app.
+
+The safety check also uses a small learned model, stored in git at
+`sentiment-analysis\models\hazard_classifier_v1\` (rebuild with
+`research\train_hazard_classifier.py`). It refuses to load if its files or the
+keyword lists it was trained with have changed. Defect and fake-product checks
+use the keyword lists. To run the keyword checker alone, set
+`$env:DEFAKETIVE_HAZARD_MODEL = "keywords"`.
+
 ## Start the web app
 
 ### Easiest method on Windows
@@ -107,6 +136,16 @@ screen so the app's progress panel remains visible.
 
 For supported URLs, the app selects the marketplace automatically and scans one
 product. Links from other countries or unsupported websites are rejected.
+
+**Lazada scans read up to 60 written reviews from each star level** (up to
+300 per product, about two minutes) instead of the first 100 in Lazada's
+order, so complaints in 1- and 2-star reviews are always reached. The scraper
+also records how many ratings each star level has, and the report weights
+every review back to that mix: a 5-star review on a listing with 13,704
+five-star ratings counts for far more than a 1-star review on one with 35.
+Review counts on the report stay counts of reviews read; percentages and
+rates are weighted. The saved Lazada login is reused, and the scan no longer
+waits for someone to scroll the page.
 
 The **Analyzed products** page lets you filter saved reports and inspect review
 evidence. The **Insights** page summarizes risk levels, review reliability, and

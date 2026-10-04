@@ -1,16 +1,36 @@
-const state = { homeScan: null, catalogLoading: true, currentProduct: null, reportFrom: "history", activity: {}, wishlist: [], catalogError: false, products: [], catalogProducts: [], toastTimer: null, activeJobId: null, jobStartedAt: null, jobElapsedTimer: null, searchBusy: false };
+const state = { homeScan: null, catalogLoading: true, currentProduct: null, reportFrom: "history", activity: {}, wishlist: [], catalogError: false, modelUnavailable: "", products: [], catalogProducts: [], toastTimer: null, activeJobId: null, jobStartedAt: null, jobElapsedTimer: null, searchBusy: false };
 const MARKETPLACES = { shopee: "Shopee PH", lazada: "Lazada PH", temu: "Temu PH" };
+// Lazada scans read a fixed number of reviews from each star level (webapp.LAZADA_REVIEWS_PER_STAR).
+const LAZADA_REVIEWS_PER_STAR = 60;
 const $ = (selector) => document.querySelector(selector);
 const esc = (value) => String(value ?? "").replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
 const money = (value) => String(value || "\u2014").replace(/(?:PHP|Php|php)\s*|\u00e2\u201a\u00b1/g, "\u20b1");
-const score = (product) => Number(product?.sentiment_summary?.risk_score || 0);
-const reliability = (product) => Math.round(Number(product?.reliability_score ?? product?.sentiment_summary?.reliability_score ?? (100 - score(product))) || 0);
-const reviewCount = (product) => Number(product?.sentiment_summary?.review_count ?? product?.comments?.length ?? 0) || 0;
-function riskLevel(product) { const risk = score(product); return risk <= 30 ? "Low" : risk <= 60 ? "Moderate" : "High"; }
+// Badges replace the old 0-100 risk score. The server words every verdict and
+// badge (dashboard_utils.badge_view) and tests that wording; the browser only
+// lays it out. A product without a view was analysed by an older model and is
+// shown as not analysed -- never as low risk, which is what reading a missing
+// score as zero used to do.
+const NO_VIEW = {available: false, state: "not_analyzed", tone: "unknown", headline: "Not analyzed yet", detail: "Open the report to check it with the current review model.", reviews_analyzed: 0, counts: {safety: 0, counterfeit: 0, defect: 0}, badges: []};
+const view = (product) => product?.badge_view || NO_VIEW;
+const tone = (product) => view(product).tone || "unknown";
+const counts = (product) => ({safety: 0, counterfeit: 0, defect: 0, ...(view(product).counts || {})});
+const reviewCount = (product) => Number(view(product).reviews_analyzed || product?.comments?.length || 0) || 0;
+// Most concerning first. A safety report outranks fake and defect reports
+// even when there are too few reviews for a verdict: one fire report on a
+// four-review listing matters more than several "peke" reports.
+function concernRank(product) { const t = tone(product); if (t === "high") return 0; if (counts(product).safety > 0) return 1; return {moderate: 2, unknown: 3, low: 4}[t] ?? 3; }
+function byConcern(a, b) { const ca = counts(a), cb = counts(b); return concernRank(a) - concernRank(b) || cb.safety - ca.safety || (cb.counterfeit + cb.defect) - (ca.counterfeit + ca.defect); }
+// A single safety report is worth a look even when there are too few reviews for a verdict.
+function needsAttention(product) { return ["high", "moderate"].includes(tone(product)) || counts(product).safety > 0; }
+function matchesConcern(product, filter) { if (filter === "attention") return needsAttention(product); if (filter === "safety") return counts(product).safety > 0; if (filter === "clear") return tone(product) === "low"; if (filter === "unknown") return tone(product) === "unknown"; return true; }
+function verdictBadge(product) { return `<span class="risk-badge ${esc(tone(product))}">${esc(view(product).headline)}</span>`; }
+function reportChips(product) { const c = counts(product); const chips = [["safety", "safety"], ["counterfeit", "fake"], ["defect", "defect"]].filter(([key]) => c[key]).map(([key, word]) => `<span class="report-chip ${key}">${c[key]} ${word} report${c[key] === 1 ? "" : "s"}</span>`); return chips.length ? `<div class="report-chips">${chips.join("")}</div>` : ""; }
+// Wrap the matched words of a quote, using the character ranges the server sent.
+function highlightSpans(text, spans) { const source = String(text || ""); const merged = []; (spans || []).map(span => [Math.max(0, Number(span?.[0]) || 0), Math.min(source.length, Number(span?.[1]) || 0)]).filter(([start, end]) => end > start).sort((a, b) => a[0] - b[0]).forEach(([start, end]) => { const last = merged[merged.length - 1]; if (last && start <= last[1]) last[1] = Math.max(last[1], end); else merged.push([start, end]); }); let html = "", cursor = 0; merged.forEach(([start, end]) => { html += esc(source.slice(cursor, start)) + "<mark>" + esc(source.slice(start, end)) + "</mark>"; cursor = end; }); return html + esc(source.slice(cursor)); }
 function safeImage(product) { const candidate = product?.img || product?.image || product?.image_url || product?.thumbnail; return /^(https?:\/\/|\/static\/)/i.test(String(candidate || "")) ? candidate : ""; }
 function safeLink(value) { return /^https?:\/\//i.test(String(value || "")) ? String(value) : ""; }
 function toast(message, kind = "info") { const node = $("#toast"); node.textContent = message; node.dataset.kind = kind; node.hidden = false; clearTimeout(state.toastTimer); state.toastTimer = setTimeout(() => { node.hidden = true; }, 5000); }
-async function api(url, options = {}) { const response = await fetch(url, options); const body = await response.json().catch(() => ({})); if (!response.ok) throw new Error(body.error || "Something went wrong."); return body; }
+async function api(url, options = {}) { const response = await fetch(url, options); const body = await response.json().catch(() => ({})); if (!response.ok) { const error = new Error(body.error || "Something went wrong."); error.body = body; throw error; } return body; }
 function queryContext(value) { const text = String(value || "").trim(); let parsed; try { parsed = new URL(text); } catch (_) { return { isUrl: false, platform: null }; } if (!/^https?:$/.test(parsed.protocol)) return { isUrl: false, platform: null }; const host = parsed.hostname.toLowerCase(); if (host === "shopee.ph" || host.endsWith(".shopee.ph")) return { isUrl: true, platform: "shopee" }; if (host === "lazada.com.ph" || host.endsWith(".lazada.com.ph")) return { isUrl: true, platform: "lazada" }; if (host === "temu.com" || host.endsWith(".temu.com")) return { isUrl: true, platform: "temu" }; return { isUrl: true, platform: null }; }
 function clearSearchFeedback() { const feedback = $("#search-feedback"); feedback.hidden = true; feedback.removeAttribute("data-kind"); }
 function showSearchFeedback(message, title = "Scan could not start", kind = "error") { $("#search-feedback-title").textContent = title; $("#search-feedback-message").textContent = message; const feedback = $("#search-feedback"); feedback.dataset.kind = kind; feedback.hidden = false; }
@@ -20,8 +40,7 @@ function productLinkIdentity(value) { try { const url = new URL(String(value || 
 function savedProductForQuery(value) { const identity = productLinkIdentity(value); if (!identity) return null; const catalog = state.catalogProducts.length ? state.catalogProducts : state.products; return catalog.find(product => productLinkIdentity(product.link) === identity) || null; }
 function setSearchBusy(busy) {
   state.searchBusy = busy;
-  $("#active-scan-link").hidden = !busy;
-  $("#active-scan-link").textContent = busy ? "Scan in progress →" : "Return to scan →";
+  updateBell();
   ["#search-query", "#product-count", "#review-count"].forEach(selector => { const node = $(selector); if (node) node.disabled = busy; });
   document.querySelectorAll('input[name="marketplace"]').forEach(input => { input.disabled = busy; });
   updateSearchUI();
@@ -87,7 +106,10 @@ function updateSearchUI(clearFeedback = false) {
   primary.disabled = state.searchBusy || !hasQuery || unsupported;
   fresh.disabled = state.searchBusy || !hasQuery || unsupported;
   productCount.disabled = state.searchBusy || Boolean(context.platform);
-  $("#review-count").disabled = state.searchBusy;
+  const lazadaScan = (context.platform || selectedMarketplace()) === "lazada";
+  $("#review-count").disabled = state.searchBusy || lazadaScan;
+  const reviewCountField = $("#review-count").closest("label");
+  if (reviewCountField) reviewCountField.hidden = lazadaScan;
   document.querySelectorAll('input[name="marketplace"]').forEach(input => { input.disabled = state.searchBusy; });
 
   if (!hasQuery || unsupported) {
@@ -96,7 +118,8 @@ function updateSearchUI(clearFeedback = false) {
     const marketplace = context.platform || selectedMarketplace();
     const products = context.platform ? 1 : Number(productCount.value || 1);
     const reviews = Number($("#review-count").value || 1);
-    summary.textContent = `Fresh collection settings: ${MARKETPLACES[marketplace]} · up to ${products} product${products === 1 ? "" : "s"} · up to ${reviews} reviews each`;
+    const reviewPlan = lazadaScan ? `up to ${LAZADA_REVIEWS_PER_STAR} reviews from each star level` : `up to ${reviews} reviews each`;
+    summary.textContent = `Fresh collection settings: ${MARKETPLACES[marketplace]} · up to ${products} product${products === 1 ? "" : "s"} · ${reviewPlan}`;
     summary.hidden = false;
   }
   $("#search-note").textContent = state.searchBusy
@@ -137,7 +160,7 @@ function currentView() {
 }
 
 function updateHeaderState() {
-  const header = $(".site-header");
+  const header = $(".pub-header");
   if (!header) return;
   header.classList.toggle("scrolled", window.scrollY > 8);
   if (currentView() !== "landing") return;
@@ -160,24 +183,19 @@ function focusProductSearch() {
 
 const WORKSPACE_ROUTES = ["home", "analyze", "history", "wishlist", "settings", "results", "analysis"];
 const ROUTE_LABELS = {home: "Home", analyze: "Analyze product", history: "History", wishlist: "Wishlist", settings: "Settings", results: "Search results", analysis: "Product report"};
-function closeWorkspaceNavigation() {
-  $("#workspace-shell").classList.remove("sidebar-open");
-  $(".workspace-mobile-menu").setAttribute("aria-expanded", "false");
-  $(".workspace-backdrop").hidden = true;
-}
 function go(view, replace = false, preserveUrl = false) {
   const previousView = currentView();
   if (view === "dashboard") view = "home";
   if (view === "admin") view = "history";
-  if (view !== "landing" && !WORKSPACE_ROUTES.includes(view)) view = "home";
+  if (view === "login" && state.user) view = "home";
+  if (view !== "landing" && view !== "login" && !WORKSPACE_ROUTES.includes(view)) view = "home";
   document.body.dataset.activeView = view;
   document.querySelectorAll("[data-view]").forEach(node => {
     const visible = node.dataset.view === view;
     node.hidden = !visible;
     node.classList.toggle("active", visible);
   });
-  $("#workspace-shell").hidden = view === "landing";
-  $("#workspace-page-label").textContent = ROUTE_LABELS[view] || "Home";
+  $("#workspace-shell").hidden = view === "landing" || view === "login";
   let hash = view;
   if (view === "analysis" && state.currentProduct?.link) {
     hash += "?" + new URLSearchParams({product: state.currentProduct.link, from: state.reportFrom});
@@ -186,7 +204,7 @@ function go(view, replace = false, preserveUrl = false) {
     window.history[replace ? "replaceState" : "pushState"](null, "", "#" + hash);
   }
   const activeRoute = view === "analysis" ? state.reportFrom : view === "results" ? "analyze" : view;
-  document.querySelectorAll(".workspace-nav [data-route]").forEach(link => {
+  document.querySelectorAll(".app-rail [data-route]").forEach(link => {
     const active = link.dataset.route === activeRoute;
     link.classList.toggle("active", active);
     if (active) link.setAttribute("aria-current", "page");
@@ -194,15 +212,15 @@ function go(view, replace = false, preserveUrl = false) {
   });
   setActiveNavigation(view);
   closeMainNavigation();
-  closeWorkspaceNavigation();
+  closeAccountMenu();
   if (view === "results") renderResults();
   if (view === "home" || view === "history" || view === "wishlist") renderWorkspace();
   if (view === "analysis" && !state.currentProduct) {
     $("#analysis-content").innerHTML = '<div class="flow-empty"><h1>Choose a product report</h1><p>Open an analysis from History, or analyze a product to get started.</p><a href="#history">View history →</a></div>';
-    $("#report-save").hidden = true;
   }
-  $("#report-back").textContent = "← Back to " + (ROUTE_LABELS[state.reportFrom] || "History").toLowerCase();
-  document.title = (view === "landing" ? "DeFaketive — Review Risk Intelligence" : ROUTE_LABELS[view] + " · DeFaketive");
+  document.title = view === "landing" ? "DeFaketive — Spot fakes and defects before you buy" : view === "login" ? "Sign in · DeFaketive" : ROUTE_LABELS[view] + " · DeFaketive";
+  if (view === "login") prepareLoginPage();
+  updateLimitNotice();
   window.scrollTo({top: 0, behavior: "instant"});
   if (previousView !== view) {
     const heading = document.querySelector(`[data-view="${view}"] h1, [data-view="${view}"] h2`);
@@ -213,6 +231,7 @@ function readWorkspaceStorage(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (_) { return fallback; }
 }
 function persistWorkspace(key, value) {
+  if (state.user) return;
   try { localStorage.setItem(key, JSON.stringify(value)); }
   catch (_) { toast("Browser storage is unavailable. Your changes will last for this visit only.", "warning"); }
 }
@@ -225,6 +244,10 @@ function cacheWorkspaceProducts(products, opened = false) {
   });
   state.activity = Object.fromEntries(Object.entries(state.activity).sort((a, b) => b[1].openedAt - a[1].openedAt).filter(([link], index) => index < 100 || state.wishlist.includes(link)));
   persistWorkspace("defaketive-activity", state.activity);
+  if (state.user && opened) products.forEach(product => {
+    const entry = state.activity[product?.link];
+    if (entry) saveToAccount("/api/me/activity", "PUT", {link: product.link, product: entry.product, openedAt: entry.openedAt});
+  });
 }
 function rememberProduct(product) { cacheWorkspaceProducts([product], true); }
 function workspaceProducts() {
@@ -247,17 +270,15 @@ function toggleWishlist(link) {
   const product = workspaceProducts().find(item => item.link === link) || state.currentProduct;
   if (!saved && product?.link === link) cacheWorkspaceProducts([product]);
   persistWorkspace("defaketive-wishlist", state.wishlist);
+  if (state.user) {
+    const entry = state.activity[link];
+    // The account needs the product's summary before it can list it as saved.
+    const ready = !saved && entry ? saveToAccount("/api/me/activity", "PUT", {link, product: entry.product, openedAt: entry.openedAt}) : Promise.resolve();
+    ready.then(() => saveToAccount("/api/me/wishlist", saved ? "DELETE" : "PUT", {link}));
+  }
   syncReportSave();
   renderWorkspace();
-  toast(saved ? "Removed from wishlist." : "Saved to your wishlist on this browser.");
-}
-function syncReportSave() {
-  const button = $("#report-save");
-  const link = safeLink(state.currentProduct?.link);
-  const saved = state.wishlist.includes(link);
-  button.hidden = !link;
-  button.setAttribute("aria-pressed", String(saved));
-  button.textContent = saved ? "♥ Saved to wishlist" : "♡ Save to wishlist";
+  toast(saved ? "Removed from wishlist." : state.user ? "Saved to the wishlist in your account." : "Saved to your wishlist on this browser.");
 }
 function reportDate(product) {
   const value = product.analysis_date || product.analyzed_at || product.updated_at;
@@ -267,8 +288,8 @@ function reportDate(product) {
 function workspaceRows(products, emptyTitle, emptyCopy) {
   if (!products.length) return '<div class="flow-empty"><h3>' + esc(emptyTitle) + '</h3><p>' + esc(emptyCopy) + '</p><a href="#analyze">Analyze a product →</a></div>';
   return '<div class="flow-report-list">' + products.map(product => {
-    const level = riskLevel(product), saved = state.wishlist.includes(product.link), image = safeImage(product), date = reportDate(product);
-    return `<article class="flow-report-row"><div class="flow-product-thumb">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : '<span aria-hidden="true">▤</span>'}</div><div class="flow-product-info"><h3 title="${esc(product.name || "Unnamed product")}">${esc(product.name || "Unnamed product")}</h3><p><span class="flow-market-label">${esc(platform(product))}</span><span>${reviewCount(product).toLocaleString()} reviews</span><span class="flow-analysis-date">${date ? `Analyzed <time datetime="${esc(date.iso)}">${esc(date.label)}</time>` : "Analysis date unavailable"}</span></p></div><span class="risk-badge ${level.toLowerCase()}">${level} risk · ${(score(product) / 100).toFixed(2)}</span><div class="flow-row-actions"><button type="button" class="flow-save" data-save-link="${esc(product.link)}" aria-label="${saved ? "Remove from" : "Save to"} wishlist: ${esc(product.name)}" aria-pressed="${saved}">${saved ? "♥" : "♡"}</button><button type="button" class="flow-open" data-product-link="${esc(product.link)}">View report →</button></div></article>`;
+    const saved = state.wishlist.includes(product.link), image = safeImage(product), date = reportDate(product);
+    return `<article class="flow-report-row"><div class="flow-product-thumb">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : '<span aria-hidden="true">▤</span>'}</div><div class="flow-product-info"><h3 title="${esc(product.name || "Unnamed product")}">${esc(product.name || "Unnamed product")}</h3><p><span class="flow-market-label">${esc(platform(product))}</span><span>${reviewCount(product).toLocaleString()} reviews</span><span class="flow-analysis-date">${date ? `Analyzed <time datetime="${esc(date.iso)}">${esc(date.label)}</time>` : "Analysis date unavailable"}</span></p></div>${verdictBadge(product)}<div class="flow-row-actions"><button type="button" class="flow-save" data-save-link="${esc(product.link)}" aria-label="${saved ? "Remove from" : "Save to"} wishlist: ${esc(product.name)}" aria-pressed="${saved}">${saved ? "♥" : "♡"}</button><button type="button" class="flow-open" data-product-link="${esc(product.link)}">View report →</button></div></article>`;
   }).join("") + "</div>";
 }
 function persistHomeScan(scan) {
@@ -277,6 +298,7 @@ function persistHomeScan(scan) {
   renderHomeScan();
 }
 function renderHomeScan() {
+  updateBell();
   const scan = state.homeScan, panel = $("#home-scan-status");
   panel.hidden = !scan;
   if (!scan) return;
@@ -319,77 +341,166 @@ async function openHomeScan() {
     $("#job-panel").scrollIntoView({behavior: "smooth", block: "center"});
   }
 }
-function renderHomeProducts(products, highRisk) {
+// --- Home ------------------------------------------------------------------
+// A chip says what reviewers reported, never "safe" or "avoid". A single
+// safety report shows as one even when there are too few reviews for a verdict.
+function chipFor(product) {
+  const t = tone(product), safety = counts(product).safety;
+  if (t === "high") return {kind: "safety", label: "Safety reports"};
+  if (safety > 0) return {kind: "safety", label: safety === 1 ? "Safety report" : "Safety reports"};
+  if (t === "moderate") return {kind: "caution", label: "Caution"};
+  if (t === "low") return {kind: "clear", label: "No warnings"};
+  return {kind: "unknown", label: view(product).state === "not_analyzed" ? "Not analyzed" : "Too few reviews"};
+}
+function marketKey(product) {
+  const name = String(product?.platform || "").toLowerCase();
+  return ["shopee", "lazada", "temu"].find(key => name.includes(key)) || "other";
+}
+function smallStars(value) {
+  const rating = Math.max(0, Math.min(5, Number(value) || 0));
+  if (!rating) return '<span class="app-rating"><small>No rating</small></span>';
+  const stars = [1, 2, 3, 4, 5].map(position => `<img src="/static/assets/app/star-${rating >= position - .5 ? "filled" : "empty"}.svg" width="8.8" height="8.47" alt="">`).join("");
+  return `<span class="app-rating" role="img" aria-label="${rating.toFixed(1)} out of 5 stars"><span class="app-stars" aria-hidden="true">${stars}</span><small aria-hidden="true">${rating.toFixed(1)}/5</small></span>`;
+}
+// One product card, used by Home, Wishlist and the Products list.
+function appCard(product, badge = "") {
+  const link = safeLink(product.link), image = safeImage(product), chip = chipFor(product);
+  const saved = state.wishlist.includes(link), name = product.name || "Unnamed product";
+  return `<article class="app-product"><div class="app-product-image">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : '<span>No photo</span>'}<span class="app-chip ${chip.kind}">${esc(chip.label)}</span>${badge}</div><div class="app-product-body"><div class="app-product-top"><span class="app-market ${marketKey(product)}">${esc(platform(product))}</span><button type="button" class="app-heart" data-save-link="${esc(link)}" aria-pressed="${saved}" aria-label="${saved ? "Remove from" : "Save to"} wishlist: ${esc(name)}"></button></div><button type="button" class="app-product-name" data-product-link="${esc(link)}" title="${esc(name)}">${esc(name)}</button><b class="app-price">${esc(money(product.price))}</b>${smallStars(product.rating)}</div></article>`;
+}
+function updateRowArrow(track) {
+  const next = track.parentElement?.querySelector("[data-row-next]");
+  if (next) next.hidden = track.scrollWidth <= track.clientWidth + 4 || track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+}
+function fillRow(key, products, emptyHtml = "") {
+  const section = document.querySelector(`[data-home-row="${key}"]`), track = $("#home-" + key);
+  if (!section || !track) return;
+  section.hidden = !products.length && !emptyHtml;
+  track.innerHTML = products.length ? products.map(product => appCard(product)).join("") : emptyHtml;
+  track.setAttribute("aria-busy", "false");
+  requestAnimationFrame(() => updateRowArrow(track));
+}
+function renderHomeBoxes(products) {
+  const total = products.length;
+  const groups = [["No warnings", "clear", .7], ["Caution", "caution", .45], ["Safety reports", "safety", .28], ["Too few reviews", "unknown", .14]]
+    .map(([label, kind, strength]) => ({label, strength, count: products.filter(product => chipFor(product).kind === kind).length}));
+  const where = state.user ? "in your account" : "on this browser";
+  $("#home-overview").innerHTML = `<h2 class="app-eyebrow quiet">Overview</h2><div class="app-bars">${groups.map(group => {
+    const percent = total ? Math.round(group.count / total * 100) : 0;
+    return `<div><p><span>${group.label} <small>${group.count} product${group.count === 1 ? "" : "s"}</small></span><b>${percent}%</b></p><div class="app-bar" role="img" aria-label="${group.label}: ${percent}%"><i style="width:${percent}%;opacity:${group.strength}"></i></div></div>`;
+  }).join("")}</div><p class="app-footnote">${total ? `Based on ${total} product${total === 1 ? "" : "s"} ${where}.` : "Check a product to see your overview."}</p>`;
+  const stores = Object.entries(MARKETPLACES).map(([key, label]) => {
+    const mine = products.filter(product => marketKey(product) === key);
+    return {label, total: mine.length, flagged: mine.filter(needsAttention).length};
+  }).filter(store => store.total);
+  $("#home-stores").innerHTML = '<h2 class="app-eyebrow quiet">Warnings by marketplace</h2>' + (stores.length
+    ? `<div class="app-store-rows">${stores.map(store => `<div><span>${store.label}</span><div class="app-bar" role="img" aria-label="${store.flagged} of ${store.total} products with warnings"><i style="width:${Math.round(store.flagged / store.total * 100)}%;opacity:.5"></i></div><b>${store.flagged} of ${store.total}</b><small>with warnings</small></div>`).join("")}</div><p class="app-footnote">Counted from the products you checked.</p>`
+    : '<p class="app-footnote">Check a product to see how each marketplace compares.</p>');
+}
+function renderHomeProducts(products) {
   renderHomeScan();
-  const lastOpened = Object.values(state.activity).filter(entry => entry.openedAt > 0 && safeLink(entry.product?.link)).sort((a, b) => b.openedAt - a.openedAt)[0];
-  $("#home-continue").hidden = !lastOpened;
-  $("#home-continue").dataset.productLink = lastOpened?.product.link || "";
-  $("#home-continue-name").textContent = lastOpened?.product.name || "Your last analysis";
-  $("#home-continue").title = lastOpened?.product.name || "";
-  $("#home-recent").setAttribute("aria-busy", String(state.catalogLoading));
-  $("#home-wishlist-preview").setAttribute("aria-busy", String(state.catalogLoading));
+  const stats = $("#home-stats");
   if (state.catalogLoading && !products.length) {
-    $("#home-metrics").innerHTML = '<span class="home-list-caption">Loading your activity…</span>';
+    stats.innerHTML = '<p class="app-loading" role="status">Loading your activity…</p>';
     return;
   }
-  $("#home-metrics").innerHTML = [
-    [products.length, "Saved analyses"],
+  const safety = products.filter(product => chipFor(product).kind === "safety").sort(byConcern);
+  const caution = products.filter(product => chipFor(product).kind === "caution").sort(byConcern);
+  stats.innerHTML = [
+    [products.length, "Products analyzed"],
     [products.reduce((total, product) => total + reviewCount(product), 0), "Reviews analyzed"],
+    [safety.length + caution.length, "With warnings"],
     [state.wishlist.length, "In your wishlist"],
-  ].map(([value, label]) => `<article><b>${value.toLocaleString()}</b><span>${label}</span></article>`).join("");
-  const query = $("#home-recent-search").value.trim().toLowerCase();
-  const matched = products.filter(product => !query || `${product.name} ${platform(product)}`.toLowerCase().includes(query));
-  $("#home-clear-search").hidden = !query;
-  $("#home-recent-count").textContent = query ? `${matched.length} matching report${matched.length === 1 ? "" : "s"} · showing ${Math.min(4, matched.length)}` : products.length ? `Showing ${Math.min(4, products.length)} recent reports · ${products.length} saved` : "";
-  $("#home-recent").innerHTML = workspaceRows(matched.slice(0, 4),
-    query ? "No matching analyses" : state.catalogError ? "Saved reports could not be loaded" : "Your first analysis starts here",
-    query ? "Try another name or marketplace, or clear your search." : state.catalogError ? "Reload the page to try again, or start a new analysis above." : "Paste a product link above. Your completed report will appear here.");
-  const byLink = new Map(products.map(product => [product.link, product]));
-  const saved = [...state.wishlist].reverse().map(link => byLink.get(link)).filter(Boolean);
-  $("#home-wishlist-count").textContent = String(saved.length);
-  $("#home-wishlist-preview").innerHTML = saved.length ? saved.slice(0, 3).map(product => {
-    const image = safeImage(product), level = riskLevel(product);
-    return `<article class="home-saved-product"><div class="home-saved-thumb">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : '<img src="/static/assets/figma/home-report.svg" width="20" height="20" alt="">'}</div><div><button type="button" data-product-link="${esc(product.link)}">${esc(product.name || "Unnamed product")}</button><p>${esc(platform(product))}</p><span class="risk-badge ${level.toLowerCase()}">${level} risk</span></div></article>`;
-  }).join("") : '<div class="home-wishlist-empty"><span aria-hidden="true">♡</span><h3>Keep your options together</h3><p>Save a product using the heart beside its report. Your shortlist will appear here.</p></div>';
-  $("#home-risk-alert").innerHTML = highRisk.length ? `<header><div><p class="flow-eyebrow">BEFORE YOU BUY</p><h2>Worth a closer look</h2><p>High risk signals in your saved analyses.</p></div><button class="home-text-button" type="button" data-show-risk>View all ${highRisk.length} →</button></header><div class="home-risk-products">${highRisk.slice(0, 2).map(product => {
-    const concern = analysisMainIssue(product.sentiment_summary || {});
-    return `<article><span class="risk-badge high">High risk · ${(score(product) / 100).toFixed(2)}</span><h3>${esc(product.name || "Unnamed product")}</h3><p>${concern === "No dominant issue" ? "High measured risk across " + reviewCount(product) + " sampled reviews. Open the report to inspect the evidence." : "Most reported concern: " + esc(concern) + ". Check what reviewers actually said."}</p><button type="button" class="home-text-button" data-home-evidence="${esc(product.link)}">Read the evidence →</button></article>`;
-  }).join("")}</div>` : "";
-  bindProductButtons($("#home-wishlist-preview"));
-  $("#home-risk-alert").querySelectorAll("[data-home-evidence]").forEach(button => button.addEventListener("click", async () => {
-    const link = button.dataset.homeEvidence;
-    await openProduct(link);
-    if (currentView() !== "analysis" || state.currentProduct?.link !== link) return;
-    document.querySelector('[data-review-filter="risk"]')?.click();
-    const section = $("#report-evidence");
-    section?.scrollIntoView({behavior: "smooth", block: "start"});
-    section?.focus({preventScroll: true});
-  }));
+  ].map(([value, label]) => `<div><b>${value.toLocaleString()}</b><span>${label}</span></div>`).join("");
+  const alert = $("#home-alert");
+  alert.hidden = !(safety.length || caution.length);
+  alert.dataset.kind = safety.length ? "danger" : "caution";
+  alert.innerHTML = safety.length
+    ? `<div><b>${safety.length} product${safety.length === 1 ? " has" : "s have"} safety reports</b><p>Reviewers described fire, smoke, shocks or overheating.</p></div><button type="button" data-show-risk="safety">View them</button>`
+    : `<div><b>${caution.length} product${caution.length === 1 ? " needs" : "s need"} a closer look</b><p>Reviewers reported fakes or defects.</p></div><button type="button" data-show-risk="attention">View them</button>`;
+  const emptyTitle = state.modelUnavailable ? "Review analysis is unavailable" : state.catalogError ? "Saved reports could not be loaded" : "Your first analysis starts here";
+  const emptyCopy = state.modelUnavailable || (state.catalogError ? "Reload the page to try again, or start a new analysis above." : "Paste a product link above. Your completed report will appear here.");
+  fillRow("recent", products.slice(0, 10), `<div class="app-empty"><h3>${esc(emptyTitle)}</h3><p>${esc(emptyCopy)}</p></div>`);
+  fillRow("caution", caution.slice(0, 10));
+  fillRow("safety", safety.slice(0, 10));
+  renderHomeBoxes(products);
+}
+function showHistoryFilter(kind) {
+  $("#history-search").value = "";
+  $("#history-risk").value = kind;
+  go("history");
+}
+// The bell stands for the background scan: a dot while one runs or has finished.
+function updateBell() {
+  const bell = $("#active-scan-link");
+  if (!bell) return;
+  const scan = state.homeScan;
+  const label = state.searchBusy ? "A scan is running. Open it" : scan?.state === "complete" ? "Your report is ready. Open it" : scan ? "Your last scan needs a look. Open it" : "No scans running";
+  bell.classList.toggle("has-dot", state.searchBusy || Boolean(scan));
+  bell.setAttribute("aria-label", label);
+  bell.title = label;
+}
+function closeAccountMenu() {
+  const menu = $("#account-menu"), toggle = $("[data-account-toggle]");
+  if (menu) menu.hidden = true;
+  if (toggle) toggle.setAttribute("aria-expanded", "false");
+}
+// --- History and wishlist in the account -----------------------------------
+// Guests keep their history in this browser. Signed-in users keep it in their
+// account, so it follows them to any browser.
+const jsonRequest = (method, body) => ({method, headers: {"Content-Type": "application/json"}, body: JSON.stringify(body || {})});
+function saveToAccount(url, method, body) {
+  return api(url, jsonRequest(method, body)).catch(() => toast("That couldn't be saved to your account. Check your connection and try again.", "error"));
+}
+async function loadLibrary() {
+  if (!state.user) return;
+  const localWishlist = readWorkspaceStorage("defaketive-wishlist", []);
+  const wishlist = Array.isArray(localWishlist) ? localWishlist.filter(link => safeLink(link)) : [];
+  const localActivity = readWorkspaceStorage("defaketive-activity", {});
+  // Bring over what this browser's guest actually opened or saved, once.
+  const opened = Object.fromEntries(Object.entries(localActivity && typeof localActivity === "object" ? localActivity : {})
+    .filter(([link, entry]) => safeLink(link) && (entry?.openedAt > 0 || wishlist.includes(link))));
+  let library;
+  try {
+    library = Object.keys(opened).length || wishlist.length
+      ? await api("/api/me/import", jsonRequest("POST", {activity: opened, wishlist}))
+      : await api("/api/me/library");
+  } catch (_) {
+    return toast("Your saved history couldn't be loaded. Reload the page to try again.", "error");
+  }
+  // The next guest on a shared computer must not see this user's history.
+  try { localStorage.removeItem("defaketive-activity"); localStorage.removeItem("defaketive-wishlist"); } catch (_) {}
+  state.activity = library.activity || {};
+  state.wishlist = library.wishlist || [];
+  cacheWorkspaceProducts(state.catalogProducts);
+  renderWorkspace();
+  syncReportSave();
+}
+function forgetLibrary() {
+  state.activity = {};
+  state.wishlist = [];
+  cacheWorkspaceProducts(state.catalogProducts);
+  renderWorkspace();
+  syncReportSave();
 }
 function renderWorkspace() {
   const products = workspaceProducts();
-  const highRisk = products.filter(product => riskLevel(product) === "High");
-  renderHomeProducts(products, highRisk);
+  renderHomeProducts(products);
   const query = $("#history-search").value.trim().toLowerCase(), risk = $("#history-risk").value;
-  const filtered = products.filter(product => (!query || `${product.name} ${platform(product)}`.toLowerCase().includes(query)) && (risk === "all" || riskLevel(product) === risk));
+  const filtered = products.filter(product => (!query || `${product.name} ${platform(product)}`.toLowerCase().includes(query)) && matchesConcern(product, risk));
   $("#history-count").textContent = `${filtered.length} of ${products.length} saved reports`;
-  $("#history-list").innerHTML = workspaceRows(filtered, products.length ? "No reports match these filters" : "No analyses yet", products.length ? "Try another product name or select all risk levels." : "Analyze a product to start your history.");
+  $("#history-list").innerHTML = workspaceRows(filtered, products.length ? "No reports match these filters" : "No analyses yet", products.length ? "Try another product name or show all reports." : "Analyze a product to start your history.");
   $("#wishlist-list").innerHTML = workspaceRows(products.filter(product => state.wishlist.includes(product.link)), "Keep a product in mind", "Use the heart beside a saved analysis or save a product from its report. It will appear here.");
-  ["#home-recent", "#history-list", "#wishlist-list"].forEach(selector => {
+  ["#history-list", "#wishlist-list"].forEach(selector => {
     const holder = $(selector);
     bindProductButtons(holder);
     holder.querySelectorAll("[data-save-link]").forEach(button => button.addEventListener("click", () => toggleWishlist(button.dataset.saveLink)));
-  });
-  $("[data-show-risk]")?.addEventListener("click", () => {
-    $("#history-search").value = "";
-    $("#history-risk").value = "High";
-    go("history");
   });
 }
 async function routeFromHash() {
   const [route, query = ""] = window.location.hash.slice(1).split("?");
   const params = new URLSearchParams(query);
-  if (["about", "faq", "how"].includes(route)) {
+  if (["about", "faq", "how", "platforms"].includes(route)) {
     go("landing", true);
     requestAnimationFrame(() => $("#" + route)?.scrollIntoView({behavior: "smooth"}));
     return;
@@ -405,14 +516,17 @@ async function routeFromHash() {
   go(route || "landing", true);
 }
 function platform(product) { return product?.platform ? (MARKETPLACES[String(product.platform).toLowerCase()] || product.platform) : "Marketplace"; }
-function productCard(product) { const level = riskLevel(product); const image = safeImage(product); const link = safeLink(product.link); return `<article class="product-card"><div class="product-image">${image ? `<img src="${esc(image)}" alt="">` : "Listing image unavailable"}</div><div class="product-card-body"><span class="platform-badge">${esc(platform(product))}</span><h3>${esc(product.name || "Unnamed product")}</h3><div class="product-price">${esc(money(product.price))}</div><div class="card-meta">★ ${esc(product.rating || "—")} · ${reviewCount(product).toLocaleString()} reviews analyzed</div><span class="risk-badge ${level.toLowerCase()}">${level} risk · ${score(product).toFixed(0)}% score</span><div class="reliability"><i style="width:${Math.min(100, Math.max(0, reliability(product)))}%"></i></div><div class="card-meta">Review reliability: ${reliability(product)}%</div><button class="card-button" data-product-link="${esc(link)}">Open report →</button></div></article>`; }
+function productCard(product) { const image = safeImage(product); const link = safeLink(product.link); return `<article class="product-card"><div class="product-image">${image ? `<img src="${esc(image)}" alt="">` : "Listing image unavailable"}</div><div class="product-card-body"><span class="platform-badge">${esc(platform(product))}</span><h3>${esc(product.name || "Unnamed product")}</h3><div class="product-price">${esc(money(product.price))}</div><div class="card-meta">★ ${esc(product.rating || "—")} · ${reviewCount(product).toLocaleString()} reviews analyzed</div>${verdictBadge(product)}${reportChips(product)}<button class="card-button" data-product-link="${esc(link)}">Open report →</button></div></article>`; }
 function bindProductButtons(root = document) {
   root.querySelectorAll("[data-product-link]").forEach(button => button.addEventListener("click", () => openProduct(button.dataset.productLink)));
 }
-function filteredProducts() { const platformFilter = $("#filter-platform")?.value || "all"; const riskFilter = $("#filter-risk")?.value || "all"; const sort = $("#filter-sort")?.value || "all"; const visible = state.products.filter(product => (platformFilter === "all" || platform(product) === platformFilter) && (riskFilter === "all" || riskLevel(product) === riskFilter)); return visible.sort((a,b) => { if (sort === "risk") return score(a)-score(b); if (sort === "reviews") return reviewCount(b)-reviewCount(a); return reliability(b)-reliability(a); }); }
+function filteredProducts() { const platformFilter = $("#filter-platform")?.value || "all"; const concernFilter = $("#filter-risk")?.value || "all"; const sort = $("#filter-sort")?.value || "fewest"; const visible = state.products.filter(product => (platformFilter === "all" || platform(product) === platformFilter) && matchesConcern(product, concernFilter)); return visible.sort((a, b) => sort === "reviews" ? reviewCount(b) - reviewCount(a) : sort === "most" ? byConcern(a, b) : byConcern(b, a)); }
 function renderResults() { const products = filteredProducts(); $("#results-summary").textContent = products.length ? `${products.length} analyzed product${products.length === 1 ? "" : "s"} shown.` : "No products match your selected filters."; $("#product-grid").innerHTML = products.map(productCard).join(""); bindProductButtons($("#product-grid")); }
 async function loadProducts() { const data = await api("/api/products"); state.products = data.products || []; state.catalogProducts = [...state.products]; state.catalogError = false; state.catalogLoading = false; cacheWorkspaceProducts(state.catalogProducts); if ($("#search-form")) updateSearchUI(); renderWorkspace(); }
-function highlightReview(review) { const analysis = review.sentiment_analysis || {}; const terms = (analysis.risk?.evidence || []).filter(item => !item.negated).map(item => item.term).filter(Boolean); let content = esc(review.content || "No written review was collected."); terms.forEach(term => { const escaped = esc(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); if (escaped) content = content.replace(new RegExp(`(${escaped})`, "ig"), "<mark>$1</mark>"); }); return content; }
+// Highlight only words from categories the check actually tagged, so a heat
+// word the filter set aside as clothing or weather talk is not marked.
+function reviewTerms(analysis) { const found = new Set(); (analysis.sentences || []).forEach(sentence => { const tags = new Set(sentence.tags || []); (sentence.terms || []).forEach(term => { if (term.negated || !tags.has(term.category) || !Array.isArray(term.span)) return; const text = String(sentence.text_raw || "").slice(term.span[0], term.span[1]).trim(); if (text) found.add(text); }); }); return [...found].sort((a, b) => b.length - a.length); }
+function highlightReview(review) { const terms = reviewTerms(review.sentiment_analysis || {}); const content = esc(review.content || "No written review was collected."); if (!terms.length) return content; const pattern = terms.map(term => esc(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"); return content.replace(new RegExp(`(${pattern})`, "ig"), "<mark>$1</mark>"); }
 async function openProduct(link, replace = false, restoring = false) {
   if (!safeLink(link)) return toast("This product has no valid listing link.", "error");
   if (!restoring && currentView() !== "analysis") state.reportFrom = ["home", "history", "wishlist", "results", "analyze"].includes(currentView()) ? currentView() : "history";
@@ -435,202 +549,417 @@ async function openProduct(link, replace = false, restoring = false) {
   }
 }
 async function openSignedInPage() {
-  go("home");
+  if (state.user) go("home");
+  else openAuth("signin");
+}
+// --- Sign in, create account, and the terms pop-up ------------------------
+const AUTH_DIALOGS = {signin: "#signin-dialog", signup: "#signup-dialog", terms: "#terms-dialog"};
+function closeDialogs() { document.querySelectorAll("dialog[open]").forEach(dialog => dialog.close()); }
+function clearAuthErrors(root) {
+  root.querySelectorAll("[data-error-for], [data-form-error]").forEach(node => { node.hidden = true; node.textContent = ""; });
+  root.querySelectorAll('[aria-invalid="true"]').forEach(node => node.removeAttribute("aria-invalid"));
+}
+function openAuth(kind) {
+  if (state.user) return go("home");
+  const dialog = $(AUTH_DIALOGS[kind]);
+  if (!dialog) return;
+  closeDialogs();
+  clearAuthErrors(dialog);
+  dialog.showModal();
+  dialog.querySelector("input")?.focus();
+}
+function openTerms(section) {
+  const dialog = $("#terms-dialog");
+  if (!dialog.open) dialog.showModal();
+  const target = $(section === "privacy" ? "#privacy-policy" : "#terms-of-use");
+  target?.scrollIntoView({block: "start"});
+  target?.querySelector("h3")?.setAttribute("tabindex", "-1");
+  target?.querySelector("h3")?.focus();
+}
+function showAuthErrors(form, error) {
+  const fields = error.body?.fields || {};
+  let shown = false;
+  Object.entries(fields).forEach(([name, message]) => {
+    const slot = form.querySelector(`[data-error-for="${name}"]`);
+    const input = form.querySelector(`[name="${name}"]`);
+    if (slot) { slot.textContent = message; slot.hidden = false; shown = true; }
+    if (input) input.setAttribute("aria-invalid", "true");
+  });
+  if (!shown) {
+    const general = form.querySelector("[data-form-error]");
+    general.textContent = error.message;
+    general.hidden = false;
+  }
+  (form.querySelector('[aria-invalid="true"]') || form.querySelector("input"))?.focus();
+}
+async function submitAuth(event) {
+  event.preventDefault();
+  const form = event.currentTarget, kind = form.dataset.authForm;
+  clearAuthErrors(form);
+  const field = name => form.elements[name]?.value || "";
+  const payload = kind === "signup"
+    ? {full_name: field("full_name"), email: field("email"), password: field("password"), confirm: field("confirm"), agree: Boolean(form.elements.agree?.checked)}
+    : {email: field("email"), password: field("password")};
+  const button = form.querySelector(".auth-submit"), label = button.textContent;
+  button.disabled = true;
+  button.textContent = kind === "signup" ? "Creating account…" : "Signing in…";
+  try {
+    const me = await api(kind === "signup" ? "/api/auth/signup" : "/api/auth/login", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)});
+    form.reset();
+    await afterSignIn(me, kind);
+  } catch (error) {
+    showAuthErrors(form, error);
+  } finally {
+    button.disabled = false;
+    button.textContent = label;
+  }
+}
+async function afterSignIn(me, kind) {
+  applyAuth(me);
+  closeDialogs();
+  state.loginNotice = "";
+  await loadLibrary();
+  toast(kind === "signup" ? `Welcome, ${firstName(me.user?.name)}. Your account is ready.` : `Signed in as ${me.user?.name}.`);
+  const here = currentView();
+  const next = state.afterLogin || (here === "landing" || here === "login" ? "home" : here);
+  state.afterLogin = null;
+  if (next !== here) go(next);
+}
+async function signOut() {
+  try {
+    applyAuth(await api("/api/auth/logout", {method: "POST", headers: {"Content-Type": "application/json"}, body: "{}"}));
+  } catch (error) {
+    return toast(error.message, "error");
+  }
+  forgetLibrary();
+  toast("You're signed out.");
+  go("landing");
+}
+function continueAsGuest() {
+  closeDialogs();
+  go("analyze");
+  focusProductSearch();
+}
+function showLoginPage(message, after = "") {
+  state.loginNotice = message || "";
+  if (after) state.afterLogin = after;
+  go("login");
+}
+async function prepareLoginPage() {
+  const notice = $("[data-login-notice]");
+  if (notice) {
+    notice.textContent = state.loginNotice || "";
+    notice.hidden = !state.loginNotice;
+  }
+  if (state.publicStats) return;
+  try {
+    state.publicStats = await api("/api/stats/public");
+    document.querySelectorAll("[data-public-stat]").forEach(node => {
+      const value = Number(state.publicStats[node.dataset.publicStat]);
+      if (Number.isFinite(value)) node.textContent = value.toLocaleString();
+    });
+  } catch (_) { /* The numbers are a nicety; the form still works without them. */ }
+}
+// Who is signed in, and how many free scans a guest has left today.
+const firstName = name => String(name || "").trim().split(/\s+/)[0] || "";
+function guestNote() {
+  if (state.user) return "Unlimited scans with your account";
+  const left = Number(state.guest?.left ?? 3);
+  return left > 0 ? `${left} free scan${left === 1 ? "" : "s"} left today as a guest · sign in for unlimited` : "No free scans left today · sign in for unlimited scans";
+}
+function applyAuth(me) {
+  state.user = me?.user || null;
+  state.guest = me?.guest || null;
+  document.body.dataset.auth = state.user ? "user" : "guest";
+  document.querySelectorAll("[data-auth-guest]").forEach(node => { node.hidden = Boolean(state.user); });
+  document.querySelectorAll("[data-auth-user]").forEach(node => { node.hidden = !state.user; });
+  document.querySelectorAll("[data-user-greeting]").forEach(node => { node.textContent = state.user ? `Hi, ${firstName(state.user.name)}` : ""; });
+  document.querySelectorAll("[data-guest-note]").forEach(node => { node.textContent = guestNote(); });
+  const parts = String(state.user?.name || "").trim().split(/\s+/).filter(Boolean);
+  const initials = parts.length ? (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase() : "";
+  document.querySelectorAll("[data-user-initials]").forEach(node => { node.textContent = initials; });
+  document.querySelectorAll("[data-user-name]").forEach(node => { node.textContent = state.user?.name || ""; });
+  const lead = $("[data-welcome-lead]"), who = $("[data-welcome-name]");
+  if (lead) lead.textContent = state.user ? "Welcome back," : "Welcome,";
+  if (who) who.textContent = state.user ? `${firstName(state.user.name)}.` : "shopper.";
+  closeAccountMenu();
+  updateLimitNotice();
+  const left = Number(state.guest?.left ?? 3);
+  document.querySelectorAll("[data-continue-guest]").forEach(node => {
+    node.textContent = left > 0 ? `Continue as guest — ${left} free scan${left === 1 ? "" : "s"} left today` : "Continue as guest — no free scans left today";
+  });
+}
+async function refreshAuth() {
+  try { applyAuth(await api("/api/auth/me")); } catch (_) { return; /* Keep the guest view if the check fails. */ }
+  if (state.user) await loadLibrary();
 }
 function sentimentData(product) { const counts = product.sentiment_summary?.sentiment_counts || {}; return [{label:"Positive", value:Number(counts.positive || 0), color:"#12b76a"},{label:"Uncertain", value:Number(counts.uncertain ?? counts.neutral ?? 0), color:"#94a3b8"},{label:"Negative", value:Number(counts.negative || 0), color:"#f04438"}]; }
-function analysisMainIssue(summary) {
-  const issues = Object.entries(summary.risk_evidence_terms || summary.risk_categories || {}).filter(([, count]) => Number(count) > 0).sort((a, b) => Number(b[1]) - Number(a[1]));
-  return issues.length ? String(issues[0][0]).replaceAll("_", " ").replace(/\b\w/g, letter => letter.toUpperCase()) : "No dominant issue";
-}
-
-function sentimentStack(product) {
-  const data = sentimentData(product);
-  const total = data.reduce((sum, item) => sum + item.value, 0);
-  if (!total) return '<p class="analysis-empty">No sentiment labels are available.</p>';
-  const segments = data.map(item => `<span class="sentiment-segment ${item.label.toLowerCase()}" style="width:${item.value / total * 100}%" title="${item.label}: ${item.value}" aria-label="${item.label}: ${item.value} reviews"></span>`).join("");
-  const legend = data.map(item => `<div><i class="${item.label.toLowerCase()}"></i><span>${item.label}</span><b>${item.value}</b><small>${Math.round(item.value / total * 100)}%</small></div>`).join("");
-  return `<div class="sentiment-stack" role="img" aria-label="Sentiment distribution across ${total} reviews">${segments}</div><div class="sentiment-legend">${legend}</div>`;
-}
-
-function issueBars(summary, reviewTotal) {
-  const issues = Object.entries(summary.risk_evidence_terms || summary.risk_categories || {}).sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 6);
-  if (!issues.length) return '<p class="analysis-empty">No active product-risk issues were detected in this review sample.</p>';
-  const highest = Math.max(...issues.map(([, count]) => Number(count || 0)), 1);
-  return `<div class="issue-bars">${issues.map(([issue, count]) => {
-    const label = String(issue).replaceAll("_", " ").replace(/\b\w/g, letter => letter.toUpperCase());
-    const numericCount = Number(count || 0);
-    const percentage = reviewTotal ? Math.round(numericCount / reviewTotal * 100) : 0;
-    return `<div class="issue-row"><div><span>${esc(label)}</span><b>${numericCount} review${numericCount === 1 ? "" : "s"} · ${percentage}%</b></div><div class="issue-track"><i style="width:${numericCount / highest * 100}%"></i></div></div>`;
-  }).join("")}</div>`;
-}
-
-const REPORT_ASSET_BASE = "/static/assets/figma/report";
-function reportIcon(file, alt = "", width = 16, height = width, className = "") {
-  return `<img${className ? ` class="${esc(className)}"` : ""} src="${REPORT_ASSET_BASE}/${esc(file)}" width="${width}" height="${height}" alt="${esc(alt)}">`;
-}
-
-function starMarkup(value) {
-  const rating = Math.max(0, Math.min(5, Number(value || 0)));
-  const stars = [1, 2, 3, 4, 5].map(position => {
-    const icon = rating >= position - .25 ? "icon-07.svg" : rating >= position - .75 ? "icon-08.svg" : "icon-02.svg";
-    return reportIcon(icon, "", 20, 20);
-  }).join("");
-  return `<span class="report-stars" role="img" aria-label="${rating.toFixed(1)} out of 5 stars">${stars}</span>`;
-}
 
 function sentimentPercentages(product) {
   const data = sentimentData(product);
   const total = data.reduce((sum, item) => sum + item.value, 0);
+  const shares = product.sentiment_summary?.sentiment_shares;
+  // Per-star samples: percentages come from the weighted shares, counts stay counts.
+  if (shares) return data.map(item => ({...item, percent: Number(shares[item.label.toLowerCase()] || 0) * 100}));
   return data.map(item => ({...item, percent: total ? item.value / total * 100 : 0}));
 }
 
-function reportKeywords(reviews, summary) {
-  const terms = new Map();
-  reviews.forEach(review => {
-    (review.sentiment_analysis?.risk?.evidence || []).filter(item => !item.negated && item.term).forEach(item => {
-      const key = String(item.term).trim().toLowerCase();
-      if (key) terms.set(key, (terms.get(key) || 0) + 1);
+
+
+// --- Product report --------------------------------------------------------
+const REVIEW_TAG_LABELS = {safety: "Safety report", counterfeit: "Possible fake", defect: "Defect report"};
+const sentimentLabel = review => { const label = String(review?.sentiment_analysis?.label || "unanalyzed").toLowerCase(); return label === "neutral" ? "uncertain" : label; };
+// The words the check matched in a review: only words from a category the
+// sentence was actually tagged with, and never a negated one ("hindi sira").
+function matchedWords(review) {
+  const found = new Map();
+  (review?.sentiment_analysis?.sentences || []).forEach(sentence => {
+    const tags = new Set(sentence.tags || []);
+    (sentence.terms || []).forEach(term => {
+      if (term.negated || !tags.has(term.category)) return;
+      const raw = Array.isArray(term.span) ? String(sentence.text_raw || "").slice(term.span[0], term.span[1]) : "";
+      const word = String(term.ngram || raw).trim().toLowerCase();
+      if (word && !found.has(word)) found.set(word, term.category);
     });
   });
-  if (!terms.size) Object.entries(summary.risk_evidence_terms || summary.risk_categories || {}).forEach(([term, count]) => terms.set(String(term).replaceAll("_", " "), Number(count || 0)));
-  const ranked = [...terms.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
-  return ranked.length
-    ? ranked.map(([term, count]) => `<span class="report-keyword"><b>${esc(term.replace(/\b\w/g, letter => letter.toUpperCase()))}</b><small>${count} mention${count === 1 ? "" : "s"}</small></span>`).join("")
-    : '<p class="report-empty-copy">No active risk terms were detected.</p>';
+  return found;
 }
-
-function riskRecommendation(level) {
-  if (level === "Low") return {title: "Generally safe to buy", copy: "Review signals indicate a low likelihood of product-quality issues."};
-  if (level === "Moderate") return {title: "Buy with caution", copy: "Compare recent reviews and seller policies before purchasing."};
-  return {title: "Not recommended", copy: "Strong review signals suggest choosing a lower-risk alternative."};
+// How many reviews each warning word appears in, most common first.
+function warningWords(reviews) {
+  const tally = new Map();
+  reviews.forEach(review => matchedWords(review).forEach((category, word) => {
+    const entry = tally.get(word) || {word, category, count: 0};
+    entry.count += 1;
+    tally.set(word, entry);
+  }));
+  return [...tally.values()].sort((a, b) => b.count - a.count || a.word.localeCompare(b.word));
 }
-
+// One plain sentence for the summary: how the reviews lean, and what was flagged.
+function summaryHeadline(positiveShare, negativeShare, reportCounts) {
+  const lean = positiveShare >= 70 ? "Mostly positive reviews" : negativeShare >= 50 ? "Mostly negative reviews" : "Mixed reviews";
+  const parts = [["safety", "safety report"], ["counterfeit", "fake report"], ["defect", "defect report"]]
+    .filter(([key]) => reportCounts[key] > 0)
+    .map(([key, noun]) => `${reportCounts[key]} ${noun}${reportCounts[key] === 1 ? "" : "s"}`);
+  if (!parts.length) return `${lean}, and nothing flagged.`;
+  const list = parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0];
+  return `${lean}, with ${list}.`;
+}
 function reviewCard(review) {
-  const analysis = review.sentiment_analysis || {};
-  const label = String(analysis.label || "unanalyzed").toLowerCase();
-  const activeRisk = Boolean(analysis.risk?.detected);
-  const stars = Math.max(0, Math.min(5, Number(review.rating || 0)));
-  const meta = [review.time || review.date, review.variation].filter(Boolean).map(esc).join(" · ");
-  const evidence = (analysis.risk?.evidence || []).filter(item => !item.negated && item.term).slice(0, 3);
-  return `<article class="report-review-card"><div class="report-review-head"><div>${starMarkup(stars)}<small>${stars ? stars.toFixed(1) : "No rating"}</small></div><span class="sentiment-pill ${esc(label)}">${esc(label)}</span></div><p>${highlightReview(review)}</p>${evidence.length ? `<div class="report-evidence-tags">${evidence.map(item => `<span>${esc(item.term)}</span>`).join("")}</div>` : ""}<footer><b>${esc(review.author || "Verified shopper")}</b>${meta ? `<span>${meta}</span>` : ""}${activeRisk ? '<span class="report-risk-evidence">Risk evidence</span>' : ""}</footer></article>`;
+  const label = sentimentLabel(review);
+  const reported = (review.sentiment_analysis?.review_tags || []).map(tag => REVIEW_TAG_LABELS[tag]).filter(Boolean);
+  const words = [...matchedWords(review).keys()].slice(0, 4);
+  const when = review.time || review.date || "";
+  const tags = [...reported.map(text => `<span class="flag">${esc(text)}</span>`), ...words.map(word => `<span>${esc(word)}</span>`)].join("");
+  return `<article class="rep-review"><header>${smallStars(review.rating)}${when ? `<time>${esc(when)}</time>` : ""}</header><p><i class="rep-dot ${esc(label)}" role="img" aria-label="${esc(label)} review"></i><span>${highlightReview(review)}</span></p>${tags ? `<div class="rep-tags">${tags}</div>` : ""}</article>`;
 }
+
+// What each verdict means, in the order the server tests them.
+const VERDICT_GUIDE = [
+  ["safety_warning", "high", "Reviewers report safety problems", "Serious or repeated reports of fire, smoke, shocks or overheating"],
+  ["possible_safety_issue", "moderate", "Some reviewers mention safety concerns", "Fewer or less severe safety reports"],
+  ["possible_counterfeit_or_defect", "moderate", "Reviewers report fakes or defects", "More fake or breakage reports than is typical for the product type"],
+  ["reviews_may_be_unreliable", "unknown", "These reviews may not be trustworthy", "Many reviews look duplicated or generic"],
+  ["no_warning_signs", "low", "No warning signs found", "Enough reviews, none flagged. This is not proof that a product is safe"],
+  ["insufficient_evidence", "unknown", "Not enough reviews to judge", "Too few reviews for an overall verdict; any reports are still shown"],
+];
+// The three labels a shopper sees on cards, and what each one means.
+const VERDICT_GROUPS = [
+  ["clear", "No warnings", "Enough reviews, none flagged. Not proof it's safe."],
+  ["caution", "Caution", "Reviewers report fakes, defects or milder safety concerns."],
+  ["safety", "Safety reports", "Serious or repeated reports of fire, smoke, shocks or overheating."],
+];
+const CHECK_LABELS = {safety: "Safety", counterfeit: "Fakes", defect: "Defects"};
 
 function renderAnalysis(product, recommendations) {
   state.currentProduct = product;
   rememberProduct(product);
-  syncReportSave();
   const summary = product.sentiment_summary || {};
+  const verdict = view(product);
+  const chip = chipFor(product);
+  const accuracy = verdict.safety_check_accuracy || null;
   const allReviews = Array.isArray(product.comments) ? product.comments.filter(item => item && typeof item === "object") : [];
   const reviews = allReviews.filter(item => !item.is_duplicate && item.included_in_analysis !== false);
-  const uniqueCount = Number(summary.review_count || reviews.length) || reviews.length;
-  const availableCount = Math.max(uniqueCount, Number(summary.reviews_available || uniqueCount) || uniqueCount);
+  const coverage = summary.coverage || {};
+  const uniqueCount = Number(verdict.reviews_analyzed || reviews.length) || reviews.length;
+  const availableCount = Math.max(uniqueCount, Number(coverage.reviews_listed || coverage.reviews_available || uniqueCount) || uniqueCount);
   const coveragePercent = availableCount ? uniqueCount / availableCount * 100 : 0;
-  const riskInterval = Array.isArray(summary.risk_score_ci_95) && summary.risk_score_ci_95.length === 2
-    ? `${Number(summary.risk_score_ci_95[0]).toFixed(1)}–${Number(summary.risk_score_ci_95[1]).toFixed(1)}%`
-    : "Unavailable";
-  const evidenceStatus = String(summary.evidence_status || "unknown").replaceAll("_", " ");
+  // A per-star sample is weighted to the listing, so "coverage" would mislead.
+  const sampleNote = coverage.sampling === "stratified_by_star"
+    ? `${uniqueCount.toLocaleString()} reviews read, up to ${Number(coverage.star_quota || LAZADA_REVIEWS_PER_STAR)} from each star level${coverage.weighted ? `, weighted to match the listing's ${availableCount.toLocaleString()} ratings` : ""}`
+    : `${uniqueCount.toLocaleString()} of ${availableCount.toLocaleString()} reviews analyzed (${coveragePercent.toFixed(1)}% coverage)`;
   const duplicateCount = Number(summary.duplicate_review_count ?? allReviews.filter(item => item.is_duplicate).length) || 0;
-  const riskReviewCount = Number(summary.risk_review_count || reviews.filter(item => item.sentiment_analysis?.risk?.detected).length) || 0;
-  const negativeCount = Number(summary.sentiment_counts?.negative || reviews.filter(item => item.sentiment_analysis?.label === "negative").length) || 0;
-  const negativeRate = Number(summary.sentiment_ratios?.negative ?? (uniqueCount ? negativeCount / uniqueCount : 0));
-  const riskReviewRate = Number(summary.detected_risk_ratio ?? summary.keyword_failure_rate ?? (uniqueCount ? riskReviewCount / uniqueCount : 0));
-  const productRisk = score(product);
-  const probabilityMethods = new Set(["confidence_severity_frequency_bayesian", "calibrated_probability_expected_severity"]);
-  const probabilityScore = probabilityMethods.has(String(summary.risk_score_method || ""));
-  const rawRiskPoints = Number(summary.raw_risk_score ?? productRisk);
-  const evidenceConfidence = Number(summary.evidence_confidence ?? 1);
-  const negativePoints = probabilityScore ? rawRiskPoints * evidenceConfidence : Number(summary.negative_contribution_points ?? negativeRate * 30);
-  const riskPoints = probabilityScore ? productRisk - negativePoints : Number(summary.defect_contribution_points ?? riskReviewRate * 70);
-  const productReliability = reliability(product);
-  const productRiskLevel = riskLevel(product);
-  const riskClass = productRiskLevel.toLowerCase();
-  const mainIssue = analysisMainIssue(summary);
-  const image = safeImage(product);
-  const link = safeLink(product.link);
+  const flagged = reviews.filter(item => (item.sentiment_analysis?.review_tags || []).length);
+  const image = safeImage(product), link = safeLink(product.link), name = product.name || "Unnamed product";
   const customerRating = Math.max(0, Math.min(5, Number(product.rating || 0)));
-  const adjustedRating = Math.max(0, Math.min(5, Number(product.adjusted_rating ?? product.authenticity_adjusted_rating ?? product.rating ?? 0)));
   const sentiment = sentimentPercentages(product);
-  const positive = sentiment.find(item => item.label === "Positive") || {value: 0, percent: 0};
-  const uncertain = sentiment.find(item => item.label === "Uncertain") || {value: 0, percent: 0};
-  const negative = sentiment.find(item => item.label === "Negative") || {value: 0, percent: 0};
-  const saferRecommendations = recommendations.slice(0, 3);
-  const recommendationMarkup = saferRecommendations.length
-    ? `<div class="report-alternative-grid">${saferRecommendations.map(item => {
-        const itemLevel = riskLevel(item);
-        const itemImage = safeImage(item);
-        const itemSentiment = sentimentPercentages(item).find(entry => entry.label === "Positive")?.percent || Math.max(0, 100 - score(item));
-        const isSafer = score(item) < productRisk;
-        const statusIcon = isSafer ? "icon-14.svg" : "icon-13.svg";
-        const statusLabel = isSafer ? "Recommended" : "Consider";
-        return `<article class="report-alternative"><header><div class="report-alt-image">${itemImage ? `<img src="${esc(itemImage)}" width="64" height="64" alt="">` : '<span>No image</span>'}</div><div><h4>${esc(item.name || "Unnamed product")}</h4><div class="report-alt-rating">${starMarkup(item.rating)}<span>${Number(item.rating || 0).toFixed(1)}</span></div></div></header><dl><div><dt>Positive</dt><dd>${itemSentiment.toFixed(0)}%</dd></div><div><dt>Risk</dt><dd>${score(item).toFixed(0)}%</dd></div><div><dt>Reliability</dt><dd>${reliability(item).toFixed(0)}%</dd></div></dl><button class="recommendation-open report-alt-action" data-product-link="${esc(safeLink(item.link))}">${reportIcon(statusIcon, "", 14, 14)}${statusLabel}<span>View report →</span></button></article>`;
-      }).join("")}</div>`
-    : '<p class="report-empty-copy">No sufficiently similar product with a lower measured risk is available in the analyzed collection.</p>';
-  const defaultReviewFilter = negativeCount ? "negative" : "all";
-  const brand = product.brand || product.seller || "Not specified";
-  const category = product.category || "Not specified";
+  const share = label => sentiment.find(item => item.label === label) || {value: 0, percent: 0};
+  const positive = share("Positive"), uncertain = share("Uncertain"), negative = share("Negative");
   const date = reportDate(product);
-  const formattedDate = date?.label || "Unavailable";
-  const findings = [
-    {title: "Risk signals", value: uniqueCount ? `${riskReviewCount} of ${uniqueCount} reviews` : "No review sample", copy: uniqueCount ? "Contain recorded product-risk signals." : "There are no sampled reviews to assess."},
-    {title: "Most reported concern", value: mainIssue === "No dominant issue" ? "None recorded" : mainIssue, copy: mainIssue === "No dominant issue" ? "No leading concern is recorded in this sample." : "The most frequent issue in the analyzed sample."},
-    {title: "Negative experiences", value: uniqueCount ? `${negativeCount} of ${uniqueCount} reviews` : "Not available", copy: uniqueCount ? "Were classified as negative. Read the context below." : "Sentiment needs a usable review sample."},
-  ];
-  $("#analysis-content").innerHTML = `<section class="report-card report-overview">
-    <div class="report-overview-product"><div class="report-product-image">${image ? `<img src="${esc(image)}" width="112" height="112" alt="">` : '<span>Listing image unavailable</span>'}</div><div><p class="report-overview-meta"><span>${esc(platform(product))}</span><span>${esc(money(product.price))}</span></p><h1>${esc(product.name || "Unnamed product")}</h1><p class="report-sample-note">${uniqueCount.toLocaleString()} of ${availableCount.toLocaleString()} reviews analyzed (${coveragePercent.toFixed(1)}% coverage) <span aria-hidden="true">·</span> ${date ? `<time datetime="${esc(date.iso)}">${esc(date.label)}</time>` : "Analysis date unavailable"}</p></div></div>
-    <div class="report-verdict ${uniqueCount ? riskClass : "unknown"}"><span class="report-verdict-label">${uniqueCount ? productRiskLevel + " risk" : "Insufficient review data"}</span><strong>${uniqueCount ? (productRisk / 100).toFixed(2) : "—"}<small>${uniqueCount ? "/ 1.00" : ""}</small></strong><p>${uniqueCount ? `Lower is better.${riskInterval === "Unavailable" ? "" : ` 95% interval ${riskInterval}.`} Evidence: ${esc(evidenceStatus)}.` : "Analyze reviews before making a risk assessment."}</p></div>
-    <div class="report-overview-bottom"><p>Review signals are a guide, not proof of authenticity.</p><div><button type="button" data-report-jump="report-evidence">Read the evidence ↓</button><button type="button" data-report-jump="report-details">How is this calculated?</button></div></div>
-  </section>
-  <section class="report-findings" aria-labelledby="report-findings-title"><header><span class="report-eyebrow">AT A GLANCE</span><h2 id="report-findings-title">Three things to know</h2></header><div>${findings.map((finding, index) => `<article><span class="report-finding-index">0${index + 1}</span><h3>${esc(finding.title)}</h3><strong>${esc(finding.value)}</strong><p>${esc(finding.copy)}</p></article>`).join("")}</div></section>
-  <section id="report-evidence" class="report-card report-evidence-panel" tabindex="-1"><header class="report-section-head"><div><span class="report-eyebrow">Review evidence</span><h2>Top Negative Reviews</h2><p>Risk terms are highlighted only when the model recorded active evidence.</p></div><span id="review-result-count" class="report-result-count"></span></header><div class="report-tools"><div class="review-filter-chips" role="group" aria-label="Filter reviews"><button class="${defaultReviewFilter === "all" ? "active" : ""}" data-review-filter="all">All</button><button data-review-filter="risk">Risk evidence</button><button class="${defaultReviewFilter === "negative" ? "active" : ""}" data-review-filter="negative">Negative</button><button data-review-filter="uncertain">Uncertain</button><button data-review-filter="positive">Positive</button></div><div class="review-search-row"><label>Search reviews<input id="review-search" type="search" placeholder="Keyword or reviewer"></label><label>Rating<select id="review-rating"><option value="all">All ratings</option><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></label></div></div><div id="analysis-review-list" class="report-review-grid"></div><button id="show-more-reviews" class="report-show-more" type="button">${reportIcon("icon-05.svg", "", 16, 16)}View more reviews</button></section>
+  // Lazada scans read a set number of reviews per star level, so low-star reviews
+  // are over-represented in the raw counts. Shares are weighted back to the listing.
+  const weighted = Boolean(summary.sentiment_shares);
+  const reportCounts = counts(product);
+  const words = warningWords(reviews);
+  const saved = state.wishlist.includes(link);
+  const status = $("#report-status");
+  if (status) status.textContent = verdict.available ? `Analysis complete · ${uniqueCount.toLocaleString()} reviews processed` : "Not analyzed yet";
 
-  <details id="report-details" class="report-details"><summary><span><b>Score details &amp; methodology</b><small>Ratings, review breakdown, and how the score is calculated</small></span><span class="report-details-chevron" aria-hidden="true">＋</span></summary><div class="report-details-body">
-    <section class="report-card report-listing-details"><header><h2>Listing details</h2></header><dl class="report-product-meta"><div><dt>Brand</dt><dd>${esc(brand)}</dd></div><div><dt>Category</dt><dd>${esc(category)}</dd></div></dl><div class="report-ratings"><article><span>Customer rating</span><div>${starMarkup(customerRating)}<b>${customerRating ? customerRating.toFixed(1) : "—"}</b></div><small>From ${uniqueCount.toLocaleString()} sampled reviews</small></article><article><span>Adjusted rating</span><div>${starMarkup(adjustedRating)}<b>${adjustedRating ? adjustedRating.toFixed(1) : "—"}</b></div><small>After review-risk adjustment</small></article></div>${link ? `<a class="report-listing-link" target="_blank" rel="noreferrer" href="${esc(link)}">View original listing ↗</a>` : ""}</section>
-  <section class="report-card report-classification"><div><span class="report-eyebrow">Risk score</span><h2>${productRiskLevel} measured risk</h2><p>Defaketive measured a <b>${productRisk.toFixed(1)}% weighted risk score</b> across ${uniqueCount.toLocaleString()} unique reviews. ${mainIssue === "No dominant issue" ? "No dominant supporting risk term was recorded." : esc(mainIssue) + " is the most frequent supporting risk term."}</p><div class="report-key-stats"><span>${reportIcon("icon-09.svg", "", 14, 14)} ${riskReviewCount} reviews have detected product risk</span><span>${reportIcon("icon-11.svg", "", 14, 14)} ${duplicateCount} Duplicates excluded</span></div></div><div class="report-thresholds"><table><thead><tr><th>Score</th><th>Risk level</th><th>Guidance</th></tr></thead><tbody><tr class="${productRiskLevel === "Low" ? "active" : ""}"><td>0.00&ndash;0.30</td><td><span class="low">Low risk</span></td><td>Fewer measured risk signals</td></tr><tr class="${productRiskLevel === "Moderate" ? "active" : ""}"><td>0.31&ndash;0.60</td><td><span class="moderate">Moderate risk</span></td><td>Review with caution</td></tr><tr class="${productRiskLevel === "High" ? "active" : ""}"><td>0.61&ndash;1.00</td><td><span class="high">High risk</span></td><td>Consider alternatives</td></tr></tbody></table><div class="report-model-note"><b>How the score is calculated</b><span>Thirty percent comes from the negative-review ratio and seventy percent from the ratio of reviews with classifier-detected product risk. Each review counts at most once in the detected-risk ratio. Higher is better applies to the separate ${productReliability.toFixed(0)}% reliability score.</span></div></div></section>
-  <section class="report-card report-breakdown"><header><span class="report-eyebrow">Analysis breakdown</span><h2>Review Analysis Summary</h2><p>Signals from unique reviews after duplicate exclusion.</p></header><div class="report-breakdown-grid"><article><h3>Sentiment distribution</h3><div class="report-donut-row"><div class="report-donut" style="--positive-stop:${positive.percent}%;--neutral-stop:${positive.percent + uncertain.percent}%">${reportIcon("icon-04.svg", "", 120, 120, "report-donut-art")}<span><b>${uniqueCount}</b><small>reviews</small></span></div><div class="report-sentiment-legend">${sentiment.map(item => `<p class="${item.label.toLowerCase()}"><i></i><span>${item.label}</span><b>${item.percent.toFixed(0)}%</b><small>${item.value}</small></p>`).join("")}</div></div></article><article><h3>Risk score breakdown</h3><div class="report-score-lines"><p><span>Negative sentiment</span><b>${(negativeRate * 100).toFixed(1)}%</b><i><em style="width:${negativeRate * 100}%"></em></i><small>30% weight contributes ${negativePoints.toFixed(1)} points</small></p><p><span>Detected-risk ratio</span><b>${(riskReviewRate * 100).toFixed(1)}%</b><i><em style="width:${riskReviewRate * 100}%"></em></i><small>70% weight contributes ${riskPoints.toFixed(1)} points</small></p></div><footer><span>Final weighted risk</span><b>${productRisk.toFixed(1)}%</b></footer></article><article><h3>Detected keywords</h3><div class="report-keywords">${reportKeywords(reviews, summary)}</div><small class="report-card-note">Supporting lexicon evidence; classifier decisions may also use sentence-level patterns.</small></article><article><h3>Aspects analyzed</h3><div class="report-aspects"><p>${reportIcon("icon-09.svg", "", 14, 14)}<span><b>Durability</b><small>Breakage and wear</small></span></p><p>${reportIcon("icon-10.svg", "", 14, 14)}<span><b>Quality</b><small>Materials and finish</small></span></p><p>${reportIcon("icon-11.svg", "", 14, 14)}<span><b>Performance</b><small>Function and reliability</small></span></p><p>${reportIcon("icon-14.svg", "", 14, 14)}<span><b>Overall</b><small>Sentiment and value</small></span></p></div></article></div></section>
-  </div></details>
-  <section class="report-card report-alternatives"><header class="report-section-head"><div><span class="report-eyebrow">Safer choices</span><h2>Recommended Alternatives</h2><p>Similar analyzed products with a lower measured risk score.</p></div></header>${recommendationMarkup}</section><p class="analysis-disclaimer report-disclaimer">This report analyzes a sample of public reviews. It supports shopping decisions but does not prove that a listing or product is authentic or counterfeit.</p>`;
+  const guideRows = VERDICT_GUIDE.map(([stateName, rowTone, label, meaning]) => `<tr class="${verdict.state === stateName ? "current" : ""}"><td><span class="${rowTone}">${esc(label)}</span>${verdict.state === stateName ? '<em>This product</em>' : ""}</td><td>${esc(meaning)}</td></tr>`).join("");
+  const accuracyCopy = accuracy
+    ? `It is not perfect. When we tested it on ${Number(accuracy.sentences_checked).toLocaleString()} review sentences that two people had checked by hand, it caught ${accuracy.reports_caught} of ${accuracy.reports_confirmed} real safety reports, and ${accuracy.flags_raised - accuracy.flags_confirmed} of the ${accuracy.flags_raised} sentences it flagged turned out to be harmless. A flagged review is a reason to read, not proof of danger, and no flags is not proof of safety.`
+    : "A flagged review is a reason to read, not proof of danger, and no flags is not proof of safety.";
+  const meta = [
+    ["Platform", platform(product)], ["Category", product.category || "Not specified"], ["Price", money(product.price)],
+    ["Positive reviews", weighted ? `${positive.percent.toFixed(0)}% (weighted)` : `${positive.value} / ${uniqueCount}`], ["Negative reviews", weighted ? `${negative.percent.toFixed(0)}% (weighted)` : `${negative.value} / ${uniqueCount}`], ["Analysis date", date?.label || "Unavailable"],
+  ].map(([term, value]) => `<div><dt>${term}</dt><dd>${esc(value)}</dd></div>`).join("");
 
-  document.querySelectorAll("[data-report-jump]").forEach(button => button.addEventListener("click", () => {
-    const section = document.getElementById(button.dataset.reportJump);
-    if (!section) return;
-    if (section.tagName === "DETAILS") section.open = true;
-    section.scrollIntoView({behavior: "smooth", block: "start"});
-    (section.querySelector("summary") || section).focus({preventScroll: true});
-  }));
-  const dateNode = $("#report-analysis-date");
-  if (dateNode) dateNode.textContent = `Analysis date: ${formattedDate}`;
-  document.querySelectorAll(".recommendation-open").forEach(button => button.addEventListener("click", () => openProduct(button.dataset.productLink)));
+  const checks = (verdict.badges || []).map(badge => {
+    const quote = (badge.evidence || [])[0];
+    const notes = quote ? [quote.hazard ? `Reports ${esc(quote.hazard)}` : "", quote.rating ? `${Number(quote.rating).toFixed(0)}-star review` : ""].filter(Boolean).join(" · ") : "";
+    const width = uniqueCount ? Math.min(100, Math.max(badge.mentions ? 3 : 0, badge.mentions / uniqueCount * 100)) : 0;
+    return `<div class="rep-check ${esc(badge.category)}"><p><span>${esc(CHECK_LABELS[badge.category] || badge.label)}</span><b>${badge.mentions} review${badge.mentions === 1 ? "" : "s"}</b></p><div class="rep-bar" role="img" aria-label="${badge.mentions} of ${uniqueCount} reviews"><i style="width:${width}%"></i></div><p class="rep-check-note">${esc(badge.summary)}</p>${quote ? `<blockquote>${highlightSpans(quote.text, quote.highlights)}${notes ? `<small>${notes}</small>` : ""}</blockquote><button type="button" class="rep-link" data-review-tag="${esc(badge.category)}">Read all ${badge.mentions} →</button>` : ""}</div>`;
+  }).join("") || '<p class="rep-empty">This product has not been checked with the current review model.</p>';
 
-  let activeFilter = defaultReviewFilter;
-  let visibleLimit = 3;
+  const topWords = words.slice(0, 6), maxWord = topWords[0]?.count || 1;
+  const wordRows = topWords.length
+    ? topWords.map(item => `<div class="rep-word"><button type="button" class="${esc(item.category)}" data-review-word="${esc(item.word)}" title="Show reviews that mention this">${esc(item.word)}</button><div class="rep-bar"><i style="width:${item.count / maxWord * 100}%"></i></div><b>${item.count}×</b></div>`).join("")
+    : '<p class="rep-empty">The check matched no warning words in these reviews.</p>';
+
+  const lookFor = [
+    [reportCounts.safety, "Safety", "Fire, smoke, shocks, overheating", "safety"],
+    [reportCounts.counterfeit, "Genuine product", "Fakes, replicas, “not original”", "counterfeit"],
+    [reportCounts.defect, "Works as expected", "Broken, dead or faulty", "defect"],
+  ].map(([count, title, text, kind]) => `<div class="rep-tile"><p><b>${count}</b><small> review${count === 1 ? "" : "s"}</small></p><h3>${title}</h3><p class="rep-tile-note"><i class="rep-dot ${count ? kind : "none"}"></i>${text}</p></div>`).join("")
+    + `<div class="rep-tile"><p><b>${positive.percent.toFixed(0)}%</b><small> positive</small></p><h3>Sentiment</h3><p class="rep-tile-note"><i class="rep-dot none"></i>Context only. It does not change the verdict.</p></div>`;
+
+  const alternatives = recommendations.slice(0, 3);
+  const alternativeCards = alternatives.length
+    ? `<div class="rep-alts">${alternatives.map(item => {
+        const itemImage = safeImage(item), itemLink = safeLink(item.link), itemCounts = counts(item);
+        const itemPositive = sentimentPercentages(item).find(entry => entry.label === "Positive")?.percent || 0;
+        return `<article class="rep-alt"><header><div class="rep-alt-image">${itemImage ? `<img src="${esc(itemImage)}" width="64" height="64" alt="" loading="lazy">` : "<span>No photo</span>"}</div><h3>${esc(item.name || "Unnamed product")}</h3></header><b class="rep-alt-price">${esc(money(item.price))}</b><dl><div><dt>Positive</dt><dd>${itemPositive.toFixed(0)}%</dd></div><div><dt>Safety reports</dt><dd>${itemCounts.safety}</dd></div><div><dt>Fake / defect</dt><dd>${itemCounts.counterfeit + itemCounts.defect}</dd></div></dl><footer><span class="rep-pill clear">✓ No warning signs</span><span><button type="button" class="rep-link recommendation-open" data-product-link="${esc(itemLink)}">Open report →</button>${itemLink ? `<a class="rep-link" target="_blank" rel="noreferrer" href="${esc(itemLink)}">Go to product <img class="app-ink-icon" src="/static/assets/app/external.svg" width="10" height="10" alt=""></a>` : ""}</span></footer></article>`;
+      }).join("")}</div>`
+    : '<p class="rep-empty">No similar product with enough reviews and no warning signs is in the analyzed collection yet.</p>';
+
+  const filterCounts = {all: reviews.length, reported: flagged.length, negative: 0, uncertain: 0, positive: 0};
+  reviews.forEach(review => { const label = sentimentLabel(review); if (label in filterCounts) filterCounts[label] += 1; });
+  const defaultReviewFilter = flagged.length ? "reported" : "all";
+
+  $("#analysis-content").innerHTML = `<section class="rep-card rep-product">
+      <div class="rep-product-image">${image ? `<img src="${esc(image)}" width="168" height="168" alt="">` : "<span>Listing image unavailable</span>"}</div>
+      <div class="rep-product-main">
+        <div class="rep-product-head"><p class="rep-eyebrow tone-green">Analyzed product</p><div class="rep-actions"><button type="button" id="report-save" class="rep-outline" data-report-save aria-pressed="${saved}">${saved ? "♥ Saved" : "♡ Save"}</button>${link ? `<a class="rep-outline" target="_blank" rel="noreferrer" href="${esc(link)}">Go to product <img class="app-ink-icon" src="/static/assets/app/external.svg" width="11" height="11" alt=""></a>` : ""}</div></div>
+        <h1 tabindex="-1">${esc(name)}</h1>
+        <div class="rep-rating">${smallStars(customerRating)}<span>${customerRating ? `${customerRating.toFixed(1)} out of 5 · ` : ""}${uniqueCount.toLocaleString()} reviews analyzed</span></div>
+        <dl class="rep-meta">${meta}</dl>
+        <p class="rep-sample">${esc(sampleNote)}</p>
+        <div class="rep-verdict"><span class="rep-pill ${chip.kind}">${esc(chip.label)}</span><strong>${esc(verdict.headline)}</strong><span class="rep-verdict-label">What reviewers report</span></div>
+        <p class="rep-verdict-detail">${esc(verdict.detail)} Review signals are a guide, not proof.</p>
+      </div>
+    </section>
+    <section class="rep-card rep-verdicts">
+      <header class="rep-head"><div><p class="rep-eyebrow">Verdicts</p><h2>How DeFaketive Labels a Product</h2><p class="rep-sub">Each product gets a plain verdict from what its reviewers reported. There is no score.</p></div><button type="button" class="rep-outline rep-toggle" data-rep-toggle="report-verdict-detail" aria-expanded="false"><span>View full detail</span><img class="app-ink-icon" src="/static/assets/app/chevron.svg" width="11" height="11" alt=""></button></header>
+      <div class="rep-scale" aria-hidden="true"><i class="clear"></i><i class="caution"></i><i class="safety"></i></div>
+      <div class="rep-scale-labels" aria-hidden="true"><span class="clear">No warnings</span><span class="caution">Caution</span><span class="safety">Safety reports</span></div>
+      <div class="rep-groups">${VERDICT_GROUPS.map(([kind, label, meaning]) => `<div class="rep-group ${kind}${chip.kind === kind ? " current" : ""}"><p><i class="rep-dot ${kind}"></i><b>${label}</b>${chip.kind === kind ? "<em>This product</em>" : ""}</p><p>${meaning}</p></div>`).join("")}</div>
+      <div id="report-verdict-detail" class="rep-table" hidden><table><thead><tr><th>Verdict</th><th>What it means</th></tr></thead><tbody>${guideRows}</tbody></table><p>This product: <b>${esc(verdict.headline)}</b>. ${esc(verdict.detail)}</p></div>
+    </section>
+    <details id="report-details" class="rep-card rep-how"><summary><span><span class="rep-eyebrow">How the check works</span><b>Why you see reviews, not a score</b></span><img class="app-ink-icon" src="/static/assets/app/chevron.svg" width="14" height="14" alt=""></summary>
+      <p>DeFaketive reads every review sentence and looks for the words people use when a product catches fire, smokes, gives a shock, turns out to be fake, or breaks, in English, Tagalog and Taglish. It shows you the sentences it found instead of a single score, because a score hides what reviewers actually said.</p>
+      <p>${esc(accuracyCopy)}</p>
+      <p class="rep-how-stats"><span>${flagged.length} of ${uniqueCount} reviews flagged</span><span>${duplicateCount} duplicates excluded</span></p>
+    </details>
+    <div class="rep-divider"><span>Our analysis</span><i></i><button type="button" class="rep-outline rep-toggle" data-rep-toggle="report-summary" aria-expanded="false"><span>View full detail</span><img class="app-ink-icon" src="/static/assets/app/chevron.svg" width="11" height="11" alt=""></button></div>
+    <section id="report-summary" class="rep-summary" hidden>
+      <div><p class="rep-eyebrow">Analysis summary</p><h2>${esc(summaryHeadline(positive.percent, negative.percent, reportCounts))}</h2><p>DeFaketive read ${uniqueCount.toLocaleString()} unique reviews (${duplicateCount} duplicates excluded): ${weighted ? `about ${positive.percent.toFixed(0)}% positive, ${uncertain.percent.toFixed(0)}% uncertain and ${negative.percent.toFixed(0)}% negative once weighted to the listing's star mix` : `${positive.value} positive, ${uncertain.value} uncertain and ${negative.value} negative`}. The check flagged ${flagged.length} review${flagged.length === 1 ? "" : "s"}${topWords.length ? `, led by ${topWords.slice(0, 2).map(item => `“${esc(item.word)}”`).join(" and ")}` : ""}.</p></div>
+      <dl><div><dt>Positive</dt><dd>${positive.percent.toFixed(1)}%</dd></div><div><dt>Negative</dt><dd>${negative.percent.toFixed(1)}%</dd></div><div><dt>Flagged reviews</dt><dd>${flagged.length}</dd></div><div><dt>Duplicates excluded</dt><dd>${duplicateCount}</dd></div></dl>
+    </section>
+    <div class="rep-grid">
+      <section class="rep-card"><p class="rep-eyebrow tone-green">Sentiment distribution</p><h2>Review Sentiment</h2><p class="rep-sub">${weighted ? "Shares are weighted to the listing's star mix, because low-star reviews were read on purpose." : "How the reviews lean. Shown for context; it does not change the verdict."}</p>
+        <div class="rep-sentiment"><div class="rep-donut" style="--positive:${positive.percent}%;--uncertain:${positive.percent + uncertain.percent}%" role="img" aria-label="${positive.percent.toFixed(0)}% positive, ${uncertain.percent.toFixed(0)}% uncertain, ${negative.percent.toFixed(0)}% negative"><span><b>${uniqueCount}</b><small>reviews</small></span></div>
+          <ul>${[["positive", "Positive reviews", positive], ["uncertain", "Uncertain reviews", uncertain], ["negative", "Negative reviews", negative]].map(([kind, label, item]) => `<li><i class="rep-dot ${kind}"></i><span>${label}<small>${weighted ? `${item.value} of ${uniqueCount} read` : `${item.percent.toFixed(0)}% of reviews`}</small></span><b>${weighted ? item.percent.toFixed(0) + "%" : item.value}</b></li>`).join("")}</ul></div>
+      </section>
+      <section id="report-findings" class="rep-card" tabindex="-1"><p class="rep-eyebrow tone-green">What reviewers reported</p><h2>Three checks, in their own words</h2><p class="rep-sub">The sentences the check flagged, with the words it matched highlighted.</p><div class="rep-checks">${checks}</div></section>
+      <section class="rep-card"><p class="rep-eyebrow tone-red">Warning words</p><h2>Warning words found</h2><p class="rep-sub">Words the check matched in these reviews. Pick one to see its reviews.</p><div class="rep-words">${wordRows}</div></section>
+      <section class="rep-card"><p class="rep-eyebrow tone-green">What we check</p><h2>What the check looks for</h2><p class="rep-sub">How many reviews mentioned each kind of problem.</p><div class="rep-tiles">${lookFor}</div></section>
+    </div>
+    <section id="report-evidence" class="rep-card rep-evidence" tabindex="-1">
+      <header class="rep-head"><div><p class="rep-eyebrow">Review evidence</p><p id="review-result-count" class="rep-sub" aria-live="polite"></p></div><label class="rep-search"><img src="/static/assets/app/search.svg" width="12" height="12" alt=""><span class="sr-only">Filter reviews by word</span><input id="review-search" type="search" placeholder="Filter by word..." autocomplete="off"></label></header>
+      <div class="rep-filters"><div role="group" aria-label="Filter reviews"><button type="button" data-review-filter="all">All · ${filterCounts.all}</button><button type="button" data-review-filter="reported">Flagged · ${filterCounts.reported}</button><button type="button" data-review-filter="negative">Negative · ${filterCounts.negative}</button><button type="button" data-review-filter="uncertain">Uncertain · ${filterCounts.uncertain}</button><button type="button" data-review-filter="positive">Positive · ${filterCounts.positive}</button></div>${topWords.length ? `<i aria-hidden="true"></i><div role="group" aria-label="Filter by warning word">${topWords.slice(0, 5).map(item => `<button type="button" class="word" data-review-word="${esc(item.word)}">${esc(item.word)}</button>`).join("")}</div>` : ""}</div>
+      <div id="analysis-review-list" class="rep-reviews"></div>
+      <button id="show-more-reviews" class="rep-more" type="button"></button>
+    </section>
+    <section class="rep-card"><p class="rep-eyebrow tone-green">Other options</p><p class="rep-sub lead">Similar products with no warning signs: enough reviews, and not a single safety report.</p>${alternativeCards}</section>
+    <p class="rep-disclaimer">This report analyzes a sample of public reviews. It supports shopping decisions but does not prove that a listing or product is authentic or counterfeit.</p>
+    <button type="button" class="rep-back-top" data-back-top>Back to top</button>`;
+
+  let activeFilter = defaultReviewFilter, activeTag = "", activeWord = "", visibleLimit = 6;
+  const content = $("#analysis-content");
   const drawReviews = () => {
     const query = $("#review-search").value.trim().toLowerCase();
-    const rating = $("#review-rating").value;
     const filtered = reviews.filter(review => {
-      const analysis = review.sentiment_analysis || {};
-      const label = String(analysis.label || "unanalyzed").toLowerCase();
-      const matchesType = activeFilter === "all" || (activeFilter === "risk" ? Boolean(analysis.risk?.detected) : label === activeFilter);
-      const matchesRating = rating === "all" || Number(review.rating || 0) === Number(rating);
-      const searchable = `${review.author || ""} ${review.content || ""} ${review.variation || ""}`.toLowerCase();
-      return matchesType && matchesRating && (!query || searchable.includes(query));
+      const tags = review.sentiment_analysis?.review_tags || [];
+      const matchesType = activeFilter === "all" || (activeFilter === "reported" ? Boolean(tags.length) : sentimentLabel(review) === activeFilter);
+      const matchesTag = !activeTag || tags.includes(activeTag);
+      const matchesWord = !activeWord || matchedWords(review).has(activeWord);
+      return matchesType && matchesTag && matchesWord && (!query || String(review.content || "").toLowerCase().includes(query));
     });
     const visible = filtered.slice(0, visibleLimit);
-    $("#review-result-count").textContent = `${filtered.length} review${filtered.length === 1 ? "" : "s"}`;
-    $("#analysis-review-list").innerHTML = visible.length ? visible.map(reviewCard).join("") : '<p class="report-empty-copy">No reviews match these filters.</p>';
+    const narrowed = [activeTag ? REVIEW_TAG_LABELS[activeTag].toLowerCase() + "s" : "", activeWord ? `“${activeWord}”` : ""].filter(Boolean).join(", ");
+    $("#review-result-count").textContent = `Showing ${visible.length} of ${filtered.length} matching review${filtered.length === 1 ? "" : "s"}${narrowed ? ` for ${narrowed}` : ""}.`;
+    $("#analysis-review-list").innerHTML = visible.length ? visible.map(reviewCard).join("") : '<p class="rep-empty">No reviews match these filters.</p>';
     const showMore = $("#show-more-reviews");
     showMore.hidden = visible.length >= filtered.length;
-    showMore.innerHTML = `${reportIcon("icon-05.svg", "", 16, 16)}View more reviews (${filtered.length - visible.length})`;
+    showMore.textContent = `View ${Math.min(6, filtered.length - visible.length)} more reviews`;
+    document.querySelectorAll("[data-review-filter]").forEach(item => item.classList.toggle("active", item.dataset.reviewFilter === activeFilter));
+    document.querySelectorAll("[data-review-word]").forEach(item => { const on = item.dataset.reviewWord === activeWord; item.classList.toggle("active", on); item.setAttribute("aria-pressed", String(on)); });
   };
-  document.querySelectorAll("[data-review-filter]").forEach(button => button.addEventListener("click", () => {
-    activeFilter = button.dataset.reviewFilter;
-    visibleLimit = 3;
-    document.querySelectorAll("[data-review-filter]").forEach(item => item.classList.toggle("active", item === button));
-    drawReviews();
-  }));
-  $("#review-search").addEventListener("input", () => { visibleLimit = 3; drawReviews(); });
-  $("#review-rating").addEventListener("change", () => { visibleLimit = 3; drawReviews(); });
-  $("#show-more-reviews").addEventListener("click", () => { visibleLimit += 6; drawReviews(); });
+  const showEvidence = () => { const panel = $("#report-evidence"); panel?.scrollIntoView({behavior: "smooth", block: "start"}); panel?.focus({preventScroll: true}); };
+  // One listener for the whole report: it is re-rendered for every product.
+  content.onclick = event => {
+    const pick = selector => event.target.closest(selector);
+    const filter = pick("[data-review-filter]"), word = pick("[data-review-word]"), tag = pick("[data-review-tag]"), toggle = pick("[data-rep-toggle]"), open = pick(".recommendation-open");
+    if (filter) {
+      activeFilter = filter.dataset.reviewFilter;
+      activeTag = "";
+      // "All" clears every narrowing, including a picked word and the search box.
+      if (activeFilter === "all") { activeWord = ""; $("#review-search").value = ""; }
+      visibleLimit = 6;
+      drawReviews();
+    }
+    else if (word) { activeWord = activeWord === word.dataset.reviewWord ? "" : word.dataset.reviewWord; activeFilter = "all"; activeTag = ""; visibleLimit = 6; drawReviews(); if (!word.closest("#report-evidence")) showEvidence(); }
+    else if (tag) { activeTag = tag.dataset.reviewTag; activeFilter = "reported"; activeWord = ""; visibleLimit = 6; drawReviews(); showEvidence(); }
+    else if (toggle) {
+      const target = document.getElementById(toggle.dataset.repToggle), show = target.hidden;
+      target.hidden = !show;
+      toggle.setAttribute("aria-expanded", String(show));
+      toggle.querySelector("span").textContent = show ? "Hide full detail" : "View full detail";
+    }
+    else if (pick("#show-more-reviews")) { visibleLimit += 6; drawReviews(); }
+    else if (pick("[data-report-save]")) toggleWishlist(state.currentProduct?.link);
+    else if (open) openProduct(open.dataset.productLink);
+    else if (pick("[data-back-top]")) window.scrollTo({top: 0, behavior: "smooth"});
+  };
+  $("#review-search").addEventListener("input", () => { visibleLimit = 6; drawReviews(); });
   drawReviews();
+  updateLimitNotice();
+}
+function syncReportSave() {
+  const button = $("#report-save");
+  if (!button) return;
+  const saved = state.wishlist.includes(safeLink(state.currentProduct?.link));
+  button.setAttribute("aria-pressed", String(saved));
+  button.textContent = saved ? "♥ Saved" : "♡ Save";
+}
+// A guest who is out of free scans sees this over the campus photo on a report.
+function updateLimitNotice() {
+  const notice = $("#guest-limit-notice");
+  if (!notice) return;
+  let dismissed = false;
+  try { dismissed = sessionStorage.getItem("defaketive-limit-dismissed") === "1"; } catch (_) {}
+  const show = !state.user && Number(state.guest?.left) === 0 && currentView() === "analysis" && !dismissed;
+  notice.hidden = !show;
+  document.body.classList.toggle("has-limit-notice", show);
 }
 
 async function search(event) {
@@ -664,6 +993,7 @@ async function search(event) {
         review_count: $("#review-count").value,
       }),
     });
+    if (data.guest) applyAuth({user: null, guest: data.guest});
     if (data.job) {
       jobStarted = true;
       state.activeJobId = data.job.id;
@@ -679,7 +1009,12 @@ async function search(event) {
       else go("results");
     }
   } catch (error) {
-    showSearchFeedback(error.message);
+    if (error.body?.limit_reached) {
+      applyAuth({user: null, guest: error.body.guest});
+      showSearchFeedback(error.message, "Out of free scans for today", "warning");
+      // After signing in, come back to Analyze with the same link still filled in.
+      showLoginPage(error.message, "analyze");
+    } else showSearchFeedback(error.message);
   } finally {
     if (!jobStarted) setSearchBusy(false);
   }
@@ -729,8 +1064,7 @@ async function pollJob(id, initialJob = {}) {
         finishJob();
         persistHomeScan(job);
         showSearchFeedback(job.message || "The marketplace couldn't complete this scan.", "Live scan stopped");
-        $("#active-scan-link").hidden = false;
-        $("#active-scan-link").textContent = "Scan needs attention →";
+        updateBell();
         return;
       }
       persistHomeScan(job);
@@ -739,8 +1073,7 @@ async function pollJob(id, initialJob = {}) {
       if (state.pollToken !== pollToken) return;
       persistHomeScan({...state.homeScan, state: "attention", message: error.message});
       showSearchFeedback(error.message, "Could not read scan progress");
-      $("#active-scan-link").hidden = false;
-      $("#active-scan-link").textContent = "Check scan progress →";
+      updateBell();
     }
   }
   return tick();
@@ -764,20 +1097,36 @@ function setup() {
     const scan = JSON.parse(sessionStorage.getItem("defaketive-home-scan") || "null");
     if (scan && typeof scan === "object" && ["running", "complete", "error", "attention"].includes(scan.state)) state.homeScan = scan;
   } catch (_) {}
-  $("#home-continue").addEventListener("click", () => openProduct($("#home-continue").dataset.productLink));
   $("#home-scan-action").addEventListener("click", openHomeScan);
-  $("#home-recent-search").addEventListener("input", renderWorkspace);
-  $("#home-clear-search").addEventListener("click", () => {
-    $("#home-recent-search").value = "";
-    renderWorkspace();
-    $("#home-recent-search").focus();
-  });
   $("#history-search").addEventListener("input", renderWorkspace);
   $("#history-risk").addEventListener("change", renderWorkspace);
-  $("#report-back").addEventListener("click", () => go(state.reportFrom));
-  $("#report-save").addEventListener("click", () => toggleWishlist(state.currentProduct?.link));
-  $("#active-scan-link").addEventListener("click", () => { if (state.homeScan?.state === "attention") openHomeScan(); else go("analyze"); });
-  $(".workspace-backdrop").addEventListener("click", closeWorkspaceNavigation);
+  $("#report-back").addEventListener("click", () => { go("analyze"); focusProductSearch(); });
+  document.querySelectorAll("[data-limit-dismiss]").forEach(button => button.addEventListener("click", () => {
+    try { sessionStorage.setItem("defaketive-limit-dismissed", "1"); } catch (_) {}
+    updateLimitNotice();
+  }));
+  $("#active-scan-link").addEventListener("click", () => {
+    if (state.homeScan) openHomeScan();
+    else if (state.searchBusy) go("analyze");
+    else toast("No scans running.");
+  });
+  // Home's cards are re-rendered often, so their clicks are handled here once.
+  $("#home").addEventListener("click", event => {
+    const save = event.target.closest("[data-save-link]"), risk = event.target.closest("[data-show-risk]"), next = event.target.closest("[data-row-next]");
+    const open = event.target.closest("[data-product-link]") || event.target.closest(".app-product")?.querySelector("[data-product-link]");
+    if (save) toggleWishlist(save.dataset.saveLink);
+    else if (risk) showHistoryFilter(risk.dataset.showRisk);
+    else if (next) { const track = next.parentElement.querySelector(".app-row-track"); track.scrollBy({left: track.clientWidth * .8, behavior: "smooth"}); }
+    else if (open) openProduct(open.dataset.productLink);
+  });
+  document.querySelectorAll(".app-row-track").forEach(track => track.addEventListener("scroll", () => updateRowArrow(track), {passive: true}));
+  const accountToggle = $("[data-account-toggle]");
+  if (accountToggle) accountToggle.addEventListener("click", () => {
+    const menu = $("#account-menu"), open = menu.hidden;
+    menu.hidden = !open;
+    accountToggle.setAttribute("aria-expanded", String(open));
+    if (open) menu.querySelector("a, button")?.focus();
+  });
   window.addEventListener("hashchange", routeFromHash);
 
   document.querySelectorAll("[data-route]").forEach(link => link.addEventListener("click", event => {
@@ -786,35 +1135,20 @@ function setup() {
     if (link.hasAttribute("data-focus-search")) focusProductSearch();
   }));
   document.querySelectorAll("[data-signin]").forEach(button => button.addEventListener("click", openSignedInPage));
-
-  const activateExploreTab = name => {
-    document.querySelectorAll("[data-explore-tab]").forEach(button => {
-      const active = button.dataset.exploreTab === name;
-      button.classList.toggle("active", active);
-      button.setAttribute("aria-selected", String(active));
-    });
-    document.querySelectorAll("[data-explore-panel]").forEach(panel => {
-      const active = panel.dataset.explorePanel === name;
-      panel.hidden = !active;
-      panel.classList.toggle("active", active);
-    });
-  };
-  document.querySelectorAll("[data-explore-tab]").forEach(button => {
-    button.addEventListener("click", () => activateExploreTab(button.dataset.exploreTab));
-    button.addEventListener("keydown", event => {
-      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
-      const tabs = [...document.querySelectorAll("[data-explore-tab]")];
-      const step = event.key === "ArrowRight" ? 1 : -1;
-      const next = tabs[(tabs.indexOf(button) + step + tabs.length) % tabs.length];
-      activateExploreTab(next.dataset.exploreTab);
-      next.focus();
-    });
-  });
-  document.querySelectorAll("[data-explore-link]").forEach(link => link.addEventListener("click", event => {
-    event.preventDefault();
-    go("landing");
-    activateExploreTab(link.dataset.exploreLink);
-    requestAnimationFrame(() => $("#how")?.scrollIntoView({behavior: "smooth"}));
+  document.querySelectorAll("[data-auth-open]").forEach(button => button.addEventListener("click", () => openAuth(button.dataset.authOpen)));
+  document.querySelectorAll("[data-terms-open]").forEach(button => button.addEventListener("click", () => openTerms(button.dataset.termsOpen)));
+  document.querySelectorAll("[data-auth-form]").forEach(form => form.addEventListener("submit", submitAuth));
+  document.querySelectorAll("[data-continue-guest]").forEach(button => button.addEventListener("click", continueAsGuest));
+  document.querySelectorAll("[data-signout]").forEach(button => button.addEventListener("click", signOut));
+  document.querySelectorAll("[data-dialog-close]").forEach(button => button.addEventListener("click", () => button.closest("dialog")?.close()));
+  // A click on the dimmed backdrop lands on the <dialog> itself, not its card.
+  document.querySelectorAll("dialog.auth-dialog").forEach(dialog => dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); }));
+  document.querySelectorAll("[data-toggle-password]").forEach(button => button.addEventListener("click", () => {
+    const input = button.parentElement.querySelector("input");
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    button.setAttribute("aria-pressed", String(show));
+    button.setAttribute("aria-label", show ? "Hide password" : "Show password");
   }));
 
   const searchForm = $("#search-form");
@@ -850,12 +1184,13 @@ function setup() {
     if (event.key === "Escape") {
       if ($("#main-nav")?.classList.contains("open")) navToggle?.focus();
       closeMainNavigation();
-      closeWorkspaceNavigation();
+      closeAccountMenu();
     }
   });
   document.addEventListener("click", event => {
-    const header = $(".site-header");
+    const header = $(".pub-header");
     if (header && !header.contains(event.target)) closeMainNavigation();
+    if (!event.target.closest?.(".app-account")) closeAccountMenu();
   });
   window.addEventListener("scroll", updateHeaderState, {passive: true});
   const desktopNavigation = window.matchMedia?.("(min-width: 761px)");
@@ -891,13 +1226,6 @@ function setup() {
     requestAnimationFrame(() => $(`#${link.dataset.landingScroll}`)?.scrollIntoView({behavior: "smooth"}));
   }));
 
-  const workspaceMenu = $(".workspace-mobile-menu");
-  workspaceMenu.addEventListener("click", () => {
-    const open = $("#workspace-shell").classList.toggle("sidebar-open");
-    workspaceMenu.setAttribute("aria-expanded", String(open));
-    $(".workspace-backdrop").hidden = !open;
-  });
-
   const themeToggles = [$("#theme-toggle"), $("#workspace-theme-toggle")].filter(Boolean);
   const syncTheme = theme => {
     document.documentElement.dataset.theme = theme;
@@ -925,10 +1253,17 @@ function setup() {
 }
 document.addEventListener("DOMContentLoaded", async () => {
   setup();
+  applyAuth(null);
+  refreshAuth();
   // Render routes immediately, so a slow catalog request never strands navigation on the landing page.
   const routeReady = routeFromHash();
   try { await loadProducts(); }
-  catch (error) { state.catalogError = true; state.catalogLoading = false; renderWorkspace(); toast("Saved results could not be loaded. You can still start a new analysis.", "error"); }
+  catch (error) {
+    // A missing model is not a transient loading problem: say so, and why.
+    state.modelUnavailable = error.body?.model_unavailable ? `${error.message} ${error.body.detail || ""}`.trim() : "";
+    state.catalogError = true; state.catalogLoading = false; renderWorkspace();
+    toast(state.modelUnavailable ? error.message : "Saved results could not be loaded. You can still start a new analysis.", "error");
+  }
   await routeReady;
   try {
     const job = JSON.parse(sessionStorage.getItem("defaketive-active-job") || "null");

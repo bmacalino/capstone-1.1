@@ -1,0 +1,209 @@
+{
+  "generated_at": "2026-10-03T02:41:03+00:00",
+  "preregistration": "research/PREREGISTRATION_hazard_v4.md",
+  "data": {
+    "sentences": 900,
+    "annotators_per_sentence": {
+      "2": 300,
+      "1": 600
+    },
+    "worksheets": [
+      "worksheet_A1_done.csv",
+      "worksheet_A2_done.xlsx"
+    ]
+  },
+  "cross_validation": {
+    "folds": 5,
+    "grouped_by": "review_id",
+    "seed": 42
+  },
+  "selection": {
+    "safety": {
+      "rows": 873,
+      "positives": 30,
+      "reviews": 535,
+      "keywords_in_sample": {
+        "tp": 24,
+        "fp": 21,
+        "fn": 6,
+        "precision": 0.5333,
+        "recall": 0.8,
+        "f1": 0.64
+      },
+      "candidates": {
+        "T": {
+          "threshold": 0.133392,
+          "tp": 24,
+          "fp": 303,
+          "fn": 6,
+          "precision": 0.0734,
+          "recall": 0.8,
+          "f1": 0.1345
+        },
+        "TK": {
+          "threshold": 0.818933,
+          "tp": 24,
+          "fp": 21,
+          "fn": 6,
+          "precision": 0.5333,
+          "recall": 0.8,
+          "f1": 0.64
+        },
+        "E": {
+          "threshold": 0.003646,
+          "tp": 24,
+          "fp": 207,
+          "fn": 6,
+          "precision": 0.1039,
+          "recall": 0.8,
+          "f1": 0.1839
+        },
+        "EK": {
+          "threshold": 0.186438,
+          "tp": 24,
+          "fp": 20,
+          "fn": 6,
+          "precision": 0.5455,
+          "recall": 0.8,
+          "f1": 0.6486
+        }
+      },
+      "chosen": "TK"
+    },
+    "defect": {
+      "rows": 824,
+      "positives": 191,
+      "reviews": 527,
+      "keywords_in_sample": {
+        "tp": 98,
+        "fp": 10,
+        "fn": 93,
+        "precision": 0.9074,
+        "recall": 0.5131,
+        "f1": 0.6555
+      },
+      "candidates": {
+        "T": {
+          "threshold": 0.478671,
+          "tp": 129,
+          "fp": 74,
+          "fn": 62,
+          "precision": 0.6355,
+          "recall": 0.6754,
+          "f1": 0.6548
+        },
+        "TK": {
+          "threshold": 0.556102,
+          "tp": 109,
+          "fp": 25,
+          "fn": 82,
+          "precision": 0.8134,
+          "recall": 0.5707,
+          "f1": 0.6708
+        },
+        "E": {
+          "threshold": 0.480603,
+          "tp": 113,
+          "fp": 97,
+          "fn": 78,
+          "precision": 0.5381,
+          "recall": 0.5916,
+          "f1": 0.5636
+        },
+        "EK": {
+          "threshold": 0.150335,
+          "tp": 140,
+          "fp": 127,
+          "fn": 51,
+          "precision": 0.5243,
+          "recall": 0.733,
+          "f1": 0.6114
+        }
+      },
+      "chosen": "TK"
+    },
+    "counterfeit": {
+      "rows": 857,
+      "positives": 81,
+      "reviews": 530,
+      "keywords_in_sample": {
+        "tp": 55,
+        "fp": 7,
+        "fn": 26,
+        "precision": 0.8871,
+        "recall": 0.679,
+        "f1": 0.7692
+      },
+      "candidates": {
+        "T": {
+          "threshold": 0.477002,
+          "tp": 48,
+          "fp": 20,
+          "fn": 33,
+          "precision": 0.7059,
+          "recall": 0.5926,
+          "f1": 0.6443
+        },
+        "TK": {
+          "threshold": 0.472058,
+          "tp": 55,
+          "fp": 7,
+          "fn": 26,
+          "precision": 0.8871,
+          "recall": 0.679,
+          "f1": 0.7692
+        },
+        "E": {
+          "threshold": 0.465705,
+          "tp": 35,
+          "fp": 59,
+          "fn": 46,
+          "precision": 0.3723,
+          "recall": 0.4321,
+          "f1": 0.4
+        },
+        "EK": {
+          "threshold": 0.596521,
+          "tp": 52,
+          "fp": 25,
+          "fn": 29,
+          "precision": 0.6753,
+          "recall": 0.642,
+          "f1": 0.6582
+        }
+      },
+      "chosen": "TK"
+    }
+  },
+  "frozen_models": {
+    "safety": {
+      "file": "safety.joblib",
+      "sha256": "e03e6239e2bddb8dc6c664487cef33386e2f63bbe1bd3ff8e85bf481fb8b9f4b",
+      "candidate": "TK",
+      "threshold": 0.818933,
+      "needs_embedding": false,
+      "training_rows": 873,
+      "training_positives": 30
+    },
+    "defect": {
+      "file": "defect.joblib",
+      "sha256": "4c42ddd36971e0871e5bc7129fe327f30397d5fc1cecb014cd49d3e2dbed4ac3",
+      "candidate": "TK",
+      "threshold": 0.556102,
+      "needs_embedding": false,
+      "training_rows": 824,
+      "training_positives": 191
+    },
+    "counterfeit": {
+      "file": "counterfeit.joblib",
+      "sha256": "bd22465780d79216888df6045bbd043c00aeaa617c406754f4a5f662c83f7b46",
+      "candidate": "TK",
+      "threshold": 0.472058,
+      "needs_embedding": false,
+      "training_rows": 857,
+      "training_positives": 81
+    }
+  },
+  "embedding_model": null,
+  "note": "keywords_in_sample is the keyword checker 0.3.0 on round 1, which it was tuned on; reference only."
+}

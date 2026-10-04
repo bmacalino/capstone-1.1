@@ -1,0 +1,264 @@
+{
+  "generated_at": "2026-09-26T13:06:10+00:00",
+  "checkpoint": "sentiment-analysis\\models\\transformers\\cardiffnlp__twitter-xlm-roberta-base-sentiment",
+  "acceptance_rule": "smallest ONNX stage with marketplace macro F1 within 0.02 of full and McNemar p >= 0.05 against full",
+  "vocabulary": {
+    "kept_tokens": 10793,
+    "full_tokens": 250002,
+    "training_corpus_check": {
+      "texts": 12360,
+      "segmentation_changed_share": 0.0,
+      "unk_tokens_introduced_share": 0.0
+    },
+    "corpus": "raw FiReCS training rows + weak-label training set (no test text)",
+    "tokenizer": "pruned to the kept pieces, in id order",
+    "test_set_segmentation": {
+      "firecs_test": {
+        "texts": 60,
+        "segmentation_changed_share": 0.16667,
+        "unk_tokens_introduced_share": 0.0
+      },
+      "marketplace": {
+        "texts": 60,
+        "segmentation_changed_share": 0.2,
+        "unk_tokens_introduced_share": 0.00059
+      }
+    }
+  },
+  "limit": 60,
+  "results": {
+    "full": {
+      "firecs_test": {
+        "accuracy": 0.8667,
+        "macro_f1": 0.8701,
+        "per_class_f1": {
+          "negative": 0.8372,
+          "neutral": 0.8,
+          "positive": 0.973
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.8701,
+          "ci_lower": 0.7809,
+          "ci_upper": 0.9502,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        }
+      },
+      "marketplace": {
+        "accuracy": 0.9167,
+        "macro_f1": 0.7466,
+        "per_class_f1": {
+          "negative": 0.9541,
+          "neutral": 0.2857,
+          "positive": 1.0
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.7466,
+          "ci_lower": 0.3188,
+          "ci_upper": 0.8859,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        }
+      },
+      "latency": {
+        "median_ms_per_review_single": 163.09,
+        "seconds_per_100_reviews_batched": 23.52,
+        "threads": 1
+      },
+      "size_mb": 1112.2,
+      "peak_ram_mb": 2592.1
+    },
+    "pruned": {
+      "firecs_test": {
+        "accuracy": 0.8667,
+        "macro_f1": 0.8701,
+        "per_class_f1": {
+          "negative": 0.8372,
+          "neutral": 0.8,
+          "positive": 0.973
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.8701,
+          "ci_lower": 0.7809,
+          "ci_upper": 0.9502,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 0,
+          "only_b_correct": 0,
+          "discordant": 0,
+          "statistic": 0.0,
+          "p_value": 1.0,
+          "method": "exact"
+        },
+        "agreement_with_full": 1.0
+      },
+      "marketplace": {
+        "accuracy": 0.9167,
+        "macro_f1": 0.7466,
+        "per_class_f1": {
+          "negative": 0.9541,
+          "neutral": 0.2857,
+          "positive": 1.0
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.7466,
+          "ci_lower": 0.3188,
+          "ci_upper": 0.8859,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 0,
+          "only_b_correct": 0,
+          "discordant": 0,
+          "statistic": 0.0,
+          "p_value": 1.0,
+          "method": "exact"
+        },
+        "agreement_with_full": 1.0
+      },
+      "latency": {
+        "median_ms_per_review_single": 164.2,
+        "seconds_per_100_reviews_batched": 25.8,
+        "threads": 1
+      },
+      "size_mb": 377.4,
+      "peak_ram_mb": 1205.9
+    },
+    "onnx": {
+      "firecs_test": {
+        "accuracy": 0.8667,
+        "macro_f1": 0.8701,
+        "per_class_f1": {
+          "negative": 0.8372,
+          "neutral": 0.8,
+          "positive": 0.973
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.8701,
+          "ci_lower": 0.7809,
+          "ci_upper": 0.9502,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 0,
+          "only_b_correct": 0,
+          "discordant": 0,
+          "statistic": 0.0,
+          "p_value": 1.0,
+          "method": "exact"
+        },
+        "agreement_with_full": 1.0
+      },
+      "marketplace": {
+        "accuracy": 0.9167,
+        "macro_f1": 0.7466,
+        "per_class_f1": {
+          "negative": 0.9541,
+          "neutral": 0.2857,
+          "positive": 1.0
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.7466,
+          "ci_lower": 0.3188,
+          "ci_upper": 0.8859,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 0,
+          "only_b_correct": 0,
+          "discordant": 0,
+          "statistic": 0.0,
+          "p_value": 1.0,
+          "method": "exact"
+        },
+        "agreement_with_full": 1.0
+      },
+      "latency": {
+        "median_ms_per_review_single": 102.75,
+        "seconds_per_100_reviews_batched": 29.15,
+        "threads": 1
+      },
+      "size_mb": 377.6,
+      "peak_ram_mb": 475.5
+    },
+    "onnx_int8": {
+      "firecs_test": {
+        "accuracy": 0.8833,
+        "macro_f1": 0.8865,
+        "per_class_f1": {
+          "negative": 0.8571,
+          "neutral": 0.8293,
+          "positive": 0.973
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.8865,
+          "ci_lower": 0.7971,
+          "ci_upper": 0.9554,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 1,
+          "only_b_correct": 2,
+          "discordant": 3,
+          "statistic": 1.0,
+          "p_value": 1.0,
+          "method": "exact"
+        },
+        "agreement_with_full": 0.95
+      },
+      "marketplace": {
+        "accuracy": 0.9,
+        "macro_f1": 0.7315,
+        "per_class_f1": {
+          "negative": 0.9444,
+          "neutral": 0.25,
+          "positive": 1.0
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.7315,
+          "ci_lower": 0.3158,
+          "ci_upper": 0.8763,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 1,
+          "only_b_correct": 0,
+          "discordant": 1,
+          "statistic": 0.0,
+          "p_value": 1.0,
+          "method": "exact"
+        },
+        "agreement_with_full": 0.9833
+      },
+      "latency": {
+        "median_ms_per_review_single": 92.7,
+        "seconds_per_100_reviews_batched": 26.57,
+        "threads": 1
+      },
+      "size_mb": 95.2,
+      "peak_ram_mb": 190.8
+    }
+  },
+  "passing_stages": [
+    "pruned",
+    "onnx",
+    "onnx_int8"
+  ],
+  "chosen_stage": "onnx_int8",
+  "qualified_for_integration": false
+}

@@ -3,22 +3,58 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="description" content="DeFaketive helps Filipino shoppers spot suspicious reviews and product-risk signals before they buy.">
+    <meta name="description" content="DeFaketive reads Shopee, Lazada and Temu PH reviews and shows what shoppers report about fakes, defects and safety problems, in their own words.">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="DeFaketive — Review Risk Intelligence">
-    <meta property="og:description" content="Spot fake reviews before you buy — in Taglish.">
+    <meta property="og:title" content="DeFaketive — Spot fakes and defects before you buy">
+    <meta property="og:description" content="Spot fakes and defects before you buy, in Taglish.">
     <meta property="og:image" content="{{ url_for('static', filename='og.png', _external=True) }}">
     <meta name="twitter:card" content="summary_large_image">
-    <title>DeFaketive — Review Risk Intelligence</title>
+    <title>DeFaketive — Spot fakes and defects before you buy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/figma.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/overhaul.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}">
   </head>
   <body data-active-view="landing">
+    {%- macro eye_button() -%}
+    <button class="auth-eye" type="button" data-toggle-password aria-pressed="false" aria-label="Show password"><span class="auth-eye-off" aria-hidden="true"><img class="auth-eye-a" src="{{ url_for('static', filename='assets/auth/eye-part-1.svg') }}" width="18.1889" height="13.5001" alt=""><img class="auth-eye-b" src="{{ url_for('static', filename='assets/auth/eye-part-2.svg') }}" width="17.5607" height="17.5607" alt=""></span><svg class="auth-eye-on" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#9CA3AF" stroke-width="1.5" aria-hidden="true"><path d="M.85 9S3.85 3 9.1 3s8.25 6 8.25 6-3 6-8.25 6S.85 9 .85 9Z"/><circle cx="9.1" cy="9" r="2.25"/></svg></button>
+    {%- endmacro %}
+    {%- macro site_campus() -%}
+        <div class="pub-campus" aria-hidden="true"><img src="{{ url_for('static', filename='assets/landing/campus.jpg') }}" width="860" height="645" alt="" loading="lazy"></div>
+    {%- endmacro %}
+    {%- macro site_footer() -%}
+        <footer class="pub-footer">
+          <div class="pub-wrap">
+            <div class="pub-footer-grid">
+              <div class="pub-footer-about">
+                <a class="pub-logo" href="#landing" data-route="landing"><span class="pub-logo-mark" aria-hidden="true"></span><b>DeFaketive</b></a>
+                <p>A capstone research project from Pangasinan State University – Urdaneta City Campus. Checks Filipino e-commerce reviews for reports of counterfeit, defective and unsafe gadgets.</p>
+              </div>
+              <div class="pub-footer-links">
+                <nav aria-label="Product"><span class="pub-footer-label">Product</span><a href="#search-query" data-focus-search>Analyze Reviews</a><a href="#faq" data-scroll="faq">How Verdicts Work</a><a href="#platforms" data-scroll="platforms">Supported Platforms</a></nav>
+                <nav aria-label="About"><span class="pub-footer-label">About</span><a href="#about" data-scroll="about">About the Team</a><a href="#faq" data-scroll="faq">FAQ</a><a href="mailto:bmacalino_20ur2047@psu.edu.ph">Contact</a></nav>
+              </div>
+              <div>
+                <span class="pub-footer-label">Follow</span>
+                <div class="pub-social">
+                  <span role="link" aria-disabled="true" aria-label="Facebook (link coming soon)" title="Link coming soon">f</span>
+                  <span role="link" aria-disabled="true" aria-label="X (link coming soon)" title="Link coming soon">X</span>
+                  <span role="link" aria-disabled="true" aria-label="Instagram (link coming soon)" title="Link coming soon">◎</span>
+                  <span role="link" aria-disabled="true" aria-label="YouTube (link coming soon)" title="Link coming soon">▶</span>
+                </div>
+              </div>
+            </div>
+            <div class="pub-footer-bottom">
+              <span>© 2026 DeFaketive · For academic use only</span>
+              <nav aria-label="Legal"><button type="button" data-terms-open="privacy">Privacy Policy</button><button type="button" data-terms-open="terms">Terms of Use</button><a href="#faq" data-scroll="faq">How Verdicts Work</a></nav>
+            </div>
+          </div>
+        </footer>
+    {%- endmacro %}
     <div class="aurora-layer" aria-hidden="true">
       <img class="aurora aurora-one" src="{{ url_for('static', filename='assets/figma/aurora-1.png') }}" alt="">
       <img class="aurora aurora-two" src="{{ url_for('static', filename='assets/figma/aurora-2.png') }}" alt="">
@@ -26,23 +62,26 @@
       <img class="aurora aurora-four" src="{{ url_for('static', filename='assets/figma/aurora-4.png') }}" alt="">
     </div>
 
-    <header class="site-header landing-topbar">
-      <a class="brand landing-brand" href="#landing" data-route="landing" aria-label="DeFaketive landing page">
-        <span class="landing-logo" aria-hidden="true"><img src="{{ url_for('static', filename='assets/figma/landing-eye.svg') }}" width="10" height="10" alt=""></span>
-        <span><b>DeFaketive</b><small>v0.9 beta</small></span>
+    <header class="pub-header">
+      <a class="pub-logo" href="#landing" data-route="landing" aria-label="DeFaketive home">
+        <span class="pub-logo-mark" aria-hidden="true"></span><b>DeFaketive</b>
       </a>
-      <nav id="main-nav" class="main-nav landing-nav" aria-label="Main navigation">
-        <a class="nav-link" href="#landing" data-route="landing">Home</a>
+      <nav id="main-nav" class="pub-nav" aria-label="Main navigation">
+        <a class="nav-link" href="#results" data-route="results">Products</a>
         <a class="nav-link" href="#about" data-scroll="about">About</a>
         <a class="nav-link" href="#faq" data-scroll="faq">FAQ</a>
+        <button class="nav-link pub-nav-mobile pub-signin" type="button" data-signin data-auth-guest>Sign In</button>
       </nav>
-      <div class="landing-account-actions">
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme" title="Switch to dark theme">
+      <div class="pub-actions">
+        <button id="theme-toggle" class="pub-icon-button" type="button" aria-pressed="false" aria-label="Switch to dark theme" title="Switch to dark theme">
           <svg class="theme-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 13A9 9 0 0 1 11 3.2 9 9 0 1 0 20.8 13Z"/></svg>
           <svg class="theme-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
           <span class="sr-only">Dark</span>
         </button>
-        <button class="landing-signin" type="button" data-signin>Sign In</button>
+        <span class="pub-divider" aria-hidden="true"></span>
+        <button class="pub-signin" type="button" data-signin data-auth-guest>Sign In</button>
+        <button class="pub-button" type="button" data-auth-open="signup" data-auth-guest>Try It Free →</button>
+        <span class="pub-user" data-auth-user hidden><span data-user-greeting>Hi</span><button class="pub-signin" type="button" data-signout>Sign out</button><a class="pub-button" href="#home" data-route="home">Open app →</a></span>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open navigation">
           <span class="nav-toggle-line"></span><span class="nav-toggle-line"></span><span class="nav-toggle-line"></span>
         </button>
@@ -50,141 +89,277 @@
     </header>
 
     <main class="site-main">
-      <div id="landing" class="view active landing-view new-landing" data-view="landing">
-        <section class="landing-hero" aria-labelledby="landing-title">
-          <p class="landing-eyebrow"><span aria-hidden="true">●</span> REVIEW RISK INTELLIGENCE · PHILIPPINES</p>
-          <div class="landing-hero-grid">
-            <div class="landing-hero-copy">
-              <h1 id="landing-title">Read the evidence<br>before you buy.</h1>
-              <p>DeFaketive examines public Shopee, Lazada, and Temu reviews for sentiment and product-risk signals—including the Taglish phrases other tools can miss.</p>
-              <div class="landing-hero-actions">
-                <a class="landing-button primary" href="#search-query" data-focus-search>Analyze a product</a>
-                <a class="landing-button secondary" href="#how" data-scroll="how">See the method</a>
+      <div id="landing" class="view active pub-landing" data-view="landing">
+        <section class="pub-hero" aria-labelledby="landing-title">
+          <div class="pub-wrap">
+            <div class="pub-hero-photo" aria-hidden="true"><img src="{{ url_for('static', filename='assets/landing/hero.jpg') }}" width="734" height="2143" alt=""></div>
+            <div class="pub-hero-copy">
+              <p class="pub-eyebrow">Real reviews<br>Real people<br>A safer you</p>
+              <span class="pub-rule" aria-hidden="true"></span>
+              <h1 id="landing-title">SPOT FAKES &amp;<br>DEFECTS<br>BEFORE YOU BUY</h1>
+              <p class="pub-hero-sub">No sign up required</p>
+              <p class="pub-hero-text">DeFaketive reads customer reviews from Shopee, Lazada and Temu PH (in English, Filipino or Taglish) and shows you what buyers report about fakes, defects and safety problems, in their own words.</p>
+              <div class="pub-hero-actions">
+                <button class="pub-button" type="button" data-auth-open="signup">Try It Free →</button>
+                <a class="pub-round-link" href="#how" data-scroll="how"><span aria-hidden="true">↓</span>How It Works</a>
               </div>
-              <small>Decision support, not proof of fraud or authenticity.</small>
             </div>
-            <form id="guest-start-form" class="landing-search-card" data-start-analysis>
-              <div class="landing-search-head"><span>NEW ANALYSIS</span><b>01 / COLLECT</b></div>
-              <p class="landing-search-help">Paste a supported Philippine marketplace product link to begin an evidence review.</p>
-              <label for="guest-product-query">Product link</label>
-              <input id="guest-product-query" name="product-query" placeholder="Paste a product link..." autocomplete="off">
-              <button class="primary-button" type="submit">Analyze product →</button>
-              <p class="landing-search-note">Shopee PH · Lazada PH · Temu PH</p>
+            <form id="guest-start-form" class="pub-scan-card" data-start-analysis aria-labelledby="scan-card-title">
+              <div class="pub-scan-head"><b id="scan-card-title">SCAN A PRODUCT</b><span class="pub-live">LIVE</span></div>
+              <div class="pub-scan-form">
+                <label class="sr-only" for="landing-product-query">Product link</label>
+                <input id="landing-product-query" name="product-query" placeholder="Paste a product link (Shopee, Lazada, Temu)" autocomplete="off">
+                <button class="pub-button" type="submit">Analyze</button>
+              </div>
+              <p class="pub-scan-note" data-guest-note>3 free scans/day as guest · sign in for unlimited</p>
             </form>
           </div>
         </section>
 
-        <section class="landing-stats" aria-label="Analysis workflow">
-          <article><b>01</b><span>COLLECT PUBLIC REVIEWS</span></article><article><b>02</b><span>CLASSIFY SENTIMENT</span></article><article><b>03</b><span>INSPECT RISK SIGNALS</span></article><article><b>04</b><span>READ THE EVIDENCE</span></article>
+        <section class="pub-stats" aria-label="DeFaketive in numbers">
+          <div><b>3</b><span>Marketplaces supported</span></div>
+          <div><b>3</b><span>Separate checks: safety · fakes · defects</span></div>
+          <div><b>100%</b><span>Warnings shown with their reviews</span></div>
+          <div><b>4</b><span>Proponents</span></div>
         </section>
 
-        <section id="how" class="landing-section landing-explore">
-          <header class="landing-section-head"><span>THE METHOD</span><h2>From listing to evidence</h2><p>Four stages keep the score connected to the reviews behind it.</p></header>
-          <div class="landing-tabs" role="tablist" aria-label="Explore DeFaketive">
-            <button class="active" type="button" role="tab" aria-selected="true" data-explore-tab="how-it-works">How It Works</button><button type="button" role="tab" aria-selected="false" data-explore-tab="what-we-detect">What We Detect</button><button type="button" role="tab" aria-selected="false" data-explore-tab="risk-score">Risk Score</button><button type="button" role="tab" aria-selected="false" data-explore-tab="built-different">Built Different</button>
-          </div>
-          <div class="landing-tab-panel active" role="tabpanel" data-explore-panel="how-it-works">
-            <article><b>01</b><h3>Paste link</h3><p>Copy any product URL from Shopee PH, Lazada PH, or Temu.</p></article><article><b>02</b><h3>Scan reviews</h3><p>Every review is classified and checked against a Taglish defect dictionary.</p></article><article><b>03</b><h3>Get risk score</h3><p>A 0–1 score, sentiment breakdown, and every flagged phrase — in seconds.</p></article><article><b>04</b><h3>Shop smarter</h3><p>Use the score or let DeFaketive recommend a lower-risk alternative.</p></article>
-          </div>
-          <div class="landing-tab-panel" role="tabpanel" data-explore-panel="what-we-detect" hidden>
-            <article><b>A</b><h3>Defect clusters</h3><p>Repeated “overheating,” “not charging,” and “sira” reports across reviews.</p></article><article><b>B</b><h3>Counterfeit slang</h3><p>Taglish warning terms such as “peke” and “scam” that generic models miss.</p></article><article><b>C</b><h3>Sentiment spikes</h3><p>A rising share of negative experiences within the collected review sample.</p></article><article><b>D</b><h3>Rating mismatch</h3><p>High star ratings paired with complaint-heavy review text.</p></article>
-          </div>
-          <div class="landing-tab-panel" role="tabpanel" data-explore-panel="risk-score" hidden>
-            <article><b>0–.35</b><h3>Low risk</h3><p>Mostly reliable review signals with relatively few product complaints.</p></article><article><b>.35–.65</b><h3>Moderate risk</h3><p>Noticeable concerns worth reviewing before you decide to buy.</p></article><article><b>.65–1</b><h3>High risk</h3><p>Persistent product-quality or counterfeit signals were detected.</p></article><article><b>100%</b><h3>Transparent</h3><p>Open every flagged review and judge the supporting evidence yourself.</p></article>
-          </div>
-          <div class="landing-tab-panel" role="tabpanel" data-explore-panel="built-different" hidden>
-            <article><b>01</b><h3>Free to use</h3><p>Three immediate guest scans, with unlimited access for signed-in users.</p></article><article><b>02</b><h3>Four marketplaces</h3><p>One simple product check across major Philippine shopping platforms.</p></article><article><b>03</b><h3>Built for Taglish</h3><p>Understands the slang and language Filipino shoppers actually use.</p></article><article><b>04</b><h3>Evidence first</h3><p>A decision-support tool that shows why a product received its score.</p></article>
-          </div>
-        </section>
-
-        <section class="landing-section">
-          <header class="landing-section-head"><span>RESEARCH PRINCIPLES</span><h2>What the report promises</h2></header>
-          <div class="landing-testimonials">
-            <article><blockquote>The verdict never stands alone. Every concern leads back to the review language that triggered it.</blockquote><footer><b>01</b><span><strong>Evidence first</strong><small>TRACEABLE FINDINGS</small></span></footer></article>
-            <article><blockquote>Filipino, English, and Taglish expressions are treated as product evidence—not noise to be discarded.</blockquote><footer><b>02</b><span><strong>Language aware</strong><small>LOCAL CONTEXT</small></span></footer></article>
-            <article><blockquote>A risk score summarizes a collected sample. It does not declare a seller or product fraudulent.</blockquote><footer><b>03</b><span><strong>Careful claims</strong><small>DECISION SUPPORT</small></span></footer></article>
+        <section class="pub-features" aria-labelledby="features-title">
+          <img src="{{ url_for('static', filename='assets/landing/features-bg.png') }}" width="1024" height="640" alt="" loading="lazy">
+          <div class="pub-wrap">
+            <div>
+              <h2 id="features-title" class="pub-eyebrow">Built for<br>a safer tomorrow.</h2>
+              <span class="pub-rule" aria-hidden="true"></span>
+            </div>
+            <div class="pub-feature-grid">
+              <article><img src="{{ url_for('static', filename='assets/landing/icon-sentiment.svg') }}" width="32" height="32" alt=""><h3>Taglish-aware sentiment</h3><p>A language model trained on Filipino and English reviews sorts each review as positive, negative or neutral.</p></article>
+              <article><img src="{{ url_for('static', filename='assets/landing/icon-scoring.svg') }}" width="32" height="32" alt=""><h3>Separate warnings</h3><p>Safety, fake and defect reports are checked one by one, so good reviews never average away a fire report.</p></article>
+              <article><img src="{{ url_for('static', filename='assets/landing/icon-platforms.svg') }}" width="32" height="32" alt=""><h3>Multi-platform coverage</h3><p>Collects public reviews straight from Shopee PH, Lazada PH and Temu PH product pages.</p></article>
+              <article><img src="{{ url_for('static', filename='assets/landing/icon-recommend.svg') }}" width="32" height="32" alt=""><h3>Similar products</h3><p>When reviewers report problems, see similar products whose reviews raised no warning signs.</p></article>
+            </div>
           </div>
         </section>
 
-        <section id="faq" class="landing-section landing-faq-section">
-          <header class="landing-section-head"><span>QUESTIONS</span><h2>Before you rely on a report</h2></header>
-          <div class="landing-faq-list">
-            <details><summary>Is DeFaketive really free to use?<span>+</span></summary><p>Yes. Guests get three scans per day, while a free account unlocks unlimited analyses.</p></details><details><summary>How accurate is the Risk Score?<span>+</span></summary><p>It summarizes sentiment and product-risk signals in the collected review sample. Use it as decision support, not proof.</p></details><details><summary>What's the difference between guest and signed-in?<span>+</span></summary><p>The workspace brings together product analysis, saved reports, and your wishlist.</p></details><details><summary>Which platforms are supported?<span>+</span></summary><p>DeFaketive supports product links from Shopee PH, Lazada PH, and Temu.</p></details><details><summary>What happens if a product scores high-risk?<span>+</span></summary><p>Review the highlighted evidence and compare lower-risk alternatives before deciding to buy.</p></details>
+        <section id="how" class="pub-how" aria-labelledby="how-title">
+          <div class="pub-wrap">
+            <div class="pub-how-intro">
+              <h2 id="how-title">EXPLORE<br>HOW IT WORKS</h2>
+              <span class="pub-rule" aria-hidden="true"></span>
+              <p>Four simple steps from link to evidence.</p>
+              <a class="pub-text-link" href="#faq" data-scroll="faq">Learn More →</a>
+            </div>
+            <ol class="pub-steps">
+              <li><div class="pub-step-top"><span>01</span><img src="{{ url_for('static', filename='assets/landing/icon-step-1.svg') }}" width="24" height="24" alt=""></div><h3>Paste Link</h3><p>Copy any gadget link from Shopee PH, Lazada PH or Temu PH.</p></li>
+              <li><div class="pub-step-top"><span>02</span><img src="{{ url_for('static', filename='assets/landing/icon-step-2.svg') }}" width="24" height="24" alt=""></div><h3>Scan Reviews</h3><p>We collect the reviews and read every one, looking for words like <i>peke</i>, <i>sira</i> and <i>umusok</i>.</p></li>
+              <li><div class="pub-step-top"><span>03</span><img src="{{ url_for('static', filename='assets/landing/icon-step-3.svg') }}" width="24" height="24" alt=""></div><h3>Read the Verdict</h3><p>A plain verdict on safety, fakes and defects, with the exact reviews behind it.</p></li>
+              <li><div class="pub-step-top"><span>04</span><img src="{{ url_for('static', filename='assets/landing/icon-step-4.svg') }}" width="24" height="24" alt=""></div><h3>Shop Smarter</h3><p>If reviewers report problems, compare similar products with no warning signs.</p></li>
+            </ol>
           </div>
         </section>
 
-        <section id="about" class="landing-section landing-team-section">
-          <header class="landing-section-head"><span>PANGASINAN STATE UNIVERSITY · URDANETA</span><h2>The research team</h2></header>
-          <div class="landing-team-grid">
-            <article class="landing-adviser"><span>CAPSTONE ADVISER</span><div class="landing-person"><b class="purple">KD</b><p><strong>Kathleen De Guzman</strong><small>Faculty Adviser</small></p></div></article>
-            <article class="landing-team"><span>CAPSTONE TEAM</span><div><div class="landing-person"><b>MC</b><p><strong>Mark Rhean Caballero</strong><small>Capstone Leader</small></p></div><div class="landing-person"><b>BM</b><p><strong>Brian Macalino</strong><small>Programmer</small></p></div><div class="landing-person"><b>RR</b><p><strong>Ryan Rovic Retuya</strong><small>UI / UX</small></p></div><div class="landing-person"><b>PG</b><p><strong>Princethom Guyo</strong><small>Designer</small></p></div></div></article>
+        <section class="pub-banner" aria-labelledby="banner-title">
+          <img src="{{ url_for('static', filename='assets/landing/shop-smarter.jpg') }}" width="1926" height="816" alt="" loading="lazy">
+          <div class="pub-banner-inner">
+            <div>
+              <p class="pub-eyebrow">Trusted choices<br>Brighter tomorrows.</p>
+              <h2 id="banner-title">SHOP<br>SMARTER</h2>
+              <p>Real insights. Less risk. Built for Filipino shoppers.</p>
+              <a class="pub-button light" href="#results" data-route="results">Explore Products →</a>
+            </div>
+            <p class="pub-banner-side" aria-hidden="true">REAL<br>PRODUCTS<br>REAL<br>INSIGHTS<br>A SAFER<br>YOU.</p>
           </div>
         </section>
 
-        <section class="landing-cta">
-          <div class="landing-cta-brand"><span><img src="{{ url_for('static', filename='assets/figma/landing-eye.svg') }}" width="10" height="10" alt=""></span> DEFAKETIVE</div>
-          <h2>Bring one listing.<br>Leave with the evidence.</h2><p>Analyze a supported product link, inspect the signals, and decide with the original review context in view.</p>
-          <div><a class="landing-cta-primary" href="#search-query" data-focus-search>Analyze a product</a></div>
-          <small>Shopee PH · Lazada PH · Temu PH</small>
+        <section id="platforms" class="pub-platforms" aria-labelledby="platforms-title">
+          <div class="pub-wrap">
+            <h2 id="platforms-title" class="pub-eyebrow">Supported platforms</h2>
+            <ul class="pub-platform-row">
+              <li style="--pub-dot: var(--pub-shopee)"><i aria-hidden="true"></i>Shopee</li>
+              <li style="--pub-dot: var(--pub-lazada)"><i aria-hidden="true"></i>Lazada</li>
+              <li style="--pub-dot: var(--pub-temu)"><i aria-hidden="true"></i>TEMU</li>
+            </ul>
+          </div>
         </section>
 
-        <footer class="landing-footer">
-          <div class="landing-footer-grid">
-            <div class="landing-footer-about"><div><span><img src="{{ url_for('static', filename='assets/figma/landing-eye-small.svg') }}" width="9" height="9" alt=""></span><b>DeFaketive</b></div><p>A capstone research project helping Filipino online shoppers spot counterfeit and defective gadgets before they buy.</p></div>
-            <nav><b>Explore</b><a href="#search-query" data-focus-search>Analyze Reviews</a><a href="#how" data-explore-link="risk-score">Risk Score Methodology</a><a href="#faq" data-scroll="faq">Supported Platforms</a></nav>
-            <nav><b>About</b><a href="#about" data-scroll="about">About the Team</a><a href="#faq" data-scroll="faq">FAQ</a><a href="mailto:bmacalino_20ur2047@psu.edu.ph">Contact</a></nav>
+        <div class="pub-faq-team">
+          <div class="pub-wrap">
+            <section id="faq" class="pub-faq" aria-labelledby="faq-title">
+              <h2 id="faq-title">COMMON QUESTIONS</h2>
+              <div class="pub-faq-list">
+                <details><summary>Is DeFaketive free to use?</summary><p>Yes. Guests get 3 new scans a day, and a free account gives unlimited scans.</p></details>
+                <details><summary>How does DeFaketive decide on a warning?</summary><p>It checks reviews for safety, fake and defect reports separately. A warning appears when enough reviewers report the same problem, and a single safety report is always shown. Every warning quotes the reviews behind it.</p></details>
+                <details><summary>Which platforms are supported?</summary><p>Product links from Shopee PH, Lazada PH and Temu PH.</p></details>
+                <details><summary>Can it detect Taglish reviews?</summary><p>Yes. The sentiment model was trained on Filipino and English reviews, and the warning word lists include Taglish terms like <i>peke</i>, <i>sira</i> and <i>umusok</i>.</p></details>
+                <details open><summary>What happens if reviewers report a problem?</summary><p>You'll see a warning with the reviewers' own words highlighted. Read them, then compare similar products with no warning signs before you buy.</p></details>
+                <details><summary>How accurate is the check?</summary><p>It is not perfect. In our tests against reviews checked by people, it missed about one in five real safety reports, and about half of what it flagged was harmless. That is why every report quotes the reviews themselves. Use it as decision support, not proof.</p></details>
+              </div>
+            </section>
+            <section id="about" class="pub-team" aria-labelledby="about-title">
+              <h2 id="about-title">THE MINDS<br>BEHIND A SAFER<br>SHOPPING EXPERIENCE.</h2>
+              <span class="pub-rule" aria-hidden="true"></span>
+              <p class="pub-team-meta">Pangasinan State University – Urdaneta City Campus · BS Information Technology · May 2026</p>
+              <ul class="pub-team-grid">
+                <li><span class="pub-avatar" style="--pub-avatar:#3b82f6" aria-hidden="true">KD</span><b>Kathleen D. De Guzman, MIT</b><small>Faculty Adviser</small></li>
+                <li><span class="pub-avatar" style="--pub-avatar:#6366f1" aria-hidden="true">MC</span><b>Mark Rhean E. Caballero</b><small>Capstone Leader</small></li>
+                <li><span class="pub-avatar" style="--pub-avatar:#f59e0b" aria-hidden="true">RR</span><b>Ryan Rovic Retuya</b><small>UI / UX</small></li>
+                <li><span class="pub-avatar" style="--pub-avatar:#10b981" aria-hidden="true">PG</span><b>Princethom A. Guyo</b><small>Quality Assurance</small></li>
+                <li><span class="pub-avatar" style="--pub-avatar:#8b5cf6" aria-hidden="true">BM</span><b>Brian P. Macalino</b><small>Programmer</small></li>
+              </ul>
+              <a class="pub-text-link" href="#learn" data-route="learn">About the Team →</a>
+            </section>
           </div>
-          <div class="landing-footer-bottom"><span>© 2026 DeFaketive · For academic use only</span><span>Privacy Policy · Terms of Use · Risk Score Methodology</span></div>
-        </footer>
+        </div>
+
+        {{ site_campus() }}
+
+        {{ site_footer() }}
       </div>
 
-      <div id="workspace-shell" class="workspace-home" hidden>
-        <button class="workspace-backdrop" type="button" aria-label="Close navigation" hidden></button>
-        <aside id="workspace-sidebar" class="workspace-sidebar" aria-label="Workspace navigation">
-          <a class="workspace-brand" href="#home" data-route="home"><span><img src="{{ url_for('static', filename='assets/figma/home-logo.svg') }}" width="16" height="12" alt=""></span><b>DeFaketive<small>SHOP WITH CONFIDENCE</small></b></a>
-          <p class="workspace-nav-label">EVIDENCE DESK</p>
-          <nav class="workspace-nav">
-            <a href="#home" data-route="home"><span aria-hidden="true">⌂</span>Overview</a>
-            <a href="#analyze" data-route="analyze"><span aria-hidden="true">＋</span>Analyze</a>
-            <a href="#history" data-route="history"><span aria-hidden="true">◷</span>History</a>
-            <a href="#wishlist" data-route="wishlist"><span aria-hidden="true">♡</span>Saved</a>
-            <a href="#settings" data-route="settings"><span aria-hidden="true">⚙</span>Settings</a>
-          </nav>
-          <div class="workspace-sidebar-tip"><b>A little context helps.</b><p>Read the flagged reviews alongside the risk score before deciding to buy.</p></div>
-          <div class="workspace-profile"><b>Local workspace</b><small>History and wishlist on this browser</small><a href="#landing" data-route="landing">Back to website ↗</a></div>
+      <section id="login" class="view auth-page" data-view="login" hidden aria-labelledby="login-title">
+        <div class="auth-page-form">
+          <div class="auth-page-inner">
+            <h1 id="login-title" tabindex="-1">Welcome back</h1>
+            <p class="auth-sub">Sign in to your DeFaketive account.</p>
+            <p class="auth-notice" data-login-notice role="status" hidden></p>
+            <form class="auth-form" data-auth-form="signin" novalidate>
+              <div class="auth-field"><label for="login-email">Email address</label><input id="login-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+              <p class="auth-error" data-error-for="email" hidden></p>
+              <div class="auth-field"><label for="login-password">Password</label><span class="auth-password"><input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required>{{ eye_button() }}</span></div>
+              <p class="auth-error" data-error-for="password" hidden></p>
+              <p class="auth-form-error" data-form-error role="alert" hidden></p>
+              <button class="auth-submit" type="submit">Sign in</button>
+            </form>
+            <div class="auth-or" aria-hidden="true"><span>or</span></div>
+            <button class="auth-guest" type="button" data-continue-guest>Continue as guest — 3 free scans left today</button>
+            <p class="auth-switch">No account yet? <button type="button" data-auth-open="signup">Sign up — it’s free</button></p>
+          </div>
+        </div>
+        <aside class="auth-page-panel" aria-label="About DeFaketive">
+          <img class="auth-page-texture" src="{{ url_for('static', filename='assets/auth/auth-bg.png') }}" width="1600" height="1000" alt="">
+          <a class="auth-brand" href="#landing" data-route="landing"><span class="auth-shield"><img src="{{ url_for('static', filename='assets/auth/shield.svg') }}" width="20" height="23" alt=""></span><b>DeFaketive</b></a>
+          <div class="auth-page-pitch">
+            <p class="auth-pitch-eyebrow">Real products. Real reviews. A safer you.</p>
+            <p class="auth-pitch-title">Spot fakes &amp; defects before you buy.</p>
+            <p class="auth-pitch-text">DeFaketive shows what Filipino shoppers report about fakes, defects and safety problems (in English, Tagalog and Taglish), quoting their own words.</p>
+            <dl class="auth-pitch-stats">
+              <div><dt>Products checked</dt><dd data-public-stat="products">—</dd></div>
+              <div><dt>Reviews analyzed</dt><dd data-public-stat="reviews">—</dd></div>
+              <div><dt>Marketplaces supported</dt><dd data-public-stat="marketplaces">3</dd></div>
+            </dl>
+          </div>
+          <p class="auth-page-foot">A Pangasinan State University capstone project helping Filipino shoppers identify counterfeit and defective electronics.</p>
         </aside>
-        <div class="workspace-main">
-          <header class="workspace-topbar">
-            <button class="workspace-mobile-menu" type="button" aria-label="Open workspace navigation" aria-expanded="false" aria-controls="workspace-sidebar">☰</button>
-            <span><span aria-hidden="true">// </span><b id="workspace-page-label">HOME</b></span>
-            <div><button id="active-scan-link" type="button" class="workspace-theme" hidden>Scan in progress →</button><button id="workspace-theme-toggle" class="workspace-theme" type="button" aria-pressed="false"><span>Light</span></button></div>
-          </header>
+      </section>
+
+      <div id="workspace-shell" class="workspace-home app-shell" hidden>
+        <header class="app-topbar">
+          <a class="app-brand" href="#home" data-route="home" aria-label="DeFaketive home"><span class="app-brand-mark" aria-hidden="true"></span><span><b>DeFaketive</b><small>v0.9 beta</small></span></a>
+          <span class="app-topbar-rule" aria-hidden="true"></span>
+          <p class="app-tagline">Real products.<br>Real reviews.<br>A safer you.</p>
+          <span class="app-topbar-space"></span>
+          <ul class="app-platforms" aria-label="Supported marketplaces">
+            <li style="--pub-dot: var(--pub-shopee)">Shopee</li>
+            <li style="--pub-dot: var(--pub-lazada)">Lazada</li>
+            <li style="--pub-dot: var(--pub-temu)">Temu PH</li>
+          </ul>
+          <button id="workspace-theme-toggle" class="app-icon-button" type="button" aria-pressed="false" aria-label="Switch to dark theme">
+            <svg class="theme-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 13A9 9 0 0 1 11 3.2 9 9 0 1 0 20.8 13Z"/></svg>
+            <svg class="theme-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+            <span class="sr-only">Light</span>
+          </button>
+          <button id="active-scan-link" class="app-icon-button app-bell" type="button" aria-label="No scans running" title="No scans running"><img class="app-ink-icon" src="{{ url_for('static', filename='assets/app/bell.svg') }}" width="18" height="18" alt=""><i class="app-bell-dot" aria-hidden="true"></i></button>
+          <div class="app-account">
+            <button class="app-signin" type="button" data-signin data-auth-guest>Sign in</button>
+            <button class="app-account-button" type="button" data-account-toggle data-auth-user hidden aria-haspopup="true" aria-expanded="false" aria-controls="account-menu"><span class="app-avatar" data-user-initials aria-hidden="true"></span><b data-user-name></b><img class="app-ink-icon" src="{{ url_for('static', filename='assets/app/chevron-down.svg') }}" width="14" height="14" alt=""></button>
+            <div id="account-menu" class="app-menu" hidden>
+              <p class="app-menu-note">Your history and wishlist are saved to your account.</p>
+              <a href="#settings" data-route="settings">Settings</a>
+              <button type="button" data-signout>Sign out</button>
+            </div>
+          </div>
+        </header>
+        <nav class="app-rail" aria-label="Workspace navigation">
+          <a href="#home" data-route="home"><span class="app-rail-icon" style="--icon: url('{{ url_for('static', filename='assets/app/nav-home.svg') }}')" aria-hidden="true"></span><b>Home</b></a>
+          <a href="#history" data-route="history"><span class="app-rail-icon" style="--icon: url('{{ url_for('static', filename='assets/app/nav-history.svg') }}')" aria-hidden="true"></span><b>History</b></a>
+          <a href="#wishlist" data-route="wishlist"><span class="app-rail-icon" style="--icon: url('{{ url_for('static', filename='assets/app/nav-wishlist.svg') }}')" aria-hidden="true"></span><b>Wishlist</b></a>
+          <a href="#about" data-scroll="about"><span class="app-rail-icon" style="--icon: url('{{ url_for('static', filename='assets/app/nav-about.svg') }}')" aria-hidden="true"></span><b>About</b></a>
+          <a href="#faq" data-scroll="faq"><span class="app-rail-icon" style="--icon: url('{{ url_for('static', filename='assets/app/nav-faq.svg') }}')" aria-hidden="true"></span><b>FAQ</b></a>
+          <a href="#settings" data-route="settings"><span class="app-rail-icon" style="--icon: url('{{ url_for('static', filename='assets/app/nav-settings.svg') }}')" aria-hidden="true"></span><b>Settings</b></a>
+        </nav>
+        <div class="app-main">
           <div id="workspace-pages"></div>
+          {{ site_campus() }}
+          <aside id="guest-limit-notice" class="rep-limit" aria-labelledby="guest-limit-title" hidden>
+            <div class="rep-limit-body">
+              <button class="rep-limit-close" type="button" data-limit-dismiss aria-label="Dismiss this notice">×</button>
+              <p class="rep-eyebrow">Guest limit reached</p>
+              <h2 id="guest-limit-title">You’ve used today’s free scans</h2>
+              <p>Sign in or create a free account for unlimited scans. Free scans come back tomorrow.</p>
+              <div class="rep-limit-actions"><button type="button" data-limit-dismiss>Not now</button><button class="primary" type="button" data-auth-open="signup">Sign up to use more</button></div>
+            </div>
+          </aside>
+          {{ site_footer() }}
         </div>
       </div>
 
-      <section id="home" class="view workspace-content" data-view="home" hidden aria-labelledby="home-title">
-        <header class="workspace-welcome home-welcome"><div><p class="flow-eyebrow">YOUR SHOPPING WORKSPACE</p><h1 id="home-title" tabindex="-1">What are you buying?</h1><p>Check the reviews before your next purchase. Start with a product link.</p></div><button id="home-continue" class="home-continue" type="button" hidden><span>CONTINUE WHERE YOU LEFT OFF</span><b id="home-continue-name"></b><small>Open last report →</small></button></header>
-        <section class="flow-scan-hero" aria-labelledby="home-title">
-          <label class="flow-scan-label" for="home-product-query">Product link or name</label>
-          <form data-start-analysis><input id="home-product-query" name="product-query" placeholder="Paste a Shopee, Lazada, or Temu product link…" autocomplete="off"><button class="primary-button" type="submit">Analyze product <span aria-hidden="true">→</span></button></form>
-          <small>Shopee PH · Lazada PH · Temu &nbsp; / &nbsp; Or search a previously analyzed product by name.</small>
-        </section>
-        <section id="home-scan-status" class="home-scan-status" aria-labelledby="home-scan-title" hidden>
-          <div class="home-scan-symbol" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7V4h3m10 0h3v3M4 17v3h3m10 0h3v-3M7 12h10"/></svg></div>
-          <div class="home-scan-copy"><p class="home-scan-meta"><span id="home-scan-platform"></span><span id="home-scan-elapsed" aria-live="off"></span></p><h2 id="home-scan-title" aria-live="polite"></h2><p id="home-scan-product"></p><p id="home-scan-message"></p><div id="home-scan-progress" class="home-scan-progress" role="progressbar" aria-label="Analysis progress" aria-valuemin="0" aria-valuemax="100"><i id="home-scan-progress-fill"></i></div></div>
-          <button id="home-scan-action" class="secondary-button" type="button">View progress →</button>
-        </section>
-        <div id="home-metrics" class="flow-metrics" aria-label="Saved analysis summary"></div>
-        <div class="home-library-grid">
-          <section class="flow-section home-recent-section" aria-labelledby="home-recent-title"><header><div><h2 id="home-recent-title">Recent analyses</h2><p>Pick up where you left off.</p></div><a href="#history" data-route="history">View history →</a></header>
-            <div class="home-search-row"><label class="home-recent-search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="sr-only">Search saved analyses</span><input id="home-recent-search" type="search" placeholder="Find a product or marketplace…" aria-controls="home-recent"></label><button id="home-clear-search" class="home-text-button" type="button" hidden>Clear</button></div>
-            <p id="home-recent-count" class="home-list-caption" aria-live="polite"></p>
-            <div id="home-recent" aria-busy="true"><div class="home-loading" role="status"><span class="sr-only">Loading saved analyses</span><div class="home-skeleton-row" aria-hidden="true"></div><div class="home-skeleton-row" aria-hidden="true"></div><div class="home-skeleton-row" aria-hidden="true"></div></div></div>
+      <section id="home" class="view workspace-content app-home" data-view="home" hidden aria-labelledby="home-title">
+        <header class="app-welcome">
+          <img src="{{ url_for('static', filename='assets/landing/hero.jpg') }}" width="734" height="2143" alt="">
+          <div class="app-welcome-copy">
+            <p data-welcome-lead>Welcome,</p>
+            <h1 id="home-title" tabindex="-1" data-welcome-name>shopper.</h1>
+            <p>Check what reviewers report before you buy<br>from Shopee, Lazada or Temu PH.</p>
+          </div>
+          <div class="app-welcome-side" aria-hidden="true"><p>CHARGE<br>SMARTER.<br>SHOP<br>SAFER.</p><span></span><p><i>Good tech<br>builds a brighter<br>tomorrow.</i></p></div>
+        </header>
+        <div class="app-body">
+          <section class="app-card app-scan" aria-label="Analyze a product">
+            <form data-start-analysis>
+              <label class="app-scan-input"><img class="app-ink-icon" src="{{ url_for('static', filename='assets/app/link.svg') }}" width="14" height="14" alt=""><span class="sr-only">Product link</span><input id="home-product-query" name="product-query" placeholder="Paste a Shopee, Lazada or Temu PH link..." autocomplete="off"></label>
+              <button class="app-button" type="submit">Analyze <img src="{{ url_for('static', filename='assets/app/arrow-light.svg') }}" width="14" height="14" alt=""></button>
+            </form>
+            <p class="app-scan-note">Press Enter to analyze · <span data-guest-note>3 free scans left today as a guest · sign in for unlimited</span></p>
           </section>
-          <aside class="flow-section home-wishlist-section" aria-labelledby="home-wishlist-title"><header><div><h2 id="home-wishlist-title">Saved for later</h2><p>Your shopping shortlist.</p></div><span id="home-wishlist-count" class="home-count"></span></header><div id="home-wishlist-preview" aria-busy="true"><p class="home-list-caption">Loading saved products…</p></div><a class="home-wishlist-link" href="#wishlist" data-route="wishlist">View wishlist →</a><p class="home-device-note">Saved on this browser.</p></aside>
+          <section id="home-scan-status" class="app-card home-scan-status" aria-labelledby="home-scan-title" hidden>
+            <div class="home-scan-symbol" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7V4h3m10 0h3v3M4 17v3h3m10 0h3v-3M7 12h10"/></svg></div>
+            <div class="home-scan-copy"><p class="home-scan-meta"><span id="home-scan-platform"></span><span id="home-scan-elapsed" aria-live="off"></span></p><h2 id="home-scan-title" aria-live="polite"></h2><p id="home-scan-product"></p><p id="home-scan-message"></p><div id="home-scan-progress" class="home-scan-progress" role="progressbar" aria-label="Analysis progress" aria-valuemin="0" aria-valuemax="100"><i id="home-scan-progress-fill"></i></div></div>
+            <button id="home-scan-action" class="app-button" type="button">View progress →</button>
+          </section>
+          <div id="home-stats" class="app-card app-stats" aria-label="Your activity in numbers"></div>
+          <div id="home-alert" class="app-alert" aria-live="polite" hidden></div>
+          <section class="app-row" data-home-row="recent" aria-labelledby="home-recent-title">
+            <header><h2 id="home-recent-title" class="app-eyebrow">Recently analyzed</h2><a class="app-see-all" href="#history" data-route="history">See all</a></header>
+            <div class="app-row-wrap"><div id="home-recent" class="app-row-track" tabindex="0" aria-label="Recently analyzed products" aria-busy="true"></div><button class="app-row-next" type="button" data-row-next aria-label="Show more recently analyzed products">›</button></div>
+          </section>
+          <section class="app-row" data-home-row="caution" aria-labelledby="home-caution-title" hidden>
+            <header><h2 id="home-caution-title" class="app-eyebrow">Caution</h2><button class="app-see-all caution" type="button" data-show-risk="attention">See all</button></header>
+            <div class="app-row-wrap"><div id="home-caution" class="app-row-track" tabindex="0" aria-label="Products where reviewers report fakes or defects"></div><button class="app-row-next" type="button" data-row-next aria-label="Show more caution products">›</button></div>
+          </section>
+          <section class="app-row" data-home-row="safety" aria-labelledby="home-safety-title" hidden>
+            <header><h2 id="home-safety-title" class="app-eyebrow">Safety reports</h2><button class="app-see-all danger" type="button" data-show-risk="safety">See all</button></header>
+            <div class="app-row-wrap"><div id="home-safety" class="app-row-track" tabindex="0" aria-label="Products where reviewers report safety problems"></div><button class="app-row-next" type="button" data-row-next aria-label="Show more products with safety reports">›</button></div>
+          </section>
+          <div class="app-two">
+            <section id="home-overview" class="app-card app-box" aria-label="Overview of your checked products"></section>
+            <section id="home-stores" class="app-card app-box" aria-label="Warnings by marketplace"></section>
+          </div>
+          <section class="app-how" aria-labelledby="home-how-title">
+            <h2 id="home-how-title" class="app-eyebrow quiet">How it works</h2>
+            <ol>
+              <li><span>STEP 01</span><h3>Paste a Link</h3><p>Copy any product link from Shopee, Lazada or Temu PH and paste it into the bar above.</p></li>
+              <li><span>STEP 02</span><h3>We Read the Reviews</h3><p>A Filipino-aware language model reads each review and looks for reports of fakes, defects and safety problems.</p></li>
+              <li><span>STEP 03</span><h3>Get Your Result</h3><p>A plain verdict (no warnings, caution, or safety reports) with the reviewers' own words.</p></li>
+            </ol>
+          </section>
+          <section class="app-tips" aria-labelledby="home-tips-title">
+            <header><h2 id="home-tips-title" class="app-eyebrow">Shopping safety tips</h2></header>
+            <dl>
+              <div><dt>Check seller ratings first</dt><dd>Prefer sellers with high ratings and many completed orders before buying electronics.</dd></div>
+              <div><dt>Verify product authenticity codes</dt><dd>Many brands print a serial or authenticity code you can check on their official website.</dd></div>
+              <div><dt>Read 1-star reviews carefully</dt><dd>Counterfeit products often appear in low-rating reviews mentioning 'fake', 'not original', or unexpected materials.</dd></div>
+              <div><dt>Check the return policy</dt><dd>Prefer sellers with a clear return policy for electronics, and keep the receipt and box.</dd></div>
+            </dl>
+          </section>
         </div>
-        <section id="home-risk-alert" class="home-risk-section" aria-live="polite"></section>
       </section>
 
       <section id="analyze" class="view workspace-content" data-view="analyze" hidden aria-labelledby="analyze-title">
@@ -216,13 +391,13 @@
               <div id="job-panel" class="job-panel" role="status" aria-live="polite" hidden><div class="spinner"></div><div class="job-body"><div class="job-heading"><b id="job-title">Live analysis running</b><span id="job-elapsed">0:00</span></div><p id="job-message">Preparing…</p><ol class="job-steps" aria-label="Analysis stages"><li data-job-stage="1">Collect</li><li data-job-stage="2">Analyze</li><li data-job-stage="3">Report</li></ol><div class="progress" aria-hidden="true"><i id="job-progress"></i></div></div></div>
               <p id="search-note" class="landing-search-note">Review the evidence before you buy.</p>
             </form>
-          <aside class="flow-analysis-help"><h2>What happens next?</h2><p>We detect the marketplace and collect a sample of public reviews. Your report explains the risk score, highlights concerns, and shows the supporting reviews.</p><h3>Already checked this product?</h3><p>Open its saved report instantly, or refresh it with new reviews.</p><a href="#history" data-route="history">Find a saved analysis →</a><p class="flow-footnote">Some marketplaces may ask you to log in or complete a CAPTCHA during collection.</p></aside>
+          <aside class="flow-analysis-help"><h2>What happens next?</h2><p>We detect the marketplace and collect a sample of public reviews. Your report gives a plain verdict, quotes what reviewers reported, and shows every review behind it.</p><h3>Already checked this product?</h3><p>Open its saved report instantly, or refresh it with new reviews.</p><a href="#history" data-route="history">Find a saved analysis →</a><p class="flow-footnote">Some marketplaces may ask you to log in or complete a CAPTCHA during collection.</p></aside>
         </div>
       </section>
 
       <section id="history" class="view workspace-content" data-view="history" hidden aria-labelledby="history-title">
         <header class="workspace-welcome flow-heading"><div><p class="flow-eyebrow">PICK UP WHERE YOU LEFT OFF</p><h1 id="history-title" tabindex="-1">Analysis history</h1><p>Find saved reports and revisit the evidence.</p></div><a class="primary-button" href="#analyze" data-route="analyze">＋ Analyze product</a></header>
-        <div class="flow-filters"><label>Find a product<input id="history-search" type="search" placeholder="Search product or marketplace"></label><label>Risk level<select id="history-risk"><option value="all">All risk levels</option><option>Low</option><option>Moderate</option><option>High</option></select></label></div>
+        <div class="flow-filters"><label>Find a product<input id="history-search" type="search" placeholder="Search product or marketplace"></label><label>Show<select id="history-risk"><option value="all">All reports</option><option value="attention">Reviewers reported problems</option><option value="safety">Safety reports</option><option value="clear">No warning signs</option><option value="unknown">Not enough reviews</option></select></label></div>
         <p id="history-count" class="flow-footnote" aria-live="polite"></p><div id="history-list"></div>
       </section>
 
@@ -237,20 +412,92 @@
       </section>
 
       <section id="results" class="view app-view" data-view="results" hidden>
-        <div class="view-heading"><div><p class="app-kicker">// Products</p><h2>Analyzed products</h2><p>Browse completed review analyses. The strongest review reliability appears first.</p></div></div>
-        <div class="filters" aria-label="Filter analyzed products"><label>Marketplace <select id="filter-platform"><option value="all">All marketplaces</option><option value="Shopee PH">Shopee PH</option><option value="Lazada PH">Lazada PH</option><option value="Temu PH">Temu PH</option></select></label><label>Risk level <select id="filter-risk"><option value="all">All risk levels</option><option>Low</option><option>Moderate</option><option>High</option></select></label><label>Sort by <select id="filter-sort"><option value="reliability">Highest reliability</option><option value="risk">Lowest risk</option><option value="reviews">Most reviews analyzed</option></select></label></div>
+        <div class="view-heading"><div><p class="app-kicker">// Products</p><h2>Analyzed products</h2><p>Browse completed review analyses. Products with the fewest reported problems appear first.</p></div></div>
+        <div class="filters" aria-label="Filter analyzed products"><label>Marketplace <select id="filter-platform"><option value="all">All marketplaces</option><option value="Shopee PH">Shopee PH</option><option value="Lazada PH">Lazada PH</option><option value="Temu PH">Temu PH</option></select></label><label>Show <select id="filter-risk"><option value="all">All reports</option><option value="attention">Reviewers reported problems</option><option value="safety">Safety reports</option><option value="clear">No warning signs</option><option value="unknown">Not enough reviews</option></select></label><label>Sort by <select id="filter-sort"><option value="fewest">Fewest reported problems</option><option value="most">Most reported problems</option><option value="reviews">Most reviews analyzed</option></select></label></div>
         <p id="results-summary" class="muted"></p><div id="product-grid" class="product-grid"></div>
       </section>
 
-      <section id="analysis" class="view report-view" data-view="analysis" hidden>
-        <div class="report-page">
-          <div class="flow-report-actions"><button id="report-back" class="report-back" type="button">← Back to history</button><div><button id="report-save" class="secondary-button" type="button" aria-pressed="false">♡ Save to wishlist</button><a class="primary-button" href="#analyze" data-route="analyze">Analyze another product →</a></div></div>
+      <section id="analysis" class="view report-view app-report" data-view="analysis" hidden aria-label="Product report">
+        <div class="rep">
+          <div class="rep-top">
+            <button id="report-back" class="rep-back" type="button"><img class="app-ink-icon" src="{{ url_for('static', filename='assets/app/back.svg') }}" width="14" height="14" alt="">Analyze another product</button>
+            <p id="report-status" class="rep-status" aria-live="polite"></p>
+          </div>
           <div id="analysis-content"></div>
-          <footer class="report-footer"><span id="report-analysis-date"></span><span>© 2026 Defaketive. Capstone Research · PSU Urdaneta City.</span></footer>
         </div>
       </section>
 
     </main>
+
+    <dialog id="signin-dialog" class="auth-dialog" aria-labelledby="signin-title">
+      <div class="auth-dialog-card">
+        <div class="auth-dialog-body">
+          <button class="auth-close" type="button" data-dialog-close aria-label="Close sign in"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
+          <p class="auth-dialog-brand"><span class="auth-shield small"><img src="{{ url_for('static', filename='assets/auth/shield-dialog.svg') }}" width="15.7142" height="18.0715" alt=""></span><b>DeFaketive</b></p>
+          <h2 id="signin-title">Sign in</h2>
+          <p class="auth-sub">Welcome back. Detect the defect.</p>
+          <form class="auth-form" data-auth-form="signin" novalidate>
+            <div class="auth-field"><label for="signin-email">Email</label><input id="signin-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+            <p class="auth-error" data-error-for="email" hidden></p>
+            <div class="auth-field"><label for="signin-password">Password</label><span class="auth-password"><input id="signin-password" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required>{{ eye_button() }}</span></div>
+            <p class="auth-error" data-error-for="password" hidden></p>
+            <p class="auth-form-error" data-form-error role="alert" hidden></p>
+            <button class="auth-submit" type="submit">Sign in</button>
+          </form>
+          <div class="auth-or" aria-hidden="true"><span>or</span></div>
+          <button class="auth-guest" type="button" data-continue-guest>Continue as guest — 3 free scans left today</button>
+          <p class="auth-switch">No account? <button type="button" data-auth-open="signup">Sign up free</button></p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="signup-dialog" class="auth-dialog" aria-labelledby="signup-title">
+      <div class="auth-dialog-card">
+        <div class="auth-dialog-body">
+          <button class="auth-close" type="button" data-dialog-close aria-label="Close create account"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
+          <p class="auth-dialog-brand"><span class="auth-shield small"><img src="{{ url_for('static', filename='assets/auth/shield-dialog.svg') }}" width="15.7142" height="18.0715" alt=""></span><b>DeFaketive</b></p>
+          <h2 id="signup-title">Create account</h2>
+          <p class="auth-sub">Join us and help protect Filipino shoppers.</p>
+          <form class="auth-form" data-auth-form="signup" novalidate>
+            <div class="auth-field"><label for="signup-name">Full name</label><input id="signup-name" name="full_name" type="text" autocomplete="name" placeholder="Juan Dela Cruz" maxlength="100" required></div>
+            <p class="auth-error" data-error-for="full_name" hidden></p>
+            <div class="auth-field"><label for="signup-email">Email</label><input id="signup-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+            <p class="auth-error" data-error-for="email" hidden></p>
+            <div class="auth-field"><label for="signup-password">Password</label><span class="auth-password"><input id="signup-password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" required>{{ eye_button() }}</span></div>
+            <p class="auth-error" data-error-for="password" hidden></p>
+            <div class="auth-field"><label for="signup-confirm">Confirm password</label><span class="auth-password"><input id="signup-confirm" name="confirm" type="password" autocomplete="new-password" placeholder="Re-enter password" required>{{ eye_button() }}</span></div>
+            <p class="auth-error" data-error-for="confirm" hidden></p>
+            <div class="auth-agree"><input id="signup-agree" name="agree" type="checkbox" required><label for="signup-agree">I agree to the <button type="button" data-terms-open="terms">Terms of Service</button> and <button type="button" data-terms-open="privacy">Privacy Policy</button>.</label></div>
+            <p class="auth-error" data-error-for="agree" hidden></p>
+            <p class="auth-form-error" data-form-error role="alert" hidden></p>
+            <button class="auth-submit" type="submit">Create account</button>
+          </form>
+          <p class="auth-switch">Already have an account? <button type="button" data-auth-open="signin">Sign in</button></p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="terms-dialog" class="auth-dialog auth-terms" aria-labelledby="terms-title">
+      <div class="auth-dialog-card">
+        <div class="auth-dialog-body">
+          <button class="auth-close" type="button" data-dialog-close aria-label="Close terms and privacy"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
+          <p class="auth-dialog-brand"><span class="auth-shield small"><img src="{{ url_for('static', filename='assets/auth/shield-dialog.svg') }}" width="15.7142" height="18.0715" alt=""></span><b>DeFaketive</b></p>
+          <h2 id="terms-title">Terms &amp; Privacy</h2>
+          <section id="terms-of-use" aria-labelledby="terms-of-use-title">
+            <h3 id="terms-of-use-title">Terms of Use</h3>
+            <p>DeFaketive is a student research project for academic use. Its warnings summarize what reviewers wrote; they are not proof that a product is fake, defective or unsafe. Decide for yourself before buying.</p>
+            <p>Please don't misuse the service, for example by automating scans.</p>
+          </section>
+          <section id="privacy-policy" aria-labelledby="privacy-policy-title">
+            <h3 id="privacy-policy-title">Privacy Policy</h3>
+            <p>With an account, we keep your name, your email and a scrambled copy of your password. Your password itself is never stored. We also keep your scan history and wishlist so they follow you to any browser.</p>
+            <p>For guests, we count scans per day using a browser cookie.</p>
+            <p>We don't sell or share any of this. To delete your account, use Settings → Delete account, or email the team at <a href="mailto:bmacalino_20ur2047@psu.edu.ph">bmacalino_20ur2047@psu.edu.ph</a>.</p>
+          </section>
+          <button class="auth-submit" type="button" data-dialog-close>Close</button>
+        </div>
+      </div>
+    </dialog>
 
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>

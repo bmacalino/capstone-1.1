@@ -1,8 +1,10 @@
 # Hazard Sentence Tagging Guide
 
 For the three annotators labelling review sentences for DeFaketive.
-Version 1.0, frozen 21 September 2026. If a rule here changes, the version
-changes and the sentences labelled under the old version are re-checked.
+Version 1.1, 29 September 2026 (1.0 frozen 21 September 2026). If a rule here
+changes, the version changes and the sentences labelled under the old version
+are re-checked. Version 1.1 only adds worked examples (Rule 7) for the cases
+labelling round 1 split on; no rule changed, so round 1 labels stay valid.
 
 Read this once all the way through before you label anything. Then do the
 30-sentence practice set together and compare answers. Disagreements at that
@@ -191,6 +193,23 @@ These come up constantly in our data and the computer gets them wrong:
 
 The general lesson: **read the whole sentence before deciding.** A single
 matching word is never enough.
+
+### Rule 7 — Worked examples for the cases round 1 split on (added in 1.1)
+
+In round 1 the two annotators on a sentence disagreed most often about defects
+(168 sentences). These examples apply the rules above; none is new.
+
+| Sentence (from round 1) | Answer | Why |
+|---|---|---|
+| "mdaling malowbat, d na full charge cp ko" | defect **yes** | battery that drains fast or will not fill is "mabilis maubos ang battery" |
+| "pero hindi nag chacharge so ano nalang?" | defect **yes** | does not charge |
+| "left side lang ang gumagana" | defect **yes** | part of the product does not work |
+| "no response, the seller only sends the automatic reply" | **no** to all | Rule 1: the seller, not the product |
+| "kulang ng 5 yung brick sa wallpaper" | **no** to all | Rule 1: missing from the order, not faulty |
+| "the box is damaged and the controller works perfectly" | **no** to all | Rule 1: the box |
+| "kaso iba sa picture yung pinadala nyo" | counterfeit **yes** | "iba sa picture" is on the counterfeit list |
+| "ang hina ng init, matagal ko nang sinaksak" (a hair straightener) | defect **yes**, safety **no** | too little heat from a heating product is a failure, not a hazard |
+| "okay din, fake news, di naman nag-stop" | counterfeit **no** | "fake news" means "that claim was false", not "this is a fake" |
 
 ---
 

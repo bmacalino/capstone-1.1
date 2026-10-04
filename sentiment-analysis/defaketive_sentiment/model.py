@@ -122,6 +122,7 @@ class DefaketiveSentimentModel:
         *,
         use_trained: bool = True,
         trained_model_path: str | Path | None = None,
+        classifier: Any | None = None,
     ):
         if negative_threshold >= positive_threshold:
             raise ValueError("negative_threshold must be lower than positive_threshold")
@@ -142,7 +143,13 @@ class DefaketiveSentimentModel:
         self.risk_entries = _load_tsv(LEXICON_DIR / "risk_lexicon.tsv")
         self.trained_classifier = None
         self.trained_model_error = None
-        if use_trained:
+        # A classifier passed in explicitly (the served transformer) is
+        # required: if it fails, analysis fails, instead of quietly labelling
+        # the review with VADER while the report names the transformer.
+        self.classifier_required = classifier is not None
+        if classifier is not None:
+            self.trained_classifier = classifier
+        elif use_trained:
             try:
                 self.trained_classifier = TrainedSentimentClassifier(
                     trained_model_path or DEFAULT_ARTIFACT
@@ -386,11 +393,20 @@ class DefaketiveSentimentModel:
         label = vader_label
         label_source = "vader_rules"
         if self.trained_classifier is not None:
+            # The transformer was trained on reviews as written; the TF-IDF
+            # model on normalized text. Each gets the input it was trained on.
+            wants_raw = getattr(self.trained_classifier, "wants_raw_text", False)
             try:
-                classifier_output = self.trained_classifier.predict(normalized)
+                classifier_output = self.trained_classifier.predict(
+                    str(text).strip() if wants_raw else normalized
+                )
                 label = classifier_output["label"]
-                label_source = "firecs_supervised_classifier"
+                label_source = getattr(
+                    self.trained_classifier, "label_source", "firecs_supervised_classifier"
+                )
             except Exception as exc:  # pragma: no cover - artifact/runtime mismatch
+                if self.classifier_required:
+                    raise
                 self.trained_model_error = f"Trained classifier prediction failed: {exc}"
 
         sentiment_evidence = self._sentiment_evidence(normalized)

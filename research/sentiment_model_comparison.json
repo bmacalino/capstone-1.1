@@ -1,0 +1,569 @@
+{
+  "dataset": "FiReCS",
+  "generated_at": "2026-09-23T08:36:07+00:00",
+  "protocol": {
+    "train_file": "FiReCS_train_set.csv",
+    "test_file": "FiReCS_test_set.csv",
+    "seed": 42,
+    "text_normalization": "train_firecs.normalized_text (feature_text + model normalize)",
+    "fairness_note": "Every arm receives identical normalized text and the identical cleaned training rows. Differences reflect the algorithm only.",
+    "bootstrap_iterations": 2000,
+    "latency_sample": 200,
+    "deployment_status": "comparison_only",
+    "qualified_for_integration": false
+  },
+  "training_audit": {
+    "original_train_rows": 7340,
+    "clean_train_rows": 7334,
+    "duplicate_train_rows_removed": 2,
+    "conflicting_duplicate_texts": 0,
+    "cross_split_train_rows_removed": 4,
+    "test_rows": 3147,
+    "clean_train_label_counts": {
+      "negative": 2381,
+      "neutral": 2547,
+      "positive": 2406
+    },
+    "test_label_counts": {
+      "negative": 1027,
+      "neutral": 1087,
+      "positive": 1033
+    },
+    "original_source_counts": {
+      "firecs_human": 7340
+    },
+    "clean_source_counts": {
+      "firecs_human": 7334
+    }
+  },
+  "significance": {
+    "reference_arm": "tfidf_logistic_regression_incumbent",
+    "correction": "holm_bonferroni",
+    "alpha": 0.05,
+    "comparisons": 6
+  },
+  "results": {
+    "shipped_artifact_reproduction": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.8112,
+      "precision": 0.8169,
+      "recall": 0.8119,
+      "f1": 0.8138,
+      "per_class": {
+        "negative": {
+          "precision": 0.8213,
+          "recall": 0.8053,
+          "f1": 0.8132,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.7219,
+          "recall": 0.7737,
+          "f1": 0.7469,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.9077,
+          "recall": 0.8567,
+          "f1": 0.8815,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          827,
+          192,
+          8
+        ],
+        [
+          164,
+          841,
+          82
+        ],
+        [
+          16,
+          132,
+          885
+        ]
+      ],
+      "arm": "shipped_artifact_reproduction",
+      "fit_seconds": 0.0,
+      "macro_f1_ci": {
+        "macro_f1": 0.8138,
+        "ci_lower": 0.8002,
+        "ci_upper": 0.8274,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "latency": {
+        "median_ms_per_review": 3.3557,
+        "p95_ms_per_review": 5.0151,
+        "sampled_reviews": 200
+      },
+      "serialized_bytes": 2484213,
+      "text_input": "normalized_with_feature_markers",
+      "mcnemar_vs_incumbent": {
+        "only_a_correct": 0,
+        "only_b_correct": 0,
+        "discordant": 0,
+        "statistic": 0.0,
+        "p_value": 1.0,
+        "method": "exact",
+        "p_adjusted": 1.0,
+        "significant_after_correction": false
+      }
+    },
+    "vader_lexicon": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.5284,
+      "precision": 0.5058,
+      "recall": 0.5357,
+      "f1": 0.4818,
+      "per_class": {
+        "negative": {
+          "precision": 0.6256,
+          "recall": 0.6329,
+          "f1": 0.6292,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.3947,
+          "recall": 0.1242,
+          "f1": 0.1889,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.4972,
+          "recall": 0.85,
+          "f1": 0.6274,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          650,
+          155,
+          222
+        ],
+        [
+          286,
+          135,
+          666
+        ],
+        [
+          103,
+          52,
+          878
+        ]
+      ],
+      "arm": "vader_lexicon",
+      "fit_seconds": 0.0,
+      "macro_f1_ci": {
+        "macro_f1": 0.4818,
+        "ci_lower": 0.4662,
+        "ci_upper": 0.4972,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "latency": {
+        "median_ms_per_review": 2.0536,
+        "p95_ms_per_review": 4.4312,
+        "sampled_reviews": 200
+      },
+      "serialized_bytes": null,
+      "text_input": "raw_review",
+      "mcnemar_vs_incumbent": {
+        "only_a_correct": 1139,
+        "only_b_correct": 249,
+        "discordant": 1388,
+        "statistic": 569.3955,
+        "p_value": 0.0,
+        "method": "chi_square_continuity_corrected",
+        "p_adjusted": 0.0,
+        "significant_after_correction": true
+      }
+    },
+    "tfidf_logistic_regression_incumbent": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.8112,
+      "precision": 0.8169,
+      "recall": 0.8119,
+      "f1": 0.8138,
+      "per_class": {
+        "negative": {
+          "precision": 0.8213,
+          "recall": 0.8053,
+          "f1": 0.8132,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.7219,
+          "recall": 0.7737,
+          "f1": 0.7469,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.9077,
+          "recall": 0.8567,
+          "f1": 0.8815,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          827,
+          192,
+          8
+        ],
+        [
+          164,
+          841,
+          82
+        ],
+        [
+          16,
+          132,
+          885
+        ]
+      ],
+      "arm": "tfidf_logistic_regression_incumbent",
+      "fit_seconds": 6.371,
+      "macro_f1_ci": {
+        "macro_f1": 0.8138,
+        "ci_lower": 0.8002,
+        "ci_upper": 0.8274,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "latency": {
+        "median_ms_per_review": 2.9948,
+        "p95_ms_per_review": 4.1537,
+        "sampled_reviews": 200
+      },
+      "serialized_bytes": 2481032,
+      "text_input": "normalized_with_feature_markers"
+    },
+    "tfidf_linear_svc": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.7982,
+      "precision": 0.8023,
+      "recall": 0.7991,
+      "f1": 0.8004,
+      "per_class": {
+        "negative": {
+          "precision": 0.8118,
+          "recall": 0.7936,
+          "f1": 0.8026,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.7119,
+          "recall": 0.7479,
+          "f1": 0.7295,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.8831,
+          "recall": 0.8558,
+          "f1": 0.8692,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          815,
+          198,
+          14
+        ],
+        [
+          171,
+          813,
+          103
+        ],
+        [
+          18,
+          131,
+          884
+        ]
+      ],
+      "arm": "tfidf_linear_svc",
+      "fit_seconds": 3.572,
+      "macro_f1_ci": {
+        "macro_f1": 0.8004,
+        "ci_lower": 0.787,
+        "ci_upper": 0.8147,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "latency": {
+        "median_ms_per_review": 3.0391,
+        "p95_ms_per_review": 4.282,
+        "sampled_reviews": 200
+      },
+      "serialized_bytes": 3149712,
+      "text_input": "normalized_with_feature_markers",
+      "mcnemar_vs_incumbent": {
+        "only_a_correct": 76,
+        "only_b_correct": 35,
+        "discordant": 111,
+        "statistic": 14.4144,
+        "p_value": 0.000147,
+        "method": "chi_square_continuity_corrected",
+        "p_adjusted": 0.000588,
+        "significant_after_correction": true
+      }
+    },
+    "tfidf_complement_naive_bayes": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.7881,
+      "precision": 0.7862,
+      "recall": 0.7904,
+      "f1": 0.7871,
+      "per_class": {
+        "negative": {
+          "precision": 0.7755,
+          "recall": 0.8208,
+          "f1": 0.7975,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.7392,
+          "recall": 0.6596,
+          "f1": 0.6971,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.844,
+          "recall": 0.8906,
+          "f1": 0.8667,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          843,
+          164,
+          20
+        ],
+        [
+          220,
+          717,
+          150
+        ],
+        [
+          24,
+          89,
+          920
+        ]
+      ],
+      "arm": "tfidf_complement_naive_bayes",
+      "fit_seconds": 2.931,
+      "macro_f1_ci": {
+        "macro_f1": 0.7871,
+        "ci_lower": 0.7723,
+        "ci_upper": 0.8016,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "latency": {
+        "median_ms_per_review": 4.1098,
+        "p95_ms_per_review": 5.4968,
+        "sampled_reviews": 200
+      },
+      "serialized_bytes": 4933076,
+      "text_input": "normalized_with_feature_markers",
+      "mcnemar_vs_incumbent": {
+        "only_a_correct": 246,
+        "only_b_correct": 173,
+        "discordant": 419,
+        "statistic": 12.3723,
+        "p_value": 0.000436,
+        "method": "chi_square_continuity_corrected",
+        "p_adjusted": 0.001308,
+        "significant_after_correction": true
+      }
+    },
+    "tfidf_svd_logistic_regression": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.8036,
+      "precision": 0.8069,
+      "recall": 0.8047,
+      "f1": 0.8056,
+      "per_class": {
+        "negative": {
+          "precision": 0.8064,
+          "recall": 0.815,
+          "f1": 0.8107,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.7243,
+          "recall": 0.7443,
+          "f1": 0.7341,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.8901,
+          "recall": 0.8548,
+          "f1": 0.8721,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          837,
+          176,
+          14
+        ],
+        [
+          183,
+          809,
+          95
+        ],
+        [
+          18,
+          132,
+          883
+        ]
+      ],
+      "arm": "tfidf_svd_logistic_regression",
+      "fit_seconds": 26.094,
+      "macro_f1_ci": {
+        "macro_f1": 0.8056,
+        "ci_lower": 0.7919,
+        "ci_upper": 0.8187,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "latency": {
+        "median_ms_per_review": 43.2658,
+        "p95_ms_per_review": 51.5798,
+        "sampled_reviews": 200
+      },
+      "serialized_bytes": 68692552,
+      "text_input": "normalized_with_feature_markers",
+      "mcnemar_vs_incumbent": {
+        "only_a_correct": 163,
+        "only_b_correct": 139,
+        "discordant": 302,
+        "statistic": 1.7517,
+        "p_value": 0.185669,
+        "method": "chi_square_continuity_corrected",
+        "p_adjusted": 0.371338,
+        "significant_after_correction": false
+      }
+    },
+    "tfidf_svd_gradient_boosting": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.7757,
+      "precision": 0.7812,
+      "recall": 0.7765,
+      "f1": 0.7784,
+      "per_class": {
+        "negative": {
+          "precision": 0.7779,
+          "recall": 0.7809,
+          "f1": 0.7794,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.6867,
+          "recall": 0.7259,
+          "f1": 0.7057,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.879,
+          "recall": 0.8228,
+          "f1": 0.85,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          802,
+          207,
+          18
+        ],
+        [
+          199,
+          789,
+          99
+        ],
+        [
+          30,
+          153,
+          850
+        ]
+      ],
+      "arm": "tfidf_svd_gradient_boosting",
+      "fit_seconds": 72.226,
+      "macro_f1_ci": {
+        "macro_f1": 0.7784,
+        "ci_lower": 0.7643,
+        "ci_upper": 0.7925,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "seed": 42
+      },
+      "latency": {
+        "median_ms_per_review": 83.6643,
+        "p95_ms_per_review": 105.3974,
+        "sampled_reviews": 200
+      },
+      "serialized_bytes": 72576188,
+      "text_input": "normalized_with_feature_markers",
+      "mcnemar_vs_incumbent": {
+        "only_a_correct": 256,
+        "only_b_correct": 144,
+        "discordant": 400,
+        "statistic": 30.8025,
+        "p_value": 0.0,
+        "method": "chi_square_continuity_corrected",
+        "p_adjusted": 0.0,
+        "significant_after_correction": true
+      }
+    }
+  }
+}

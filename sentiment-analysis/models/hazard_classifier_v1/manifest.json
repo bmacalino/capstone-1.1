@@ -1,0 +1,87 @@
+{
+  "version": "hazard-learned-1.0.0",
+  "trained_at": "2026-10-03T02:41:03+00:00",
+  "training_data": "labelling round 1 (annotators A1, A2; A3 sheet missing)",
+  "preregistration": "research/PREREGISTRATION_hazard_v4.md",
+  "categories": {
+    "safety": {
+      "file": "safety.joblib",
+      "sha256": "e03e6239e2bddb8dc6c664487cef33386e2f63bbe1bd3ff8e85bf481fb8b9f4b",
+      "candidate": "TK",
+      "threshold": 0.818933,
+      "needs_embedding": false,
+      "training_rows": 873,
+      "training_positives": 30
+    }
+  },
+  "keyword_files": {
+    "risk_lexicon.tsv": "c46a844844dc73e487dd3ce9684f0f6b9f5259ad83ea51a270a7616a19e26282",
+    "safety_false_friends_v1.tsv": "9754b41c50112893e9a3fa007921dc8b2317b78381dc3ffa32d3ce2db1ad918a",
+    "hazard_phrase_exclusions_v1.tsv": "bbcc404373f4f2e2655945b9a89d63831ba5d16413dcd7feccb2b4a9099a8dcd"
+  },
+  "embedding_model": null,
+  "qualified_for_integration": true,
+  "note": "Ships only the adopted categories; the others keep the keyword checker.",
+  "not_adopted": {
+    "counterfeit": {
+      "candidate": "TK",
+      "sha256": "bd22465780d79216888df6045bbd043c00aeaa617c406754f4a5f662c83f7b46"
+    },
+    "defect": {
+      "candidate": "TK",
+      "sha256": "4c42ddd36971e0871e5bc7129fe327f30397d5fc1cecb014cd49d3e2dbed4ac3"
+    }
+  },
+  "adoption": {
+    "rule": "adopt if round-2 F1 > keyword checker 0.3.0 and round-2 recall not lower",
+    "round2_report": "research\\hazard_tagger_measurement_round2.json",
+    "decisions": {
+      "safety": {
+        "adopted": true,
+        "adopted_by_rule": true,
+        "round2_keywords": {
+          "precision": 0.4,
+          "recall": 0.625,
+          "f1": 0.4878
+        },
+        "round2_learned": {
+          "precision": 0.4167,
+          "recall": 0.625,
+          "f1": 0.5
+        },
+        "mcnemar_p": 1.0
+      },
+      "defect": {
+        "adopted": false,
+        "adopted_by_rule": true,
+        "override": "User decision 3 Oct 2026 after the live check: on unseen reviews about 1 in 3 of the learned model's extra defect flags were wrong, typically sentences saying the product works ('gumagana po cya', 'fast charging'), quoted to shoppers as defect reports. Kept on keywords until a gate is tested on a new labelling round.",
+        "round2_keywords": {
+          "precision": 0.8194,
+          "recall": 0.447,
+          "f1": 0.5784
+        },
+        "round2_learned": {
+          "precision": 0.8068,
+          "recall": 0.5379,
+          "f1": 0.6455
+        },
+        "mcnemar_p": 0.076813
+      },
+      "counterfeit": {
+        "adopted": false,
+        "round2_keywords": {
+          "precision": 0.5385,
+          "recall": 0.5833,
+          "f1": 0.56
+        },
+        "round2_learned": {
+          "precision": 0.5,
+          "recall": 0.5833,
+          "f1": 0.5385
+        },
+        "mcnemar_p": 1.0
+      }
+    },
+    "decided_at": "2026-10-03T03:12:17+00:00"
+  }
+}

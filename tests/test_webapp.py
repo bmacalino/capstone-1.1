@@ -1,6 +1,9 @@
+import json
 import subprocess
+import tempfile
 import unittest
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import patch
 
 import webapp
@@ -14,15 +17,50 @@ SAMPLE_PRODUCT = {
     "platform": "shopee",
     "comments": [{"author": "Shopper", "rating": 5, "content": "Good product"}],
     "sentiment_summary": {
-        "review_count": 1,
-        "risk_score": 10,
-        "risk_score_scale": "percent",
-        "risk_review_count": 0,
-        "keyword_failure_rate": 0,
+        "schema_version": "defaketive-summary-2.0",
+        "verdict": {
+            "state": "insufficient_evidence",
+            "detail": "Only 1 usable reviews; at least 30 are needed",
+        },
+        "usable_review_count": 1,
+        "safety": {"flagged_reviews": 0, "hazard_subtypes": {}, "evidence": []},
+        "flags": {
+            "counterfeit": {"flagged_reviews": 0, "evidence": []},
+            "defect": {"flagged_reviews": 0, "evidence": []},
+        },
         "sentiment_counts": {"positive": 1, "neutral": 0, "negative": 0},
-        "sentiment_ratios": {"positive": 1, "neutral": 0, "negative": 0},
     },
 }
+
+
+def fire_product(link="https://shopee.ph/fire-i.1.3"):
+    """A badge summary whose reviews report fires, and one defect."""
+    fire = {
+        "text": "nasunog yung charger pagka saksak",
+        "score": 3.0,
+        "high_confidence": True,
+        "hazard_subtype": "fire_explosion_swelling",
+        "terms": [{"span": [0, 7], "negated": False}],
+    }
+    return {
+        **SAMPLE_PRODUCT,
+        "link": link,
+        "name": "VoltMax power bank",
+        "sentiment_summary": {
+            **SAMPLE_PRODUCT["sentiment_summary"],
+            "verdict": {"state": "safety_warning", "detail": "Two independent fire reports"},
+            "usable_review_count": 40,
+            "safety": {
+                "flagged_reviews": 3,
+                "hazard_subtypes": {"fire_explosion_swelling": {"reviews": 3, "severity": 4}},
+                "evidence": [fire],
+            },
+            "flags": {
+                "counterfeit": {"flagged_reviews": 0, "evidence": []},
+                "defect": {"flagged_reviews": 1, "evidence": []},
+            },
+        },
+    }
 
 
 class TestWebApp(unittest.TestCase):
@@ -34,7 +72,10 @@ class TestWebApp(unittest.TestCase):
     def setUp(self):
         webapp._catalogs.clear()
         webapp._jobs.clear()
-        self.app = webapp.create_app({"TESTING": True, "SECRET_KEY": "test"})
+        # A fresh accounts database per test, so guest scans never carry over.
+        accounts_folder = tempfile.TemporaryDirectory()
+        self.addCleanup(accounts_folder.cleanup)
+        self.app = webapp.create_app({"TESTING": True, "SECRET_KEY": "test", "ACCOUNTS_DB": str(Path(accounts_folder.name) / "accounts.db")})
         self.client = self.app.test_client()
         with self.client.session_transaction() as state:
             state["catalog_key"] = "webapp-test"
@@ -45,9 +86,8 @@ class TestWebApp(unittest.TestCase):
         catalog = self.client.get("/api/products")
         self.assertEqual(page.status_code, 200)
         self.assertIn(b"DeFaketive", page.data)
-        self.assertNotIn(b">Products</a>", page.data)
         self.assertNotIn(b"Check another product", page.data)
-        self.assertIn(b"Back to history", page.data)
+        self.assertIn(b"Analyze another product", page.data)
         self.assertEqual(catalog.status_code, 200)
         self.assertEqual(catalog.json["count"], 1)
 
@@ -93,8 +133,9 @@ class TestWebApp(unittest.TestCase):
             {
                 "products": 1,
                 "reviews": 1,
-                "average_reliability": 90.0,
-                "high_risk": 0,
+                "safety_warnings": 0,
+                "with_safety_reports": 0,
+                "not_analyzed": 0,
                 "marketplaces": 1,
             },
         )
@@ -105,84 +146,137 @@ class TestWebApp(unittest.TestCase):
         script = script_response.get_data()
         script_response.close()
 
-        self.assertIn(b"Read the evidence<br>before you buy", page.data)
-        self.assertIn(b'id="landing" class="view active landing-view new-landing"', page.data)
+        self.assertIn(b"SPOT FAKES &amp;<br>DEFECTS<br>BEFORE YOU BUY", page.data)
+        self.assertIn(b'id="landing" class="view active pub-landing"', page.data)
+        self.assertIn(b"css/public.css", page.data)
         self.assertIn(b'id="workspace-shell"', page.data)
         self.assertIn(b'data-view="home"', page.data)
-        self.assertIn(b'data-signin>Sign In', page.data)
+        self.assertIn(b"data-signin data-auth-guest>Sign In", page.data)
         self.assertIn(b'id="search-form"', page.data)
-        self.assertIn(b"COLLECT PUBLIC REVIEWS", page.data)
-        self.assertIn(b'data-explore-tab="how-it-works"', page.data)
-        self.assertIn(b"What the report promises", page.data)
-        self.assertIn(b"The research team", page.data)
-        self.assertIn(b"Bring one listing.<br>Leave with the evidence.", page.data)
-        self.assertIn(b"landing-eye.svg", page.data)
-        self.assertIn(b"Recent analyses", page.data)
-        self.assertIn(b'aria-label="Workspace navigation"', page.data)
+        self.assertIn(b'id="platforms"', page.data)
+        self.assertIn(b"THE MINDS<br>BEHIND A SAFER<br>SHOPPING EXPERIENCE.", page.data)
+        self.assertIn(b"assets/landing/hero.jpg", page.data)
+        self.assertNotIn(b"data-explore-tab", page.data)
+        self.assertNotIn(b"function activateExploreTab", script)
+        self.assertIn(b"Recently analyzed", page.data)
+        # The app frame: a top bar and a floating icon rail replace the old sidebar.
+        self.assertIn(b'class="app-topbar"', page.data)
+        self.assertIn(b'class="app-rail" aria-label="Workspace navigation"', page.data)
+        self.assertNotIn(b"workspace-sidebar", page.data)
+        self.assertIn(b'id="home-overview"', page.data)
+        self.assertIn(b'id="home-stores"', page.data)
+        # Signed-in history and wishlist are kept in the account, not the browser.
+        self.assertIn(b"function loadLibrary", script)
+        self.assertIn(b'if (state.user) return;', script)
+        self.assertIn(b"Too few reviews", script)
         self.assertIn(b'data-view="history"', page.data)
         self.assertIn(b'data-view="wishlist"', page.data)
         self.assertIn(b'data-view="settings"', page.data)
         self.assertNotIn(b'data-home-report=', page.data)
         self.assertNotIn(b'data-workspace-placeholder=', page.data)
-        self.assertIn(b"home-logo.svg", page.data)
+        self.assertIn(b'class="app-brand-mark"', page.data)
         self.assertNotIn(b'id="dashboard"', page.data)
         self.assertNotIn(b'data-view="dashboard"', page.data)
         self.assertNotIn(b"Your safer-shopping dashboard", page.data)
         self.assertNotIn(b"function renderHomeDashboard", script)
         self.assertIn(b"function openSignedInPage", script)
-        self.assertIn(b'async function openSignedInPage() {\n  go("home");', script)
+        # Sign In opens the sign-in pop-up, or Home when already signed in.
+        self.assertIn(b'async function openSignedInPage() {\n  if (state.user) go("home");\n  else openAuth("signin");', script)
+        for marker in (b'data-view="login"', b'id="signin-dialog"', b'id="signup-dialog"', b'id="terms-dialog"',
+                       b'autocomplete="current-password"', b'autocomplete="new-password"', b'data-auth-open="signup"'):
+            self.assertIn(marker, page.data)
+        # "Forgot password?" stays hidden until the app can send email.
+        self.assertNotIn(b"Forgot", page.data)
         self.assertIn(b'if (view === "dashboard") view = "home"', script)
         self.assertIn(b"context.isUrl && state.products.length === 1", script)
 
     def test_dashboard_reports_a_products_main_risk_issue(self):
-        product = {
-            **SAMPLE_PRODUCT,
-            "sentiment_summary": {
-                **SAMPLE_PRODUCT["sentiment_summary"],
-                "risk_score": 80,
-            },
-            "comments": [
-                {
-                    "content": "Sira agad",
-                    "sentiment_analysis": {
-                        "risk": {
-                            "detected": True,
-                            "categories": ["defect"],
-                            "evidence": [
-                                {"category": "defect", "term": "sira", "negated": False}
-                            ],
-                        }
-                    },
-                }
-            ],
-        }
-        webapp._catalogs["webapp-test"] = [product]
+        webapp._catalogs["webapp-test"] = [SAMPLE_PRODUCT, fire_product()]
 
         overview = self.client.get("/api/admin/overview")
 
-        self.assertEqual(overview.json["summary"]["high_risk"], 1)
-        self.assertEqual(overview.json["flagged"][0]["Main issue"], "Defect")
+        self.assertEqual(overview.json["summary"]["safety_warnings"], 1)
+        self.assertEqual(overview.json["summary"]["with_safety_reports"], 1)
+        flagged = overview.json["flagged"]
+        self.assertEqual(len(flagged), 1)
+        # Three safety reports outnumber the one defect report.
+        self.assertEqual(flagged[0]["Main issue"], "Safety")
+        self.assertEqual(flagged[0]["Verdict"], "Reviewers report safety problems")
+
+    def test_a_product_with_fire_reports_is_served_as_a_safety_warning(self):
+        # Regression: the screens read a risk_score the badge model does not
+        # produce, defaulted it to 0, and showed fire reports as "Low risk".
+        product = fire_product()
+        webapp._catalogs["webapp-test"] = [product]
+
+        listed = self.client.get("/api/products").json["products"][0]["badge_view"]
+        detail = self.client.get(
+            "/api/products/detail", query_string={"link": product["link"]}
+        ).json["product"]["badge_view"]
+
+        for view in (listed, detail):
+            self.assertEqual(view["tone"], "high")
+            self.assertEqual(view["headline"], "Reviewers report safety problems")
+            self.assertEqual(view["counts"]["safety"], 3)
+        quote = detail["badges"][0]["evidence"][0]
+        self.assertEqual(quote["text"], "nasunog yung charger pagka saksak")
+        self.assertEqual(quote["highlights"], [[0, 7]])
+
+    def test_exported_products_carry_badges_not_scores(self):
+        webapp._catalogs["webapp-test"] = [fire_product()]
+        response = self.client.get("/api/export/products.csv")
+        header = response.get_data().decode("utf-8-sig").splitlines()[0]
+        response.close()
+        self.assertIn("Safety reports", header)
+        self.assertNotIn("Risk score", header)
+        self.assertNotIn("Reliability", header)
 
     def test_analysis_ui_explains_scores_and_filters_review_evidence(self):
         response = self.client.get("/static/js/app.js")
         script = response.get_data()
         response.close()
 
-        self.assertIn(b"Lower is better", script)
-        self.assertIn(b"Higher is better", script)
-        self.assertIn(b"Negative sentiment", script)
-        self.assertIn(b"Detected-risk ratio", script)
-        self.assertIn(
-            b"Thirty percent comes from the negative-review ratio",
-            script,
-        )
-        self.assertIn(b"Supporting lexicon evidence", script)
-        self.assertIn(b'data-review-filter="risk"', script)
+        # The report quotes what reviewers said and explains why there is no score.
+        self.assertIn(b"Three checks, in their own words", script)
+        self.assertIn(b"Why you see reviews, not a score", script)
+        self.assertIn(b"no flags is not proof of safety", script)
+        self.assertIn(b"function highlightSpans", script)
+        self.assertIn(b'data-review-filter="reported"', script)
         self.assertIn(b'data-review-filter="uncertain"', script)
         self.assertIn(b'id="review-search"', script)
-        self.assertIn(b"Duplicates excluded", script)
-        self.assertNotIn(b"Active defect/fraud terms", script)
+        self.assertIn(b"duplicates excluded", script)
+        # Nothing of the retired 0-100 score survives, including the 30/70
+        # formula it was built from and the "safe to buy" clearance.
+        for retired in (
+            b"risk_score",
+            b"Lower is better",
+            b"Thirty percent comes from the negative-review ratio",
+            b"weighted risk score",
+            b"Generally safe to buy",
+            b'data-review-filter="risk"',
+        ):
+            self.assertNotIn(retired, script)
         self.assertNotIn(b'id="sentiment-chart"', script)
+        # The redesigned report keeps the Figma layout but none of its score-era
+        # content: no final score, no score table, no invented aspect scores,
+        # no "safe to buy" or "avoid", and no reviewer name the data never had.
+        for invented in (b"Final risk score", b"Score Components", b"Safe to buy", b"Aspect Scores",
+                         b"Verified shopper", b"/ 100", b"Recommended Alternatives", b"Confidence", b"AiAssistant"):
+            self.assertNotIn(invented, script)
+        for honest in (b"How DeFaketive Labels a Product", b"Warning words found", b"What the check looks for",
+                       b"Duplicates excluded", b"No warning signs", b"function warningWords", b"term.negated"):
+            self.assertIn(honest, script)
+
+    def test_guest_report_has_the_out_of_scans_notice(self):
+        page = self.client.get("/")
+        script_response = self.client.get("/static/js/app.js")
+        script = script_response.get_data()
+        script_response.close()
+        self.assertIn(b'id="guest-limit-notice"', page.data)
+        self.assertIn("You’ve used today’s free scans".encode("utf-8"), page.data)
+        self.assertNotIn(b"credit limit", page.data)
+        # Shown only to a guest with no scans left, on a report.
+        self.assertIn(b'!state.user && Number(state.guest?.left) === 0 && currentView() === "analysis"', script)
 
     def test_top_navigation_is_shopper_focused_and_accessible(self):
         page = self.client.get("/")
@@ -190,8 +284,8 @@ class TestWebApp(unittest.TestCase):
         script = script_response.get_data()
         script_response.close()
 
-        self.assertIn(b'>Home</a>', page.data)
-        self.assertNotIn(b'>Products</a>', page.data)
+        # The logo is the way home; Products opens the list of checked products.
+        self.assertIn(b'data-route="results">Products</a>', page.data)
         self.assertIn(b'>About</a>', page.data)
         self.assertIn(b'>FAQ</a>', page.data)
         self.assertIn(b'aria-label="Open navigation"', page.data)
@@ -203,6 +297,17 @@ class TestWebApp(unittest.TestCase):
         self.assertIn(b"function setActiveNavigation", script)
         self.assertIn(b'event.key === "Escape"', script)
         self.assertIn(b"focusProductSearch", script)
+
+    def test_pages_never_describe_the_retired_score_or_invented_numbers(self):
+        # The Figma screens still carried the old 0-1 score, its 30/70 formula,
+        # marketplaces the app does not support, and made-up statistics.
+        page = self.client.get("/").get_data(as_text=True)
+        for claim in (
+            "Risk Score", "KFR", "NLTK", "lexicon-based", "Amazon", "TikTok", "verified",
+            "Reliability Score", "4,821", "28,493", "96.2%", "Flagged as Avoid",
+            "Safe, Caution, Avoid", "90 days", "Free Plan", "community favorites", "Watch Demo",
+        ):
+            self.assertNotIn(claim, page)
 
     def test_product_link_marketplace_overrides_selected_marketplace(self):
         job = {
@@ -257,6 +362,18 @@ class TestWebApp(unittest.TestCase):
 
         self.assertIn("earphones", command)
         self.assertNotIn("--chrome-user-data-dir", command)
+
+    def test_lazada_scans_read_sixty_reviews_from_each_star_level(self):
+        command, _target = webapp._command_for_scrape(
+            "https://www.lazada.com.ph/products/pdp-i4644812363-s1.html", "lazada", 1, 100
+        )
+        self.assertIn("--all-star-types", command)
+        self.assertEqual(command[command.index("--star-limit-per-type") + 1], "60")
+
+    def test_other_marketplaces_keep_the_review_count(self):
+        command, _target = webapp._command_for_scrape("earphones", "temu", 1, 40)
+        self.assertNotIn("--all-star-types", command)
+        self.assertEqual(command[command.index("-r") + 1], "40")
 
     def test_network_access_denied_has_actionable_launcher_message(self):
         result = subprocess.CompletedProcess(
@@ -314,6 +431,73 @@ class TestWebApp(unittest.TestCase):
         self.assertEqual(response.json["sample_count"], 2)
         self.assertEqual(response.json["labels"], ["negative", "positive"])
         save.assert_called_once()
+
+
+
+class TestModelUnavailable(unittest.TestCase):
+    """A missing model must be explained, never shown as an empty catalog."""
+
+    def setUp(self):
+        webapp._catalogs.clear()
+        self.addCleanup(webapp._catalogs.clear)
+        self.client = webapp.create_app({"TESTING": True, "SECRET_KEY": "test"}).test_client()
+        self.missing = webapp.ModelUnavailableError(
+            "The sentiment model is not installed. Build it with research/slim_sentiment_model.py"
+        )
+
+    def results_file(self):
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        target = Path(folder.name) / "results.json"
+        target.write_bytes(json.dumps([SAMPLE_PRODUCT]).encode("utf-8"))
+        return target
+
+    def test_the_catalog_reports_the_missing_model_instead_of_an_empty_list(self):
+        webapp._analysed_files.clear()
+        with patch.object(webapp, "result_files", return_value=[self.results_file()]),                 patch.object(webapp, "load_saved_products", side_effect=AssertionError("must not fall through")),                 patch.object(webapp, "sentiment_model_version", return_value="unavailable"),                 patch.object(webapp, "analysis_is_current", return_value=False),                 patch.object(webapp, "analyze_products", side_effect=self.missing):
+            response = self.client.get("/api/products")
+        self.assertEqual(response.status_code, 503)
+        self.assertTrue(response.json["model_unavailable"])
+        self.assertIn("Nothing was analyzed", response.json["error"])
+        self.assertIn("slim_sentiment_model.py", response.json["detail"])
+
+    def test_a_live_scan_is_refused_before_any_scraping(self):
+        with patch.object(webapp, "require_model", side_effect=self.missing),                 patch.object(webapp, "_start_job") as start:
+            response = self.client.post(
+                "/api/search",
+                json={"query": "https://www.lazada.com.ph/products/pdp-i1234567.html", "platform": "lazada", "live": True},
+            )
+        self.assertEqual(response.status_code, 503)
+        start.assert_not_called()
+
+    def test_an_upload_reports_the_missing_model(self):
+        with patch.object(webapp, "_set_products", side_effect=self.missing):
+            response = self.client.post(
+                "/api/upload",
+                data={"file": (BytesIO(json.dumps([SAMPLE_PRODUCT]).encode("utf-8")), "results.json")},
+                content_type="multipart/form-data",
+            )
+        self.assertEqual(response.status_code, 503)
+        self.assertTrue(response.json["model_unavailable"])
+
+    def test_a_results_file_is_analysed_once_for_all_sessions(self):
+        # The transformer takes ~19 s per 100 reviews; each new browser session
+        # used to re-analyse the same file.
+        webapp._analysed_files.clear()
+        self.addCleanup(webapp._analysed_files.clear)
+        with patch.object(webapp, "result_files", return_value=[self.results_file()]),                 patch.object(webapp, "sentiment_model_version", return_value="v-test"),                 patch.object(webapp, "analysis_is_current", return_value=False),                 patch.object(webapp, "analyze_products", side_effect=lambda products: products) as analyze:
+            for key in ("session-a", "session-b"):
+                with self.client.session_transaction() as state:
+                    state["catalog_key"] = key
+                self.assertEqual(self.client.get("/api/products").json["count"], 1)
+        self.assertEqual(analyze.call_count, 1)
+
+    def test_the_home_page_shows_the_reason(self):
+        script = self.client.get("/static/js/app.js")
+        data = script.get_data()
+        script.close()
+        self.assertIn(b"Review analysis is unavailable", data)
+        self.assertIn(b"model_unavailable", data)
 
 
 if __name__ == "__main__":

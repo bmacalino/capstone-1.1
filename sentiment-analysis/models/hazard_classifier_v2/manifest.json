@@ -1,0 +1,44 @@
+{
+  "version": "hazard-learned-2.0.0",
+  "trained_at": "2026-10-03T03:31:39+00:00",
+  "preregistration": "research/PREREGISTRATION_defect_v5.md",
+  "categories": {
+    "safety": {
+      "file": "safety.joblib",
+      "sha256": "e03e6239e2bddb8dc6c664487cef33386e2f63bbe1bd3ff8e85bf481fb8b9f4b",
+      "candidate": "TK",
+      "threshold": 0.818933,
+      "needs_embedding": false,
+      "training_rows": 873,
+      "training_positives": 30,
+      "combine": "decide",
+      "from": "hazard_classifier_v1 (unchanged)"
+    },
+    "defect": {
+      "file": "defect.joblib",
+      "sha256": "76392093ba127c7c5ac2bbed5d85ba84f7a8a1672f7bdbc0da148688233b18de",
+      "candidate": "TK",
+      "threshold": 0.484941,
+      "combine": "or_gated",
+      "gate": "sentence sentiment is not positive",
+      "needs_embedding": false,
+      "training_rows": 1322,
+      "training_positives": 323,
+      "training_data": "labelling rounds 1 (A1, A2) and 2 (A1, A2, A3)"
+    }
+  },
+  "keyword_files": {
+    "risk_lexicon.tsv": "c46a844844dc73e487dd3ce9684f0f6b9f5259ad83ea51a270a7616a19e26282",
+    "safety_false_friends_v1.tsv": "9754b41c50112893e9a3fa007921dc8b2317b78381dc3ffa32d3ce2db1ad918a",
+    "hazard_phrase_exclusions_v1.tsv": "bbcc404373f4f2e2655945b9a89d63831ba5d16413dcd7feccb2b4a9099a8dcd"
+  },
+  "embedding_model": null,
+  "sentiment_model": {
+    "model_version": "defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+    "model_sha256": "e04da4c268bc8ab94e27da2e0fb4206f38dadc43e9cfb52050818a5bb40c3478"
+  },
+  "qualified_for_integration": false,
+  "adoption": {
+    "status": "pending: tested once on labelling round 3"
+  }
+}

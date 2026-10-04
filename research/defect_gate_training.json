@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-10-03T03:31:39+00:00",
+  "preregistration": "research/PREREGISTRATION_defect_v5.md",
+  "data": {
+    "sentences": 1322,
+    "defects": 323,
+    "by_round": {
+      "1": 824,
+      "2": 498
+    },
+    "sentence_sentiment": {
+      "neutral": 405,
+      "negative": 511,
+      "positive": 406
+    }
+  },
+  "cross_validation": {
+    "folds": 5,
+    "grouped_by": "review_id",
+    "seed": 42
+  },
+  "keywords_alone": {
+    "tp": 157,
+    "fp": 24,
+    "fn": 166,
+    "precision": 0.8674,
+    "recall": 0.4861,
+    "f1": 0.623
+  },
+  "ungated_reference": {
+    "threshold": 0.484941,
+    "tp": 215,
+    "fp": 68,
+    "fn": 108,
+    "precision": 0.7597,
+    "recall": 0.6656,
+    "f1": 0.7096
+  },
+  "gated_candidate": {
+    "threshold": 0.484941,
+    "tp": 215,
+    "fp": 63,
+    "fn": 108,
+    "precision": 0.7734,
+    "recall": 0.6656,
+    "f1": 0.7155
+  },
+  "gate_blocked_additions": {
+    "total": 5,
+    "real_defects": 0
+  },
+  "frozen": {
+    "file": "defect.joblib",
+    "sha256": "76392093ba127c7c5ac2bbed5d85ba84f7a8a1672f7bdbc0da148688233b18de",
+    "candidate": "TK",
+    "threshold": 0.484941,
+    "combine": "or_gated",
+    "gate": "sentence sentiment is not positive",
+    "needs_embedding": false,
+    "training_rows": 1322,
+    "training_positives": 323,
+    "training_data": "labelling rounds 1 (A1, A2) and 2 (A1, A2, A3)"
+  },
+  "note": "Keyword features carry round-1 tuning (in-sample there); round 3 decides."
+}

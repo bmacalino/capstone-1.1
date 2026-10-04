@@ -1,0 +1,153 @@
+{
+  "model_id": "cardiffnlp/twitter-xlm-roberta-base-sentiment",
+  "generated_at": "2026-09-26T14:42:15+00:00",
+  "checkpoint": "sentiment-analysis\\models\\transformers\\xlmr_firecs_lazada_raw",
+  "deployment_status": "comparison_candidate",
+  "qualified_for_integration": false,
+  "training": {
+    "device": "cuda",
+    "mixed_precision": true,
+    "epochs": 3,
+    "selected_epoch": 3,
+    "batch_size": 8,
+    "gradient_accumulation": 2,
+    "effective_batch_size": 16,
+    "learning_rate": 2e-05,
+    "max_length": 128,
+    "embeddings_frozen": true,
+    "frozen_parameters": 192001536,
+    "trainable_parameters": 86044419,
+    "seed": 42,
+    "train_seconds": 7209.33,
+    "fit_rows": 10899,
+    "validation_rows": 1461,
+    "composition": {
+      "text": "raw",
+      "firecs_fit_rows": 6600,
+      "firecs_validation_rows": 734,
+      "extra_train_file": "lazada_star_labels_v1.csv",
+      "extra_train_sha256": "8b6080782c20bc9c9ea7280a19e080e578e86b9c6a6d3915079ec3b936b194a8",
+      "extra_fit_rows": 4299,
+      "extra_validation_rows": 727,
+      "extra_validation_products": [
+        "3169275025",
+        "3431056306",
+        "394848395",
+        "4034782758",
+        "4590800496",
+        "5256422305"
+      ],
+      "extra_label_type": "weak: reviewer star rating (1-2 negative, 4-5 positive)",
+      "fit_label_counts": {
+        "negative": 3713,
+        "neutral": 2292,
+        "positive": 4894
+      }
+    }
+  },
+  "training_audit": {
+    "original_train_rows": 7340,
+    "clean_train_rows": 7334,
+    "duplicate_train_rows_removed": 2,
+    "conflicting_duplicate_texts": 0,
+    "cross_split_train_rows_removed": 4,
+    "test_rows": 3147,
+    "clean_train_label_counts": {
+      "negative": 2381,
+      "neutral": 2547,
+      "positive": 2406
+    },
+    "test_label_counts": {
+      "negative": 1027,
+      "neutral": 1087,
+      "positive": 1033
+    },
+    "original_source_counts": {
+      "firecs_human": 7340
+    },
+    "clean_source_counts": {
+      "firecs_human": 7334
+    }
+  },
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "mean_train_loss": 0.4858,
+      "validation_accuracy": 0.7995,
+      "validation_macro_f1": 0.7687,
+      "validation_macro_f1_by_source": {
+        "extra": 0.5565,
+        "firecs": 0.7757
+      }
+    },
+    {
+      "epoch": 2,
+      "mean_train_loss": 0.3193,
+      "validation_accuracy": 0.8378,
+      "validation_macro_f1": 0.8182,
+      "validation_macro_f1_by_source": {
+        "extra": 0.5665,
+        "firecs": 0.8365
+      }
+    },
+    {
+      "epoch": 3,
+      "mean_train_loss": 0.2265,
+      "validation_accuracy": 0.8487,
+      "validation_macro_f1": 0.835,
+      "validation_macro_f1_by_source": {
+        "extra": 0.5685,
+        "firecs": 0.8549
+      }
+    }
+  ],
+  "test": {
+    "sample_count": 3147,
+    "labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "accuracy": 0.8421,
+    "precision": 0.8434,
+    "recall": 0.8433,
+    "f1": 0.8433,
+    "per_class": {
+      "negative": {
+        "precision": 0.8545,
+        "recall": 0.8637,
+        "f1": 0.8591,
+        "support": 1027
+      },
+      "neutral": {
+        "precision": 0.7762,
+        "recall": 0.7755,
+        "f1": 0.7759,
+        "support": 1087
+      },
+      "positive": {
+        "precision": 0.8993,
+        "recall": 0.8906,
+        "f1": 0.8949,
+        "support": 1033
+      }
+    },
+    "matrix": [
+      [
+        887,
+        132,
+        8
+      ],
+      [
+        149,
+        843,
+        95
+      ],
+      [
+        2,
+        111,
+        920
+      ]
+    ]
+  }
+}

@@ -165,6 +165,7 @@ input,select { outline: 2px solid transparent; outline-offset: 1px; }
 .risk-badge.low { background: var(--color-success-soft); color: var(--color-success); }
 .risk-badge.moderate { background: var(--color-warning-soft); color: var(--color-warning); }
 .risk-badge.high { background: var(--color-danger-soft); color: var(--color-danger); }
+.risk-badge.unknown { background: var(--color-paper-3); color: var(--color-ink-2); }
 .home-scan-progress,.progress,.reliability { border-radius: 0; background: var(--color-paper-3); }
 .home-scan-progress i,.progress i,.reliability i { border-radius: 0; background: var(--color-accent); }
 .job-panel,.toast { border: 2px solid var(--color-paper); border-radius: 0; background: var(--color-ink); color: var(--color-paper); box-shadow: 8px 8px 0 var(--color-accent); }

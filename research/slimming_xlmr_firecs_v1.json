@@ -1,0 +1,280 @@
+{
+  "generated_at": "2026-09-27T06:07:39+00:00",
+  "checkpoint": "sentiment-analysis\\models\\transformers\\cardiffnlp__twitter-xlm-roberta-base-sentiment",
+  "acceptance_rule": "smallest ONNX stage with marketplace macro F1 within 0.02 of full and McNemar p >= 0.05 against full",
+  "vocabulary": {
+    "kept_tokens": 10793,
+    "full_tokens": 250002,
+    "training_corpus_check": {
+      "texts": 12360,
+      "segmentation_changed_share": 0.0,
+      "unk_tokens_introduced_share": 0.0
+    },
+    "corpus": "raw FiReCS training rows + weak-label training set (no test text)",
+    "tokenizer": "pruned to the kept pieces, in id order",
+    "test_set_segmentation": {
+      "firecs_test": {
+        "texts": 3147,
+        "segmentation_changed_share": 0.15253,
+        "unk_tokens_introduced_share": 0.0
+      },
+      "marketplace": {
+        "texts": 470,
+        "segmentation_changed_share": 0.2,
+        "unk_tokens_introduced_share": 0.00049
+      }
+    }
+  },
+  "limit": null,
+  "results": {
+    "full": {
+      "firecs_test": {
+        "accuracy": 0.8446,
+        "macro_f1": 0.8457,
+        "per_class_f1": {
+          "negative": 0.8638,
+          "neutral": 0.7782,
+          "positive": 0.8951
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.8457,
+          "ci_lower": 0.8331,
+          "ci_upper": 0.8587,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        }
+      },
+      "marketplace": {
+        "accuracy": 0.8638,
+        "macro_f1": 0.719,
+        "per_class_f1": {
+          "negative": 0.9163,
+          "neutral": 0.2989,
+          "positive": 0.9419
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.719,
+          "ci_lower": 0.6689,
+          "ci_upper": 0.7654,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        }
+      },
+      "latency": {
+        "median_ms_per_review": 157.15,
+        "seconds_per_100_reviews": 19.16,
+        "threads": 1
+      },
+      "size_mb": 1112.2,
+      "peak_ram_mb": 2588.2
+    },
+    "pruned": {
+      "firecs_test": {
+        "accuracy": 0.8456,
+        "macro_f1": 0.8467,
+        "per_class_f1": {
+          "negative": 0.8647,
+          "neutral": 0.7797,
+          "positive": 0.8957
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.8467,
+          "ci_lower": 0.8344,
+          "ci_upper": 0.8597,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 5,
+          "only_b_correct": 8,
+          "discordant": 13,
+          "statistic": 5.0,
+          "p_value": 0.581055,
+          "method": "exact"
+        },
+        "agreement_with_full": 0.9959
+      },
+      "marketplace": {
+        "accuracy": 0.8681,
+        "macro_f1": 0.7218,
+        "per_class_f1": {
+          "negative": 0.9195,
+          "neutral": 0.3095,
+          "positive": 0.9364
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.7218,
+          "ci_lower": 0.6698,
+          "ci_upper": 0.7696,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 1,
+          "only_b_correct": 3,
+          "discordant": 4,
+          "statistic": 1.0,
+          "p_value": 0.625,
+          "method": "exact"
+        },
+        "agreement_with_full": 0.9915
+      },
+      "latency": {
+        "median_ms_per_review": 163.84,
+        "seconds_per_100_reviews": 19.4,
+        "threads": 1
+      },
+      "size_mb": 377.4,
+      "peak_ram_mb": 1203.3
+    },
+    "onnx": {
+      "firecs_test": {
+        "accuracy": 0.8456,
+        "macro_f1": 0.8467,
+        "per_class_f1": {
+          "negative": 0.8647,
+          "neutral": 0.7797,
+          "positive": 0.8957
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.8467,
+          "ci_lower": 0.8344,
+          "ci_upper": 0.8597,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 5,
+          "only_b_correct": 8,
+          "discordant": 13,
+          "statistic": 5.0,
+          "p_value": 0.581055,
+          "method": "exact"
+        },
+        "agreement_with_full": 0.9959
+      },
+      "marketplace": {
+        "accuracy": 0.8681,
+        "macro_f1": 0.7218,
+        "per_class_f1": {
+          "negative": 0.9195,
+          "neutral": 0.3095,
+          "positive": 0.9364
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.7218,
+          "ci_lower": 0.6698,
+          "ci_upper": 0.7696,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 1,
+          "only_b_correct": 3,
+          "discordant": 4,
+          "statistic": 1.0,
+          "p_value": 0.625,
+          "method": "exact"
+        },
+        "agreement_with_full": 0.9915
+      },
+      "latency": {
+        "median_ms_per_review": 104.61,
+        "seconds_per_100_reviews": 14.5,
+        "threads": 1
+      },
+      "size_mb": 377.6,
+      "peak_ram_mb": 469.1
+    },
+    "onnx_int8": {
+      "firecs_test": {
+        "accuracy": 0.8335,
+        "macro_f1": 0.833,
+        "per_class_f1": {
+          "negative": 0.8574,
+          "neutral": 0.7557,
+          "positive": 0.8858
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.833,
+          "ci_lower": 0.8198,
+          "ci_upper": 0.8455,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 113,
+          "only_b_correct": 78,
+          "discordant": 191,
+          "statistic": 6.0524,
+          "p_value": 0.013888,
+          "method": "chi_square_continuity_corrected"
+        },
+        "agreement_with_full": 0.9377
+      },
+      "marketplace": {
+        "accuracy": 0.8638,
+        "macro_f1": 0.7064,
+        "per_class_f1": {
+          "negative": 0.915,
+          "neutral": 0.2821,
+          "positive": 0.9222
+        },
+        "macro_f1_ci": {
+          "macro_f1": 0.7064,
+          "ci_lower": 0.6586,
+          "ci_upper": 0.7542,
+          "confidence": 0.95,
+          "iterations": 1000,
+          "seed": 42
+        },
+        "mcnemar_vs_full": {
+          "only_a_correct": 10,
+          "only_b_correct": 10,
+          "discordant": 20,
+          "statistic": 10.0,
+          "p_value": 1.0,
+          "method": "exact"
+        },
+        "agreement_with_full": 0.9511
+      },
+      "latency": {
+        "median_ms_per_review": 92.79,
+        "seconds_per_100_reviews": 13.14,
+        "threads": 1
+      },
+      "size_mb": 95.2,
+      "peak_ram_mb": 175.1
+    }
+  },
+  "passing_stages": [
+    "pruned",
+    "onnx",
+    "onnx_int8"
+  ],
+  "chosen_stage": "onnx_int8",
+  "integration_gate": {
+    "rule": "FiReCS test macro F1 >= incumbent TF-IDF; marketplace macro F1 >= incumbent + 0.02; stage passed the slimming acceptance rule",
+    "scores": {
+      "firecs_test_macro_f1": 0.833,
+      "marketplace_macro_f1": 0.7064
+    },
+    "incumbent": {
+      "firecs_test_macro_f1": 0.8138,
+      "marketplace_macro_f1": 0.5627
+    },
+    "checks": {
+      "firecs_not_worse_than_incumbent": true,
+      "marketplace_beats_incumbent_by_margin": true
+    },
+    "qualified_for_integration": true
+  },
+  "qualified_for_integration": true
+}

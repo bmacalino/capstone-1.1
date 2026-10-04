@@ -325,11 +325,90 @@ def rank_recommendations(
     product: dict[str, Any],
     products: list[dict[str, Any]],
     limit: int = 3,
+    min_positive_ratio: float = 0.5,
+    min_review_count: int = 5,
+) -> list[dict[str, Any]]:
+    """Rank similar products whose reviews show no warning signs.
+
+    Only products analysed with the badge model qualify: a legacy risk score
+    cannot vouch for a product under the current checks. A candidate needs the
+    "no warning signs" verdict -- which already requires enough reviews -- and
+    not a single safety report, because suggesting a product with a fire report
+    as the safer choice would be worse than suggesting nothing. Candidates rank
+    by similarity, then by the lower bound of their positive-review ratio,
+    which discounts products whose praise rests on a small sample.
+    """
+    if limit <= 0:
+        return []
+    target_terms = _recommendation_terms(product)
+    target_type = _recommendation_type(product)
+    target_category = str(product.get("category") or "").strip().casefold()
+    target_brand = _recommendation_brand(product).casefold()
+    ranked: list[tuple[float, float, int, int, dict[str, Any]]] = []
+    for index, candidate in enumerate(products):
+        if candidate.get("link") == product.get("link"):
+            continue
+        summary = candidate.get("sentiment_summary") or {}
+        if not is_badge_summary(summary):
+            continue
+        view = badge_view(candidate)
+        if view["state"] != "no_warning_signs" or view["counts"]["safety"]:
+            continue
+        positive = float(summary.get("positive_ratio_lower_bound") or 0)
+        review_count = view["reviews_analyzed"]
+        rating = rating_value(candidate.get("rating"))
+        if (
+            positive < min_positive_ratio
+            or review_count < min_review_count
+            or (rating is not None and rating < 4.0)
+        ):
+            continue
+
+        candidate_terms = _recommendation_terms(candidate)
+        candidate_type = _recommendation_type(candidate)
+        if target_type and candidate_type and target_type != candidate_type:
+            continue
+        overlap = target_terms & candidate_terms
+        candidate_category = str(candidate.get("category") or "").strip().casefold()
+        category_match = bool(target_category and target_category == candidate_category)
+        type_match = bool(target_type and target_type == candidate_type)
+        lexical_similarity = len(overlap) / max(1, min(len(target_terms), len(candidate_terms)))
+        if not category_match and not type_match and (
+            len(overlap) < 3 or lexical_similarity < 0.35
+        ):
+            continue
+        brand_match = bool(
+            target_brand and target_brand == _recommendation_brand(candidate).casefold()
+        )
+        similarity = min(
+            1.0,
+            lexical_similarity + (0.25 if category_match else 0) + (0.08 if brand_match else 0),
+        )
+        evidence = min(1.0, math.log10(review_count + 1) / 2)
+        recommendation_score = 0.6 * similarity + 0.3 * positive + 0.1 * evidence
+        ranked.append((recommendation_score, positive, review_count, -index, candidate))
+    ranked.sort(key=lambda item: item[:4], reverse=True)
+    return [item[-1] for item in ranked[:limit]]
+
+
+# --- Legacy Streamlit prototype (app.py) ------------------------------------
+# The prototype still renders the retired 0-100 score. These two keep it working
+# on score-era data until it is converted or removed; the web app does not use
+# them.
+
+def legacy_rank_recommendations(
+    product: dict[str, Any],
+    products: list[dict[str, Any]],
+    limit: int = 3,
     min_reliability: float = 60.0,
     min_positive_ratio: float = 0.55,
     min_review_count: int = 5,
 ) -> list[dict[str, Any]]:
-    """Rank similar Low Risk products that improve on the target's risk score."""
+    """Rank by the retired 0-100 risk score. Legacy Streamlit prototype only.
+
+    Kept verbatim so the prototype behaves as it did on score-era data. The
+    web app uses rank_recommendations, which ranks on badges instead.
+    """
     if limit <= 0:
         return []
     target_terms = _recommendation_terms(product)
@@ -392,6 +471,38 @@ def rank_recommendations(
     return [item[-1] for item in ranked[:limit]]
 
 
+def legacy_product_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Score-era columns for the legacy Streamlit prototype only.
+
+    A badge summary has no score, so its Risk level reads "Not scored"
+    rather than the "Low" a missing score used to default to.
+    """
+    rows = []
+    for product in products:
+        comments = product.get("comments")
+        summary = product.get("sentiment_summary") or {}
+        rows.append(
+            {
+                "Image": product.get("img", ""),
+                "Product": product.get("name", ""),
+                "Price": str(product.get("price", "")).replace("â‚±", "₱"),
+                "Price (PHP)": price_value(product.get("price")),
+                "Rating": rating_value(product.get("rating")),
+                "Reviews": len(comments) if isinstance(comments, list) else 0,
+                "Total ratings": int(product.get("total_rating") or 0),
+                "Location": product.get("location", ""),
+                "Platform": platform_name(product),
+                "Risk score": risk_score_percent(
+                    summary.get("risk_score"), summary.get("risk_score_scale")
+                ),
+                "Risk level": product_risk_level(product),
+                "Reliability score": product_reliability(product),
+                "Link": product.get("link", ""),
+            }
+        )
+    return rows
+
+
 def price_value(value: Any) -> float | None:
     text = str(value or "").replace("â‚±", "₱")
     numbers = re.findall(r"\d[\d,]*(?:\.\d+)?", text)
@@ -413,7 +524,7 @@ def product_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     rows = []
     for product in products:
         comments = product.get("comments")
-        summary = product.get("sentiment_summary") or {}
+        view = badge_view(product)
         rows.append(
             {
                 "Image": product.get("img", ""),
@@ -425,11 +536,11 @@ def product_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "Total ratings": int(product.get("total_rating") or 0),
                 "Location": product.get("location", ""),
                 "Platform": platform_name(product),
-                "Risk score": risk_score_percent(
-                    summary.get("risk_score"), summary.get("risk_score_scale")
-                ),
-                "Risk level": product_risk_level(product),
-                "Reliability score": product_reliability(product),
+                "Verdict": view["headline"],
+                "Reviews analyzed": view["reviews_analyzed"],
+                "Safety reports": view["counts"]["safety"],
+                "Counterfeit reports": view["counts"]["counterfeit"],
+                "Defect reports": view["counts"]["defect"],
                 "Link": product.get("link", ""),
             }
         )
@@ -509,7 +620,286 @@ def product_risk_percent(product: dict[str, Any]) -> float:
 
 def product_risk_level(product: dict[str, Any]) -> str:
     summary = product.get("sentiment_summary") or {}
+    if is_badge_summary(summary):
+        # Badge summaries carry no risk score. Reading one as a score used to
+        # default to 0, so a product with fire reports displayed "Low risk".
+        return NOT_SCORED
     return risk_level(summary.get("risk_score"), summary.get("risk_score_scale"))
+
+
+# ---------------------------------------------------------------------------
+# Badge presentation (summary schema 2.0)
+#
+# The badge model does not produce a score. It records which reviews mention a
+# safety hazard, a counterfeit or a defect, and quotes them. The check is
+# imperfect -- on round 1 it caught 21 of 27 confirmed safety reports, and 18
+# of its 39 safety flags were harmless -- so the screen shows shoppers the
+# reviews and says what they report, rather than asserting that a product is
+# safe or unsafe. Everything user-facing about badges is worded here, once.
+# ---------------------------------------------------------------------------
+
+BADGE_SCHEMA_PREFIX = "defaketive-summary-2"
+NOT_SCORED = "Not scored"
+EVIDENCE_SHOWN_PER_BADGE = 5
+
+# Held-out figures for the shipped safety check (keyword checker 0.3.0 with the
+# learned safety model adopted on labelling round 2): 569 sentences whose safety
+# label two annotators agreed on, none seen while either was built. Source:
+# research/hazard_tagger_measurement_round2.json, configuration "v4_learned".
+SAFETY_CHECK_ACCURACY = {
+    "sentences_checked": 569,
+    "reports_confirmed": 16,
+    "reports_caught": 10,
+    "flags_raised": 24,
+    "flags_confirmed": 10,
+}
+
+# Tone drives colour only. It is never shown as a word.
+VERDICT_TONES = {
+    "safety_warning": "high",
+    "possible_safety_issue": "moderate",
+    "possible_counterfeit_or_defect": "moderate",
+    "no_warning_signs": "low",
+    "insufficient_evidence": "unknown",
+    "reviews_may_be_unreliable": "unknown",
+}
+
+# Headlines say what reviewers report, never that a product IS unsafe.
+VERDICT_HEADLINES = {
+    "safety_warning": "Reviewers report safety problems",
+    "possible_safety_issue": "Some reviewers mention safety concerns",
+    "possible_counterfeit_or_defect": "Reviewers report fakes or defects",
+    "reviews_may_be_unreliable": "These reviews may not be trustworthy",
+    "insufficient_evidence": "Not enough reviews to judge",
+    "no_warning_signs": "No warning signs found",
+}
+
+HAZARD_LABELS = {
+    "fire_explosion_swelling": "fire, explosion or a swollen battery",
+    "shock_spark_short": "electric shocks, sparks or short circuits",
+    "overheat_burn": "overheating or burns",
+    "smoke_smell": "smoke or a burning smell",
+    "safety_unspecified": "a safety problem",
+}
+
+# "verb" is (singular, plural): "1 review says", "3 reviews say".
+BADGE_COPY = {
+    "safety": {
+        "label": "Safety",
+        "verb": ("mentions", "mention"),
+        "none": "No reviews mention fire, smoke, shocks or overheating",
+    },
+    "counterfeit": {
+        "label": "Genuine product",
+        "verb": ("says", "say"),
+        "claim": "it may not be genuine",
+        "none": "No reviews say it is fake",
+    },
+    "defect": {
+        "label": "Works as expected",
+        "verb": ("says", "say"),
+        "claim": "it broke or did not work",
+        "none": "No reviews say it broke or stopped working",
+    },
+}
+
+
+def is_badge_summary(summary: Any) -> bool:
+    return isinstance(summary, dict) and str(summary.get("schema_version") or "").startswith(
+        BADGE_SCHEMA_PREFIX
+    )
+
+
+def _reviews(count: int) -> str:
+    return f"{count} review{'' if count == 1 else 's'}"
+
+
+def _report_phrase(category: str, mentions: int, claim: str) -> str:
+    """The verb phrase after a count: "mentions fire", "say it broke"."""
+    singular, plural = BADGE_COPY[category]["verb"]
+    return f"{singular if mentions == 1 else plural} {claim}"
+
+
+def _usable_reviews(summary: dict[str, Any]) -> int:
+    coverage = summary.get("coverage") or {}
+    return int(summary.get("usable_review_count") or coverage.get("usable_reviews") or 0)
+
+
+def _evidence_items(evidence: Any) -> tuple[list[dict[str, Any]], int]:
+    """Return the strongest distinct quotes for a badge, and how many were cut.
+
+    Each quote carries the character ranges of the words that triggered it, so
+    the screen can highlight them without re-matching the text.
+    """
+    if not isinstance(evidence, list):
+        return [], 0
+    ranked = sorted(
+        (item for item in evidence if isinstance(item, dict) and str(item.get("text") or "").strip()),
+        key=lambda item: (bool(item.get("high_confidence")), float(item.get("score") or 0)),
+        reverse=True,
+    )
+    seen: set[str] = set()
+    distinct: list[dict[str, Any]] = []
+    for item in ranked:
+        text = str(item["text"]).strip()
+        key = " ".join(text.casefold().split())
+        if key in seen:
+            continue
+        seen.add(key)
+        highlights = sorted(
+            [int(term["span"][0]), int(term["span"][1])]
+            for term in item.get("terms") or []
+            if isinstance(term, dict)
+            and not term.get("negated")
+            and isinstance(term.get("span"), list)
+            and len(term["span"]) == 2
+        )
+        distinct.append(
+            {
+                "text": text,
+                "rating": item.get("rating"),
+                "hazard": HAZARD_LABELS.get(str(item.get("hazard_subtype") or "")),
+                "highlights": highlights,
+            }
+        )
+    shown = distinct[:EVIDENCE_SHOWN_PER_BADGE]
+    return shown, len(distinct) - len(shown)
+
+
+def _hazard_phrase(safety: dict[str, Any]) -> str:
+    """Name the most serious hazard reported, noting when there are others.
+
+    Each quote also carries its own hazard label, so naming one type here loses
+    nothing, and joining two "X or Y" labels reads as "X or Y and A or B".
+    """
+    subtypes = safety.get("hazard_subtypes") or {}
+    ranked = sorted(
+        (
+            (int(detail.get("severity") or 0), int(detail.get("reviews") or 0), name)
+            for name, detail in subtypes.items()
+            if isinstance(detail, dict) and name in HAZARD_LABELS
+        ),
+        reverse=True,
+    )
+    if not ranked:
+        return HAZARD_LABELS["safety_unspecified"]
+    phrase = HAZARD_LABELS[ranked[0][2]]
+    return f"{phrase}, and other hazards" if len(ranked) > 1 else phrase
+
+
+def _safety_badge(safety: dict[str, Any], usable: int) -> dict[str, Any]:
+    mentions = int(safety.get("flagged_reviews") or 0)
+    evidence, more = _evidence_items(safety.get("evidence"))
+    return {
+        "category": "safety",
+        "label": BADGE_COPY["safety"]["label"],
+        "mentions": mentions,
+        "reviews_analyzed": usable,
+        "phrase": _report_phrase("safety", mentions, _hazard_phrase(safety)),
+        "summary": (
+            f"{_reviews(mentions)} {_report_phrase('safety', mentions, _hazard_phrase(safety))}"
+            if mentions
+            else BADGE_COPY["safety"]["none"]
+        ),
+        "evidence": evidence,
+        "more_evidence": more,
+    }
+
+
+def _flag_badge(category: str, flag: Any, usable: int) -> dict[str, Any]:
+    flag = flag if isinstance(flag, dict) else {}
+    mentions = int(flag.get("flagged_reviews") or 0)
+    evidence, more = _evidence_items(flag.get("evidence"))
+    copy_text = BADGE_COPY[category]
+    phrase = _report_phrase(category, mentions, copy_text["claim"])
+    return {
+        "category": category,
+        "label": copy_text["label"],
+        "mentions": mentions,
+        "reviews_analyzed": usable,
+        "phrase": phrase,
+        "summary": f"{_reviews(mentions)} {phrase}" if mentions else copy_text["none"],
+        "evidence": evidence,
+        "more_evidence": more,
+    }
+
+
+def _verdict_detail(state: str, verdict: dict[str, Any], badges: list[dict[str, Any]], usable: int) -> str:
+    """Explain the verdict in terms of what the reviews say."""
+    reported = [badge for badge in badges if badge["mentions"]]
+    if reported and state in {
+        "safety_warning",
+        "possible_safety_issue",
+        "possible_counterfeit_or_defect",
+    }:
+        clauses = "; ".join(f"{badge['mentions']} {badge['phrase']}" for badge in reported)
+        return f"Of {_reviews(usable)}, {clauses}. Read them below and judge for yourself."
+    detail = str(verdict.get("detail") or "").strip().rstrip(".")
+    if state == "insufficient_evidence" and reported:
+        # Too few reviews for an overall judgement must not hide what the few
+        # reviews say: a single fire report is still worth reading.
+        clauses = "; ".join(
+            [reported[0]["summary"]]
+            + [f"{badge['mentions']} {badge['phrase']}" for badge in reported[1:]]
+        )
+        pronoun = "it" if sum(badge["mentions"] for badge in reported) == 1 else "them"
+        return f"{detail}. Even so, {clauses}. Read {pronoun} below."
+    if state == "no_warning_signs" and reported:
+        # The aggregator's own detail says "absence of complaints", which is
+        # false when an isolated complaint sits just below the warning level.
+        clauses = "; ".join(
+            [reported[0]["summary"]]
+            + [f"{badge['mentions']} {badge['phrase']}" for badge in reported[1:]]
+        )
+        pronoun = "it" if sum(badge["mentions"] for badge in reported) == 1 else "them"
+        return (
+            f"No problem reaches a warning level in {_reviews(usable)}, but {clauses}. "
+            f"Read {pronoun} below. This is not proof that a product is safe."
+        )
+    return f"{detail}." if detail else ""
+
+
+def badge_view(product: dict[str, Any]) -> dict[str, Any]:
+    """Turn a product's badge summary into what the screen shows."""
+    summary = product.get("sentiment_summary") or {}
+    if not is_badge_summary(summary):
+        return {
+            "available": False,
+            "state": "not_analyzed",
+            "tone": "unknown",
+            "headline": "Not analyzed yet",
+            "detail": "This product has not been checked with the current review model.",
+            "reviews_analyzed": 0,
+            "counts": {"safety": 0, "counterfeit": 0, "defect": 0},
+            "badges": [],
+        }
+
+    usable = _usable_reviews(summary)
+    verdict = summary.get("verdict") or {}
+    state = str(verdict.get("state") or "insufficient_evidence")
+    flags = summary.get("flags") or {}
+    badges = [
+        _safety_badge(summary.get("safety") or {}, usable),
+        _flag_badge("counterfeit", flags.get("counterfeit"), usable),
+        _flag_badge("defect", flags.get("defect"), usable),
+    ]
+    return {
+        "available": True,
+        "state": state,
+        "tone": VERDICT_TONES.get(state, "unknown"),
+        "headline": VERDICT_HEADLINES.get(state, "Not enough reviews to judge"),
+        "detail": _verdict_detail(state, verdict, badges, usable),
+        "reviews_analyzed": usable,
+        "counts": {badge["category"]: badge["mentions"] for badge in badges},
+        "badges": badges,
+        "limits_notice": summary.get("limits_notice"),
+        "safety_check_accuracy": SAFETY_CHECK_ACCURACY,
+    }
+
+
+def with_badge_view(product: dict[str, Any]) -> dict[str, Any]:
+    """Return a shallow copy of a product carrying its display view."""
+    return {**product, "badge_view": badge_view(product)}
 
 
 def risk_keyword_counts(product: dict[str, Any]) -> dict[str, int]:
@@ -727,6 +1117,26 @@ def sentiment_model_version() -> str:
         return "unavailable"
 
 
+def model_unavailable_error() -> type[Exception]:
+    """The exception raised when the configured model cannot be loaded."""
+    _ensure_sentiment_path()
+    from defaketive_sentiment.registry import ModelUnavailableError
+
+    return ModelUnavailableError
+
+
+def require_model() -> None:
+    """Raise ModelUnavailableError now if the model cannot load.
+
+    Called before a live scan, so a missing model is reported before minutes of
+    marketplace collection rather than after them.
+    """
+    _ensure_sentiment_path()
+    from defaketive_sentiment.registry import load_model
+
+    load_model()
+
+
 def analysis_is_current(products: list[dict[str, Any]]) -> bool:
     """Return whether every saved analysis uses the active model version."""
     if not products:
@@ -735,7 +1145,8 @@ def analysis_is_current(products: list[dict[str, Any]]) -> bool:
     for product in products:
         if not isinstance(product, dict):
             return False
-        if not (product.get("sentiment_summary") or {}).get("risk_score_scale"):
+        summary = product.get("sentiment_summary") or {}
+        if not (is_badge_summary(summary) or summary.get("risk_score_scale")):
             return False
         for review in product.get("comments") or []:
             if not isinstance(review, dict):

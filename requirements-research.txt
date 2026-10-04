@@ -1,0 +1,11 @@
+# Retraining and slimming the sentiment model (research only; the app
+# serves the ONNX file and needs only requirements.txt).
+# PyTorch with CUDA: install the wheel for your GPU from pytorch.org first.
+-r requirements.txt
+torch>=2.4
+transformers>=4.45
+sentencepiece>=0.2
+tiktoken>=0.7
+onnx>=1.16
+onnxscript>=0.1
+psutil>=5.9

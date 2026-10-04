@@ -321,5 +321,109 @@ class GeneratedQueueTests(unittest.TestCase):
         self.assertIn("keyword baseline", self.manifest["prelabel_source"])
 
 
+
+ROUND_2 = ROOT / "outputs/labelling_queue_round_2"
+
+
+def _read(path: Path) -> list[dict[str, str]]:
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+class RoundDefaultsTests(unittest.TestCase):
+    def test_round_one_keeps_its_original_settings(self) -> None:
+        from research.build_labelling_queue import DEFAULT_BUDGET, parse_args
+
+        args = parse_args([])
+        self.assertEqual(args.round, 1)
+        self.assertEqual(args.blind_rate, 0.15)
+        self.assertEqual(args.seed, 20260922)
+        self.assertEqual({s: getattr(args, f"budget_{s}") for s in STRATA}, DEFAULT_BUDGET)
+        self.assertTrue(str(args.output_dir).endswith("labelling_queue_round_1"))
+
+    def test_round_two_is_blind_and_separate(self) -> None:
+        from research.build_labelling_queue import parse_args
+
+        args = parse_args(["--round", "2"])
+        self.assertEqual(args.blind_rate, 1.0)
+        self.assertNotEqual(args.seed, 20260922)
+        self.assertTrue(str(args.output_dir).endswith("labelling_queue_round_2"))
+
+
+@unittest.skipUnless(
+    (ROUND_2 / "manifest.json").is_file() and (OUTPUT / "queue_master.csv").is_file(),
+    "run research/build_labelling_queue.py --round 2 first",
+)
+class GeneratedRoundTwoTests(unittest.TestCase):
+    """Round 2 is the held-out test of the hazard checker."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.master = _read(ROUND_2 / "queue_master.csv")
+        cls.practice = _read(ROUND_2 / "practice_set_master.csv")
+        cls.round_one = {
+            text_key(row["review_text_raw"])
+            for name in ("queue_master.csv", "practice_set_master.csv")
+            for row in _read(OUTPUT / name)
+        }
+
+    def test_no_review_from_round_one_is_labelled_again(self) -> None:
+        for row in self.master + self.practice:
+            self.assertNotIn(text_key(row["review_text_raw"]), self.round_one, row["row_id"])
+
+    def test_every_test_row_is_blind(self) -> None:
+        # The checker under test produces the pre-labels; showing them would
+        # pull the test labels towards its answers.
+        for row in self.master:
+            self.assertEqual(row["is_blind"], "yes", row["row_id"])
+            for column in ("llm_safety", "llm_defect", "llm_counterfeit", "llm_hazard_subtype"):
+                self.assertEqual(row[column], "", row["row_id"])
+
+    def test_row_ids_are_round_two(self) -> None:
+        self.assertTrue(all(row["row_id"].startswith("r2-") for row in self.master))
+
+    def test_each_row_has_two_annotators(self) -> None:
+        self.assertTrue(all(len(row["assigned_to"].split("|")) == 2 for row in self.master))
+
+
+ROUND_3 = ROOT / "outputs/labelling_queue_round_3"
+
+
+@unittest.skipUnless(
+    (ROUND_3 / "manifest.json").is_file() and (ROUND_2 / "queue_master.csv").is_file(),
+    "run research/build_labelling_queue.py --round 3 first",
+)
+class GeneratedRoundThreeTests(unittest.TestCase):
+    """Round 3 is the held-out test of the gated defect model."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.master = _read(ROUND_3 / "queue_master.csv")
+        cls.practice = _read(ROUND_3 / "practice_set_master.csv")
+        cls.earlier = {
+            text_key(row["review_text_raw"])
+            for folder in (OUTPUT, ROUND_2)
+            for name in ("queue_master.csv", "practice_set_master.csv")
+            for row in _read(folder / name)
+        }
+
+    def test_no_review_from_rounds_one_or_two_is_labelled_again(self) -> None:
+        for row in self.master + self.practice:
+            self.assertNotIn(text_key(row["review_text_raw"]), self.earlier, row["row_id"])
+
+    def test_every_test_row_is_blind(self) -> None:
+        for row in self.master:
+            self.assertEqual(row["is_blind"], "yes", row["row_id"])
+            self.assertEqual(row["llm_defect"], "", row["row_id"])
+
+    def test_the_disagreement_stratum_is_present_and_weighted(self) -> None:
+        strata = {row["stratum"] for row in self.master}
+        self.assertEqual(strata, {"defect_disagreement", "seed_hit", "low_star", "random_all"})
+        self.assertTrue(all(float(row["sampling_weight"]) > 0 for row in self.master))
+
+    def test_row_ids_are_round_three(self) -> None:
+        self.assertTrue(all(row["row_id"].startswith("r3-") for row in self.master))
+
+
 if __name__ == "__main__":
     unittest.main()

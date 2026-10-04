@@ -1,0 +1,69 @@
+# safety_false_friends_v1.tsv  --  version: safety-false-friends-1.0.0
+#
+# SHIPPED: read by LexiconHazardTagger (hazard_model.py) since model 0.2.0.
+#
+# Context cues that make a MILD heat term (severity <= 2, e.g. "umiinit",
+# "init") a comfort or feature remark rather than a hazard report.
+#
+# PROVENANCE AND ITS LIMIT. Derived by inspecting ALL 26 false-positive safety
+# sentences from labelling round 1. There is therefore NO held-out sample: any
+# precision measured on round 1 after applying these cues is in-sample and
+# optimistic. Treat it as the ceiling of what these rules can do, not as an
+# estimate of field performance. Confirming the gain requires a fresh labelled
+# round on sentences these rules have never seen.
+#
+# Suppression applies ONLY when the strongest safety term in the segment has
+# severity <= 2. Strong evidence (sunog, usok, sumabog, pumutok, spark,
+# grounded, bloated battery) is never suppressed by a cue.
+#
+# cue	class	language
+# ---------- worn on the body: heat is a comfort complaint ----------
+tela	apparel	tl
+damit	apparel	tl
+sando	apparel	tl
+medyas	apparel	tl
+brassiere	apparel	en
+square pants	apparel	en
+jogging pants	apparel	en
+t shirt	apparel	en
+tshirt	apparel	en
+sa skin	apparel	taglish
+sa balat	apparel	tl
+suot	apparel	tl
+isuot	apparel	tl
+kapal	apparel	tl
+sizing	apparel	en
+# ---------- ambient weather or a venue, not the product ----------
+tag init	ambient	tl
+tag ulan	ambient	tl
+panahon	ambient	tl
+ang place	ambient	taglish
+sa lugar	ambient	tl
+sa loob ng room	ambient	taglish
+hotel	ambient	en
+lobby	ambient	en
+inverter	ambient	en
+aircon	ambient	en
+# ---------- the product's job is heat or heat retention ----------
+tumbler	heat_feature	en
+thermos	heat_feature	en
+flask	heat_feature	en
+init at lamig	heat_feature	taglish
+lamig at init	heat_feature	taglish
+mag salamin	heat_feature	tl
+straightener	heat_feature	en
+pang curl	heat_feature	taglish
+plantsa	heat_feature	tl
+# ---------- a scent or a feature name, not an event ----------
+smoke removal	feature_name	en
+smoke purifier	feature_name	en
+air purifier	feature_name	en
+smoke detector	feature_name	en
+yung amoy	scent	taglish
+ang amoy	scent	taglish
+coconuty	scent	en
+perfume	scent	en
+# ---------- "burnt" as a colour name ----------
+burnt at burgandy	colour	taglish
+burnt orange	colour	en
+burnt umber	colour	en

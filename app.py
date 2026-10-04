@@ -34,11 +34,11 @@ from dashboard_utils import (
     price_value,
     product_platform,
     product_image_url,
-    product_rows,
+    legacy_product_rows,
     product_reliability,
     product_risk_level,
     product_risk_percent,
-    rank_recommendations,
+    legacy_rank_recommendations,
     recommendation_search_query,
     result_files,
     review_signal_counts,
@@ -532,7 +532,7 @@ def render_recommendations(
     except Exception:
         saved_products = []
     catalog = merge_product_catalogs(products, saved_products)
-    recommendations = rank_recommendations(product, catalog, limit=limit)
+    recommendations = legacy_rank_recommendations(product, catalog, limit=limit)
     high_risk = product_risk_level(product) == "High"
     title = "Safer alternatives" if high_risk else "Recommended similar products"
     if recommendations:
@@ -1362,7 +1362,7 @@ def database_page(products: list[dict[str, Any]]) -> None:
     st.title("Product database")
     counts = database_counts()
     st.caption(f"Central SQLite store · {counts['products']:,} products · {counts['reviews']:,} reviews")
-    rows = product_rows(products)
+    rows = legacy_product_rows(products)
     if not rows:
         st.info("No products have been collected.")
         return
@@ -1391,7 +1391,7 @@ def overview_page(products: list[dict[str, Any]]) -> None:
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
     with right:
         st.subheader("Recent high-risk flags")
-        flagged = [row for row in product_rows(products) if row["Risk level"] == "High"]
+        flagged = [row for row in legacy_product_rows(products) if row["Risk level"] == "High"]
         st.dataframe(pd.DataFrame(flagged)[["Product", "Risk score", "Reviews", "Link"]] if flagged else pd.DataFrame(columns=["Product", "Risk score", "Reviews", "Link"]), use_container_width=True, hide_index=True)
 
 

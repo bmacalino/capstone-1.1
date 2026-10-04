@@ -1,0 +1,118 @@
+{
+  "model_id": "dost-asti/RoBERTa-tl-sentiment-analysis",
+  "generated_at": "2026-09-23T13:36:43+00:00",
+  "checkpoint": "E:\\school\\SCRAPPERS\\Capstone-Version-Control-Version-1.1\\sentiment-analysis\\models\\transformers\\dost-asti__RoBERTa-tl-sentiment-analysis",
+  "deployment_status": "comparison_candidate",
+  "qualified_for_integration": false,
+  "training": {
+    "device": "cuda",
+    "mixed_precision": true,
+    "epochs": 3,
+    "selected_epoch": 2,
+    "batch_size": 8,
+    "gradient_accumulation": 2,
+    "effective_batch_size": 16,
+    "learning_rate": 2e-05,
+    "max_length": 128,
+    "embeddings_frozen": true,
+    "frozen_parameters": 23040000,
+    "trainable_parameters": 86043651,
+    "seed": 42,
+    "train_seconds": 4097.49,
+    "fit_rows": 6600,
+    "validation_rows": 734
+  },
+  "training_audit": {
+    "original_train_rows": 7340,
+    "clean_train_rows": 7334,
+    "duplicate_train_rows_removed": 2,
+    "conflicting_duplicate_texts": 0,
+    "cross_split_train_rows_removed": 4,
+    "test_rows": 3147,
+    "clean_train_label_counts": {
+      "negative": 2381,
+      "neutral": 2547,
+      "positive": 2406
+    },
+    "test_label_counts": {
+      "negative": 1027,
+      "neutral": 1087,
+      "positive": 1033
+    },
+    "original_source_counts": {
+      "firecs_human": 7340
+    },
+    "clean_source_counts": {
+      "firecs_human": 7334
+    }
+  },
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "mean_train_loss": 0.9319,
+      "validation_accuracy": 0.7766,
+      "validation_macro_f1": 0.7829
+    },
+    {
+      "epoch": 2,
+      "mean_train_loss": 0.3614,
+      "validation_accuracy": 0.8134,
+      "validation_macro_f1": 0.8164
+    },
+    {
+      "epoch": 3,
+      "mean_train_loss": 0.2089,
+      "validation_accuracy": 0.8106,
+      "validation_macro_f1": 0.8136
+    }
+  ],
+  "test": {
+    "sample_count": 3147,
+    "labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "accuracy": 0.7998,
+    "precision": 0.8054,
+    "recall": 0.8006,
+    "f1": 0.8025,
+    "per_class": {
+      "negative": {
+        "precision": 0.8337,
+        "recall": 0.7955,
+        "f1": 0.8142,
+        "support": 1027
+      },
+      "neutral": {
+        "precision": 0.7024,
+        "recall": 0.7534,
+        "f1": 0.727,
+        "support": 1087
+      },
+      "positive": {
+        "precision": 0.8801,
+        "recall": 0.8529,
+        "f1": 0.8663,
+        "support": 1033
+      }
+    },
+    "matrix": [
+      [
+        817,
+        201,
+        9
+      ],
+      [
+        157,
+        819,
+        111
+      ],
+      [
+        6,
+        146,
+        881
+      ]
+    ]
+  }
+}

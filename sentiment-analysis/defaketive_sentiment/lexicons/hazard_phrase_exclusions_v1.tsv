@@ -1,0 +1,29 @@
+# hazard_phrase_exclusions_v1.tsv  --  version: hazard-phrase-exclusions-1.0.0
+#
+# SHIPPED: read by LexiconHazardTagger (hazard_model.py) from model 0.3.0.
+#
+# phrase<TAB>category<TAB>class
+#
+# A term match that lies wholly inside one of these phrases is not a report of
+# that category, whatever its severity: the phrase names a product type or a
+# material, or is an idiom. Only that match is dropped; any other match in the
+# same sentence still counts. Phrases are matched in the tagger's normalized
+# text, so spelling variants the normalizer folds ("fake nailll") are covered.
+#
+# Safety name phrases (colours, feature names) live in safety_false_friends_v1.tsv
+# under the classes "colour" and "feature_name".
+#
+# PROVENANCE AND ITS LIMIT. Written from rule 6 of
+# research/HAZARD_SENTENCE_TAGGING_GUIDE.md ("fake nails" is the product type)
+# and from the round-1 counterfeit false alarms, so any gain measured on round 1
+# is in-sample. Labelling round 2 is the held-out test.
+fake news	counterfeit	idiom
+fake nail	counterfeit	product_type
+fake nails	counterfeit	product_type
+fake lashes	counterfeit	product_type
+fake eyelashes	counterfeit	product_type
+fake flowers	counterfeit	product_type
+fake plant	counterfeit	product_type
+fake plants	counterfeit	product_type
+fake leather	counterfeit	material
+imitation leather	counterfeit	material

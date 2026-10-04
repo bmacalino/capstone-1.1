@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-10-02T15:20:32+00:00",
+  "worksheets": [
+    "worksheet_A1_done.csv",
+    "worksheet_A2_done.xlsx",
+    "worksheet_A3_done.xlsx"
+  ],
+  "coverage": {
+    "rows_with_any_label": 600,
+    "rows_with_two_labels": 593,
+    "rows_with_consensus_on_any_category": 599,
+    "rows_agreed_on_all_categories": 463,
+    "consensus_rows_by_stratum": {
+      "low_star": 160,
+      "random_all": 180,
+      "seed_hit": 259
+    },
+    "queue_rows_total": 600
+  },
+  "inter_annotator_agreement": {
+    "safety": {
+      "doubly_labelled_rows": 593,
+      "raw_agreement": 0.9595,
+      "cohens_kappa": 0.5509,
+      "kappa_note": null,
+      "positives_annotator_a": 23,
+      "positives_annotator_b": 33,
+      "disagreement_rows": 24
+    },
+    "defect": {
+      "doubly_labelled_rows": 593,
+      "raw_agreement": 0.828,
+      "cohens_kappa": 0.5997,
+      "kappa_note": null,
+      "positives_annotator_a": 160,
+      "positives_annotator_b": 206,
+      "disagreement_rows": 102
+    },
+    "counterfeit": {
+      "doubly_labelled_rows": 593,
+      "raw_agreement": 0.9595,
+      "cohens_kappa": 0.4791,
+      "kappa_note": null,
+      "positives_annotator_a": 26,
+      "positives_annotator_b": 22,
+      "disagreement_rows": 24
+    }
+  },
+  "adjudication_queue": {
+    "safety": [
+      "r2-00049",
+      "r2-00055",
+      "r2-00077",
+      "r2-00090",
+      "r2-00104",
+      "r2-00106",
+      "r2-00114",
+      "r2-00125",
+      "r2-00129",
+      "r2-00167",
+      "r2-00269",
+      "r2-00280",
+      "r2-00303",
+      "r2-00331",
+      "r2-00335",
+      "r2-00365",
+      "r2-00409",
+      "r2-00446",
+      "r2-00450",
+      "r2-00467",
+      "r2-00469",
+      "r2-00486",
+      "r2-00532",
+      "r2-00577"
+    ],
+    "defect": [
+      "r2-00007",
+      "r2-00015",
+      "r2-00016",
+      "r2-00020",
+      "r2-00022",
+      "r2-00024",
+      "r2-00038",
+      "r2-00041",
+      "r2-00050",
+      "r2-00055",
+      "r2-00069",
+      "r2-00070",
+      "r2-00077",
+      "r2-00082",
+      "r2-00086",
+      "r2-00091",
+      "r2-00092",
+      "r2-00093",
+      "r2-00099",
+      "r2-00100",
+      "r2-00104",
+      "r2-00113",
+      "r2-00119",
+      "r2-00125",
+      "r2-00129",
+      "r2-00171",
+      "r2-00173",
+      "r2-00174",
+      "r2-00191",
+      "r2-00220",
+      "r2-00224",
+      "r2-00229",
+      "r2-00231",
+      "r2-00236",
+      "r2-00240",
+      "r2-00244",
+      "r2-00260",
+      "r2-00269",
+      "r2-00280",
+      "r2-00281",
+      "r2-00289",
+      "r2-00290",
+      "r2-00291",
+      "r2-00293",
+      "r2-00298",
+      "r2-00299",
+      "r2-00303",
+      "r2-00334",
+      "r2-00335",
+      "r2-00343",
+      "r2-00345",
+      "r2-00348",
+      "r2-00351",
+      "r2-00357",
+      "r2-00358",
+      "r2-00359",
+      "r2-00362",
+      "r2-00364",
+      "r2-00365",
+      "r2-00381",
+      "r2-00390",
+      "r2-00393",
+      "r2-00394",
+      "r2-00401",
+      "r2-00404",
+      "r2-00405",
+      "r2-00407",
+      "r2-00425",
+      "r2-00427",
+      "r2-00430",
+      "r2-00434",
+      "r2-00452",
+      "r2-00459",
+      "r2-00462",
+      "r2-00467",
+      "r2-00471",
+      "r2-00482",
+      "r2-00486",
+      "r2-00498",
+      "r2-00499",
+      "r2-00504",
+      "r2-00506",
+      "r2-00510",
+      "r2-00515",
+      "r2-00519",
+      "r2-00521",
+      "r2-00533",
+      "r2-00535",
+      "r2-00536",
+      "r2-00558",
+      "r2-00564",
+      "r2-00566",
+      "r2-00569",
+      "r2-00572",
+      "r2-00577",
+      "r2-00581",
+      "r2-00582",
+      "r2-00589",
+      "r2-00591",
+      "r2-00592",
+      "r2-00597",
+      "r2-00600"
+    ],
+    "counterfeit": [
+      "r2-00021",
+      "r2-00022",
+      "r2-00027",
+      "r2-00028",
+      "r2-00037",
+      "r2-00038",
+      "r2-00077",
+      "r2-00085",
+      "r2-00107",
+      "r2-00121",
+      "r2-00131",
+      "r2-00181",
+      "r2-00213",
+      "r2-00265",
+      "r2-00384",
+      "r2-00394",
+      "r2-00478",
+      "r2-00498",
+      "r2-00515",
+      "r2-00533",
+      "r2-00545",
+      "r2-00546",
+      "r2-00547",
+      "r2-00576"
+    ]
+  },
+  "keyword_screen_precision": {
+    "safety": {
+      "screen_positives_with_consensus": 0,
+      "human_confirmed": 0,
+      "precision": null,
+      "note": "no screened positives have consensus labels yet"
+    },
+    "defect": {
+      "screen_positives_with_consensus": 0,
+      "human_confirmed": 0,
+      "precision": null,
+      "note": "no screened positives have consensus labels yet"
+    },
+    "counterfeit": {
+      "screen_positives_with_consensus": 0,
+      "human_confirmed": 0,
+      "precision": null,
+      "note": "no screened positives have consensus labels yet"
+    }
+  },
+  "prevalence_random_all_only": {
+    "safety": {
+      "labelled_rows": 180,
+      "positive_rows": 0,
+      "weighted_prevalence": 0.0,
+      "note": null
+    },
+    "defect": {
+      "labelled_rows": 164,
+      "positive_rows": 7,
+      "weighted_prevalence": 0.042683,
+      "note": null
+    },
+    "counterfeit": {
+      "labelled_rows": 180,
+      "positive_rows": 0,
+      "weighted_prevalence": 0.0,
+      "note": null
+    }
+  },
+  "anchoring_check": {
+    "blind": {
+      "safety": {
+        "labelled_rows": 576,
+        "positive_rate": 0.0278
+      },
+      "defect": {
+        "labelled_rows": 498,
+        "positive_rate": 0.2651
+      },
+      "counterfeit": {
+        "labelled_rows": 576,
+        "positive_rate": 0.0208
+      }
+    },
+    "pre_labelled": {
+      "safety": {
+        "labelled_rows": 0,
+        "positive_rate": null
+      },
+      "defect": {
+        "labelled_rows": 0,
+        "positive_rate": null
+      },
+      "counterfeit": {
+        "labelled_rows": 0,
+        "positive_rate": null
+      }
+    }
+  },
+  "claim_boundary": "Precision is measured on screened positives only. Recall and prevalence are valid only for the random_all stratum. Nothing here qualifies the hazard tagger for integration."
+}

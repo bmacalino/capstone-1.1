@@ -1,0 +1,126 @@
+{
+  "incumbent": {
+    "sample_count": 3147,
+    "labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "accuracy": 0.8112,
+    "precision": 0.8169,
+    "recall": 0.8119,
+    "f1": 0.8138,
+    "per_class": {
+      "negative": {
+        "precision": 0.8213,
+        "recall": 0.8053,
+        "f1": 0.8132,
+        "support": 1027
+      },
+      "neutral": {
+        "precision": 0.7219,
+        "recall": 0.7737,
+        "f1": 0.7469,
+        "support": 1087
+      },
+      "positive": {
+        "precision": 0.9077,
+        "recall": 0.8567,
+        "f1": 0.8815,
+        "support": 1033
+      }
+    },
+    "matrix": [
+      [
+        827,
+        192,
+        8
+      ],
+      [
+        164,
+        841,
+        82
+      ],
+      [
+        16,
+        132,
+        885
+      ]
+    ]
+  },
+  "finetuned": {
+    "sample_count": 3147,
+    "labels": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "accuracy": 0.8449,
+    "precision": 0.846,
+    "recall": 0.8461,
+    "f1": 0.8461,
+    "per_class": {
+      "negative": {
+        "precision": 0.863,
+        "recall": 0.8647,
+        "f1": 0.8638,
+        "support": 1027
+      },
+      "neutral": {
+        "precision": 0.7802,
+        "recall": 0.7774,
+        "f1": 0.7788,
+        "support": 1087
+      },
+      "positive": {
+        "precision": 0.8947,
+        "recall": 0.8964,
+        "f1": 0.8956,
+        "support": 1033
+      }
+    },
+    "matrix": [
+      [
+        888,
+        132,
+        7
+      ],
+      [
+        140,
+        845,
+        102
+      ],
+      [
+        1,
+        106,
+        926
+      ]
+    ]
+  },
+  "mcnemar": {
+    "only_a_correct": 181,
+    "only_b_correct": 287,
+    "discordant": 468,
+    "statistic": 23.5577,
+    "p_value": 1e-06,
+    "method": "chi_square_continuity_corrected"
+  },
+  "ci": {
+    "incumbent": {
+      "macro_f1": 0.8138,
+      "ci_lower": 0.8002,
+      "ci_upper": 0.8274,
+      "confidence": 0.95,
+      "iterations": 2000,
+      "seed": 42
+    },
+    "finetuned": {
+      "macro_f1": 0.8461,
+      "ci_lower": 0.8334,
+      "ci_upper": 0.859,
+      "confidence": 0.95,
+      "iterations": 2000,
+      "seed": 42
+    }
+  }
+}

@@ -24,5 +24,17 @@ artifacts_*.png
 # Generated research artifacts and tooling state (large; not versioned)
 outputs/
 .hallmark/
+.claude/
 node_modules/
 *.inspect.ndjson
+
+
+# Scraped review text (weak-label training set; rebuild with research/build_sentiment_training_set.py)
+sentiment-analysis/data/lazada_star_labels/*.csv
+# Model weights: large and reproducible from research/finetune_transformer.py
+sentiment-analysis/models/transformers/
+sentiment-analysis/models/sentiment_onnx/
+sentiment-analysis/models/slimming/
+
+# Accounts database and signing key (personal data; never commit)
+instance/

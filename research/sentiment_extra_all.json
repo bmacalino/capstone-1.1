@@ -1,0 +1,129 @@
+{
+  "generated_at": "2026-09-23T10:49:24+00:00",
+  "deployment_status": "comparison_only",
+  "qualified_for_integration": false,
+  "corpora": {
+    "firecs": true,
+    "sentitaglish": true,
+    "tagasenti": true,
+    "lazada_filipino": false,
+    "auxiliary_audits": [
+      {
+        "file": "SentiTaglish_ProductsAndServices.csv",
+        "sha256": "965040798aa172aba316e9902303da181eeab9502dde3dec9b81be4f6afa2688",
+        "usable_three_class_rows": 7113,
+        "mixed_rows_excluded": 3397,
+        "invalid_rows_excluded": 0,
+        "license": "CC BY 4.0",
+        "source": "https://huggingface.co/datasets/ccosme/SentiTaglishProductsAndServices"
+      },
+      {
+        "file": "tagasenti_dataset.csv",
+        "sha256": "f9e189b33242b92235ee675affc7e4c06c7fd192972fe9e9fc0c24cad6eb9ccf",
+        "usable_rows": 35686,
+        "invalid_rows_excluded": 0,
+        "provenance_warning": "The downloadable CSV has no row-level source field and combines human, synthetic, translated, and LLM-labeled data.",
+        "license": "CC BY-SA 4.0",
+        "source": "https://huggingface.co/datasets/jjjardev/tagasenti"
+      }
+    ]
+  },
+  "training_audit": {
+    "original_train_rows": 50139,
+    "clean_train_rows": 32342,
+    "duplicate_train_rows_removed": 14861,
+    "conflicting_duplicate_texts": 932,
+    "cross_split_train_rows_removed": 2936,
+    "test_rows": 3147,
+    "clean_train_label_counts": {
+      "negative": 11907,
+      "neutral": 11626,
+      "positive": 8809
+    },
+    "test_label_counts": {
+      "negative": 1027,
+      "neutral": 1087,
+      "positive": 1033
+    },
+    "original_source_counts": {
+      "firecs_human": 7340,
+      "sentitaglish_human": 7113,
+      "tagasenti_mixed_provenance": 35686
+    },
+    "clean_source_counts": {
+      "firecs_human": 7334,
+      "sentitaglish_human": 12,
+      "tagasenti_mixed_provenance": 24996
+    }
+  },
+  "search": {},
+  "final": {
+    "params": {
+      "features__word__ngram_range": "(1, 2)",
+      "features__word__min_df": "2",
+      "features__word__max_features": "40000",
+      "features__word__sublinear_tf": "True",
+      "features__character__ngram_range": "(3, 5)",
+      "features__character__min_df": "2",
+      "features__character__max_features": "60000",
+      "features__character__sublinear_tf": "True",
+      "classifier__C": "4.0",
+      "classifier__class_weight": "None"
+    },
+    "fit_seconds": 20.294,
+    "test": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.7935,
+      "precision": 0.7951,
+      "recall": 0.7948,
+      "f1": 0.7949,
+      "per_class": {
+        "negative": {
+          "precision": 0.7967,
+          "recall": 0.8053,
+          "f1": 0.801,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.7178,
+          "recall": 0.7185,
+          "f1": 0.7182,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.8707,
+          "recall": 0.8606,
+          "f1": 0.8656,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          827,
+          187,
+          13
+        ],
+        [
+          187,
+          781,
+          119
+        ],
+        [
+          24,
+          120,
+          889
+        ]
+      ]
+    }
+  },
+  "mcnemar_vs_incumbent_same_data": null,
+  "reference": {
+    "shipped_model_test_macro_f1": 0.8138,
+    "note": "The shipped model trained on FiReCS alone. When extra corpora are included the incumbent comparison is refit on the same rows, so the McNemar test isolates the settings rather than the data."
+  }
+}

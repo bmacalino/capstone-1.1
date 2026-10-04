@@ -25,7 +25,13 @@ recombined into an unbiased estimate later. The worksheets given to the
 annotators deliberately omit both columns: an annotator who can see that a
 row was selected for containing "nasunog" is no longer labelling blind.
 
+ROUND 2 (--round 2) is the held-out test round for the hazard checker. It
+excludes every review already used in an earlier round (queue and practice
+set), and every row is blind: the checker being tested is what produces the
+pre-labels, so showing them would pull the test labels towards its answers.
+
 Usage:
+    python research/build_labelling_queue.py --round 2 --annotators A1,A2,A3
     python research/build_labelling_queue.py --annotators AAA,BBB,CCC
     python research/build_labelling_queue.py --dry-run
     python research/build_labelling_queue.py --shopee-hf path/to/shopee.csv
@@ -62,6 +68,7 @@ GUIDE_VERSION = "1.0"
 
 SEEDS_PATH = ROOT / "research" / "lexicons" / "mining_seeds_v1.tsv"
 OUTPUT_DIR = ROOT / "outputs" / "labelling_queue_round_1"
+OUTPUTS = ROOT / "outputs"
 
 SCRAPE_DIRS = (ROOT / "research" / "data", ROOT)
 SCRAPE_GLOBS = ("lazada_*.json", "temu_*.json", "shopee_*.json")
@@ -81,10 +88,73 @@ EXCLUSION_FILES = (
 TEXT_COLUMNS = ("review_text", "review", "text", "content")
 
 STRATA = ("seed_hit", "low_star", "random_all")
+# Round 3 adds a stratum, sampled first: reviews with at least one sentence on
+# which keyword checker 0.3.0 and the round-1 learned defect model disagree.
+# That is where a learned defect model gains or loses against the keywords, and
+# a uniform sample holds too few such sentences to measure it.
+DISAGREEMENT = "defect_disagreement"
+ALL_STRATA = (DISAGREEMENT,) + STRATA
+DISAGREEMENT_MODEL = ROOT / "research" / "models" / "defect_tk_round1.joblib"
 DEFAULT_BUDGET = {"seed_hit": 380, "low_star": 240, "random_all": 280}
 DEFAULT_BLIND_RATE = 0.15
 DEFAULT_PRACTICE_SIZE = 30
 DEFAULT_SEED = 20260922
+
+# Per-round defaults. Round 1 keeps its original settings (its queue
+# regenerates exactly only while its source files are unchanged). Round 2 is
+# the test round: about 600 sentences, all blind, a fresh seed.
+ROUND_DEFAULTS = {
+    1: {
+        "budget": DEFAULT_BUDGET,
+        "blind_rate": DEFAULT_BLIND_RATE,
+        "seed": DEFAULT_SEED,
+        "guide": GUIDE_VERSION,
+    },
+    2: {
+        "budget": {"seed_hit": 260, "low_star": 160, "random_all": 180},
+        "blind_rate": 1.0,
+        "seed": 20260929,
+        # 1.1 adds worked examples only; see the guide's version note.
+        "guide": "1.1",
+    },
+    3: {
+        "strata": ALL_STRATA,
+        "budget": {DISAGREEMENT: 120, "seed_hit": 220, "low_star": 130, "random_all": 130},
+        "blind_rate": 1.0,
+        "seed": 20261003,
+        "guide": "1.1",
+    },
+}
+
+
+def round_strata(round_number: int) -> tuple[str, ...]:
+    return tuple(ROUND_DEFAULTS[round_number].get("strata", STRATA))
+
+
+def defect_disagreement_predicate():
+    """True for a review with a sentence where keywords and the round-1 learned
+    defect model disagree about a defect."""
+    import joblib
+
+    from defaketive_sentiment.hazard_learned import keyword_features
+    from defaketive_sentiment.hazard_model import LexiconHazardTagger
+
+    model = joblib.load(DISAGREEMENT_MODEL)
+    tagger = LexiconHazardTagger()
+
+    def disagrees(text: str) -> bool:
+        for sentence in sentences_for(text):
+            tagged = tagger.tag_sentence(sentence)
+            keywords = "defect" in tagged["tags"]
+            p = model.probability([tagged["text_normalized"]], keyword_features(tagged).reshape(1, -1), None)[0]
+            if (p >= model.threshold) != keywords:
+                return True
+        return False
+
+    return disagrees
+# Files of an earlier round that hold review text, and the column holding it.
+PRIOR_ROUND_FILES = ("queue_master.csv", "practice_set_master.csv")
+PRIOR_ROUND_TEXT_COLUMN = "review_text_raw"
 
 # Most severe first: when a sentence matches two safety subtypes the guide
 # says to record the more severe one, and hazard_taxonomy orders them this way.
@@ -401,6 +471,30 @@ def load_shopee_hf(path: Path | None) -> tuple[list[dict[str, Any]], list[Path]]
     return rows, [path]
 
 
+def round_dir(round_number: int) -> Path:
+    return OUTPUTS / f"labelling_queue_round_{round_number}"
+
+
+def load_prior_rounds(round_number: int) -> tuple[set[str], list[Path]]:
+    """Every review already put in front of annotators in an earlier round."""
+    keys: set[str] = set()
+    used: list[Path] = []
+    for earlier in range(1, round_number):
+        for name in PRIOR_ROUND_FILES:
+            path = round_dir(earlier) / name
+            if not path.is_file():
+                if name == "queue_master.csv":
+                    raise SystemExit(f"Round {earlier} queue not found at {path}; cannot exclude it.")
+                continue
+            used.append(path)
+            with path.open(encoding="utf-8-sig", errors="replace", newline="") as handle:
+                for record in csv.DictReader(handle):
+                    value = str(record.get(PRIOR_ROUND_TEXT_COLUMN) or "").strip()
+                    if value:
+                        keys.add(text_key(value))
+    return keys, used
+
+
 def load_exclusions() -> tuple[set[str], list[Path]]:
     keys: set[str] = set()
     used: list[Path] = []
@@ -437,6 +531,7 @@ def build_pool(
     rows: Iterable[dict[str, Any]],
     matcher: SeedMatcher,
     excluded: set[str],
+    first_stratum: tuple[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """De-duplicate, drop excluded rows, and assign every survivor a stratum."""
     pool: list[dict[str, Any]] = []
@@ -465,7 +560,9 @@ def build_pool(
         record["blocked_terms"] = hit["blocked"]
         record["seed_categories"] = hit["categories"]
         record["seed_subtype"] = hit["subtype"]
-        if hit["terms"]:
+        if first_stratum is not None and first_stratum[1](text):
+            record["stratum"] = first_stratum[0]
+        elif hit["terms"]:
             record["stratum"] = "seed_hit"
         elif is_low_star(record):
             record["stratum"] = "low_star"
@@ -613,7 +710,9 @@ def expand_rows(
     blind_rate: float,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for stratum in STRATA:
+    # In the order the strata were sampled (STRATA for rounds 1 and 2, so
+    # their queues regenerate unchanged).
+    for stratum in sampled:
         for review in sampled.get(stratum, []):
             for index, sentence in enumerate(review["sentences"], start=1):
                 guess = prelabel(sentence, matcher)
@@ -765,25 +864,43 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Comma-separated initials, e.g. CAB,MAC,RET. Re-run with the real "
         "initials before the team starts; the initials go in the filenames.",
     )
-    for stratum in STRATA:
+    parser.add_argument(
+        "--round",
+        type=int,
+        default=1,
+        choices=sorted(ROUND_DEFAULTS),
+        help="Labelling round. Round 2 excludes round 1 and is fully blind.",
+    )
+    for stratum in ALL_STRATA:
         parser.add_argument(
             f"--budget-{stratum.replace('_', '-')}",
             type=int,
-            default=DEFAULT_BUDGET[stratum],
+            default=None,
             dest=f"budget_{stratum}",
-            help=f"Sentence budget for the {stratum} stratum.",
+            help=f"Sentence budget for the {stratum} stratum (default: the round's).",
         )
-    parser.add_argument("--blind-rate", type=float, default=DEFAULT_BLIND_RATE)
+    parser.add_argument("--blind-rate", type=float, default=None)
     parser.add_argument("--practice-size", type=int, default=DEFAULT_PRACTICE_SIZE)
-    parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--shopee-hf", type=Path, default=None)
-    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Report what the pool looks like and write nothing.",
     )
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    defaults = ROUND_DEFAULTS[args.round]
+    for stratum in ALL_STRATA:
+        if getattr(args, f"budget_{stratum}") is None:
+            setattr(args, f"budget_{stratum}", defaults["budget"].get(stratum, 0))
+    if args.blind_rate is None:
+        args.blind_rate = defaults["blind_rate"]
+    if args.seed is None:
+        args.seed = defaults["seed"]
+    if args.output_dir is None:
+        args.output_dir = round_dir(args.round)
+    return args
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -798,29 +915,33 @@ def main(argv: Sequence[str] | None = None) -> int:
     firecs_rows, firecs_files = load_firecs()
     shopee_rows, shopee_files = load_shopee_hf(args.shopee_hf)
     excluded, exclusion_files = load_exclusions()
+    prior_keys, prior_files = load_prior_rounds(args.round)
+    excluded |= prior_keys
 
-    pool, drops = build_pool(scrape_rows + firecs_rows + shopee_rows, matcher, excluded)
+    strata = round_strata(args.round)
+    first = (DISAGREEMENT, defect_disagreement_predicate()) if DISAGREEMENT in strata else None
+    pool, drops = build_pool(scrape_rows + firecs_rows + shopee_rows, matcher, excluded, first)
 
-    by_stratum: dict[str, list[dict[str, Any]]] = {s: [] for s in STRATA}
+    by_stratum: dict[str, list[dict[str, Any]]] = {s: [] for s in strata}
     for row in pool:
         by_stratum[row["stratum"]].append(row)
 
-    budgets = {s: getattr(args, f"budget_{s}") for s in STRATA}
+    budgets = {s: getattr(args, f"budget_{s}") for s in strata}
     sampled = {
         s: sample_stratum(
             by_stratum[s], budgets[s], rng, prioritise_rare=(s == "seed_hit")
         )
-        for s in STRATA
+        for s in strata
     }
     weights = {
-        s: (len(by_stratum[s]) / len(sampled[s])) if sampled[s] else 0.0 for s in STRATA
+        s: (len(by_stratum[s]) / len(sampled[s])) if sampled[s] else 0.0 for s in strata
     }
 
     rows = expand_rows(sampled, weights, matcher, rng, args.blind_rate)
     rng.shuffle(rows)  # interleave strata so the source of a row is not guessable
     assign(rows, annotators)
     for index, row in enumerate(rows, start=1):
-        row["row_id"] = f"r1-{index:05d}"
+        row["row_id"] = f"r{args.round}-{index:05d}"
 
     used_review_ids = {row["review_id"] for row in rows}
     practice = build_practice_set(
@@ -849,9 +970,10 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     summary: dict[str, Any] = {
         "queue_version": QUEUE_VERSION,
+        "round": args.round,
         "seeds_version": SEEDS_VERSION,
         "segmenter_version": SEGMENTER_VERSION,
-        "tagging_guide_version": GUIDE_VERSION,
+        "tagging_guide_version": ROUND_DEFAULTS[args.round]["guide"],
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "random_seed": args.seed,
         "annotators": annotators,
@@ -880,12 +1002,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             "starting their own worksheet."
         ),
         "sentence_rows": len(rows),
-        "reviews_sampled": {s: len(sampled[s]) for s in STRATA},
+        "reviews_sampled": {s: len(sampled[s]) for s in strata},
         "sentences_by_stratum": {
-            s: sum(1 for r in rows if r["stratum"] == s) for s in STRATA
+            s: sum(1 for r in rows if r["stratum"] == s) for s in strata
         },
         "sentences_by_cohort": cohort_counts,
-        "pool_by_stratum": {s: len(by_stratum[s]) for s in STRATA},
+        "pool_by_stratum": {s: len(by_stratum[s]) for s in strata},
         "seed_candidates_in_pool": pool_by_category,
         "seed_candidates_sampled": sampled_by_category,
         "seed_candidate_note": (
@@ -896,7 +1018,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "safety, then counterfeit, then defect, so the rare categories are "
             "not crowded out; this is a stratified draw, not a simple random one."
         ),
-        "sampling_weights": {s: round(weights[s], 4) for s in STRATA},
+        "sampling_weights": {s: round(weights[s], 4) for s in strata},
         "pool_size": len(pool),
         "dropped": drops,
         "budgets": budgets,
@@ -918,7 +1040,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             "shopee_hf": [p.name for p in shopee_files],
             "exclusion_files": {p.name: sha256(p) for p in exclusion_files},
             "excluded_text_keys": len(excluded),
+            "prior_round_files": {p.relative_to(ROOT).as_posix(): sha256(p) for p in prior_files},
+            "prior_round_reviews_excluded": len(prior_keys),
             "seeds_sha256": sha256(SEEDS_PATH),
+            **(
+                {"disagreement_model": str(DISAGREEMENT_MODEL.relative_to(ROOT)), "disagreement_model_sha256": sha256(DISAGREEMENT_MODEL)}
+                if DISAGREEMENT in strata
+                else {}
+            ),
         },
     }
 
@@ -941,15 +1070,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         worksheet_rows[annotator] = len(assigned)
     summary["worksheet_rows"] = worksheet_rows
 
-    (out / "manifest.json").write_text(
-        json.dumps(summary, indent=2) + "\n", encoding="utf-8"
-    )
+    # Bytes, not write_text: on Windows text mode turns every LF into CRLF.
+    (out / "manifest.json").write_bytes((json.dumps(summary, indent=2) + "\n").encode("utf-8"))
 
     print(f"Wrote {len(rows)} sentence rows to {out}")
     for annotator in annotators:
         print(f"  worksheet_{annotator}.csv: {worksheet_rows[annotator]} rows")
     print(f"  practice_set.csv: {len(practice)} rows (all three label these together)")
-    for stratum in STRATA:
+    for stratum in strata:
         print(
             f"  {stratum}: {summary['sentences_by_stratum'][stratum]} sentences "
             f"from {len(sampled[stratum])} reviews "

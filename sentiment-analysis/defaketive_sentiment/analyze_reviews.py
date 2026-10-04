@@ -42,6 +42,11 @@ LEGACY_ANALYSIS_LIMIT = 100
 # Fields a scraper may use for the review timestamp, most specific first.
 DATE_FIELDS = ("reviewed_at", "create_time", "ctime", "review_time", "date", "time")
 
+# A scraper collected up to a fixed number of reviews from each star level.
+# Such a sample is weighted back to the listing's star mix (see
+# `_stratum_weights`) instead of being read as an incomplete census.
+STRATIFIED_BY_STAR = "stratified_by_star"
+
 # Scraper stop reasons that mean the collection is known to be incomplete.
 PARTIAL_STOP_REASONS = {
     "max_review_pages_reached",
@@ -66,6 +71,65 @@ def _rating_bucket(review: dict[str, Any]) -> int:
     except (TypeError, ValueError):
         return 0
     return rating if rating in {1, 2, 3, 4, 5} else 0
+
+
+def _stratum(review: dict[str, Any]) -> int:
+    """The star level a review was sampled from: its star filter, else its rating."""
+    try:
+        source = int(review.get("source_rating_filter") or 0)
+    except (TypeError, ValueError):
+        source = 0
+    return source if source in {1, 2, 3, 4, 5} else _rating_bucket(review)
+
+
+def _stratum_weights(
+    listed_by_star: dict[str, Any], sampled: list[dict[str, Any]]
+) -> dict[int, float]:
+    """How many listed ratings each sampled review stands for, per star level.
+
+    Weight = ratings the listing shows at that star / reviews analysed from it
+    (inverse-probability weights for a stratified sample). A star level with no
+    analysed review gets no weight: its share cannot be estimated, and is
+    therefore left out of every weighted rate. The listing counts include
+    ratings without text, so this assumes the written reviews at a star level
+    are typical of all its ratings - stated as a limitation.
+    """
+    analysed: dict[int, int] = {}
+    for review in sampled:
+        star = _stratum(review)
+        analysed[star] = analysed.get(star, 0) + 1
+    weights: dict[int, float] = {}
+    for star in range(1, 6):
+        try:
+            listed = float(listed_by_star.get(str(star)) or 0)
+        except (TypeError, ValueError):
+            listed = 0.0
+        if listed > 0 and analysed.get(star):
+            weights[star] = listed / analysed[star]
+    return weights
+
+
+def _stratified_completeness(product: dict[str, Any]) -> tuple[str, str | None]:
+    """A per-star sample is sufficient when every listed star level was read to
+    its quota or to the end of its list, and the per-star counts are known."""
+    listed = product.get("review_star_distribution")
+    if not isinstance(listed, dict) or not listed:
+        return "partial", "the listing's per-star counts were unavailable, so the sample cannot be weighted"
+    if product.get("review_filter_warning"):
+        return "partial", str(product["review_filter_warning"])
+    collection = product.get("star_collection") or {}
+    for star in ("1", "2", "3", "4", "5"):
+        try:
+            count = int(float(listed.get(star) or 0))
+        except (TypeError, ValueError):
+            count = 0
+        if count <= 0:
+            continue
+        entry = collection.get(star) or {}
+        if not entry.get("complete"):
+            reason = entry.get("stop_reason") or "not collected"
+            return "partial", f"collection of {star}-star reviews stopped early ({reason})"
+    return "stratified", None
 
 
 def _evenly_spaced(items: list[tuple[int, dict[str, Any]]], count: int) -> list[tuple[int, dict[str, Any]]]:
@@ -206,6 +270,9 @@ def _completeness(
     stop_reason = str(product.get("stop_reason") or "").strip().casefold()
     if stop_reason in PARTIAL_STOP_REASONS:
         return "partial", f"collection stopped early: {stop_reason}"
+
+    if product.get("sampling_method") == STRATIFIED_BY_STAR:
+        return _stratified_completeness(product)
 
     if product.get("applied_rating_filters"):
         return "partial", "only selected star ratings were collected"
@@ -374,6 +441,15 @@ def analyze_product_json(
         )
         listed_by_star = product.get("review_star_distribution") or product.get("displayed_by_star")
 
+        stratified = product.get("sampling_method") == STRATIFIED_BY_STAR
+        weights_by_star: dict[int, float] = {}
+        if stratified and isinstance(listed_by_star, dict) and listed_by_star:
+            weights_by_star = _stratum_weights(listed_by_star, analyzed_comments)
+            for comment, analysis in zip(analyzed_comments, unique_analyses):
+                # Reviews from a star level with no listed count carry no
+                # weight and drop out of the weighted rates.
+                analysis["sampling_weight"] = round(weights_by_star.get(_stratum(comment), 0.0), 6)
+
         coverage = {
             "reviews_analyzed": len(unique_analyses),
             "reviews_scraped": len(comments),
@@ -389,13 +465,24 @@ def analyze_product_json(
             "sampling": (
                 "star_proportional_sample"
                 if review_limit and review_limit > 0
+                else STRATIFIED_BY_STAR
+                if stratified
                 else "census_of_scraped_reviews"
             ),
         }
+        if stratified:
+            coverage["star_quota"] = product.get("star_quota")
+            coverage["weighted"] = bool(weights_by_star)
+            coverage["weights_by_star"] = {
+                str(star): round(weight, 4) for star, weight in sorted(weights_by_star.items())
+            }
 
         targeted_order = str(product.get("review_order") or "").casefold()
         explicitly_representative = product.get("sampling_representative")
-        if "sampling_representative" in product:
+        if stratified:
+            # Representative once weighted back to the listing's star mix.
+            representative = bool(weights_by_star)
+        elif "sampling_representative" in product:
             representative = (
                 None
                 if explicitly_representative is None

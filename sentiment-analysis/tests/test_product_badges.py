@@ -361,6 +361,38 @@ class TestOutputContract(unittest.TestCase):
         self.assertGreater(summary["positive_ratio_lower_bound"], 0.80)
 
 
+class TestFloorWithoutBaseline(unittest.TestCase):
+    """No product-type baseline exists yet, so every counterfeit and defect
+    flag is NO_BASELINE. That must not mean "nothing to report"."""
+
+    def test_the_floor_alone_can_warn(self):
+        reviews = [review(f"f{i}", ("counterfeit", True, None, "peke to")) for i in range(6)]
+        reviews += [clean(f"c{i}") for i in range(34)]
+        summary = aggregator().summarize(reviews, product_type="unknown_gadget")
+
+        # The flag still says honestly that it has no peer rate...
+        self.assertEqual(summary["flags"]["counterfeit"]["state"], badges.NO_BASELINE)
+        # ...but six of forty reviews calling it fake is not "no warning signs".
+        self.assertEqual(summary["verdict"]["state"], badges.POSSIBLE_COUNTERFEIT_OR_DEFECT)
+        self.assertIn("floor", summary["verdict"]["detail"])
+        self.assertIn("no product-type baseline", summary["verdict"]["detail"])
+
+    def test_an_isolated_report_below_the_floor_does_not_warn(self):
+        reviews = [review("f0", ("counterfeit", True, None, "peke to"))]
+        reviews += [clean(f"c{i}") for i in range(99)]
+        summary = aggregator().summarize(reviews, product_type="unknown_gadget")
+        self.assertEqual(summary["verdict"]["state"], badges.NO_WARNING_SIGNS)
+
+    def test_a_baseline_when_present_still_decides(self):
+        # 3 of 100 is above the 2% floor on its face, but its Wilson lower
+        # bound is not, and the power_bank baseline applies: not flagged.
+        reviews = [review(f"f{i}", ("counterfeit", True, None, "peke to")) for i in range(3)]
+        reviews += [clean(f"c{i}") for i in range(97)]
+        summary = aggregator().summarize(reviews, product_type="power_bank")
+        self.assertEqual(summary["flags"]["counterfeit"]["state"], badges.NOT_FLAGGED)
+        self.assertEqual(summary["verdict"]["state"], badges.NO_WARNING_SIGNS)
+
+
 class TestMissingBaselines(unittest.TestCase):
     def test_aggregator_works_with_no_reference_corpus_at_all(self):
         # Phase ordering: the product layer must run before the reference

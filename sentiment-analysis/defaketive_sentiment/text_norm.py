@@ -474,6 +474,84 @@ def is_negated(normalized: str, start: int, extra_negators: Iterable[str] = ()) 
     return any(word in negators for word in previous)
 
 
+# Words a negator reaches across in `is_negated_adjacent`: particles, pronouns,
+# determiners, and the nouns of "no issues with", "walang problema sa".
+NEGATION_TRANSPARENT = frozenset(
+    {
+        # Filipino particles, linkers, pronouns and demonstratives
+        "po", "pa", "na", "nang", "naman", "nman", "nmn", "man", "ng", "ang",
+        "yung", "ung", "yong", "iyong", "sa", "si", "ni", "ay", "ba", "din",
+        "rin", "ring", "daw", "raw", "lang", "lng", "lamang", "talaga",
+        "masyado", "gaano", "ganun", "ganon", "kasi", "ka", "ko", "mo", "siya",
+        "sya", "xa", "nya", "niya", "nila", "namin", "natin", "ito", "to", "yan",
+        "iyan", "yun", "iyon", "kahit", "pati", "nag", "mag", "ma", "problema",
+        # English function words
+        "the", "a", "an", "it", "its", "is", "was", "are", "were", "be", "been",
+        "being", "very", "really", "too", "so", "even", "at", "all", "ever",
+        "any", "anything", "still", "yet", "of", "with", "that", "this", "there",
+        "has", "have", "had", "got", "get", "gets", "getting", "single", "more",
+        "much", "issue", "issues", "problem", "problems", "sign", "signs", "trace",
+        "feel", "feels", "felt", "become", "becomes", "seem", "seems", "run", "runs",
+    }
+)
+
+# Tagalog linkers. "wala nalabas na usok" (no smoke came out): the negator
+# governs the verb, and the linker "na" makes the smoke its subject. One verb
+# may therefore sit between a negator and the term when a linker follows it.
+NEGATION_LINKERS = frozenset({"na", "ng", "nang", "yung", "ung", "yong", "iyong", "ang"})
+
+# "walang dent o sira": the negator covers every item of an "or" list.
+NEGATION_COORDINATORS = frozenset({"o", "or", "nor"})
+
+
+def is_negated_adjacent(
+    normalized: str, start: int, extra_negators: Iterable[str] = ()
+) -> bool:
+    """Report whether a negator governs the term beginning at `start`.
+
+    Used by the hazard tagger. `is_negated` looks up to three words back, so in
+    "not good sira yung isa" the "not" that belongs to "good" also cancels
+    "sira", and "hindi samsung fake" loses its "fake". Here a negator reaches
+    the term across function words ("hindi po sira", "no issues with
+    overheating"), across one verb that a linker ties to the term ("wala
+    nalabas na usok"), and across an "or" list ("walang dent o sira"). Any
+    other word ends its reach, so "not good sira" is not negated. The clause
+    limit is the same as `is_negated`'s. `is_negated` itself is left unchanged
+    because the sentiment path and its recorded results depend on it.
+    """
+    negators = set(NEGATORS)
+    negators.update(word.casefold() for word in extra_negators)
+    clause = re.split(
+        r"[.!?;:]|(?<!\w)(?:at|and|but|pero|subalit|ngunit)(?!\w)",
+        normalized[:start],
+        flags=re.IGNORECASE,
+    )[-1]
+    words = re.findall(r"[\w']+", clause, flags=re.UNICODE)
+    linker_seen = False
+    verb_allowance = 1
+    skip_coordinated = False
+    for word in reversed(words[-8:]):
+        if word in negators:
+            return True
+        if word in NEGATION_COORDINATORS:
+            skip_coordinated = True
+            continue
+        if skip_coordinated:
+            skip_coordinated = False
+            continue
+        if word in NEGATION_LINKERS:
+            linker_seen = True
+            continue
+        if word in NEGATION_TRANSPARENT:
+            continue
+        if linker_seen and verb_allowance:
+            verb_allowance -= 1
+            linker_seen = False
+            continue
+        return False
+    return False
+
+
 def starts_with_negator(term: str) -> bool:
     """Report whether a lexicon term already contains its own negation."""
     return term.casefold().startswith(DIRECT_FAILURE_PREFIXES)

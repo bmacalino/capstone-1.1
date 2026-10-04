@@ -1,0 +1,118 @@
+{
+  "generated_at": "2026-09-23T10:48:53+00:00",
+  "deployment_status": "comparison_only",
+  "qualified_for_integration": false,
+  "corpora": {
+    "firecs": true,
+    "sentitaglish": true,
+    "tagasenti": false,
+    "lazada_filipino": false,
+    "auxiliary_audits": [
+      {
+        "file": "SentiTaglish_ProductsAndServices.csv",
+        "sha256": "965040798aa172aba316e9902303da181eeab9502dde3dec9b81be4f6afa2688",
+        "usable_three_class_rows": 7113,
+        "mixed_rows_excluded": 3397,
+        "invalid_rows_excluded": 0,
+        "license": "CC BY 4.0",
+        "source": "https://huggingface.co/datasets/ccosme/SentiTaglishProductsAndServices"
+      }
+    ]
+  },
+  "training_audit": {
+    "original_train_rows": 14453,
+    "clean_train_rows": 7346,
+    "duplicate_train_rows_removed": 4969,
+    "conflicting_duplicate_texts": 0,
+    "cross_split_train_rows_removed": 2138,
+    "test_rows": 3147,
+    "clean_train_label_counts": {
+      "negative": 2386,
+      "neutral": 2547,
+      "positive": 2413
+    },
+    "test_label_counts": {
+      "negative": 1027,
+      "neutral": 1087,
+      "positive": 1033
+    },
+    "original_source_counts": {
+      "firecs_human": 7340,
+      "sentitaglish_human": 7113
+    },
+    "clean_source_counts": {
+      "firecs_human": 7334,
+      "sentitaglish_human": 12
+    }
+  },
+  "search": {},
+  "final": {
+    "params": {
+      "features__word__ngram_range": "(1, 2)",
+      "features__word__min_df": "2",
+      "features__word__max_features": "40000",
+      "features__word__sublinear_tf": "True",
+      "features__character__ngram_range": "(3, 5)",
+      "features__character__min_df": "2",
+      "features__character__max_features": "60000",
+      "features__character__sublinear_tf": "True",
+      "classifier__C": "4.0",
+      "classifier__class_weight": "None"
+    },
+    "fit_seconds": 6.045,
+    "test": {
+      "sample_count": 3147,
+      "labels": [
+        "negative",
+        "neutral",
+        "positive"
+      ],
+      "accuracy": 0.8106,
+      "precision": 0.8166,
+      "recall": 0.8112,
+      "f1": 0.8133,
+      "per_class": {
+        "negative": {
+          "precision": 0.8219,
+          "recall": 0.8043,
+          "f1": 0.813,
+          "support": 1027
+        },
+        "neutral": {
+          "precision": 0.7203,
+          "recall": 0.7746,
+          "f1": 0.7465,
+          "support": 1087
+        },
+        "positive": {
+          "precision": 0.9075,
+          "recall": 0.8548,
+          "f1": 0.8804,
+          "support": 1033
+        }
+      },
+      "matrix": [
+        [
+          826,
+          193,
+          8
+        ],
+        [
+          163,
+          842,
+          82
+        ],
+        [
+          16,
+          134,
+          883
+        ]
+      ]
+    }
+  },
+  "mcnemar_vs_incumbent_same_data": null,
+  "reference": {
+    "shipped_model_test_macro_f1": 0.8138,
+    "note": "The shipped model trained on FiReCS alone. When extra corpora are included the incumbent comparison is refit on the same rows, so the McNemar test isolates the settings rather than the data."
+  }
+}
