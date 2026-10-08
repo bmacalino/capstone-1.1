@@ -1,0 +1,23 @@
+{
+  "what": "Second set of training sentences written by the AI assistant, one by one. Not reviews. Training only, never a test.",
+  "approved_by": "adviser, as reported by the owner on 8 October 2026",
+  "source": "research/synthetic/v2_source/*.txt",
+  "sentences": 1146,
+  "left_out_because_identical_to_a_real_sentence": 15,
+  "by_family": {
+    "counterfeit_negative": 141,
+    "counterfeit_positive": 234,
+    "not_as_described_negative": 145,
+    "not_as_described_positive": 234,
+    "quality_negative": 145,
+    "quality_positive": 247
+  },
+  "yes_per_label": {
+    "safety": 3,
+    "defect": 32,
+    "quality": 247,
+    "counterfeit": 234,
+    "not_as_described": 245
+  },
+  "sha256": "cd9e996a8b64159085098f0a5cf7476f836a7a623c9e3aee0c6b131e20e52d22"
+}

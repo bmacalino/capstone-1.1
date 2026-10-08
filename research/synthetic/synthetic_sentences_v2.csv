@@ -1,0 +1,1147 @@
+row_id,core_id,family,kind,text,safety,defect,quality,counterfeit,not_as_described
+syn2-00001,v2-00001,counterfeit,negative,"original talaga, na verify ko sa website",no,no,no,no,no
+syn2-00002,v2-00002,counterfeit,negative,"legit na original, may serial at hologram",no,no,no,no,no
+syn2-00003,v2-00003,counterfeit,negative,"100% authentic, chineck ko sa app",no,no,no,no,no
+syn2-00004,v2-00004,counterfeit,negative,"tunay na samsung, lumabas sa phone ko na super fast charging",no,no,no,no,no
+syn2-00005,v2-00005,counterfeit,negative,"orig na jbl, nag connect sa jbl app",no,no,no,no,no
+syn2-00006,v2-00006,counterfeit,negative,"hindi fake, pinatingnan ko pa sa service center",no,no,no,no,no
+syn2-00007,v2-00007,counterfeit,negative,"di sya peke, legit na legit",no,no,no,no,no
+syn2-00008,v2-00008,counterfeit,negative,"not fake, verified on the official site",no,no,no,no,no
+syn2-00009,v2-00009,counterfeit,negative,"this is the real deal, serial checks out",no,no,no,no,no
+syn2-00010,v2-00010,counterfeit,negative,"genuine product, registered the warranty without issue",no,no,no,no,no
+syn2-00011,v2-00011,counterfeit,negative,"authentic anker, works with my macbook",no,no,no,no,no
+syn2-00012,v2-00012,counterfeit,negative,"original po ito, same sa binili ko sa mall",no,no,no,no,no
+syn2-00013,v2-00013,counterfeit,negative,kaparehong kapareho ng original ko kasi original din,no,no,no,no,no
+syn2-00014,v2-00014,counterfeit,negative,"akala ko fake, original pala",no,no,no,no,no
+syn2-00015,v2-00015,counterfeit,negative,"akala ko peke kasi mura, legit pala",no,no,no,no,no
+syn2-00016,v2-00016,counterfeit,negative,"kala ko class a lang, tunay pala",no,no,no,no,no
+syn2-00017,v2-00017,counterfeit,negative,i thought it was fake because of the price but it is genuine,no,no,no,no,no
+syn2-00018,v2-00018,counterfeit,negative,"i was worried it was a copy, it is not",no,no,no,no,no
+syn2-00019,v2-00019,counterfeit,negative,duda ako nung una pero original pala nung chineck ko,no,no,no,no,no
+syn2-00020,v2-00020,counterfeit,negative,nagduda ako kasi mura pero authentic naman,no,no,no,no,no
+syn2-00021,v2-00021,counterfeit,negative,pero mukhang puro peke yung mga 5 star review,no,no,no,no,no
+syn2-00022,v2-00022,counterfeit,negative,"fake yung mga review, hindi naman maganda",no,no,no,no,no
+syn2-00023,v2-00023,counterfeit,negative,fake reviews lang yung nasa taas,no,no,no,no,no
+syn2-00024,v2-00024,counterfeit,negative,ang daming fake na feedback dito,no,no,no,no,no
+syn2-00025,v2-00025,counterfeit,negative,"fake seller, hindi nagpapadala",no,no,no,no,no
+syn2-00026,v2-00026,counterfeit,negative,fake ang tracking number na binigay,no,no,no,no,no
+syn2-00027,v2-00027,counterfeit,negative,fake yung voucher hindi gumana,no,no,no,no,no
+syn2-00028,v2-00028,counterfeit,negative,fake news yung sabi na mabilis mag deliver,no,no,no,no,no
+syn2-00029,v2-00029,counterfeit,negative,those five star reviews look fake,no,no,no,no,no
+syn2-00030,v2-00030,counterfeit,negative,"fake tracking, parcel never moved",no,no,no,no,no
+syn2-00031,v2-00031,counterfeit,negative,"scam to, hindi dumating yung order ko",no,no,no,no,no
+syn2-00032,v2-00032,counterfeit,negative,"scam, walang laman yung box",no,no,no,no,no
+syn2-00033,v2-00033,counterfeit,negative,"scam, isa lang dumating sa dalawang order",no,no,no,no,no
+syn2-00034,v2-00034,counterfeit,negative,"scammer yung seller, hindi nagre reply",no,no,no,no,no
+syn2-00035,v2-00035,counterfeit,negative,"definitely a scam, they sent an empty box",no,no,no,no,no
+syn2-00036,v2-00036,counterfeit,negative,"this is a scam, item never arrived",no,no,no,no,no
+syn2-00037,v2-00037,counterfeit,negative,"scam talaga, sira yung pinadala",no,yes,no,no,no
+syn2-00038,v2-00038,counterfeit,negative,"scam, ayaw gumana pagdating",no,yes,no,no,no
+syn2-00039,v2-00039,counterfeit,negative,"na scam ako, kulang yung item",no,no,no,no,no
+syn2-00040,v2-00040,counterfeit,negative,"budol, ang liit pala",no,no,no,no,no
+syn2-00041,v2-00041,counterfeit,negative,na budol ako sa free shipping haha,no,no,no,no,no
+syn2-00042,v2-00042,counterfeit,negative,"budol is real, ang ganda kasi",no,no,no,no,no
+syn2-00043,v2-00043,counterfeit,negative,"fake ung 20000mah, 5000 lang ata",no,no,no,no,yes
+syn2-00044,v2-00044,counterfeit,negative,fake yung capacity na nakalagay,no,no,no,no,yes
+syn2-00045,v2-00045,counterfeit,negative,"peke yung 65w, 10w lang lumalabas",no,no,no,no,yes
+syn2-00046,v2-00046,counterfeit,negative,"fake ads, hindi ganyan yung dumating",no,no,no,no,yes
+syn2-00047,v2-00047,counterfeit,negative,fake yung blood pressure reading nya,no,no,no,no,yes
+syn2-00048,v2-00048,counterfeit,negative,hindi totoong 5g to,no,no,no,no,yes
+syn2-00049,v2-00049,counterfeit,negative,hindi totoong 10 meters,no,no,no,no,yes
+syn2-00050,v2-00050,counterfeit,negative,"parang original ang tunog, solid",no,no,no,no,no
+syn2-00051,v2-00051,counterfeit,negative,"tunog original, ang lakas ng bass",no,no,no,no,no
+syn2-00052,v2-00052,counterfeit,negative,kasing ganda ng original,no,no,no,no,no
+syn2-00053,v2-00053,counterfeit,negative,kalidad pang original,no,no,no,no,no
+syn2-00054,v2-00054,counterfeit,negative,as good as the original one i had,no,no,no,no,no
+syn2-00055,v2-00055,counterfeit,negative,sounds just like my old jbl,no,no,no,no,no
+syn2-00056,v2-00056,counterfeit,negative,mas maganda pa sa original kong charger,no,no,no,no,no
+syn2-00057,v2-00057,counterfeit,negative,mas mabilis pa sa original na adapter ng cp ko,no,no,no,no,no
+syn2-00058,v2-00058,counterfeit,negative,better than the original cable that came with my phone,no,no,no,no,no
+syn2-00059,v2-00059,counterfeit,negative,pamalit sa original kong charger na nasira,no,no,no,no,no
+syn2-00060,v2-00060,counterfeit,negative,replacement to sa original na cable ko na naputol,no,no,no,no,no
+syn2-00061,v2-00061,counterfeit,negative,this replaces the original charger that broke after a year,no,no,no,no,no
+syn2-00062,v2-00062,counterfeit,negative,nasira na kasi yung original na remote kaya bumili ako,no,no,no,no,no
+syn2-00063,v2-00063,counterfeit,negative,nawala yung original kong earbuds kaya ito muna,no,no,no,no,no
+syn2-00064,v2-00064,counterfeit,negative,the original one stopped working so i got this,no,no,no,no,no
+syn2-00065,v2-00065,counterfeit,negative,"yung original price 999, nabili ko ng 499",no,no,no,no,no
+syn2-00066,v2-00066,counterfeit,negative,ang taas ng original price pero naka sale,no,no,no,no,no
+syn2-00067,v2-00067,counterfeit,negative,"original price is too high, wait for a sale",no,no,no,no,no
+syn2-00068,v2-00068,counterfeit,negative,"nasa original box pa, sealed",no,no,no,no,no
+syn2-00069,v2-00069,counterfeit,negative,"original packaging, walang sira",no,no,no,no,no
+syn2-00070,v2-00070,counterfeit,negative,may kasamang original na resibo,no,no,no,no,no
+syn2-00071,v2-00071,counterfeit,negative,"original na kulay yung pinili ko, black",no,no,no,no,no
+syn2-00072,v2-00072,counterfeit,negative,"bumili ako dati ng original sa mall, mas mahal pero pareho lang",no,no,no,no,no
+syn2-00073,v2-00073,counterfeit,negative,mas mura dito kesa sa official store pero pareho naman,no,no,no,no,no
+syn2-00074,v2-00074,counterfeit,negative,same lang sa binili ko sa mall,no,no,no,no,no
+syn2-00075,v2-00075,counterfeit,negative,sa official store ako bumili para sure,no,no,no,no,no
+syn2-00076,v2-00076,counterfeit,negative,sa flagship store ko binili kaya panatag ako,no,no,no,no,no
+syn2-00077,v2-00077,counterfeit,negative,bought from the official store so i know it is real,no,no,no,no,no
+syn2-00078,v2-00078,counterfeit,negative,"salamat realme, mabilis dumating",no,no,no,no,no
+syn2-00079,v2-00079,counterfeit,negative,anker never disappoints,no,no,no,no,no
+syn2-00080,v2-00080,counterfeit,negative,jbl talaga pag dating sa tunog,no,no,no,no,no
+syn2-00081,v2-00081,counterfeit,negative,realme user ako kaya realme din ang charger,no,no,no,no,no
+syn2-00082,v2-00082,counterfeit,negative,compatible sa samsung at iphone,no,no,no,no,no
+syn2-00083,v2-00083,counterfeit,negative,"pwede sa realme, oppo at vivo",no,no,no,no,no
+syn2-00084,v2-00084,counterfeit,negative,works with my sony tv,no,no,no,no,no
+syn2-00085,v2-00085,counterfeit,negative,"gamit ko sa xiaomi ko, ok naman",no,no,no,no,no
+syn2-00086,v2-00086,counterfeit,negative,local brand lang pero matibay,no,no,no,no,no
+syn2-00087,v2-00087,counterfeit,negative,hindi sikat yung brand pero maganda,no,no,no,no,no
+syn2-00088,v2-00088,counterfeit,negative,"unbranded pero ok naman, yun naman talaga nakalagay",no,no,no,no,no
+syn2-00089,v2-00089,counterfeit,negative,"generic lang pero yun naman ang binili ko, ok",no,no,no,no,no
+syn2-00090,v2-00090,counterfeit,negative,"no name brand but works well, as listed",no,no,no,no,no
+syn2-00091,v2-00091,counterfeit,negative,"oem naman talaga nakalagay sa listing, ok lang",no,no,no,no,no
+syn2-00092,v2-00092,counterfeit,negative,replica naman talaga nakasulat kaya alam ko na,no,no,no,no,no
+syn2-00093,v2-00093,counterfeit,negative,"class 10 yung sd card, mabilis mag save",no,no,no,no,no
+syn2-00094,v2-00094,counterfeit,negative,"class 10 at u3, pwede sa 4k",no,no,no,no,no
+syn2-00095,v2-00095,counterfeit,negative,na copy ko agad lahat ng files,no,no,no,no,no
+syn2-00096,v2-00096,counterfeit,negative,mabilis mag copy ng movies sa flashdrive,no,no,no,no,no
+syn2-00097,v2-00097,counterfeit,negative,"copy paste lang ng files, walang error",no,no,no,no,no
+syn2-00098,v2-00098,counterfeit,negative,kopya lang ako ng review ng iba haha ok naman kasi,no,no,no,no,no
+syn2-00099,v2-00099,counterfeit,negative,pwede mag clone ng app sa phone na to,no,no,no,no,no
+syn2-00100,v2-00100,counterfeit,negative,dual apps or clone apps supported,no,no,no,no,no
+syn2-00101,v2-00101,counterfeit,negative,imitation leather yung strap pero komportable,no,no,no,no,no
+syn2-00102,v2-00102,counterfeit,negative,"faux leather case, maganda",no,no,no,no,no
+syn2-00103,v2-00103,counterfeit,negative,iba yung kulay na dumating,no,no,no,no,no
+syn2-00104,v2-00104,counterfeit,negative,not the item i ordered,no,no,no,no,no
+syn2-00105,v2-00105,counterfeit,negative,hindi yan yung order ko,no,no,no,no,no
+syn2-00106,v2-00106,counterfeit,negative,huwag na kayong bibili,no,no,no,no,no
+syn2-00107,v2-00107,counterfeit,negative,ang pangit ng customer service,no,no,no,no,no
+syn2-00108,v2-00108,counterfeit,negative,gusto pa dalhin sa service center e malayo kami,no,no,no,no,no
+syn2-00109,v2-00109,counterfeit,negative,"hindi totoo yung sabi na mahina, malakas naman",no,no,no,no,no
+syn2-00110,v2-00110,counterfeit,negative,di naman totoo na madaling masira,no,no,no,no,no
+syn2-00111,v2-00111,counterfeit,negative,"legit seller, mabilis mag ship",no,no,no,no,no
+syn2-00112,v2-00112,counterfeit,negative,legit na mabilis mag charge,no,no,no,no,no
+syn2-00113,v2-00113,counterfeit,negative,legit ang ganda,no,no,no,no,no
+syn2-00114,v2-00114,counterfeit,negative,"super legit, recommended",no,no,no,no,no
+syn2-00115,v2-00115,counterfeit,negative,legit check: pasado,no,no,no,no,no
+syn2-00116,v2-00116,counterfeit,negative,"mukhang legit naman, wala akong napansing kakaiba",no,no,no,no,no
+syn2-00117,v2-00117,counterfeit,negative,i checked for signs of a fake and found none,no,no,no,no,no
+syn2-00118,v2-00118,counterfeit,negative,no signs of being counterfeit,no,no,no,no,no
+syn2-00119,v2-00119,counterfeit,negative,"box, logo and serial all match the real one",no,no,no,no,no
+syn2-00120,v2-00120,counterfeit,negative,"tinignan ko yung logo at serial, tama lahat",no,no,no,no,no
+syn2-00121,v2-00121,counterfeit,negative,"may hologram at warranty card, kumpleto",no,no,no,no,no
+syn2-00122,v2-00122,counterfeit,negative,na register ko yung warranty sa site ng brand,no,no,no,no,no
+syn2-00123,v2-00123,counterfeit,negative,"nag pop up agad sa iphone, tunay",no,no,no,no,no
+syn2-00124,v2-00124,counterfeit,negative,"lumabas sa find my, original nga",no,no,no,no,no
+syn2-00125,v2-00125,counterfeit,negative,detected agad ng jbl app,no,no,no,no,no
+syn2-00126,v2-00126,counterfeit,negative,"sabi ng cp ko fast charging, original cable nga",no,no,no,no,no
+syn2-00127,v2-00127,counterfeit,negative,hindi ko alam kung original pero ang ganda ng tunog,no,no,no,no,no
+syn2-00128,v2-00128,counterfeit,negative,"di ko sure kung orig, di ko pa na check",no,no,no,no,no
+syn2-00129,v2-00129,counterfeit,negative,original ba to? di ko pa alam,no,no,no,no,no
+syn2-00130,v2-00130,counterfeit,negative,is this original? i have not checked yet,no,no,no,no,no
+syn2-00131,v2-00131,counterfeit,negative,paano malalaman kung original?,no,no,no,no,no
+syn2-00132,v2-00132,counterfeit,negative,sana original,no,no,no,no,no
+syn2-00133,v2-00133,counterfeit,negative,sana hindi fake yung dumating sa susunod,no,no,no,no,no
+syn2-00134,v2-00134,counterfeit,negative,hope it is authentic,no,no,no,no,no
+syn2-00135,v2-00135,counterfeit,negative,may nabasa akong fake daw pero sa akin tunay,no,no,no,no,no
+syn2-00136,v2-00136,counterfeit,negative,"sabi ng iba peke daw, pero na verify ko naman",no,no,no,no,no
+syn2-00137,v2-00137,counterfeit,negative,others say it is fake but mine passed the check,no,no,no,no,no
+syn2-00138,v2-00138,counterfeit,negative,"yung nabili ko sa ibang shop ang peke, ito tunay",no,no,no,no,no
+syn2-00139,v2-00139,counterfeit,negative,"sa ibang store ako na fake, dito legit",no,no,no,no,no
+syn2-00140,v2-00140,counterfeit,negative,"the one from the other shop was a replica, this one is real",no,no,no,no,no
+syn2-00141,v2-00141,counterfeit,negative,"di tulad ng nabili ko sa iba na class a, ito original",no,no,no,no,no
+syn2-00142,v2-00142,counterfeit,positive,"hindi original yung charger, halata sa bigat",no,no,no,yes,no
+syn2-00143,v2-00143,counterfeit,positive,"di sya original na samsung, iba yung font sa likod",no,no,no,yes,no
+syn2-00144,v2-00144,counterfeit,positive,"hindi to original na jbl, tunog lata",no,no,no,yes,no
+syn2-00145,v2-00145,counterfeit,positive,"hindi orig yung airpods, ayaw ma detect ng iphone",no,no,no,yes,no
+syn2-00146,v2-00146,counterfeit,positive,"di original, class a lang",no,no,no,yes,no
+syn2-00147,v2-00147,counterfeit,positive,hindi naman to tunay na anker,no,no,no,yes,no
+syn2-00148,v2-00148,counterfeit,positive,"hindi tunay na sandisk, ibang iba sa binili ko sa mall",no,no,no,yes,no
+syn2-00149,v2-00149,counterfeit,positive,"not original, the logo is slightly off",no,no,no,yes,no
+syn2-00150,v2-00150,counterfeit,positive,not an original sony controller,no,no,no,yes,no
+syn2-00151,v2-00151,counterfeit,positive,this is not a genuine apple cable,no,no,no,yes,no
+syn2-00152,v2-00152,counterfeit,positive,"not genuine, serial number does not exist",no,no,no,yes,no
+syn2-00153,v2-00153,counterfeit,positive,definitely not authentic logitech,no,no,no,yes,no
+syn2-00154,v2-00154,counterfeit,positive,these are not real airpods,no,no,no,yes,no
+syn2-00155,v2-00155,counterfeit,positive,this is not the real xiaomi powerbank,no,no,no,yes,no
+syn2-00156,v2-00156,counterfeit,positive,"fake to, wag kayong maniwala sa reviews na 5 star",no,no,no,yes,no
+syn2-00157,v2-00157,counterfeit,positive,"fake yung earbuds, ayaw mag pop up sa iphone",no,no,no,yes,no
+syn2-00158,v2-00158,counterfeit,positive,"fake na jbl, walang serial sa ilalim",no,no,no,yes,no
+syn2-00159,v2-00159,counterfeit,positive,"fake po ito, kinumpara ko sa original ko",no,no,no,yes,no
+syn2-00160,v2-00160,counterfeit,positive,"fake ang dumating, hindi realme",no,no,no,yes,no
+syn2-00161,v2-00161,counterfeit,positive,"peke yung charger, nag iinit agad",yes,yes,no,yes,no
+syn2-00162,v2-00162,counterfeit,positive,"peke to guys, iba yung logo",no,no,no,yes,no
+syn2-00163,v2-00163,counterfeit,positive,peke ang binebenta nila dito,no,no,no,yes,no
+syn2-00164,v2-00164,counterfeit,positive,"pekeng sandisk, 8gb lang totoong laman",no,no,no,yes,yes
+syn2-00165,v2-00165,counterfeit,positive,"pekeng airpods, walang noise cancelling",no,no,no,yes,yes
+syn2-00166,v2-00166,counterfeit,positive,"pekeng peke, sayang pera",no,no,no,yes,no
+syn2-00167,v2-00167,counterfeit,positive,"halatang fake, mali yung spelling sa box",no,no,no,yes,no
+syn2-00168,v2-00168,counterfeit,positive,halatang peke kasi malabo yung print ng logo,no,no,no,yes,no
+syn2-00169,v2-00169,counterfeit,positive,halata na hindi orig sa tunog pa lang,no,no,no,yes,no
+syn2-00170,v2-00170,counterfeit,positive,"obvious na fake, ang gaan at ang lutong ng plastic",no,no,no,yes,no
+syn2-00171,v2-00171,counterfeit,positive,"obviously fake, the packaging has typos",no,no,no,yes,no
+syn2-00172,v2-00172,counterfeit,positive,"clearly a fake, the box print is blurry",no,no,no,yes,no
+syn2-00173,v2-00173,counterfeit,positive,"mukhang fake, iba yung kulay ng logo",no,no,no,yes,no
+syn2-00174,v2-00174,counterfeit,positive,mukhang peke kasi walang hologram sticker,no,no,no,yes,no
+syn2-00175,v2-00175,counterfeit,positive,"mukhang hindi original, walang seal",no,no,no,yes,no
+syn2-00176,v2-00176,counterfeit,positive,parang fake kasi hindi ma verify sa website,no,no,no,yes,no
+syn2-00177,v2-00177,counterfeit,positive,"parang hindi orig, iba yung amoy ng plastic",no,no,no,yes,no
+syn2-00178,v2-00178,counterfeit,positive,"it looks fake, the font is different from the real one",no,no,no,yes,no
+syn2-00179,v2-00179,counterfeit,positive,"seems like a knock off, not the real brand",no,no,no,yes,no
+syn2-00180,v2-00180,counterfeit,positive,"class a lang to, hindi original",no,no,no,yes,no
+syn2-00181,v2-00181,counterfeit,positive,class a daw pero mukhang class c,no,no,no,yes,no
+syn2-00182,v2-00182,counterfeit,positive,"kind of class a, not the real thing",no,no,no,yes,no
+syn2-00183,v2-00183,counterfeit,positive,"replica lang, wag umasa na original",no,no,no,yes,no
+syn2-00184,v2-00184,counterfeit,positive,replica lang pala kahit sabi original,no,no,no,yes,no
+syn2-00185,v2-00185,counterfeit,positive,imitation lang ng apple charger,no,no,no,yes,no
+syn2-00186,v2-00186,counterfeit,positive,"imitation lang, ibang iba sa tunay",no,no,no,yes,no
+syn2-00187,v2-00187,counterfeit,positive,"clone lang ng dualshock, hindi sony",no,no,no,yes,no
+syn2-00188,v2-00188,counterfeit,positive,"clone lang pala, akala ko orig",no,no,no,yes,no
+syn2-00189,v2-00189,counterfeit,positive,copy lang to ng anker,no,no,no,yes,no
+syn2-00190,v2-00190,counterfeit,positive,"kopya lang ng original, mas magaan",no,no,no,yes,no
+syn2-00191,v2-00191,counterfeit,positive,gaya gaya lang ng jbl,no,no,no,yes,no
+syn2-00192,v2-00192,counterfeit,positive,"knock off version, not the real jbl",no,no,no,yes,no
+syn2-00193,v2-00193,counterfeit,positive,it is a replica of the original controller,no,no,no,yes,no
+syn2-00194,v2-00194,counterfeit,positive,just an imitation of the real product,no,no,no,yes,no
+syn2-00195,v2-00195,counterfeit,positive,a cheap copy of the samsung charger,no,no,no,yes,no
+syn2-00196,v2-00196,counterfeit,positive,oem lang daw pero binenta as original,no,no,no,yes,no
+syn2-00197,v2-00197,counterfeit,positive,sabi original pero oem lang pala,no,no,no,yes,no
+syn2-00198,v2-00198,counterfeit,positive,"sabi orig, hindi naman",no,no,no,yes,no
+syn2-00199,v2-00199,counterfeit,positive,"ang sabi legit na samsung, hindi naman pala",no,no,no,yes,no
+syn2-00200,v2-00200,counterfeit,positive,"sabi authentic, pero fake yung dumating",no,no,no,yes,no
+syn2-00201,v2-00201,counterfeit,positive,"nakalagay original, peke naman",no,no,no,yes,no
+syn2-00202,v2-00202,counterfeit,positive,original daw pero walang tatak ng brand,no,no,no,yes,no
+syn2-00203,v2-00203,counterfeit,positive,they said original but it is clearly a copy,no,no,no,yes,no
+syn2-00204,v2-00204,counterfeit,positive,sold as authentic but it is not,no,no,no,yes,no
+syn2-00205,v2-00205,counterfeit,positive,listed as genuine but this is counterfeit,no,no,no,yes,no
+syn2-00206,v2-00206,counterfeit,positive,"akala ko original, hindi pala",no,no,no,yes,no
+syn2-00207,v2-00207,counterfeit,positive,"akala ko orig na realme, peke pala",no,no,no,yes,no
+syn2-00208,v2-00208,counterfeit,positive,"akala ko legit kasi mall, fake pala",no,no,no,yes,no
+syn2-00209,v2-00209,counterfeit,positive,"kala ko tunay na anker, gaya lang pala",no,no,no,yes,no
+syn2-00210,v2-00210,counterfeit,positive,"akala ko authentic, class a lang pala",no,no,no,yes,no
+syn2-00211,v2-00211,counterfeit,positive,"i thought it was original, turns out it is fake",no,no,no,yes,no
+syn2-00212,v2-00212,counterfeit,positive,"i thought this was genuine sony, it is not",no,no,no,yes,no
+syn2-00213,v2-00213,counterfeit,positive,walang tatak na samsung sa mismong charger,no,no,no,yes,no
+syn2-00214,v2-00214,counterfeit,positive,"walang logo ng jbl sa likod, sa box lang meron",no,no,no,yes,no
+syn2-00215,v2-00215,counterfeit,positive,walang realme na nakasulat sa unit,no,no,no,yes,no
+syn2-00216,v2-00216,counterfeit,positive,"walang brand name sa mismong item, sa picture meron",no,no,no,yes,yes
+syn2-00217,v2-00217,counterfeit,positive,"walang serial number, kaya alam mong peke",no,no,no,yes,no
+syn2-00218,v2-00218,counterfeit,positive,"walang hologram, hindi authentic",no,no,no,yes,no
+syn2-00219,v2-00219,counterfeit,positive,"no logo on the unit itself, only on the box",no,no,no,yes,no
+syn2-00220,v2-00220,counterfeit,positive,"there is no serial number anywhere, so it is not genuine",no,no,no,yes,no
+syn2-00221,v2-00221,counterfeit,positive,the brand name is misspelled on the box,no,no,no,yes,no
+syn2-00222,v2-00222,counterfeit,positive,"mali yung spelling ng brand sa box, sansung nakalagay",no,no,no,yes,no
+syn2-00223,v2-00223,counterfeit,positive,samsnug ang nakasulat haha halatang peke,no,no,no,yes,no
+syn2-00224,v2-00224,counterfeit,positive,"iba yung logo, mas mataba yung letra",no,no,no,yes,no
+syn2-00225,v2-00225,counterfeit,positive,iba yung font ng logo kumpara sa original ko,no,no,no,yes,no
+syn2-00226,v2-00226,counterfeit,positive,iba yung box sa original na binili ko sa store,no,no,no,yes,no
+syn2-00227,v2-00227,counterfeit,positive,"iba sa binili ko sa official store, mas magaan to",no,no,no,yes,no
+syn2-00228,v2-00228,counterfeit,positive,ibang iba sa nabili ko sa mall na tunay,no,no,no,yes,no
+syn2-00229,v2-00229,counterfeit,positive,"hindi kapareho ng original ko, iba yung timbang at kulay",no,no,no,yes,no
+syn2-00230,v2-00230,counterfeit,positive,"kinumpara ko sa original, magkaiba yung port at logo",no,no,no,yes,no
+syn2-00231,v2-00231,counterfeit,positive,"compared to my original one, the weight and logo are different",no,no,no,yes,no
+syn2-00232,v2-00232,counterfeit,positive,"side by side with the real one, this is clearly fake",no,no,no,yes,no
+syn2-00233,v2-00233,counterfeit,positive,"different from the one i got at the official store, this one is fake",no,no,no,yes,no
+syn2-00234,v2-00234,counterfeit,positive,hindi ma verify sa app ng brand,no,no,no,yes,no
+syn2-00235,v2-00235,counterfeit,positive,"ayaw ma scan yung qr sa box, fake daw sabi ng site",no,no,no,yes,no
+syn2-00236,v2-00236,counterfeit,positive,nung chineck ko sa website invalid yung serial,no,no,no,yes,no
+syn2-00237,v2-00237,counterfeit,positive,invalid serial number sa official site,no,no,no,yes,no
+syn2-00238,v2-00238,counterfeit,positive,serial number is not recognized by the manufacturer,no,no,no,yes,no
+syn2-00239,v2-00239,counterfeit,positive,the verification code says it is not authentic,no,no,no,yes,no
+syn2-00240,v2-00240,counterfeit,positive,failed the authenticity check on the official website,no,no,no,yes,no
+syn2-00241,v2-00241,counterfeit,positive,"hindi nade detect ng iphone as airpods, fake",no,no,no,yes,no
+syn2-00242,v2-00242,counterfeit,positive,"walang pop up sa iphone, hindi tunay na airpods",no,no,no,yes,no
+syn2-00243,v2-00243,counterfeit,positive,"di lumalabas sa find my, peke",no,no,no,yes,no
+syn2-00244,v2-00244,counterfeit,positive,"does not show up as airpods on my iphone, fake",no,no,no,yes,no
+syn2-00245,v2-00245,counterfeit,positive,"my phone says this accessory is not supported, not original",no,no,no,yes,no
+syn2-00246,v2-00246,counterfeit,positive,lumabas sa phone ko na hindi original na charger,no,no,no,yes,no
+syn2-00247,v2-00247,counterfeit,positive,"sabi ng cp ko slow charging, hindi daw original cable",no,no,no,yes,no
+syn2-00248,v2-00248,counterfeit,positive,"unknown brand yung dumating, hindi yung nasa listing",no,no,no,yes,no
+syn2-00249,v2-00249,counterfeit,positive,"ibang brand yung pinadala, hindi jbl",no,no,no,yes,no
+syn2-00250,v2-00250,counterfeit,positive,"hindi sony ang dumating, walang pangalan",no,no,no,yes,no
+syn2-00251,v2-00251,counterfeit,positive,they delivered an unbranded one instead of the anker,no,no,no,yes,no
+syn2-00252,v2-00252,counterfeit,positive,"came in a brand i have never heard of, not the one advertised",no,no,no,yes,no
+syn2-00253,v2-00253,counterfeit,positive,"di sya tunay na realme, sticker lang yung logo",no,no,no,yes,no
+syn2-00254,v2-00254,counterfeit,positive,"sticker lang yung tatak, natatanggal",no,no,no,yes,no
+syn2-00255,v2-00255,counterfeit,positive,dinikit lang yung logo ng brand,no,no,no,yes,no
+syn2-00256,v2-00256,counterfeit,positive,"printed lang yung logo, hindi naka emboss gaya ng original",no,no,no,yes,no
+syn2-00257,v2-00257,counterfeit,positive,the logo is just a sticker,no,no,no,yes,no
+syn2-00258,v2-00258,counterfeit,positive,"the logo peels off, real ones are engraved",no,no,no,yes,no
+syn2-00259,v2-00259,counterfeit,positive,"binuksan ko, buhangin yung laman ng battery",no,no,no,yes,no
+syn2-00260,v2-00260,counterfeit,positive,pagbukas ko may bakal lang na pampabigat sa loob,no,no,no,yes,no
+syn2-00261,v2-00261,counterfeit,positive,"may semento sa loob para bumigat, peke",no,no,no,yes,no
+syn2-00262,v2-00262,counterfeit,positive,nung binuksan ko maliit lang yung battery at may pabigat,no,no,no,yes,no
+syn2-00263,v2-00263,counterfeit,positive,"opened it and found a tiny cell with weights, fake",no,no,no,yes,no
+syn2-00264,v2-00264,counterfeit,positive,"inside is sand and a small battery, counterfeit",no,no,no,yes,no
+syn2-00265,v2-00265,counterfeit,positive,fake products ang tinda ng shop na to,no,no,no,yes,no
+syn2-00266,v2-00266,counterfeit,positive,puro peke tinda nila,no,no,no,yes,no
+syn2-00267,v2-00267,counterfeit,positive,nagbebenta sila ng peke,no,no,no,yes,no
+syn2-00268,v2-00268,counterfeit,positive,wag kayo bumili dito peke mga item,no,no,no,yes,no
+syn2-00269,v2-00269,counterfeit,positive,this shop sells counterfeit items,no,no,no,yes,no
+syn2-00270,v2-00270,counterfeit,positive,they are selling fakes here,no,no,no,yes,no
+syn2-00271,v2-00271,counterfeit,positive,"hindi authorized seller, peke yung binebenta",no,no,no,yes,no
+syn2-00272,v2-00272,counterfeit,positive,legit daw na store pero fake yung item,no,no,no,yes,no
+syn2-00273,v2-00273,counterfeit,positive,naka mall pa pero fake naman yung dumating,no,no,no,yes,no
+syn2-00274,v2-00274,counterfeit,positive,flagship store daw pero peke binigay,no,no,no,yes,no
+syn2-00275,v2-00275,counterfeit,positive,official store kuno pero hindi original,no,no,no,yes,no
+syn2-00276,v2-00276,counterfeit,positive,ok naman kahit hindi original,no,no,no,yes,no
+syn2-00277,v2-00277,counterfeit,positive,gumagana naman kahit fake,no,no,no,yes,no
+syn2-00278,v2-00278,counterfeit,positive,working naman kahit class a lang,no,no,no,yes,no
+syn2-00279,v2-00279,counterfeit,positive,pwede na kahit imitation lang,no,no,no,yes,no
+syn2-00280,v2-00280,counterfeit,positive,okay na rin kahit hindi tunay na jbl,no,no,no,yes,no
+syn2-00281,v2-00281,counterfeit,positive,maganda naman tunog kahit replica,no,no,no,yes,no
+syn2-00282,v2-00282,counterfeit,positive,sulit pa rin kahit di orig,no,no,no,yes,no
+syn2-00283,v2-00283,counterfeit,positive,good enough even though it is not original,no,no,no,yes,no
+syn2-00284,v2-00284,counterfeit,positive,works fine for a fake,no,no,no,yes,no
+syn2-00285,v2-00285,counterfeit,positive,not bad for a replica,no,no,no,yes,no
+syn2-00286,v2-00286,counterfeit,positive,decent for a copy but do not expect the real thing,no,no,no,yes,no
+syn2-00287,v2-00287,counterfeit,positive,alam ko namang hindi original sa presyong yan,no,no,no,yes,no
+syn2-00288,v2-00288,counterfeit,positive,sa presyo pa lang alam mo nang hindi orig,no,no,no,yes,no
+syn2-00289,v2-00289,counterfeit,positive,sa ganyang presyo imposibleng original yan,no,no,no,yes,no
+syn2-00290,v2-00290,counterfeit,positive,mura kasi kaya malamang hindi original,no,no,no,yes,no
+syn2-00291,v2-00291,counterfeit,positive,at this price it is obviously not genuine,no,no,no,yes,no
+syn2-00292,v2-00292,counterfeit,positive,"too cheap to be real, and it is not",no,no,no,yes,no
+syn2-00293,v2-00293,counterfeit,positive,wag umasa na original sa 99 pesos,no,no,no,yes,no
+syn2-00294,v2-00294,counterfeit,positive,"don't expect an original for that price, it is a copy",no,no,no,yes,no
+syn2-00295,v2-00295,counterfeit,positive,"fake pala, sayang binayad ko",no,no,no,yes,no
+syn2-00296,v2-00296,counterfeit,positive,"fake pala to, na scam ako",no,no,no,yes,no
+syn2-00297,v2-00297,counterfeit,positive,"peke pala, kaya pala mura",no,no,no,yes,no
+syn2-00298,v2-00298,counterfeit,positive,"replica pala, hindi sinabi sa description",no,no,no,yes,yes
+syn2-00299,v2-00299,counterfeit,positive,"hindi pala original, sana sinabi nyo",no,no,no,yes,no
+syn2-00300,v2-00300,counterfeit,positive,"fake ata to, iba sa dati kong binili",no,no,no,yes,no
+syn2-00301,v2-00301,counterfeit,positive,peke ata kasi mabilis uminit,no,no,no,yes,no
+syn2-00302,v2-00302,counterfeit,positive,fake yata kasi walang tatak,no,no,no,yes,no
+syn2-00303,v2-00303,counterfeit,positive,"i think it is fake, the sound is nothing like my old pair",no,no,no,yes,no
+syn2-00304,v2-00304,counterfeit,positive,pretty sure this is counterfeit,no,no,no,yes,no
+syn2-00305,v2-00305,counterfeit,positive,"medyo fake ang dating, magaan at walang serial",no,no,no,yes,no
+syn2-00306,v2-00306,counterfeit,positive,"duda ako kung original to, iba yung box",no,no,no,yes,no
+syn2-00307,v2-00307,counterfeit,positive,"nagdududa ako na tunay to, iba yung kulay",no,no,no,yes,no
+syn2-00308,v2-00308,counterfeit,positive,"i doubt this is authentic, the box looks reprinted",no,no,no,yes,no
+syn2-00309,v2-00309,counterfeit,positive,"reprint lang yung box, hindi original packaging",no,no,no,yes,no
+syn2-00310,v2-00310,counterfeit,positive,recycled box tapos peke yung laman,no,no,no,yes,no
+syn2-00311,v2-00311,counterfeit,positive,yung box original pero yung laman hindi,no,no,no,yes,no
+syn2-00312,v2-00312,counterfeit,positive,original box pero fake yung unit sa loob,no,no,no,yes,no
+syn2-00313,v2-00313,counterfeit,positive,the box is real but what's inside is not,no,no,no,yes,no
+syn2-00314,v2-00314,counterfeit,positive,"fake yung battery, hindi samsung",no,no,no,yes,no
+syn2-00315,v2-00315,counterfeit,positive,"fake yung cable na kasama, hindi apple",no,no,no,yes,no
+syn2-00316,v2-00316,counterfeit,positive,hindi original yung adapter na kasama,no,no,no,yes,no
+syn2-00317,v2-00317,counterfeit,positive,"yung earbuds peke, yung case lang ata ang tunay",no,no,no,yes,no
+syn2-00318,v2-00318,counterfeit,positive,hindi orig yung lcd na pinalit,no,no,no,yes,no
+syn2-00319,v2-00319,counterfeit,positive,"not an original screen, colors are off",no,no,no,yes,no
+syn2-00320,v2-00320,counterfeit,positive,"the battery is not genuine, it swells",no,yes,no,yes,no
+syn2-00321,v2-00321,counterfeit,positive,"after market lang yung battery, hindi original",no,no,no,yes,no
+syn2-00322,v2-00322,counterfeit,positive,"generic lang, nilagyan lang ng tatak",no,no,no,yes,no
+syn2-00323,v2-00323,counterfeit,positive,"rebranded generic, hindi totoong ugreen",no,no,no,yes,no
+syn2-00324,v2-00324,counterfeit,positive,it is a generic unit with a brand sticker,no,no,no,yes,no
+syn2-00325,v2-00325,counterfeit,positive,just a rebranded no name product,no,no,no,yes,no
+syn2-00326,v2-00326,counterfeit,positive,"di talaga sya jbl, walang jbl app na maka detect",no,no,no,yes,no
+syn2-00327,v2-00327,counterfeit,positive,"ayaw kumonekta sa official app, peke",no,no,no,yes,no
+syn2-00328,v2-00328,counterfeit,positive,"does not connect to the official app, so it is fake",no,no,no,yes,no
+syn2-00329,v2-00329,counterfeit,positive,"the official app says device not recognized, counterfeit",no,no,no,yes,no
+syn2-00330,v2-00330,counterfeit,positive,"hindi nag a update sa app ng brand, fake",no,no,no,yes,no
+syn2-00331,v2-00331,counterfeit,positive,bootleg lang,no,no,no,yes,no
+syn2-00332,v2-00332,counterfeit,positive,bootleg version of the real one,no,no,no,yes,no
+syn2-00333,v2-00333,counterfeit,positive,"budol, fake yung airpods",no,no,no,yes,no
+syn2-00334,v2-00334,counterfeit,positive,"na budol ako, hindi original",no,no,no,yes,no
+syn2-00335,v2-00335,counterfeit,positive,"scam, peke yung pinadala",no,no,no,yes,no
+syn2-00336,v2-00336,counterfeit,positive,"scammer, fake na realme ang binigay",no,no,no,yes,no
+syn2-00337,v2-00337,counterfeit,positive,"niloko kami, class a lang pala",no,no,no,yes,no
+syn2-00338,v2-00338,counterfeit,positive,pinalabas na original pero imitation,no,no,no,yes,no
+syn2-00339,v2-00339,counterfeit,positive,"dinaya kami, hindi tunay na brand",no,no,no,yes,no
+syn2-00340,v2-00340,counterfeit,positive,"they tricked us, it is a fake",no,no,no,yes,no
+syn2-00341,v2-00341,counterfeit,positive,"false claim of authenticity, this is a clone",no,no,no,yes,no
+syn2-00342,v2-00342,counterfeit,positive,kung gusto nyo ng original wag dito,no,no,no,yes,no
+syn2-00343,v2-00343,counterfeit,positive,"bili na lang kayo sa official store, peke dito",no,no,no,yes,no
+syn2-00344,v2-00344,counterfeit,positive,"go to the official store, this one is fake",no,no,no,yes,no
+syn2-00345,v2-00345,counterfeit,positive,"buy from the mall instead, these are not real",no,no,no,yes,no
+syn2-00346,v2-00346,counterfeit,positive,"di na ko uulit, fake yung una at pangalawa",no,no,no,yes,no
+syn2-00347,v2-00347,counterfeit,positive,dalawang beses na ako nabigyan ng peke dito,no,no,no,yes,no
+syn2-00348,v2-00348,counterfeit,positive,second time ordering and both are fake,no,no,no,yes,no
+syn2-00349,v2-00349,counterfeit,positive,i returned it because it is counterfeit,no,no,no,yes,no
+syn2-00350,v2-00350,counterfeit,positive,nireport ko na kasi fake,no,no,no,yes,no
+syn2-00351,v2-00351,counterfeit,positive,"ibabalik ko, hindi original",no,no,no,yes,no
+syn2-00352,v2-00352,counterfeit,positive,"refund please, this is not authentic",no,no,no,yes,no
+syn2-00353,v2-00353,counterfeit,positive,gusto ko i refund kasi peke,no,no,no,yes,no
+syn2-00354,v2-00354,counterfeit,positive,"hindi siya gaya ng original na ps4 controller, iba yung materyal",no,no,no,yes,no
+syn2-00355,v2-00355,counterfeit,positive,it has a different material from an original controller,no,no,no,yes,no
+syn2-00356,v2-00356,counterfeit,positive,the light bar does not behave like an original,no,no,no,yes,no
+syn2-00357,v2-00357,counterfeit,positive,iba yung ilaw kumpara sa tunay,no,no,no,yes,no
+syn2-00358,v2-00358,counterfeit,positive,iba yung tunog kumpara sa totoong jbl,no,no,no,yes,no
+syn2-00359,v2-00359,counterfeit,positive,"tunog peke, malayo sa totoong bose",no,no,no,yes,no
+syn2-00360,v2-00360,counterfeit,positive,yung tunog hindi pang original,no,no,no,yes,no
+syn2-00361,v2-00361,counterfeit,positive,"sound is far from the real thing, it is fake",no,no,no,yes,no
+syn2-00362,v2-00362,counterfeit,positive,"iba yung timbang sa original, mas magaan ng kalahati",no,no,no,yes,no
+syn2-00363,v2-00363,counterfeit,positive,half the weight of the genuine one,no,no,no,yes,no
+syn2-00364,v2-00364,counterfeit,positive,"mas magaan sa tunay, kaya alam kong peke",no,no,no,yes,no
+syn2-00365,v2-00365,counterfeit,positive,"logo is crooked, real ones are centered",no,no,no,yes,no
+syn2-00366,v2-00366,counterfeit,positive,"the box has no barcode, real ones do",no,no,no,yes,no
+syn2-00367,v2-00367,counterfeit,positive,"walang barcode yung box, peke",no,no,no,yes,no
+syn2-00368,v2-00368,counterfeit,positive,"walang warranty card na galing sa brand, fake",no,no,no,yes,no
+syn2-00369,v2-00369,counterfeit,positive,"walang manual at walang seal ng brand, mukhang peke",no,no,no,yes,no
+syn2-00370,v2-00370,counterfeit,positive,"di sya realme, ibang charger na nilagyan lang ng box ng realme",no,no,no,yes,no
+syn2-00371,v2-00371,counterfeit,positive,"lalagyan lang yung realme, yung laman iba",no,no,no,yes,no
+syn2-00372,v2-00372,counterfeit,positive,realme yung box pero walang tatak yung powerbank,no,no,no,yes,no
+syn2-00373,v2-00373,counterfeit,positive,samsung ang box pero walang samsung sa adapter,no,no,no,yes,no
+syn2-00374,v2-00374,counterfeit,positive,the box says apple but the cable inside is unbranded,no,no,no,yes,no
+syn2-00375,v2-00375,counterfeit,positive,"anker box, no name charger inside",no,no,no,yes,no
+syn2-00376,v2-00376,not_as_described,negative,"20000mah high capacity, fast charge for two phones",no,no,no,no,no
+syn2-00377,v2-00377,not_as_described,negative,capacity: 20000mah,no,no,no,no,no
+syn2-00378,v2-00378,not_as_described,negative,capacity: 10000,no,no,no,no,no
+syn2-00379,v2-00379,not_as_described,negative,"65w fast charging, built in cable",no,no,no,no,no
+syn2-00380,v2-00380,not_as_described,negative,"maganda naman yung item, 10000mah gaya ng nasa description",no,no,no,no,no
+syn2-00381,v2-00381,not_as_described,negative,"10 meters nga sya, sinukat ko pa",no,no,no,no,no
+syn2-00382,v2-00382,not_as_described,negative,"totoong 20000mah, apat na beses kong na charge yung cp ko",no,no,no,no,no
+syn2-00383,v2-00383,not_as_described,negative,"legit na 65w, lumalabas sa tester",no,no,no,no,no
+syn2-00384,v2-00384,not_as_described,negative,"sakto yung 256gb, na test ko na",no,no,no,no,no
+syn2-00385,v2-00385,not_as_described,negative,"tama yung haba, 3 meters talaga",no,no,no,no,no
+syn2-00386,v2-00386,not_as_described,negative,"true to its capacity, charged my phone 4 times",no,no,no,no,no
+syn2-00387,v2-00387,not_as_described,negative,exactly as described,no,no,no,no,no
+syn2-00388,v2-00388,not_as_described,negative,same as in the pictures,no,no,no,no,no
+syn2-00389,v2-00389,not_as_described,negative,kung ano yung nasa picture yun ang dumating,no,no,no,no,no
+syn2-00390,v2-00390,not_as_described,negative,"kagaya ng nasa picture, walang pinagkaiba",no,no,no,no,no
+syn2-00391,v2-00391,not_as_described,negative,tugma sa description lahat,no,no,no,no,no
+syn2-00392,v2-00392,not_as_described,negative,tama lahat ng nakalagay sa description,no,no,no,no,no
+syn2-00393,v2-00393,not_as_described,negative,parehong pareho sa pic,no,no,no,no,no
+syn2-00394,v2-00394,not_as_described,negative,what you see is what you get,no,no,no,no,no
+syn2-00395,v2-00395,not_as_described,negative,"as advertised, no complaints",no,no,no,no,no
+syn2-00396,v2-00396,not_as_described,negative,mas maganda pa sa personal kesa sa picture,no,no,no,no,no
+syn2-00397,v2-00397,not_as_described,negative,mas maganda sa actual kaysa sa pic,no,no,no,no,no
+syn2-00398,v2-00398,not_as_described,negative,better than the photos,no,no,no,no,no
+syn2-00399,v2-00399,not_as_described,negative,looks even nicer than in the listing,no,no,no,no,no
+syn2-00400,v2-00400,not_as_described,negative,fast charger talaga sya guys,no,no,no,no,no
+syn2-00401,v2-00401,not_as_described,negative,"wireless talaga sya, walang cable na kailangan",no,no,no,no,no
+syn2-00402,v2-00402,not_as_described,negative,"waterproof nga, nabasa ng ulan ok pa rin",no,no,no,no,no
+syn2-00403,v2-00403,not_as_described,negative,noise cancelling works well,no,no,no,no,no
+syn2-00404,v2-00404,not_as_described,negative,yes it is type c,no,no,no,no,no
+syn2-00405,v2-00405,not_as_described,negative,"may bluetooth at aux, kumpleto",no,no,no,no,no
+syn2-00406,v2-00406,not_as_described,negative,"rechargeable sya, may kasamang cable",no,no,no,no,no
+syn2-00407,v2-00407,not_as_described,negative,5000mah lang yung battery ng cp ko kaya tatlong charge,no,no,no,no,no
+syn2-00408,v2-00408,not_as_described,negative,4500mah lang naman cp ko,no,no,no,no,no
+syn2-00409,v2-00409,not_as_described,negative,i only have one device with a 5000mah battery,no,no,no,no,no
+syn2-00410,v2-00410,not_as_described,negative,"yung luma kong powerbank 10000mah lang, ito 20000",no,no,no,no,no
+syn2-00411,v2-00411,not_as_described,negative,may isa pa kaming 10000mah na powerbank sa bahay,no,no,no,no,no
+syn2-00412,v2-00412,not_as_described,negative,yung charger ng oppo ko 33w lang,no,no,no,no,no
+syn2-00413,v2-00413,not_as_described,negative,my old one was only 18w,no,no,no,no,no
+syn2-00414,v2-00414,not_as_described,negative,my laptop only needs 45w,no,no,no,no,no
+syn2-00415,v2-00415,not_as_described,negative,150 pesos lang sya nung sale,no,no,no,no,no
+syn2-00416,v2-00416,not_as_described,negative,"99 lang nabili ko, sulit",no,no,no,no,no
+syn2-00417,v2-00417,not_as_described,negative,2 days lang dumating na,no,no,no,no,no
+syn2-00418,v2-00418,not_as_described,negative,only took 3 days to arrive,no,no,no,no,no
+syn2-00419,v2-00419,not_as_described,negative,isang oras lang full na,no,no,no,no,no
+syn2-00420,v2-00420,not_as_described,negative,30 minutes lang puno na cp ko,no,no,no,no,no
+syn2-00421,v2-00421,not_as_described,negative,10 seconds lang naka pair na,no,no,no,no,no
+syn2-00422,v2-00422,not_as_described,negative,"just didn't notice that it was only half a meter, my fault",no,no,no,no,no
+syn2-00423,v2-00423,not_as_described,negative,"di ko nabasa na 1 meter lang pala, kasalanan ko",no,no,no,no,no
+syn2-00424,v2-00424,not_as_described,negative,hindi ko napansin na micro usb pala yung pinili ko,no,no,no,no,no
+syn2-00425,v2-00425,not_as_described,negative,"mali yung na check out ko, 10000mah pala napindot ko",no,no,no,no,no
+syn2-00426,v2-00426,not_as_described,negative,"i picked the wrong variant, should have read the description",no,no,no,no,no
+syn2-00427,v2-00427,not_as_described,negative,"my bad, i ordered the 1 meter one",no,no,no,no,no
+syn2-00428,v2-00428,not_as_described,negative,"black order ko, blue yung dumating",no,no,no,no,no
+syn2-00429,v2-00429,not_as_described,negative,white ang order ko pero pink pinadala,no,no,no,no,no
+syn2-00430,v2-00430,not_as_described,negative,"different from what i ordered, wrong color",no,no,no,no,no
+syn2-00431,v2-00431,not_as_described,negative,"mali yung item na pinadala, speaker order ko charger dumating",no,no,no,no,no
+syn2-00432,v2-00432,not_as_described,negative,"wrong item sent, i ordered type c and got lightning",no,no,no,no,no
+syn2-00433,v2-00433,not_as_described,negative,"iba yung dumating sa order ko, palitan nyo",no,no,no,no,no
+syn2-00434,v2-00434,not_as_described,negative,"kulang yung order, dalawa binayaran ko isa lang dumating",no,no,no,no,no
+syn2-00435,v2-00435,not_as_described,negative,missing yung isang piraso,no,no,no,no,no
+syn2-00436,v2-00436,not_as_described,negative,hindi kita masyado sa pic pero maganda sya,no,no,no,no,no
+syn2-00437,v2-00437,not_as_described,negative,malabo yung picture ko pasensya,no,no,no,no,no
+syn2-00438,v2-00438,not_as_described,negative,video not related,no,no,no,no,no
+syn2-00439,v2-00439,not_as_described,negative,photo for points only,no,no,no,no,no
+syn2-00440,v2-00440,not_as_described,negative,sa picture ko may ilang kuha na malabo,no,no,no,no,no
+syn2-00441,v2-00441,not_as_described,negative,"yung picture sa review ko corrupt, sorry",no,no,no,no,no
+syn2-00442,v2-00442,not_as_described,negative,di ko na nakunan ng picture,no,no,no,no,no
+syn2-00443,v2-00443,not_as_described,negative,see pictures for reference,no,no,no,no,no
+syn2-00444,v2-00444,not_as_described,negative,check nyo sa video kung paano gamitin,no,no,no,no,no
+syn2-00445,v2-00445,not_as_described,negative,"akala ko sira, lowbat lang pala",no,no,no,no,no
+syn2-00446,v2-00446,not_as_described,negative,"akala ko scam, legit naman pala",no,no,no,no,no
+syn2-00447,v2-00447,not_as_described,negative,"akala ko hindi darating, dumating din",no,no,no,no,no
+syn2-00448,v2-00448,not_as_described,negative,"akala ko maliit, sakto lang pala",no,no,no,no,no
+syn2-00449,v2-00449,not_as_described,negative,"akala ko mahina, malakas pala",no,no,no,no,no
+syn2-00450,v2-00450,not_as_described,negative,"kala ko di kasya, kasya naman",no,no,no,no,no
+syn2-00451,v2-00451,not_as_described,negative,i thought it would not work with my phone but it does,no,no,no,no,no
+syn2-00452,v2-00452,not_as_described,negative,i thought it was fake but it is legit,no,no,no,no,no
+syn2-00453,v2-00453,not_as_described,negative,di ko sure kung fast charging pero mabilis naman,no,no,no,no,no
+syn2-00454,v2-00454,not_as_described,negative,di ko pa natetest kung 20000mah talaga,no,no,no,no,no
+syn2-00455,v2-00455,not_as_described,negative,hindi ko pa nasusukat yung haba,no,no,no,no,no
+syn2-00456,v2-00456,not_as_described,negative,i have not tested the real capacity yet,no,no,no,no,no
+syn2-00457,v2-00457,not_as_described,negative,will update once i measure it,no,no,no,no,no
+syn2-00458,v2-00458,not_as_described,negative,sana totoo yung 20000mah,no,no,no,no,no
+syn2-00459,v2-00459,not_as_described,negative,sana tumagal yung battery gaya ng sabi,no,no,no,no,no
+syn2-00460,v2-00460,not_as_described,negative,hope the capacity is real,no,no,no,no,no
+syn2-00461,v2-00461,not_as_described,negative,but the airport security said this capacity is not allowed,no,no,no,no,no
+syn2-00462,v2-00462,not_as_described,negative,bawal pala sa eroplano ang 30000mah,no,no,no,no,no
+syn2-00463,v2-00463,not_as_described,negative,sabi ng rider bukas pa daw,no,no,no,no,no
+syn2-00464,v2-00464,not_as_described,negative,sabi ko sa seller paki bubble wrap,no,no,no,no,no
+syn2-00465,v2-00465,not_as_described,negative,sabi ni seller ipapadala nila yung kulang,no,no,no,no,no
+syn2-00466,v2-00466,not_as_described,negative,"sabi nila 3 days, dumating naman on time",no,no,no,no,no
+syn2-00467,v2-00467,not_as_described,negative,nakalagay sa waybill fragile pero binato pa rin,no,no,no,no,no
+syn2-00468,v2-00468,not_as_described,negative,nakalagay sa box made in china,no,no,no,no,no
+syn2-00469,v2-00469,not_as_described,negative,nakasulat sa manual kung paano i pair,no,no,no,no,no
+syn2-00470,v2-00470,not_as_described,negative,hindi naman naka bubble wrap,no,no,no,no,no
+syn2-00471,v2-00471,not_as_described,negative,hindi naka seal yung box,no,no,no,no,no
+syn2-00472,v2-00472,not_as_described,negative,hindi nakakapuno ng phone kasi luma na cp ko,no,no,no,no,no
+syn2-00473,v2-00473,not_as_described,negative,hindi mabilis mag charge sa cp ko pero baka cable ko ang problema,no,no,no,no,no
+syn2-00474,v2-00474,not_as_described,negative,not as fast as my old charger but it is fine,no,no,no,no,no
+syn2-00475,v2-00475,not_as_described,negative,"kaso hindi pala fake, legit pala",no,no,no,no,no
+syn2-00476,v2-00476,not_as_described,negative,hindi pala scam,no,no,no,no,no
+syn2-00477,v2-00477,not_as_described,negative,hindi naman pala sira,no,no,no,no,no
+syn2-00478,v2-00478,not_as_described,negative,"wala naman palang problema, ako lang mali",no,no,no,no,no
+syn2-00479,v2-00479,not_as_described,negative,"fast ethernet cable, stable connection",no,no,no,no,no
+syn2-00480,v2-00480,not_as_described,negative,"fast delivery, 2 days lang",no,no,no,no,no
+syn2-00481,v2-00481,not_as_described,negative,"fast charging, type c, with led display",no,no,no,no,no
+syn2-00482,v2-00482,not_as_described,negative,"mabilis mag charge, 0 to 100 in an hour",no,no,no,no,no
+syn2-00483,v2-00483,not_as_described,negative,ang bilis mapuno ng cp ko dito,no,no,no,no,no
+syn2-00484,v2-00484,not_as_described,negative,"30w output, sakto sa iphone",no,no,no,no,no
+syn2-00485,v2-00485,not_as_described,negative,pwede sa laptop at cp,no,no,no,no,no
+syn2-00486,v2-00486,not_as_described,negative,"compatible sa ps4 ko, plug and play",no,no,no,no,no
+syn2-00487,v2-00487,not_as_described,negative,compatible with my samsung,no,no,no,no,no
+syn2-00488,v2-00488,not_as_described,negative,gumagana sa android at iphone,no,no,no,no,no
+syn2-00489,v2-00489,not_as_described,negative,the seller insists it is not intended for calls,no,no,no,no,no
+syn2-00490,v2-00490,not_as_described,negative,"di daw pang gaming sabi ni seller, ok lang",no,no,no,no,no
+syn2-00491,v2-00491,not_as_described,negative,alam ko namang hindi waterproof to kaya iniingatan ko,no,no,no,no,no
+syn2-00492,v2-00492,not_as_described,negative,hindi naman sinabing waterproof kaya ok lang,no,no,no,no,no
+syn2-00493,v2-00493,not_as_described,negative,di naman nila sinabing may kasamang adapter,no,no,no,no,no
+syn2-00494,v2-00494,not_as_described,negative,wala namang nakalagay na may free case kaya ok lang,no,no,no,no,no
+syn2-00495,v2-00495,not_as_described,negative,i knew it had no mic when i bought it,no,no,no,no,no
+syn2-00496,v2-00496,not_as_described,negative,"it never claimed to be noise cancelling, so no issue",no,no,no,no,no
+syn2-00497,v2-00497,not_as_described,negative,hindi sya hd pero ganun naman talaga nakalagay,no,no,no,no,no
+syn2-00498,v2-00498,not_as_described,negative,"720p lang, alam ko naman nung binili ko",no,no,no,no,no
+syn2-00499,v2-00499,not_as_described,negative,"maliit lang, pero nakalagay naman yung sukat",no,no,no,no,no
+syn2-00500,v2-00500,not_as_described,negative,medyo maliit pero tama sa nakasulat na size,no,no,no,no,no
+syn2-00501,v2-00501,not_as_described,negative,smaller than i imagined but the size was stated,no,no,no,no,no
+syn2-00502,v2-00502,not_as_described,negative,1 meter lang pero yun naman talaga order ko,no,no,no,no,no
+syn2-00503,v2-00503,not_as_described,negative,"5000mah lang kaya isang charge lang, expected",no,no,no,no,no
+syn2-00504,v2-00504,not_as_described,negative,"10000mah lang to kaya dalawang charge, sakto",no,no,no,no,no
+syn2-00505,v2-00505,not_as_described,negative,30000mah kaya mabigat,no,no,no,no,no
+syn2-00506,v2-00506,not_as_described,negative,"20000mah kaya medyo malaki, normal lang",no,no,no,no,no
+syn2-00507,v2-00507,not_as_described,negative,ayaw mag charge kahit anong gawin,no,yes,no,no,no
+syn2-00508,v2-00508,not_as_described,negative,hindi nag oon yung powerbank,no,yes,no,no,no
+syn2-00509,v2-00509,not_as_described,negative,di gumagana yung type c port,no,yes,no,no,no
+syn2-00510,v2-00510,not_as_described,negative,namatay agad after one use,no,yes,no,no,no
+syn2-00511,v2-00511,not_as_described,negative,the charger you delivered is not working,no,yes,no,no,no
+syn2-00512,v2-00512,not_as_described,negative,a fast charger daw pero sira yung connector pagdating,no,yes,no,no,no
+syn2-00513,v2-00513,not_as_described,negative,umiinit ng sobra habang naka charge,yes,yes,no,no,no
+syn2-00514,v2-00514,not_as_described,negative,nag iinit yung adapter after 10 minutes,yes,yes,no,no,no
+syn2-00515,v2-00515,not_as_described,negative,"ang sabi nila maganda, totoo nga",no,no,no,no,no
+syn2-00516,v2-00516,not_as_described,negative,"totoo yung mga review, maganda talaga",no,no,no,no,no
+syn2-00517,v2-00517,not_as_described,negative,"totoo ang sabi ng iba, sulit",no,no,no,no,no
+syn2-00518,v2-00518,not_as_described,negative,hindi totoo yung sabi ng iba na pangit,no,no,no,no,no
+syn2-00519,v2-00519,not_as_described,negative,"di totoo yung mga bad review, ok naman sa akin",no,no,no,no,no
+syn2-00520,v2-00520,not_as_described,negative,"1 star reviews are not true, mine works well",no,no,no,no,no
+syn2-00521,v2-00521,not_as_described,positive,"hindi totoong 30000mah to, dalawang charge lang ubos na",no,no,no,no,yes
+syn2-00522,v2-00522,not_as_described,positive,"di sya talagang 20000 mah, kalahati lang siguro",no,no,no,no,yes
+syn2-00523,v2-00523,not_as_described,positive,hindi naman 10000mah yan kasi isang charge lang ng cp ko,no,no,no,no,yes
+syn2-00524,v2-00524,not_as_described,positive,parang hindi sya 50000mah ang bilis maubos,no,no,no,no,yes
+syn2-00525,v2-00525,not_as_described,positive,malabong 20k mah to sa gaan nya,no,no,no,no,yes
+syn2-00526,v2-00526,not_as_described,positive,duda ako na 30000 mah to kasi ang liit,no,no,no,no,yes
+syn2-00527,v2-00527,not_as_described,positive,wala pa atang 5000mah yung laman nito,no,no,no,no,yes
+syn2-00528,v2-00528,not_as_described,positive,i doubt this is really 20000mah,no,no,no,no,yes
+syn2-00529,v2-00529,not_as_described,positive,"no way this is 30000mah, it charged my phone once",no,no,no,no,yes
+syn2-00530,v2-00530,not_as_described,positive,definitely not 10000mah as claimed,no,no,no,no,yes
+syn2-00531,v2-00531,not_as_described,positive,the capacity is nowhere near 20000mah,no,no,no,no,yes
+syn2-00532,v2-00532,not_as_described,positive,20000mah nakalagay pero isang full charge lang kaya,no,no,no,no,yes
+syn2-00533,v2-00533,not_as_described,positive,"30,000 mah daw pero di man lang napuno yung cp ko",no,no,no,no,yes
+syn2-00534,v2-00534,not_as_described,positive,10000mah ang nakasulat sa box pero 3000 lang ata,no,no,no,no,yes
+syn2-00535,v2-00535,not_as_described,positive,nakalagay 65w pero 18w lang lumalabas sa tester,no,no,no,no,yes
+syn2-00536,v2-00536,not_as_described,positive,"sabi 120w fast charge, sa tester 10w lang",no,no,no,no,yes
+syn2-00537,v2-00537,not_as_described,positive,"nakalagay sa box 5 meters, sinukat ko 3 meters lang",no,no,no,no,yes
+syn2-00538,v2-00538,not_as_described,positive,"sabi sa description 2 meters yung cable, 1 meter lang dumating",no,no,no,no,yes
+syn2-00539,v2-00539,not_as_described,positive,nakasulat 256gb pero 32gb lang nababasa ng laptop,no,no,no,no,yes
+syn2-00540,v2-00540,not_as_described,positive,128gb daw pero pag nilagyan mo ng 20gb puno na,no,no,no,no,yes
+syn2-00541,v2-00541,not_as_described,positive,512gb nakalagay tapos corrupt lahat pag lampas 8gb,no,no,no,no,yes
+syn2-00542,v2-00542,not_as_described,positive,"sabi 1tb yung flashdrive, 16gb lang totoo",no,no,no,no,yes
+syn2-00543,v2-00543,not_as_described,positive,64gb yung order ko pero 58 lang lumalabas sa cp,no,no,no,no,yes
+syn2-00544,v2-00544,not_as_described,positive,"ang sabi sa ad 12 hours ang battery, 3 hours lang inabot",no,no,no,no,yes
+syn2-00545,v2-00545,not_as_described,positive,"sabi 8 hours playtime, wala pang dalawang oras",no,no,no,no,yes
+syn2-00546,v2-00546,not_as_described,positive,description says 40 hours battery but it lasts 5,no,no,no,no,yes
+syn2-00547,v2-00547,not_as_described,positive,it says 100w on the listing but it only pulls 20w,no,no,no,no,yes
+syn2-00548,v2-00548,not_as_described,positive,"box says 10000mah, actual maybe 4000",no,no,no,no,yes
+syn2-00549,v2-00549,not_as_described,positive,"listing says 2 meters, i measured 1.2",no,no,no,no,yes
+syn2-00550,v2-00550,not_as_described,positive,advertised as 4k but it is only 720p,no,no,no,no,yes
+syn2-00551,v2-00551,not_as_described,positive,they claim 1080p but the picture is clearly lower,no,no,no,no,yes
+syn2-00552,v2-00552,not_as_described,positive,"sabi sa picture may kasamang remote, wala naman",no,no,no,no,yes
+syn2-00553,v2-00553,not_as_described,positive,"sa picture may stand, pagdating wala",no,no,no,no,yes
+syn2-00554,v2-00554,not_as_described,positive,"sa pic nila may kasamang case, sa akin wala",no,no,no,no,yes
+syn2-00555,v2-00555,not_as_described,positive,"nasa picture may mic, yung dumating walang mic",no,no,no,no,yes
+syn2-00556,v2-00556,not_as_described,positive,"nakalagay sa description with free cable daw, wala naman",no,no,no,no,yes
+syn2-00557,v2-00557,not_as_described,positive,"sabi sa description may rgb lights, wala pala",no,no,no,no,yes
+syn2-00558,v2-00558,not_as_described,positive,"nakalagay bluetooth 5.3, 4.2 lang pala",no,no,no,no,yes
+syn2-00559,v2-00559,not_as_described,positive,"sabi sa ads waterproof, nabasa lang ng konti sira na",no,no,no,no,yes
+syn2-00560,v2-00560,not_as_described,positive,"sabi noise cancelling, rinig pa rin lahat",no,no,no,no,yes
+syn2-00561,v2-00561,not_as_described,positive,"nakalagay fast charging, normal lang naman pala",no,no,no,no,yes
+syn2-00562,v2-00562,not_as_described,positive,"sabi compatible sa iphone, ayaw naman gumana",no,no,no,no,yes
+syn2-00563,v2-00563,not_as_described,positive,"sabi sa description pwede sa ps4, di naman nadedetect",no,no,no,no,yes
+syn2-00564,v2-00564,not_as_described,positive,"nakalagay sa listing type c, micro usb yung dumating",no,no,no,no,yes
+syn2-00565,v2-00565,not_as_described,positive,the listing says type c but it came with micro usb,no,no,no,no,yes
+syn2-00566,v2-00566,not_as_described,positive,"description says it has a mic, there is none",no,no,no,no,yes
+syn2-00567,v2-00567,not_as_described,positive,it was advertised with noise cancelling but there is no such feature,no,no,no,no,yes
+syn2-00568,v2-00568,not_as_described,positive,"photos show a metal body, what i got is plastic",no,no,no,no,yes
+syn2-00569,v2-00569,not_as_described,positive,"the page says waterproof, it is clearly not",no,no,no,no,yes
+syn2-00570,v2-00570,not_as_described,positive,"hindi naman pala wireless, kailangan pa ng cable",no,no,no,no,yes
+syn2-00571,v2-00571,not_as_described,positive,"di pala rechargeable, de battery lang",no,no,no,no,yes
+syn2-00572,v2-00572,not_as_described,positive,hindi naman touch screen gaya ng sabi,no,no,no,no,yes
+syn2-00573,v2-00573,not_as_described,positive,"wala naman palang bluetooth, aux lang",no,no,no,no,yes
+syn2-00574,v2-00574,not_as_described,positive,"wala pala syang sensor, laging nakabukas ang ilaw",no,no,no,no,yes
+syn2-00575,v2-00575,not_as_described,positive,"wala naman pong fast charge, ang tagal mapuno",no,no,no,no,yes
+syn2-00576,v2-00576,not_as_described,positive,hindi sya fast charger normal lang,no,no,no,no,yes
+syn2-00577,v2-00577,not_as_described,positive,hindi fast charging kahit anong cable gamitin,no,no,no,no,yes
+syn2-00578,v2-00578,not_as_described,positive,hindi sya waterproof gaya ng nakalagay,no,no,no,no,yes
+syn2-00579,v2-00579,not_as_described,positive,hindi naman noise cancelling yan,no,no,no,no,yes
+syn2-00580,v2-00580,not_as_described,positive,"di naman sya magnetic, nahuhulog lang",no,no,no,no,yes
+syn2-00581,v2-00581,not_as_described,positive,"hindi totoong 5g, 2.4 lang nasasagap",no,no,no,no,yes
+syn2-00582,v2-00582,not_as_described,positive,"hindi totoo yung 4k, malabo",no,no,no,no,yes
+syn2-00583,v2-00583,not_as_described,positive,di totoo yung nasa description,no,no,no,no,yes
+syn2-00584,v2-00584,not_as_described,positive,hindi totoo ang specs na nakalagay,no,no,no,no,yes
+syn2-00585,v2-00585,not_as_described,positive,hindi tugma sa description yung dumating,no,no,no,no,yes
+syn2-00586,v2-00586,not_as_described,positive,di tugma sa picture yung itsura,no,no,no,no,yes
+syn2-00587,v2-00587,not_as_described,positive,hindi match sa nakalagay sa listing,no,no,no,no,yes
+syn2-00588,v2-00588,not_as_described,positive,iba yung nasa picture sa dumating,no,no,no,no,yes
+syn2-00589,v2-00589,not_as_described,positive,"ibang iba yung nasa pic, mas maganda yung sa picture",no,no,no,no,yes
+syn2-00590,v2-00590,not_as_described,positive,"iba yung kulay na nasa picture, mas dark yung dumating",no,no,no,no,yes
+syn2-00591,v2-00591,not_as_described,positive,iba ang itsura sa personal kumpara sa picture,no,no,no,no,yes
+syn2-00592,v2-00592,not_as_described,positive,malayo sa picture yung actual na item,no,no,no,no,yes
+syn2-00593,v2-00593,not_as_described,positive,ang layo sa pinakita nila sa video,no,no,no,no,yes
+syn2-00594,v2-00594,not_as_described,positive,hindi ganito yung nasa picture nila,no,no,no,no,yes
+syn2-00595,v2-00595,not_as_described,positive,hindi ito yung nasa litrato,no,no,no,no,yes
+syn2-00596,v2-00596,not_as_described,positive,di kamukha ng nasa picture,no,no,no,no,yes
+syn2-00597,v2-00597,not_as_described,positive,hindi katulad ng nasa thumbnail,no,no,no,no,yes
+syn2-00598,v2-00598,not_as_described,positive,looks nothing like the photos,no,no,no,no,yes
+syn2-00599,v2-00599,not_as_described,positive,completely different from what was shown,no,no,no,no,yes
+syn2-00600,v2-00600,not_as_described,positive,not what was shown in the video,no,no,no,no,yes
+syn2-00601,v2-00601,not_as_described,positive,the actual item is way different from the listing,no,no,no,no,yes
+syn2-00602,v2-00602,not_as_described,positive,very different from what is described,no,no,no,no,yes
+syn2-00603,v2-00603,not_as_described,positive,not the same as in the advertisement,no,no,no,no,yes
+syn2-00604,v2-00604,not_as_described,positive,"mas maliit kesa sa nasa picture, parang 10 inches lang",no,no,no,no,yes
+syn2-00605,v2-00605,not_as_described,positive,"mukhang malaki sa picture, pagdating ang liit",no,no,no,no,yes
+syn2-00606,v2-00606,not_as_described,positive,mukha syang makapal sa pic pero manipis pala,no,no,no,no,yes
+syn2-00607,v2-00607,not_as_described,positive,"sa picture mukhang metal, plastic pala",no,no,no,no,yes
+syn2-00608,v2-00608,not_as_described,positive,"sa video ang lakas ng tunog, sa personal hindi",no,no,no,no,yes
+syn2-00609,v2-00609,not_as_described,positive,"sa ads ang liwanag ng ilaw, actual malamlam",no,no,no,no,yes
+syn2-00610,v2-00610,not_as_described,positive,maganda lang sa picture,no,no,no,no,yes
+syn2-00611,v2-00611,not_as_described,positive,"sa picture lang maganda, sa personal hindi",no,no,no,no,yes
+syn2-00612,v2-00612,not_as_described,positive,picture lang ang maganda dito,no,no,no,no,yes
+syn2-00613,v2-00613,not_as_described,positive,"description versus reality, ang layo",no,no,no,no,yes
+syn2-00614,v2-00614,not_as_described,positive,expectation vs reality talaga to,no,no,no,no,yes
+syn2-00615,v2-00615,not_as_described,positive,misleading yung description nyo,no,no,no,no,yes
+syn2-00616,v2-00616,not_as_described,positive,"misleading ang picture, hindi ganun kalaki",no,no,no,no,yes
+syn2-00617,v2-00617,not_as_described,positive,nakaka mislead yung title ng listing,no,no,no,no,yes
+syn2-00618,v2-00618,not_as_described,positive,"false advertising to, hindi naman 65w",no,no,no,no,yes
+syn2-00619,v2-00619,not_as_described,positive,"fake ads, hindi naman ganyan yung dumating",no,no,no,no,yes
+syn2-00620,v2-00620,not_as_described,positive,"wrong description, hindi sya 2 meters",no,no,no,no,yes
+syn2-00621,v2-00621,not_as_described,positive,mali yung specs na nakalagay sa page,no,no,no,no,yes
+syn2-00622,v2-00622,not_as_described,positive,"paki ayos yung description nyo, hindi sya 20000mah",no,no,no,no,yes
+syn2-00623,v2-00623,not_as_described,positive,palitan nyo yung description kasi di naman totoo,no,no,no,no,yes
+syn2-00624,v2-00624,not_as_described,positive,wag nyo ilagay sa picture kung hindi naman kasama,no,no,no,no,yes
+syn2-00625,v2-00625,not_as_described,positive,wag nyo sabihing fast charge kung hindi naman,no,no,no,no,yes
+syn2-00626,v2-00626,not_as_described,positive,"dapat ilagay nyo sa description na walang adapter, sa picture kasi meron",no,no,no,no,yes
+syn2-00627,v2-00627,not_as_described,positive,"please update your description, it is not 10 meters",no,no,no,no,yes
+syn2-00628,v2-00628,not_as_described,positive,"seller should correct the listing, it is not noise cancelling",no,no,no,no,yes
+syn2-00629,v2-00629,not_as_described,positive,"i ordered 10 meters, i got 6",no,no,no,no,yes
+syn2-00630,v2-00630,not_as_described,positive,"i ordered the 20000mah, they sent 10000mah and labeled it 20000",no,no,no,no,yes
+syn2-00631,v2-00631,not_as_described,positive,"ordered 65w, received a 20w with a 65w sticker",no,no,no,no,yes
+syn2-00632,v2-00632,not_as_described,positive,order ko 3 meters pero 1.5 lang yung haba pag sinukat,no,no,no,no,yes
+syn2-00633,v2-00633,not_as_described,positive,24 inches yung order ko pero 20 lang pag sinukat,no,no,no,no,yes
+syn2-00634,v2-00634,not_as_described,positive,"ang tv 22 inches lang pag sinukat, hindi 32",no,no,no,no,yes
+syn2-00635,v2-00635,not_as_described,positive,"the cable is only 80cm, not 2 meters",no,no,no,no,yes
+syn2-00636,v2-00636,not_as_described,positive,"tv is 19 inches measured, not 24",no,no,no,no,yes
+syn2-00637,v2-00637,not_as_described,positive,"only 30 watts, not the 100 it says",no,no,no,no,yes
+syn2-00638,v2-00638,not_as_described,positive,"it is 2.4ghz only, not dual band like the title says",no,no,no,no,yes
+syn2-00639,v2-00639,not_as_described,positive,usb 2.0 lang pala hindi 3.0,no,no,no,no,yes
+syn2-00640,v2-00640,not_as_described,positive,bluetooth 4 lang hindi 5.3,no,no,no,no,yes
+syn2-00641,v2-00641,not_as_described,positive,micro usb pala hindi type c gaya ng sabi,no,no,no,no,yes
+syn2-00642,v2-00642,not_as_described,positive,"kulang sa sukat, hindi umabot ng 5 meters",no,no,no,no,yes
+syn2-00643,v2-00643,not_as_described,positive,"kulang ang haba, sabi 3m",no,no,no,no,yes
+syn2-00644,v2-00644,not_as_described,positive,"kulang sa capacity, hindi umaabot sa nakasulat",no,no,no,no,yes
+syn2-00645,v2-00645,not_as_described,positive,hindi rin sakto yung 10 meters kulang ng dalawa,no,no,no,no,yes
+syn2-00646,v2-00646,not_as_described,positive,not even 1 meter long,no,no,no,no,yes
+syn2-00647,v2-00647,not_as_described,positive,not even close to 20000mah,no,no,no,no,yes
+syn2-00648,v2-00648,not_as_described,positive,"just 5w output, far from the 20w stated",no,no,no,no,yes
+syn2-00649,v2-00649,not_as_described,positive,"lighter than advertised, feels empty",no,no,no,no,yes
+syn2-00650,v2-00650,not_as_described,positive,smaller than stated in the description,no,no,no,no,yes
+syn2-00651,v2-00651,not_as_described,positive,shorter than what the listing says,no,no,no,no,yes
+syn2-00652,v2-00652,not_as_described,positive,"akala ko rechargeable, de battery pala",no,no,no,no,yes
+syn2-00653,v2-00653,not_as_described,positive,"akala ko wireless, may wire pala",no,no,no,no,yes
+syn2-00654,v2-00654,not_as_described,positive,akala ko may kasamang adapter kasi nasa picture,no,no,no,no,yes
+syn2-00655,v2-00655,not_as_described,positive,"akala ko bluetooth speaker, aux lang pala",no,no,no,no,yes
+syn2-00656,v2-00656,not_as_described,positive,"akala ko pwede sa laptop gaya ng sabi, hindi pala",no,no,no,no,yes
+syn2-00657,v2-00657,not_as_described,positive,kala ko waterproof kasi yun yung nakalagay,no,no,no,no,yes
+syn2-00658,v2-00658,not_as_described,positive,"kala ko 20000mah talaga, hindi pala",no,no,no,no,yes
+syn2-00659,v2-00659,not_as_described,positive,kala ko may mic kasi nasa description,no,no,no,no,yes
+syn2-00660,v2-00660,not_as_described,positive,i thought it was wireless because the title says so,no,no,no,no,yes
+syn2-00661,v2-00661,not_as_described,positive,i thought it had bluetooth like the listing says,no,no,no,no,yes
+syn2-00662,v2-00662,not_as_described,positive,i thought it was rechargeable as stated,no,no,no,no,yes
+syn2-00663,v2-00663,not_as_described,positive,"parang normal na charger lang, hindi fast charge",no,no,no,no,yes
+syn2-00664,v2-00664,not_as_described,positive,"parang ordinaryong fan lang, hindi air cooler",no,no,no,no,yes
+syn2-00665,v2-00665,not_as_described,positive,"para lang syang normal na mouse, walang silent click",no,no,no,no,yes
+syn2-00666,v2-00666,not_as_described,positive,"parang ordinary earphones lang, walang noise cancelling",no,no,no,no,yes
+syn2-00667,v2-00667,not_as_described,positive,"just like a regular charger, nothing fast about it",no,no,no,no,yes
+syn2-00668,v2-00668,not_as_described,positive,"it is just a normal fan, not an air cooler as advertised",no,no,no,no,yes
+syn2-00669,v2-00669,not_as_described,positive,"same lang sa regular na cable, hindi 100w",no,no,no,no,yes
+syn2-00670,v2-00670,not_as_described,positive,"fake yung 20000mah, 5000 lang siguro",no,no,no,no,yes
+syn2-00671,v2-00671,not_as_described,positive,"fake yung capacity, hindi umaabot",no,no,no,no,yes
+syn2-00672,v2-00672,not_as_described,positive,peke yung nakalagay na 30000mah,no,no,no,no,yes
+syn2-00673,v2-00673,not_as_described,positive,"fake specs, hindi 8gb ram",no,no,no,no,yes
+syn2-00674,v2-00674,not_as_described,positive,"fake 4k, 480p lang",no,no,no,no,yes
+syn2-00675,v2-00675,not_as_described,positive,"fake ang heart rate sensor, may reading kahit nakapatong sa mesa",no,no,no,no,yes
+syn2-00676,v2-00676,not_as_described,positive,"fake yung blood pressure reading, pareho lagi",no,no,no,no,yes
+syn2-00677,v2-00677,not_as_described,positive,"peke yung noise cancelling button, walang nangyayari",no,no,no,no,yes
+syn2-00678,v2-00678,not_as_described,positive,"ang totoo 2gb ram lang, hindi 8gb",no,no,no,no,yes
+syn2-00679,v2-00679,not_as_described,positive,ang totoo 16gb lang yung storage,no,no,no,no,yes
+syn2-00680,v2-00680,not_as_described,positive,"sa settings 2gb ram lang lumalabas, hindi 6",no,no,no,no,yes
+syn2-00681,v2-00681,not_as_described,positive,sa test 4000mah lang lumabas,no,no,no,no,yes
+syn2-00682,v2-00682,not_as_described,positive,"tinest ko sa app, 8gb lang totoong laman",no,no,no,no,yes
+syn2-00683,v2-00683,not_as_described,positive,"nung tinest ko 12w lang, hindi 33w",no,no,no,no,yes
+syn2-00684,v2-00684,not_as_described,positive,sinukat ko 1.8m lang yung 3m na cable,no,no,no,no,yes
+syn2-00685,v2-00685,not_as_described,positive,capacity nya daw 20000mah pero di mapuno yung 4000mah na cp ko,no,no,no,no,yes
+syn2-00686,v2-00686,not_as_described,positive,30000mah daw pero di kayang i full charge yung 5000mah phone,no,no,no,no,yes
+syn2-00687,v2-00687,not_as_described,positive,"kung totoong 20000mah to dapat apat na charge, isa lang kaya",no,no,no,no,yes
+syn2-00688,v2-00688,not_as_described,positive,"sobrang gaan para sa 30000mah, imposible",no,no,no,no,yes
+syn2-00689,v2-00689,not_as_described,positive,"ang gaan para sa 20k mah, halatang hindi totoo",no,no,no,no,yes
+syn2-00690,v2-00690,not_as_described,positive,hindi mukhang 8gb ram sa bagal,no,no,no,no,yes
+syn2-00691,v2-00691,not_as_described,positive,"hindi mukhang 50 inches, parang 43 lang",no,no,no,no,yes
+syn2-00692,v2-00692,not_as_described,positive,parang 15 inches lang kahit 17 ang sabi,no,no,no,no,yes
+syn2-00693,v2-00693,not_as_described,positive,parang 5 meters lang yung 10 meters nila,no,no,no,no,yes
+syn2-00694,v2-00694,not_as_described,positive,not compatible sa samsung kahit sabi sa description pwede,no,no,no,no,yes
+syn2-00695,v2-00695,not_as_described,positive,hindi compatible sa ps5 kahit nakalagay compatible,no,no,no,no,yes
+syn2-00696,v2-00696,not_as_described,positive,not compatible with iphone as claimed,no,no,no,no,yes
+syn2-00697,v2-00697,not_as_described,positive,does not support fast charge on samsung as stated,no,no,no,no,yes
+syn2-00698,v2-00698,not_as_described,positive,di naman pala pwede sa laptop gaya ng sabi,no,no,no,no,yes
+syn2-00699,v2-00699,not_as_described,positive,hindi pala kasya sa 14 inch laptop kahit yun ang nakalagay,no,no,no,no,yes
+syn2-00700,v2-00700,not_as_described,positive,"old rose pala sa personal, sa picture light pink",no,no,no,no,yes
+syn2-00701,v2-00701,not_as_described,positive,dark gray dumating pero sa picture space gray na maliwanag,no,no,no,no,yes
+syn2-00702,v2-00702,not_as_described,positive,mas dark yung kulay sa personal kesa sa picture,no,no,no,no,yes
+syn2-00703,v2-00703,not_as_described,positive,mas maputla kesa sa nasa photo,no,no,no,no,yes
+syn2-00704,v2-00704,not_as_described,positive,the color is much lighter than in the photos,no,no,no,no,yes
+syn2-00705,v2-00705,not_as_described,positive,the blue is nothing like the blue in the picture,no,no,no,no,yes
+syn2-00706,v2-00706,not_as_described,positive,yung kulay hindi kagaya ng nasa pic,no,no,no,no,yes
+syn2-00707,v2-00707,not_as_described,positive,"sa box nakalagay 20w, sa listing 65w",no,no,no,no,yes
+syn2-00708,v2-00708,not_as_described,positive,"ang nakalagay sa manual 5v 1a lang, hindi fast charge",no,no,no,no,yes
+syn2-00709,v2-00709,not_as_described,positive,"sa mismong unit nakasulat 2000mah, sa page 20000",no,no,no,no,yes
+syn2-00710,v2-00710,not_as_described,positive,"the label on the unit says 10w, the page says 30w",no,no,no,no,yes
+syn2-00711,v2-00711,not_as_described,positive,box says cat 5e but the listing says cat 6,no,no,no,no,yes
+syn2-00712,v2-00712,not_as_described,positive,vooc nakalagay sa box pero hindi naman nag vooc,no,no,no,no,yes
+syn2-00713,v2-00713,not_as_described,positive,supervooc daw pero normal charging lang lumalabas,no,no,no,no,yes
+syn2-00714,v2-00714,not_as_described,positive,"turbo charge daw, hindi naman lumalabas sa cp",no,no,no,no,yes
+syn2-00715,v2-00715,not_as_described,positive,65w nakalagay pero walang fast charging na lumalabas,no,no,no,no,yes
+syn2-00716,v2-00716,not_as_described,positive,"6 ports daw, 4 lang gumagana at dalawa display lang",no,no,no,no,yes
+syn2-00717,v2-00717,not_as_described,positive,dual sim daw pero isa lang slot,no,no,no,no,yes
+syn2-00718,v2-00718,not_as_described,positive,"with remote daw, wala naman sa box at wala ring sensor",no,no,no,no,yes
+syn2-00719,v2-00719,not_as_described,positive,"may free tripod daw sabi sa title, walang dumating",no,no,no,no,yes
+syn2-00720,v2-00720,not_as_described,positive,"2 pcs daw sabi sa listing, isa lang laman",no,no,no,no,yes
+syn2-00721,v2-00721,not_as_described,positive,buy 1 take 1 nakalagay pero isa lang dumating,no,no,no,no,yes
+syn2-00722,v2-00722,not_as_described,positive,it says pack of 3 but only one came,no,no,no,no,yes
+syn2-00723,v2-00723,not_as_described,positive,hindi ganyan yung sinabi nyo sa chat at sa description,no,no,no,no,yes
+syn2-00724,v2-00724,not_as_described,positive,"sabi ni seller original capacity, hindi naman",no,no,no,no,yes
+syn2-00725,v2-00725,not_as_described,positive,"pinangako 1 year warranty sa page, wala naman pala",no,no,no,no,yes
+syn2-00726,v2-00726,not_as_described,positive,wala pala yung feature na pinakita sa video,no,no,no,no,yes
+syn2-00727,v2-00727,not_as_described,positive,yung pinakita sa live iba sa pinadala,no,no,no,no,yes
+syn2-00728,v2-00728,not_as_described,positive,"nasa review ng iba may ilaw, yung sa akin wala, iba sa picture",no,no,no,no,yes
+syn2-00729,v2-00729,not_as_described,positive,hindi sya 360 rotation gaya ng nakalagay,no,no,no,no,yes
+syn2-00730,v2-00730,not_as_described,positive,di naman umiikot ng 180 gaya ng sabi,no,no,no,no,yes
+syn2-00731,v2-00731,not_as_described,positive,hindi adjustable kahit sabi adjustable,no,no,no,no,yes
+syn2-00732,v2-00732,not_as_described,positive,"hindi foldable, taliwas sa description",no,no,no,no,yes
+syn2-00733,v2-00733,not_as_described,positive,di naman dimmable yung ilaw gaya ng sabi,no,no,no,no,yes
+syn2-00734,v2-00734,not_as_described,positive,"wala namang 3 modes, isa lang",no,no,no,no,yes
+syn2-00735,v2-00735,not_as_described,positive,"sabi 3 speed, dalawa lang pala",no,no,no,no,yes
+syn2-00736,v2-00736,not_as_described,positive,"sabi 7 colors, puti lang ilaw",no,no,no,no,yes
+syn2-00737,v2-00737,not_as_described,positive,"it only has one mode, not the three shown",no,no,no,no,yes
+syn2-00738,v2-00738,not_as_described,positive,not adjustable like the description says,no,no,no,no,yes
+syn2-00739,v2-00739,not_as_described,positive,"steady light lang pala, sabi sa picture motion sensor",no,no,no,no,yes
+syn2-00740,v2-00740,not_as_described,positive,"sabi anti radiation, wala namang blue light filter",no,no,no,no,yes
+syn2-00741,v2-00741,not_as_described,positive,"sabi tempered glass, plastic film lang pala",no,no,no,no,yes
+syn2-00742,v2-00742,not_as_described,positive,"sabi leather, plastic lang pala",no,no,no,no,yes
+syn2-00743,v2-00743,not_as_described,positive,"sabi metal body, plastic na pininturahan lang",no,no,no,no,yes
+syn2-00744,v2-00744,not_as_described,positive,"sabi braided cable, ordinaryong goma lang",no,no,no,no,yes
+syn2-00745,v2-00745,not_as_described,positive,supposed to be aluminum but it is plastic,no,no,no,no,yes
+syn2-00746,v2-00746,not_as_described,positive,"said to be tempered glass, it bends like plastic",no,no,no,no,yes
+syn2-00747,v2-00747,not_as_described,positive,"mali yung nakalagay na sukat, mas maliit sa actual",no,no,no,no,yes
+syn2-00748,v2-00748,not_as_described,positive,di accurate yung size sa description,no,no,no,no,yes
+syn2-00749,v2-00749,not_as_described,positive,measurements on the page are wrong,no,no,no,no,yes
+syn2-00750,v2-00750,not_as_described,positive,the dimensions listed are not accurate,no,no,no,no,yes
+syn2-00751,v2-00751,not_as_described,positive,hindi ito yung model na nasa title,no,no,no,no,yes
+syn2-00752,v2-00752,not_as_described,positive,"pro max nakalagay sa title, ordinary lang dumating",no,no,no,no,yes
+syn2-00753,v2-00753,not_as_described,positive,"sa title 2024 model, luma pala",no,no,no,no,yes
+syn2-00754,v2-00754,not_as_described,positive,"title says version 5.3, box says 5.0",no,no,no,no,yes
+syn2-00755,v2-00755,quality,negative,"malakas yung tunog ng speaker, hindi basag",no,no,no,no,no
+syn2-00756,v2-00756,quality,negative,maganda ang sound hindi sabog kahit todo,no,no,no,no,no
+syn2-00757,v2-00757,quality,negative,ok naman tunog walang crack kahit malakas,no,no,no,no,no
+syn2-00758,v2-00758,quality,negative,"sound quality: maganda, malinaw ang bass",no,no,no,no,no
+syn2-00759,v2-00759,quality,negative,sound quality: 5,no,no,no,no,no
+syn2-00760,v2-00760,quality,negative,sound quality: sakto lang sa presyo,no,no,no,no,no
+syn2-00761,v2-00761,quality,negative,quality: ok naman,no,no,no,no,no
+syn2-00762,v2-00762,quality,negative,"maganda ang quality niya, makapal yung plastic",no,no,no,no,no
+syn2-00763,v2-00763,quality,negative,"high quality materials, solid sa kamay",no,no,no,no,no
+syn2-00764,v2-00764,quality,negative,"good quality for the price, sturdy",no,no,no,no,no
+syn2-00765,v2-00765,quality,negative,"hindi manipis yung cable, makapal at matibay",no,no,no,no,no
+syn2-00766,v2-00766,quality,negative,makapal yung wire di gaya ng iba,no,no,no,no,no
+syn2-00767,v2-00767,quality,negative,matibay yung stand kahit mabigat yung tablet,no,no,no,no,no
+syn2-00768,v2-00768,quality,negative,"hindi mahina yung hangin, malamig pa",no,no,no,no,no
+syn2-00769,v2-00769,quality,negative,di naman maingay yung fan tahimik nga eh,no,no,no,no,no
+syn2-00770,v2-00770,quality,negative,"walang gasgas pagdating, maayos lahat",no,no,no,no,no
+syn2-00771,v2-00771,quality,negative,wala namang yupi o dent ang unit,no,no,no,no,no
+syn2-00772,v2-00772,quality,negative,"no scratches, no dents, looks brand new",no,no,no,no,no
+syn2-00773,v2-00773,quality,negative,walang delay yung mic sabay sa tugtog,no,no,no,no,no
+syn2-00774,v2-00774,quality,negative,hindi delay yung sound sa games,no,no,no,no,no
+syn2-00775,v2-00775,quality,negative,no lag at all when gaming,no,no,no,no,no
+syn2-00776,v2-00776,quality,negative,malinaw yung camera kahit gabi,no,no,no,no,no
+syn2-00777,v2-00777,quality,negative,malinaw ang boses sa call sabi ng kausap ko,no,no,no,no,no
+syn2-00778,v2-00778,quality,negative,"hindi malabo yung screen, sharp nga",no,no,no,no,no
+syn2-00779,v2-00779,quality,negative,hindi maluwag yung saksakan sakto lang,no,no,no,no,no
+syn2-00780,v2-00780,quality,negative,mahigpit ang kapit ng holder,no,no,no,no,no
+syn2-00781,v2-00781,quality,negative,magaan kaya madaling dalhin sa byahe,no,no,no,no,no
+syn2-00782,v2-00782,quality,negative,ang gaan sa kamay di nakakangalay gamitin,no,no,no,no,no
+syn2-00783,v2-00783,quality,negative,"manipis sya kaya kasya sa bulsa, gusto ko yun",no,no,no,no,no
+syn2-00784,v2-00784,quality,negative,"slim at magaan, perfect sa bag",no,no,no,no,no
+syn2-00785,v2-00785,quality,negative,lightweight and easy to carry around,no,no,no,no,no
+syn2-00786,v2-00786,quality,negative,"thin design, fits in my laptop sleeve",no,no,no,no,no
+syn2-00787,v2-00787,quality,negative,"tahimik yung keys, di maingay mag type",no,no,no,no,no
+syn2-00788,v2-00788,quality,negative,"malambot pindutin yung keys, ang sarap gamitin",no,no,no,no,no
+syn2-00789,v2-00789,quality,negative,smooth yung scroll ng mouse,no,no,no,no,no
+syn2-00790,v2-00790,quality,negative,mabilis yung response ng remote,no,no,no,no,no
+syn2-00791,v2-00791,quality,negative,mabilis mag transfer ng files,no,no,no,no,no
+syn2-00792,v2-00792,quality,negative,pag mahina lang yung volume ok na ok sya,no,no,no,no,no
+syn2-00793,v2-00793,quality,negative,kapag malayo ka sa router syempre hihina signal,no,no,no,no,no
+syn2-00794,v2-00794,quality,negative,kung mahina yung wifi nyo wag nyo isisi sa item,no,no,no,no,no
+syn2-00795,v2-00795,quality,negative,if you keep the volume low it sounds fine,no,no,no,no,no
+syn2-00796,v2-00796,quality,negative,mahina lang muna pinatugtog ko kasi gabi na,no,no,no,no,no
+syn2-00797,v2-00797,quality,negative,hininaan ko lang kasi tulog na si baby,no,no,no,no,no
+syn2-00798,v2-00798,quality,negative,"nilakasan ko todo, walang basag",no,no,no,no,no
+syn2-00799,v2-00799,quality,negative,sana matibay to at tumagal,no,no,no,no,no
+syn2-00800,v2-00800,quality,negative,sana di madaling masira,no,no,no,no,no
+syn2-00801,v2-00801,quality,negative,hope it lasts long,no,no,no,no,no
+syn2-00802,v2-00802,quality,negative,"di ko pa alam kung matibay, kakarating lang",no,no,no,no,no
+syn2-00803,v2-00803,quality,negative,di ko pa na try yung mic,no,no,no,no,no
+syn2-00804,v2-00804,quality,negative,hindi ko pa nasusubukan sa malakas na volume,no,no,no,no,no
+syn2-00805,v2-00805,quality,negative,will update kung matibay,no,no,no,no,no
+syn2-00806,v2-00806,quality,negative,nabasa ko sa reviews na mahina daw pero sakin ok naman,no,no,no,no,no
+syn2-00807,v2-00807,quality,negative,"sabi ng iba madali daw masira, sa akin isang taon na",no,no,no,no,no
+syn2-00808,v2-00808,quality,negative,"may nababasa ako na maingay daw, hindi naman",no,no,no,no,no
+syn2-00809,v2-00809,quality,negative,others say the sound is weak but mine is loud,no,no,no,no,no
+syn2-00810,v2-00810,quality,negative,mahina ba talaga to o sa cp ko lang?,no,no,no,no,no
+syn2-00811,v2-00811,quality,negative,ganito ba talaga kaingay yung fan?,no,no,no,no,no
+syn2-00812,v2-00812,quality,negative,normal lang ba na medyo magaan?,no,no,no,no,no
+syn2-00813,v2-00813,quality,negative,is it supposed to be this light?,no,no,no,no,no
+syn2-00814,v2-00814,quality,negative,yung luma kong speaker mahina na kaya bumili ako nito,no,no,no,no,no
+syn2-00815,v2-00815,quality,negative,mahina na kasi yung dati kong powerbank,no,no,no,no,no
+syn2-00816,v2-00816,quality,negative,"yung dati kong headset ang nipis ng wire, ito makapal",no,no,no,no,no
+syn2-00817,v2-00817,quality,negative,"my old mouse was laggy, this one is not",no,no,no,no,no
+syn2-00818,v2-00818,quality,negative,sira yung mic pagdating,no,yes,no,no,no
+syn2-00819,v2-00819,quality,negative,kaso basag po yung screen pagkabukas,no,yes,no,no,no
+syn2-00820,v2-00820,quality,negative,basag ang lcd upon opening,no,yes,no,no,no
+syn2-00821,v2-00821,quality,negative,basag yung isang earbud ayaw na tumunog,no,yes,no,no,no
+syn2-00822,v2-00822,quality,negative,sira yung left side walang tunog,no,yes,no,no,no
+syn2-00823,v2-00823,quality,negative,hindi gumagana yung remote,no,yes,no,no,no
+syn2-00824,v2-00824,quality,negative,di na nag oon after 2 days,no,yes,no,no,no
+syn2-00825,v2-00825,quality,negative,ayaw mag charge kahit anong cable,no,yes,no,no,no
+syn2-00826,v2-00826,quality,negative,yung isang speaker walang tunog,no,yes,no,no,no
+syn2-00827,v2-00827,quality,negative,biglang namatay tapos di na nabuhay,no,yes,no,no,no
+syn2-00828,v2-00828,quality,negative,namamatay bigla yung mouse habang ginagamit,no,yes,no,no,no
+syn2-00829,v2-00829,quality,negative,putol putol yung sounds tapos nawala na,no,yes,no,no,no
+syn2-00830,v2-00830,quality,negative,dead on arrival,no,yes,no,no,no
+syn2-00831,v2-00831,quality,negative,one side stopped working after a week,no,yes,no,no,no
+syn2-00832,v2-00832,quality,negative,the mic does not work at all,no,yes,no,no,no
+syn2-00833,v2-00833,quality,negative,sira yung cord ng remote pagdating,no,yes,no,no,no
+syn2-00834,v2-00834,quality,negative,ang tagal mag charge inabot ng 8 hours,no,yes,no,no,no
+syn2-00835,v2-00835,quality,negative,mabagal mag charge yung powerbank,no,yes,no,no,no
+syn2-00836,v2-00836,quality,negative,slow charging even with the original adapter,no,yes,no,no,no
+syn2-00837,v2-00837,quality,negative,mabilis malowbat wala pang isang oras,no,yes,no,no,no
+syn2-00838,v2-00838,quality,negative,yupi yung box pero ok naman yung laman,no,no,no,no,no
+syn2-00839,v2-00839,quality,negative,sira yung karton pero walang damage ang unit,no,no,no,no,no
+syn2-00840,v2-00840,quality,negative,"basag yung packaging, buti buo yung item",no,no,no,no,no
+syn2-00841,v2-00841,quality,negative,"gasgas yung box lang, yung item makinis",no,no,no,no,no
+syn2-00842,v2-00842,quality,negative,box was dented but the product is fine,no,no,no,no,no
+syn2-00843,v2-00843,quality,negative,walang bubble wrap pero buo naman dumating,no,no,no,no,no
+syn2-00844,v2-00844,quality,negative,"hindi naka bubble wrap, pasalamat na lang at ok",no,no,no,no,no
+syn2-00845,v2-00845,quality,negative,"poor packaging, nilagay lang sa plastic",no,no,no,no,no
+syn2-00846,v2-00846,quality,negative,di maayos pagkakabalot ni seller,no,no,no,no,no
+syn2-00847,v2-00847,quality,negative,punit yung plastic ng parcel,no,no,no,no,no
+syn2-00848,v2-00848,quality,negative,"mabagal dumating, isang linggo bago na deliver",no,no,no,no,no
+syn2-00849,v2-00849,quality,negative,ang bagal ng shipping pero ok yung item,no,no,no,no,no
+syn2-00850,v2-00850,quality,negative,mabagal mag reply si seller,no,no,no,no,no
+syn2-00851,v2-00851,quality,negative,slow delivery but the product is good,no,no,no,no,no
+syn2-00852,v2-00852,quality,negative,delay yung delivery ng tatlong araw,no,no,no,no,no
+syn2-00853,v2-00853,quality,negative,may delay sa courier pero dumating naman,no,no,no,no,no
+syn2-00854,v2-00854,quality,negative,maingay yung rider kumatok ng madaling araw haha,no,no,no,no,no
+syn2-00855,v2-00855,quality,negative,"maingay sa labas kaya nilakasan ko, rinig pa rin",no,no,no,no,no
+syn2-00856,v2-00856,quality,negative,maingay kasi yung luma kong fan kaya ito binili ko,no,no,no,no,no
+syn2-00857,v2-00857,quality,negative,manipis lang yung bubble wrap pero ok naman,no,no,no,no,no
+syn2-00858,v2-00858,quality,negative,manipis yung karton na pinaglagyan,no,no,no,no,no
+syn2-00859,v2-00859,quality,negative,maliit lang pala sya kesa sa inaakala ko,no,no,no,no,no
+syn2-00860,v2-00860,quality,negative,mas maliit kaysa sa picture pero ayos lang,no,no,no,no,no
+syn2-00861,v2-00861,quality,negative,maliit pero malakas,no,no,no,no,no
+syn2-00862,v2-00862,quality,negative,mura lang pero maganda,no,no,no,no,no
+syn2-00863,v2-00863,quality,negative,mura na matibay pa,no,no,no,no,no
+syn2-00864,v2-00864,quality,negative,cheap but works great,no,no,no,no,no
+syn2-00865,v2-00865,quality,negative,"mura kaya di na ako nag expect, pero nagulat ako maganda",no,no,no,no,no
+syn2-00866,v2-00866,quality,negative,ang hirap lang ibalik kasi malayo kami,no,no,no,no,no
+syn2-00867,v2-00867,quality,negative,hirap kausap ng seller,no,no,no,no,no
+syn2-00868,v2-00868,quality,negative,mahirap hanapin sa mall kaya dito ako bumili,no,no,no,no,no
+syn2-00869,v2-00869,quality,negative,medyo mahirap intindihin yung manual chinese kasi,no,no,no,no,no
+syn2-00870,v2-00870,quality,negative,di ko makuhanan ng maayos na picture sorry,no,no,no,no,no
+syn2-00871,v2-00871,quality,negative,malabo yung video ko pasensya na,no,no,no,no,no
+syn2-00872,v2-00872,quality,negative,malabo kuha ko kasi gabi na,no,no,no,no,no
+syn2-00873,v2-00873,quality,negative,pasensya malabo camera ng cp ko,no,no,no,no,no
+syn2-00874,v2-00874,quality,negative,may plastic cover pa pala yung screen akala ko gasgas,no,no,no,no,no
+syn2-00875,v2-00875,quality,negative,"akala ko gasgas, protective film lang pala",no,no,no,no,no
+syn2-00876,v2-00876,quality,negative,"akala ko basag, sticker lang pala",no,no,no,no,no
+syn2-00877,v2-00877,quality,negative,i thought it was scratched but it was just the film,no,no,no,no,no
+syn2-00878,v2-00878,quality,negative,"i thought the quality would be bad, but it's actually solid",no,no,no,no,no
+syn2-00879,v2-00879,quality,negative,ok sana quality kaso mali yung kulay na pinadala,no,no,no,no,no
+syn2-00880,v2-00880,quality,negative,maganda sana kaso kulang yung laman ng box,no,no,no,no,no
+syn2-00881,v2-00881,quality,negative,"okay yung unit, yung free gift lang ang wala",no,no,no,no,no
+syn2-00882,v2-00882,quality,negative,"loose lang yung turnilyo kaya hinigpitan ko, ok na",no,no,no,no,no
+syn2-00883,v2-00883,quality,negative,niluwagan ko lang ng konti yung strap,no,no,no,no,no
+syn2-00884,v2-00884,quality,negative,"pinahina ko yung bass sa equalizer, mas ok",no,no,no,no,no
+syn2-00885,v2-00885,quality,negative,tinodo ko yung bass ang lakas ng dagundong,no,no,no,no,no
+syn2-00886,v2-00886,quality,negative,"noise cancelling nya ok, tahimik sa loob",no,no,no,no,no
+syn2-00887,v2-00887,quality,negative,may konting ingay sa labas pero di rinig pag suot,no,no,no,no,no
+syn2-00888,v2-00888,quality,negative,static free at malinaw yung tawag,no,no,no,no,no
+syn2-00889,v2-00889,quality,negative,"hindi sya tunog lata, buo ang tunog",no,no,no,no,no
+syn2-00890,v2-00890,quality,negative,"di sya mukhang mumurahin, premium ang dating",no,no,no,no,no
+syn2-00891,v2-00891,quality,negative,does not feel cheap at all,no,no,no,no,no
+syn2-00892,v2-00892,quality,negative,doesn't wobble even on full extension,no,no,no,no,no
+syn2-00893,v2-00893,quality,negative,hindi umuuga kahit naka full extend,no,no,no,no,no
+syn2-00894,v2-00894,quality,negative,di natutumba kahit mahangin,no,no,no,no,no
+syn2-00895,v2-00895,quality,negative,hindi natatanggal yung earbuds kahit tumakbo,no,no,no,no,no
+syn2-00896,v2-00896,quality,negative,kapit na kapit yung magnet,no,no,no,no,no
+syn2-00897,v2-00897,quality,negative,3 star lang kasi wala yung remote na kasama,no,no,no,no,no
+syn2-00898,v2-00898,quality,negative,3 stars kasi late dumating,no,no,no,no,no
+syn2-00899,v2-00899,quality,negative,binawasan ko ng star dahil sa courier,no,no,no,no,no
+syn2-00900,v2-00900,quality,positive,mahina yung tunog ng speaker kahit naka max volume na,no,no,yes,no,no
+syn2-00901,v2-00901,quality,positive,ang hina ng bass parang radyo lang ng lolo ko,no,no,yes,no,no
+syn2-00902,v2-00902,quality,positive,"sound quality: mahina, di abot sa kabilang kwarto",no,no,yes,no,no
+syn2-00903,v2-00903,quality,positive,okay sana kaso ang hina ng hangin ng fan,no,no,yes,no,no
+syn2-00904,v2-00904,quality,positive,kahit number 3 na halos walang buga yung mini fan,no,no,yes,no,no
+syn2-00905,v2-00905,quality,positive,yung ilaw ng ring light di ganun kaliwanag,no,no,yes,no,no
+syn2-00906,v2-00906,quality,positive,"medyo dim yung flashlight nya, mas maliwanag pa cp ko",no,no,yes,no,no
+syn2-00907,v2-00907,quality,positive,mahina signal ng router pag nasa kwarto na,no,no,yes,no,no
+syn2-00908,v2-00908,quality,positive,weak ang vibration ng controller halos di ramdam,no,no,yes,no,no
+syn2-00909,v2-00909,quality,positive,ang hina ng mic kailangan mo pang isigaw,no,no,yes,no,no
+syn2-00910,v2-00910,quality,positive,di ko masyado marinig yung kausap ko sa earbuds na to,no,no,yes,no,no
+syn2-00911,v2-00911,quality,positive,di kalakasan ang volume ng headset,no,no,yes,no,no
+syn2-00912,v2-00912,quality,positive,hindi sya ganon kalakas gaya ng inaasahan ko,no,no,yes,no,no
+syn2-00913,v2-00913,quality,positive,the volume is too low even at maximum,no,no,yes,no,no
+syn2-00914,v2-00914,quality,positive,"sound is very weak, i can barely hear it outside",no,no,yes,no,no
+syn2-00915,v2-00915,quality,positive,the fan barely blows any air on the highest setting,no,no,yes,no,no
+syn2-00916,v2-00916,quality,positive,suction of the mini vacuum is quite weak,no,no,yes,no,no
+syn2-00917,v2-00917,quality,positive,magnet is weak so the phone keeps sliding down,no,no,yes,no,no
+syn2-00918,v2-00918,quality,positive,mas malakas pa tunog ng lumang radyo namin,no,no,yes,no,no
+syn2-00919,v2-00919,quality,positive,mas malakas pa yung electric fan namin na maliit kesa dito,no,no,yes,no,no
+syn2-00920,v2-00920,quality,positive,mas maliwanag pa yung kandila kesa sa ilaw nito,no,no,yes,no,no
+syn2-00921,v2-00921,quality,positive,parang bulong lang yung tunog pag sa labas ginamit,no,no,yes,no,no
+syn2-00922,v2-00922,quality,positive,"kulang sa bass yung tunog, puro treble",no,no,yes,no,no
+syn2-00923,v2-00923,quality,positive,walang bass ung earphones flat lang tunog,no,no,yes,no,no
+syn2-00924,v2-00924,quality,positive,sound lacks depth and bass,no,no,yes,no,no
+syn2-00925,v2-00925,quality,positive,bass is almost non existent on these buds,no,no,yes,no,no
+syn2-00926,v2-00926,quality,positive,not enough volume for a living room,no,no,yes,no,no
+syn2-00927,v2-00927,quality,positive,malabnaw yung tunog walang kabuhay buhay,no,no,yes,no,no
+syn2-00928,v2-00928,quality,positive,tunog lata yung speaker pag nilakasan,no,no,yes,no,no
+syn2-00929,v2-00929,quality,positive,sabog ang tunog pag tinodo yung volume,no,no,yes,no,no
+syn2-00930,v2-00930,quality,positive,basag yung sound kapag malakas ang bass,no,no,yes,no,no
+syn2-00931,v2-00931,quality,positive,garalgal yung boses sa mic,no,no,yes,no,no
+syn2-00932,v2-00932,quality,positive,medyo sabog yung mic pag malapit sa bibig,no,no,yes,no,no
+syn2-00933,v2-00933,quality,positive,ang sakit sa tenga ng tunog matinis masyado,no,no,yes,no,no
+syn2-00934,v2-00934,quality,positive,tinny ang tunog parang nasa loob ng lata,no,no,yes,no,no
+syn2-00935,v2-00935,quality,positive,sound is muffled like its under a pillow,no,no,yes,no,no
+syn2-00936,v2-00936,quality,positive,kulob yung tunog ng headset,no,no,yes,no,no
+syn2-00937,v2-00937,quality,positive,parang nasa balde yung boses mo pag ginamit yung mic,no,no,yes,no,no
+syn2-00938,v2-00938,quality,positive,may echo yung mic kahit tahimik ang kwarto,no,no,yes,no,no
+syn2-00939,v2-00939,quality,positive,ma echo masyado di maintindihan yung kumakanta,no,no,yes,no,no
+syn2-00940,v2-00940,quality,positive,ngongo yung dating ng boses sa kabilang linya,no,no,yes,no,no
+syn2-00941,v2-00941,quality,positive,the mic makes my voice sound nasal and distant,no,no,yes,no,no
+syn2-00942,v2-00942,quality,positive,"audio is not clear, lots of static",no,no,yes,no,no
+syn2-00943,v2-00943,quality,positive,hindi malinaw yung tunog may kasamang hiss,no,no,yes,no,no
+syn2-00944,v2-00944,quality,positive,may white noise pag walang tugtog,no,no,yes,no,no
+syn2-00945,v2-00945,quality,positive,may ugong yung speaker kahit mahina lang,no,no,yes,no,no
+syn2-00946,v2-00946,quality,positive,maingay yung fan parang may kumakaluskos,no,no,yes,no,no
+syn2-00947,v2-00947,quality,positive,ang ingay ng motor ng vacuum sakit sa tenga,no,no,yes,no,no
+syn2-00948,v2-00948,quality,positive,sobrang ingay ng cooling pad di ka makakapag concentrate,no,no,yes,no,no
+syn2-00949,v2-00949,quality,positive,the fan is too noisy for a bedroom,no,no,yes,no,no
+syn2-00950,v2-00950,quality,positive,keyboard keys are loud and rattly,no,no,yes,no,no
+syn2-00951,v2-00951,quality,positive,click ng mouse ang lutong masyado at maingay,no,no,yes,no,no
+syn2-00952,v2-00952,quality,positive,may delay yung tunog sa video di sabay sa bibig,no,no,yes,no,no
+syn2-00953,v2-00953,quality,positive,delay ang mic mga isang segundo bago lumabas,no,no,yes,no,no
+syn2-00954,v2-00954,quality,positive,lag yung audio pag naglalaro ka ng ml,no,no,yes,no,no
+syn2-00955,v2-00955,quality,positive,may latency sa bluetooth di pwede sa games,no,no,yes,no,no
+syn2-00956,v2-00956,quality,positive,the sound is delayed when watching videos,no,no,yes,no,no
+syn2-00957,v2-00957,quality,positive,"mabagal yung response ng remote, ilang pindot bago gumana",no,no,yes,no,no
+syn2-00958,v2-00958,quality,positive,ang bagal ng touch ng smartwatch,no,no,yes,no,no
+syn2-00959,v2-00959,quality,positive,mabagal mag transfer ng files yung flashdrive,no,no,yes,no,no
+syn2-00960,v2-00960,quality,positive,"ang bagal ng tablet, nag hahang pag dalawang app",no,no,yes,no,no
+syn2-00961,v2-00961,quality,positive,slow and laggy even on light apps,no,no,yes,no,no
+syn2-00962,v2-00962,quality,positive,mabagal magbasa yung card reader,no,no,yes,no,no
+syn2-00963,v2-00963,quality,positive,medyo delayed yung pindot sa keyboard,no,no,yes,no,no
+syn2-00964,v2-00964,quality,positive,malabo yung camera ng cctv pag gabi,no,no,yes,no,no
+syn2-00965,v2-00965,quality,positive,malabo ang video ng webcam parang 2010,no,no,yes,no,no
+syn2-00966,v2-00966,quality,positive,hindi malinaw yung display ng tv pag malapitan,no,no,yes,no,no
+syn2-00967,v2-00967,quality,positive,ang labo ng projector kahit patay ilaw,no,no,yes,no,no
+syn2-00968,v2-00968,quality,positive,pixelated yung screen ng relo,no,no,yes,no,no
+syn2-00969,v2-00969,quality,positive,picture quality is grainy and washed out,no,no,yes,no,no
+syn2-00970,v2-00970,quality,positive,the camera is blurry even in daylight,no,no,yes,no,no
+syn2-00971,v2-00971,quality,positive,display is dim and the colors look faded,no,no,yes,no,no
+syn2-00972,v2-00972,quality,positive,manipis yung plastic ng case parang mababasag pag nahulog,no,no,yes,no,no
+syn2-00973,v2-00973,quality,positive,ang nipis ng cable parang sinulid lang,no,no,yes,no,no
+syn2-00974,v2-00974,quality,positive,manipis yung wire ng charger kinakabahan ako,no,no,yes,no,no
+syn2-00975,v2-00975,quality,positive,sobrang nipis ng tripod legs,no,no,yes,no,no
+syn2-00976,v2-00976,quality,positive,nipis ng foam ng headset masakit sa tenga,no,no,yes,no,no
+syn2-00977,v2-00977,quality,positive,the cable is very thin and feels cheap,no,no,yes,no,no
+syn2-00978,v2-00978,quality,positive,mukhang marupok yung hinge ng stand,no,no,yes,no,no
+syn2-00979,v2-00979,quality,positive,"marupok yung clip ng mic, ingat sa pag ipit",no,no,yes,no,no
+syn2-00980,v2-00980,quality,positive,mukhang madaling masira yung port,no,no,yes,no,no
+syn2-00981,v2-00981,quality,positive,parang madali lang mabali yung headband,no,no,yes,no,no
+syn2-00982,v2-00982,quality,positive,"feel ko di tatagal to, ang lambot ng plastic",no,no,yes,no,no
+syn2-00983,v2-00983,quality,positive,hindi matibay yung pagkakagawa ng stand,no,no,yes,no,no
+syn2-00984,v2-00984,quality,positive,di ganun katibay yung tripod pag naka extend,no,no,yes,no,no
+syn2-00985,v2-00985,quality,positive,"not sturdy at all, it wobbles when i type",no,no,yes,no,no
+syn2-00986,v2-00986,quality,positive,"not durable, the coating is already peeling",no,no,yes,no,no
+syn2-00987,v2-00987,quality,positive,the build feels flimsy and hollow,no,no,yes,no,no
+syn2-00988,v2-00988,quality,positive,cheap plastic lang yung katawan nya,no,no,yes,no,no
+syn2-00989,v2-00989,quality,positive,halatang mumurahin yung materyales,no,no,yes,no,no
+syn2-00990,v2-00990,quality,positive,mura lang talaga yung materials na ginamit,no,no,yes,no,no
+syn2-00991,v2-00991,quality,positive,materials feel cheap for the price,no,no,yes,no,no
+syn2-00992,v2-00992,quality,positive,"build quality is poor, creaks when you press it",no,no,yes,no,no
+syn2-00993,v2-00993,quality,positive,"cheaply made, the seams are uneven",no,no,yes,no,no
+syn2-00994,v2-00994,quality,positive,parang laruan lang yung itsura at bigat,no,no,yes,no,no
+syn2-00995,v2-00995,quality,positive,mukhang laruan yung keyboard ang gaan,no,no,yes,no,no
+syn2-00996,v2-00996,quality,positive,sobrang gaan parang walang laman sa loob,no,no,yes,no,no
+syn2-00997,v2-00997,quality,positive,ang gaan ng powerbank nakakaduda,no,no,yes,no,no
+syn2-00998,v2-00998,quality,positive,masyadong magaan yung speaker parang karton,no,no,yes,no,no
+syn2-00999,v2-00999,quality,positive,"it feels like a toy, too light and plasticky",no,no,yes,no,no
+syn2-01000,v2-01000,quality,positive,low quality yung item sa totoo lang,no,no,yes,no,no
+syn2-01001,v2-01001,quality,positive,"low quality po, di ko na uulitin",no,no,yes,no,no
+syn2-01002,v2-01002,quality,positive,quality: poor,no,no,yes,no,no
+syn2-01003,v2-01003,quality,positive,"quality: hindi maganda, mukhang mura",no,no,yes,no,no
+syn2-01004,v2-01004,quality,positive,"sound quality: poor, basag pag nilakasan",no,no,yes,no,no
+syn2-01005,v2-01005,quality,positive,sound quality: bad,no,no,yes,no,no
+syn2-01006,v2-01006,quality,positive,"sound quality: not good, walang bass",no,no,yes,no,no
+syn2-01007,v2-01007,quality,positive,"sound quality: pangit, sabog",no,no,yes,no,no
+syn2-01008,v2-01008,quality,positive,quality is not good for this price,no,no,yes,no,no
+syn2-01009,v2-01009,quality,positive,the quality is really bad,no,no,yes,no,no
+syn2-01010,v2-01010,quality,positive,quality is below average,no,no,yes,no,no
+syn2-01011,v2-01011,quality,positive,"poor quality item, look elsewhere",no,no,yes,no,no
+syn2-01012,v2-01012,quality,positive,very low quality for a branded looking item,no,no,yes,no,no
+syn2-01013,v2-01013,quality,positive,"not good quality, the buttons feel mushy",no,no,yes,no,no
+syn2-01014,v2-01014,quality,positive,hindi maganda ang quality ng mic,no,no,yes,no,no
+syn2-01015,v2-01015,quality,positive,pangit ng quality ng tunog,no,no,yes,no,no
+syn2-01016,v2-01016,quality,positive,di maganda yung quality ng cable,no,no,yes,no,no
+syn2-01017,v2-01017,quality,positive,ang baba ng quality ng camera,no,no,yes,no,no
+syn2-01018,v2-01018,quality,positive,disappointed sa quality ng headset,no,no,yes,no,no
+syn2-01019,v2-01019,quality,positive,substandard yung pagkakagawa,no,no,yes,no,no
+syn2-01020,v2-01020,quality,positive,"hindi sya quality, sa picture lang maganda yung build",no,no,yes,no,no
+syn2-01021,v2-01021,quality,positive,"panget ng pagkakagawa, tabingi yung logo",no,no,yes,no,no
+syn2-01022,v2-01022,quality,positive,"pangit gamitin, matigas yung mga pindutan",no,no,yes,no,no
+syn2-01023,v2-01023,quality,positive,ang panget ng tunog ng mic parang robot,no,no,yes,no,no
+syn2-01024,v2-01024,quality,positive,pangit ng pagkaka print ng letters sa keyboard,no,no,yes,no,no
+syn2-01025,v2-01025,quality,positive,hindi pantay yung pagkakadikit ng tempered,no,no,yes,no,no
+syn2-01026,v2-01026,quality,positive,di pantay yung paa ng stand kaya umuuga,no,no,yes,no,no
+syn2-01027,v2-01027,quality,positive,tabingi yung pagkakakabit ng lens,no,no,yes,no,no
+syn2-01028,v2-01028,quality,positive,hindi straight yung arm ng lamp,no,no,yes,no,no
+syn2-01029,v2-01029,quality,positive,baliko yung isang paa ng tripod,no,no,yes,no,no
+syn2-01030,v2-01030,quality,positive,"uneven yung ilaw ng keyboard, yung iba malabo",no,no,yes,no,no
+syn2-01031,v2-01031,quality,positive,maluwag yung saksakan ng charger sa extension,no,no,yes,no,no
+syn2-01032,v2-01032,quality,positive,"maluwag yung port, konting galaw natatanggal",no,no,yes,no,no
+syn2-01033,v2-01033,quality,positive,maluwag yung takip ng battery ng remote,no,no,yes,no,no
+syn2-01034,v2-01034,quality,positive,"ang luwag ng earbuds sa case, nalalaglag",no,no,yes,no,no
+syn2-01035,v2-01035,quality,positive,"loose yung type c, kailangan ipitin para mag charge",no,no,yes,no,no
+syn2-01036,v2-01036,quality,positive,"loose fit sa tenga, nahuhulog pag naglalakad",no,no,yes,no,no
+syn2-01037,v2-01037,quality,positive,the plug is loose in the socket and falls out,no,no,yes,no,no
+syn2-01038,v2-01038,quality,positive,buttons are loose and rattle when shaken,no,no,yes,no,no
+syn2-01039,v2-01039,quality,positive,wobbly yung stand di kaya yung tablet,no,no,yes,no,no
+syn2-01040,v2-01040,quality,positive,umuuga yung monitor arm pag nagta type,no,no,yes,no,no
+syn2-01041,v2-01041,quality,positive,natatanggal yung phone holder pag medyo nagalaw,no,no,yes,no,no
+syn2-01042,v2-01042,quality,positive,nalalaglag yung earbuds sa tenga ko,no,no,yes,no,no
+syn2-01043,v2-01043,quality,positive,hindi kumakapit yung suction sa salamin,no,no,yes,no,no
+syn2-01044,v2-01044,quality,positive,di dumidikit ng maayos yung adhesive ng led strip,no,no,yes,no,no
+syn2-01045,v2-01045,quality,positive,mahina kapit ng magnet ng wireless charger,no,no,yes,no,no
+syn2-01046,v2-01046,quality,positive,"hindi nya kaya yung bigat ng cellphone, yumuyuko",no,no,yes,no,no
+syn2-01047,v2-01047,quality,positive,di kinakaya ng tripod yung bigat ng dslr,no,no,yes,no,no
+syn2-01048,v2-01048,quality,positive,it cannot hold the weight of my phone,no,no,yes,no,no
+syn2-01049,v2-01049,quality,positive,the clamp does not grip tightly,no,no,yes,no,no
+syn2-01050,v2-01050,quality,positive,may gasgas na yung screen pagdating,no,no,yes,no,no
+syn2-01051,v2-01051,quality,positive,may gasgas sa gilid ng speaker,no,no,yes,no,no
+syn2-01052,v2-01052,quality,positive,gasgas agad yung likod kahit ingat na ingat,no,no,yes,no,no
+syn2-01053,v2-01053,quality,positive,may konting gasgas yung lens pero ok lang naman,no,no,yes,no,no
+syn2-01054,v2-01054,quality,positive,there are scratches on the body out of the box,no,no,yes,no,no
+syn2-01055,v2-01055,quality,positive,may scratch yung salamin ng relo,no,no,yes,no,no
+syn2-01056,v2-01056,quality,positive,may yupi sa gilid yung powerbank,no,no,yes,no,no
+syn2-01057,v2-01057,quality,positive,may dent yung casing sa likod,no,no,yes,no,no
+syn2-01058,v2-01058,quality,positive,slightly dented yung grill ng speaker,no,no,yes,no,no
+syn2-01059,v2-01059,quality,positive,may maliit na crack sa kanto ng case,no,no,yes,no,no
+syn2-01060,v2-01060,quality,positive,may tuklap yung pintura sa likod,no,no,yes,no,no
+syn2-01061,v2-01061,quality,positive,tuklap na yung sticker ng keyboard,no,no,yes,no,no
+syn2-01062,v2-01062,quality,positive,"madumi yung item pagdating, may mga fingerprint",no,no,yes,no,no
+syn2-01063,v2-01063,quality,positive,ang dumi ng earbuds parang nagamit na,no,no,yes,no,no
+syn2-01064,v2-01064,quality,positive,dusty yung loob ng box at yung unit mismo,no,no,yes,no,no
+syn2-01065,v2-01065,quality,positive,may mantsa yung foam ng headset,no,no,yes,no,no
+syn2-01066,v2-01066,quality,positive,"parang gamit na, may mga marka sa port",no,no,yes,no,no
+syn2-01067,v2-01067,quality,positive,"mukhang second hand, may kalawang yung turnilyo",no,no,yes,no,no
+syn2-01068,v2-01068,quality,positive,"looks used, the charging port has scratches",no,no,yes,no,no
+syn2-01069,v2-01069,quality,positive,"it does not look brand new, seal was open and body is smudged",no,no,yes,no,no
+syn2-01070,v2-01070,quality,positive,may kalawang na yung plug kahit bago,no,no,yes,no,no
+syn2-01071,v2-01071,quality,positive,kupas yung kulay ng keycaps,no,no,yes,no,no
+syn2-01072,v2-01072,quality,positive,nangingitim agad yung gilid ng cable,no,no,yes,no,no
+syn2-01073,v2-01073,quality,positive,matigas pindutin yung power button,no,no,yes,no,no
+syn2-01074,v2-01074,quality,positive,ang tigas ng mga keys nakakangalay,no,no,yes,no,no
+syn2-01075,v2-01075,quality,positive,sobrang tigas ng zipper ng pouch,no,no,yes,no,no
+syn2-01076,v2-01076,quality,positive,"hirap pindutin yung volume, kailangan idiin",no,no,yes,no,no
+syn2-01077,v2-01077,quality,positive,hirap isaksak yung usb masikip masyado,no,no,yes,no,no
+syn2-01078,v2-01078,quality,positive,ang hirap ikabit ng clip sa mesa,no,no,yes,no,no
+syn2-01079,v2-01079,quality,positive,mahirap buksan yung takip ng battery,no,no,yes,no,no
+syn2-01080,v2-01080,quality,positive,hirap i connect sa bluetooth ilang ulit bago ma detect,no,no,yes,no,no
+syn2-01081,v2-01081,quality,positive,hard to press the side buttons,no,no,yes,no,no
+syn2-01082,v2-01082,quality,positive,the switch is stiff and needs force,no,no,yes,no,no
+syn2-01083,v2-01083,quality,positive,"very hard to plug in, the port is too tight",no,no,yes,no,no
+syn2-01084,v2-01084,quality,positive,magaspang yung scroll ng mouse,no,no,yes,no,no
+syn2-01085,v2-01085,quality,positive,magaspang yung gilid ng case nakakasugat,no,no,yes,no,no
+syn2-01086,v2-01086,quality,positive,di smooth yung ikot ng fan parang may sumasabit,no,no,yes,no,no
+syn2-01087,v2-01087,quality,positive,"hindi maayos yung pagkaka solder, kita sa loob",no,no,yes,no,no
+syn2-01088,v2-01088,quality,positive,di maayos ang pagkakabuo may awang sa gilid,no,no,yes,no,no
+syn2-01089,v2-01089,quality,positive,may awang yung takip di lapat,no,no,yes,no,no
+syn2-01090,v2-01090,quality,positive,hindi lapat yung back cover,no,no,yes,no,no
+syn2-01091,v2-01091,quality,positive,"di sukat yung tempered glass sa phone, lampas sa gilid",no,no,yes,no,no
+syn2-01092,v2-01092,quality,positive,"di pantay yung tunog, mas malakas sa kaliwa",no,no,yes,no,no
+syn2-01093,v2-01093,quality,positive,mas mahina yung kanang earbud kesa sa kaliwa,no,no,yes,no,no
+syn2-01094,v2-01094,quality,positive,left side is quieter than the right,no,no,yes,no,no
+syn2-01095,v2-01095,quality,positive,hindi pare pareho yung liwanag ng mga bulb,no,no,yes,no,no
+syn2-01096,v2-01096,quality,positive,medyo malabo yung print ng mga letra,no,no,yes,no,no
+syn2-01097,v2-01097,quality,positive,mabilis mabura yung letters sa keyboard,no,no,yes,no,no
+syn2-01098,v2-01098,quality,positive,madaling matanggal yung goma ng earbuds,no,no,yes,no,no
+syn2-01099,v2-01099,quality,positive,madali matuklap yung leather ng headset,no,no,yes,no,no
+syn2-01100,v2-01100,quality,positive,mabilis lumuwag yung turnilyo ng stand,no,no,yes,no,no
+syn2-01101,v2-01101,quality,positive,dali masira ng charging pin pag di ingat,no,no,yes,no,no
+syn2-01102,v2-01102,quality,positive,madaling magasgas yung screen protector,no,no,yes,no,no
+syn2-01103,v2-01103,quality,positive,mabilis kumupas yung kulay ng strap,no,no,yes,no,no
+syn2-01104,v2-01104,quality,positive,it scratches very easily,no,no,yes,no,no
+syn2-01105,v2-01105,quality,positive,the paint chips off after a week,no,no,yes,no,no
+syn2-01106,v2-01106,quality,positive,rubber tips come off too easily,no,no,yes,no,no
+syn2-01107,v2-01107,quality,positive,"hindi pangmatagalan, pang ilang buwan lang siguro",no,no,yes,no,no
+syn2-01108,v2-01108,quality,positive,di tatagal sa araw araw na gamit,no,no,yes,no,no
+syn2-01109,v2-01109,quality,positive,not built to last,no,no,yes,no,no
+syn2-01110,v2-01110,quality,positive,mura pero ramdam mo sa quality,no,no,yes,no,no
+syn2-01111,v2-01111,quality,positive,"you get what you pay for, the quality shows",no,no,yes,no,no
+syn2-01112,v2-01112,quality,positive,"sa presyo pa lang alam mo nang hindi premium, ramdam sa kamay",no,no,yes,no,no
+syn2-01113,v2-01113,quality,positive,medyo may kahinaan yung tunog sa labas,no,no,yes,no,no
+syn2-01114,v2-01114,quality,positive,may pagka malabo yung boses sa call,no,no,yes,no,no
+syn2-01115,v2-01115,quality,positive,medyo matinis at walang lalim yung tunog,no,no,yes,no,no
+syn2-01116,v2-01116,quality,positive,okay naman kaso ang hina ng mic pick up,no,no,yes,no,no
+syn2-01117,v2-01117,quality,positive,works naman pero ang nipis ng wire,no,no,yes,no,no
+syn2-01118,v2-01118,quality,positive,gumagana naman kaso maingay yung fan nya,no,no,yes,no,no
+syn2-01119,v2-01119,quality,positive,"ok lang, mahina lang talaga yung bass",no,no,yes,no,no
+syn2-01120,v2-01120,quality,positive,functional pero mumurahin ang dating,no,no,yes,no,no
+syn2-01121,v2-01121,quality,positive,it works but the sound is tinny and weak,no,no,yes,no,no
+syn2-01122,v2-01122,quality,positive,usable but the buttons feel cheap and stiff,no,no,yes,no,no
+syn2-01123,v2-01123,quality,positive,"does the job, though the build is flimsy",no,no,yes,no,no
+syn2-01124,v2-01124,quality,positive,"ayos lang, medyo maluwag lang yung saksakan",no,no,yes,no,no
+syn2-01125,v2-01125,quality,positive,pwede na pero malabo yung cam sa gabi,no,no,yes,no,no
+syn2-01126,v2-01126,quality,positive,"keri lang, may konting gasgas lang yung gilid",no,no,yes,no,no
+syn2-01127,v2-01127,quality,positive,may static pag hinahawakan yung wire,no,no,yes,no,no
+syn2-01128,v2-01128,quality,positive,may kaluskos yung tunog pag ginagalaw yung cable,no,no,yes,no,no
+syn2-01129,v2-01129,quality,positive,may hugong pag naka charge habang ginagamit,no,no,yes,no,no
+syn2-01130,v2-01130,quality,positive,humihina yung tunog pag medyo malayo sa cp,no,no,yes,no,no
+syn2-01131,v2-01131,quality,positive,nawawala wala yung linaw pag malakas na,no,no,yes,no,no
+syn2-01132,v2-01132,quality,positive,hindi buo yung tunog parang hati,no,no,yes,no,no
+syn2-01133,v2-01133,quality,positive,sintunado yung tunog ng speaker pag bass,no,no,yes,no,no
+syn2-01134,v2-01134,quality,positive,yung mic nya di malinaw sabi ng kausap ko,no,no,yes,no,no
+syn2-01135,v2-01135,quality,positive,sabi ng ka meeting ko choppy at malabo yung boses ko,no,no,yes,no,no
+syn2-01136,v2-01136,quality,positive,my friends say my voice sounds far away on this mic,no,no,yes,no,no
+syn2-01137,v2-01137,quality,positive,the speaker rattles at high volume,no,no,yes,no,no
+syn2-01138,v2-01138,quality,positive,plastic rattles inside when the bass hits,no,no,yes,no,no
+syn2-01139,v2-01139,quality,positive,keys feel mushy and uneven,no,no,yes,no,no
+syn2-01140,v2-01140,quality,positive,scroll wheel feels gritty,no,no,yes,no,no
+syn2-01141,v2-01141,quality,positive,the strap feels rough and cheap on the skin,no,no,yes,no,no
+syn2-01142,v2-01142,quality,positive,"stand is too light, tumutumba pag may hangin",no,no,yes,no,no
+syn2-01143,v2-01143,quality,positive,ang gaan ng base kaya natutumba yung lamp,no,no,yes,no,no
+syn2-01144,v2-01144,quality,positive,natutumba yung tripod pag naka full extend,no,no,yes,no,no
+syn2-01145,v2-01145,quality,positive,"di stable yung ring light, konting tapik umuuga",no,no,yes,no,no
+syn2-01146,v2-01146,quality,positive,hindi steady yung holder nanginginig yung video,no,no,yes,no,no

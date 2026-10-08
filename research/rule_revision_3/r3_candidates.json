@@ -1,0 +1,1055 @@
+[
+ {
+  "label": "not_as_described",
+  "name": "r2_01",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   1,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_02",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_03",
+  "source": [
+   2,
+   1
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_04",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_05",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_06",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_07",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_08",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_09",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_10",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_11",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_12",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_13",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_14",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_15",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_16",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_17",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_18",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_19",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_20",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_21",
+  "source": [
+   1,
+   1
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_22",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_shared_pieces",
+  "source": [
+   14,
+   1
+  ],
+  "check": [
+   10,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "not_as_described",
+  "name": "r2_all_together",
+  "source": [
+   41,
+   3
+  ],
+  "check": [
+   11,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "not_as_described",
+  "name": "num_nakalagay",
+  "source": [
+   3,
+   1
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "nakalagay_num",
+  "source": [
+   2,
+   1
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "sabi_sa_listing",
+  "source": [
+   6,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "nakalagay_sa_listing",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   1
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "hindi_tugma",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "shown_hindi_kamukha",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "iba_nasa_picture",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "hindi_nasa_picture",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "sa_picture_may",
+  "source": [
+   1,
+   1
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "same_as_advertise",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "as_advertised_compare",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "different_from_listed",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "ordered_num_received",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "only_received_num",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "num_not_num",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   1,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "not_as_described",
+  "name": "hindi_totoo_wide",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "hindi_talagang_num",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "akala_hindi_pala",
+  "source": [
+   1,
+   3
+  ],
+  "check": [
+   1,
+   4
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "akala_feature",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   2,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "not_as_described",
+  "name": "i_thought_feature",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   1,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "not_as_described",
+  "name": "fast_charger_typo",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "not_compatible",
+  "source": [
+   5,
+   1
+  ],
+  "check": [
+   1,
+   1
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "parang_normal_lang",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   1,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "not_as_described",
+  "name": "versus_reality",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "malau_sa_picture",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "box_says",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "ang_totoo_num",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "fake_comma_num",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "lagay_sa_description",
+  "source": [
+   4,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "hindi_ganto_picture",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "not_as_described",
+  "name": "kasi_sa_picture",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "quality_is_bad_wide",
+  "source": [
+   17,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "material_bad",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "lo_quality",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "hindi_sya_quality",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "disappointed_quality",
+  "source": [
+   1,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "bass_lacking",
+  "source": [
+   5,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "echo_kulob",
+  "source": [
+   7,
+   0
+  ],
+  "check": [
+   1,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "quality",
+  "name": "not_clear",
+  "source": [
+   7,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "malabo_wide",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "hindi_kalakas_wide",
+  "source": [
+   6,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "hindi_malamig",
+  "source": [
+   1,
+   1
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "malakas_pa",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "weak_words",
+  "source": [
+   5,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "mabagal",
+  "source": [
+   5,
+   0
+  ],
+  "check": [
+   1,
+   1
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "maluwag_wide",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "falls_over",
+  "source": [
+   6,
+   1
+  ],
+  "check": [
+   2,
+   3
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "tumutunog_sa_loob",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "hindi_maayos_gawa",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "fit_words",
+  "source": [
+   5,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "may_basag_part",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "cosmetic_more",
+  "source": [
+   5,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "sobrang_gaan",
+  "source": [
+   1,
+   1
+  ],
+  "check": [
+   1,
+   0
+  ],
+  "keep": true
+ },
+ {
+  "label": "quality",
+  "name": "hirap_wide",
+  "source": [
+   4,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "lag_words",
+  "source": [
+   4,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "pangit_wide",
+  "source": [
+   3,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ },
+ {
+  "label": "quality",
+  "name": "bilis_sira_wide",
+  "source": [
+   2,
+   0
+  ],
+  "check": [
+   0,
+   0
+  ],
+  "keep": false
+ }
+]

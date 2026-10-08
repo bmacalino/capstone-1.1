@@ -415,9 +415,18 @@ class ProductBadgeAggregator:
         return share, interval, interval[0]
 
     def _type_baselines(self, product_type: str | None) -> dict[str, Any]:
-        if not product_type:
-            return {}
-        return (self.baselines.get("product_types") or {}).get(product_type, {}) or {}
+        types = self.baselines.get("product_types") or {}
+        if product_type and product_type in types:
+            return types[product_type] or {}
+        # Scans rarely name a product type, and the app is used for one kind of
+        # product (gadgets). A baseline file may therefore name the type every
+        # other listing is compared with (research/build_reference_baselines.py).
+        default = self.baselines.get("default_product_type")
+        return (types.get(default) or {}) if default else {}
+
+    def _baseline_type(self, product_type: str | None) -> str | None:
+        types = self.baselines.get("product_types") or {}
+        return product_type if product_type and product_type in types else self.baselines.get("default_product_type")
 
     def _likelihood_bin(
         self, lower_bound: float, product_type: str | None
@@ -560,7 +569,7 @@ class ProductBadgeAggregator:
             return flag
         flag.baseline_rate = float(baseline)
         flag.baseline_source = (
-            f"{self.baselines.get('version', 'reference_baselines')}/{product_type}"
+            f"{self.baselines.get('version', 'reference_baselines')}/{self._baseline_type(product_type)}"
         )
 
         if not flag.n_min_met:

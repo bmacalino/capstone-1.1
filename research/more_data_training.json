@@ -1,0 +1,425 @@
+{
+  "generated_at": "2026-10-08T13:52:41+00:00",
+  "warning": "Agreement with AI labels on the held-out third of rounds 1-8. Later rounds and written sentences are training only.",
+  "held_out_sentences": 1748,
+  "held_out_sha1": "6a75f3a20133e90fe33796b68f7561f07730d315",
+  "written_sentences": 2514,
+  "margin": 0.02,
+  "additions_right_at_least": 0.7,
+  "labels": {
+    "quality": {
+      "held_out_reports": 175,
+      "rules_alone": {
+        "tp": 105,
+        "fp": 8,
+        "fn": 70,
+        "precision": 0.9292,
+        "recall": 0.6,
+        "f1": 0.7292
+      },
+      "steps": {
+        "rounds 1-8": {
+          "training_sentences": 2623,
+          "training_reports": 245,
+          "validation_reports": 55,
+          "threshold": null,
+          "rules_or_model": {
+            "tp": 105,
+            "fp": 8,
+            "fn": 70,
+            "precision": 0.9292,
+            "recall": 0.6,
+            "f1": 0.7292
+          },
+          "added_right": 0,
+          "added_wrong": 0,
+          "model_alone": {
+            "tp": 97,
+            "fp": 118,
+            "fn": 78,
+            "precision": 0.4512,
+            "recall": 0.5543,
+            "f1": 0.4974
+          },
+          "passes": false
+        },
+        "+ round 9": {
+          "training_sentences": 3409,
+          "training_reports": 411,
+          "validation_reports": 97,
+          "threshold": 0.944,
+          "rules_or_model": {
+            "tp": 106,
+            "fp": 8,
+            "fn": 69,
+            "precision": 0.9298,
+            "recall": 0.6057,
+            "f1": 0.7336
+          },
+          "added_right": 1,
+          "added_wrong": 0,
+          "model_alone": {
+            "tp": 85,
+            "fp": 79,
+            "fn": 90,
+            "precision": 0.5183,
+            "recall": 0.4857,
+            "f1": 0.5015
+          },
+          "passes": false
+        },
+        "rounds 1-8 + written": {
+          "training_sentences": 5137,
+          "training_reports": 648,
+          "validation_reports": 55,
+          "threshold": null,
+          "rules_or_model": {
+            "tp": 105,
+            "fp": 8,
+            "fn": 70,
+            "precision": 0.9292,
+            "recall": 0.6,
+            "f1": 0.7292
+          },
+          "added_right": 0,
+          "added_wrong": 0,
+          "model_alone": {
+            "tp": 103,
+            "fp": 101,
+            "fn": 72,
+            "precision": 0.5049,
+            "recall": 0.5886,
+            "f1": 0.5435
+          },
+          "passes": false
+        },
+        "+ round 9 + written 1": {
+          "training_sentences": 4777,
+          "training_reports": 567,
+          "validation_reports": 97,
+          "threshold": 0.905,
+          "rules_or_model": {
+            "tp": 109,
+            "fp": 9,
+            "fn": 66,
+            "precision": 0.9237,
+            "recall": 0.6229,
+            "f1": 0.744
+          },
+          "added_right": 4,
+          "added_wrong": 1,
+          "model_alone": {
+            "tp": 79,
+            "fp": 42,
+            "fn": 96,
+            "precision": 0.6529,
+            "recall": 0.4514,
+            "f1": 0.5338
+          },
+          "passes": false
+        },
+        "+ round 9 + written 1, 2": {
+          "training_sentences": 5923,
+          "training_reports": 814,
+          "validation_reports": 97,
+          "threshold": 0.873,
+          "rules_or_model": {
+            "tp": 110,
+            "fp": 10,
+            "fn": 65,
+            "precision": 0.9167,
+            "recall": 0.6286,
+            "f1": 0.7458
+          },
+          "added_right": 5,
+          "added_wrong": 2,
+          "model_alone": {
+            "tp": 89,
+            "fp": 55,
+            "fn": 86,
+            "precision": 0.6181,
+            "recall": 0.5086,
+            "f1": 0.558
+          },
+          "passes": false
+        }
+      }
+    },
+    "counterfeit": {
+      "held_out_reports": 64,
+      "rules_alone": {
+        "tp": 46,
+        "fp": 6,
+        "fn": 18,
+        "precision": 0.8846,
+        "recall": 0.7188,
+        "f1": 0.7931
+      },
+      "steps": {
+        "rounds 1-8": {
+          "training_sentences": 2579,
+          "training_reports": 121,
+          "validation_reports": 26,
+          "threshold": null,
+          "rules_or_model": {
+            "tp": 46,
+            "fp": 6,
+            "fn": 18,
+            "precision": 0.8846,
+            "recall": 0.7188,
+            "f1": 0.7931
+          },
+          "added_right": 0,
+          "added_wrong": 0,
+          "model_alone": {
+            "tp": 38,
+            "fp": 15,
+            "fn": 26,
+            "precision": 0.717,
+            "recall": 0.5938,
+            "f1": 0.6496
+          },
+          "passes": false
+        },
+        "+ round 9": {
+          "training_sentences": 3365,
+          "training_reports": 149,
+          "validation_reports": 33,
+          "threshold": 0.99,
+          "rules_or_model": {
+            "tp": 46,
+            "fp": 6,
+            "fn": 18,
+            "precision": 0.8846,
+            "recall": 0.7188,
+            "f1": 0.7931
+          },
+          "added_right": 0,
+          "added_wrong": 0,
+          "model_alone": {
+            "tp": 41,
+            "fp": 14,
+            "fn": 23,
+            "precision": 0.7455,
+            "recall": 0.6406,
+            "f1": 0.6891
+          },
+          "passes": false
+        },
+        "rounds 1-8 + written": {
+          "training_sentences": 5093,
+          "training_reports": 505,
+          "validation_reports": 26,
+          "threshold": null,
+          "rules_or_model": {
+            "tp": 46,
+            "fp": 6,
+            "fn": 18,
+            "precision": 0.8846,
+            "recall": 0.7188,
+            "f1": 0.7931
+          },
+          "added_right": 0,
+          "added_wrong": 0,
+          "model_alone": {
+            "tp": 44,
+            "fp": 27,
+            "fn": 20,
+            "precision": 0.6197,
+            "recall": 0.6875,
+            "f1": 0.6519
+          },
+          "passes": false
+        },
+        "+ round 9 + written 1": {
+          "training_sentences": 4733,
+          "training_reports": 299,
+          "validation_reports": 33,
+          "threshold": 0.96,
+          "rules_or_model": {
+            "tp": 46,
+            "fp": 9,
+            "fn": 18,
+            "precision": 0.8364,
+            "recall": 0.7188,
+            "f1": 0.7731
+          },
+          "added_right": 0,
+          "added_wrong": 3,
+          "model_alone": {
+            "tp": 42,
+            "fp": 23,
+            "fn": 22,
+            "precision": 0.6462,
+            "recall": 0.6562,
+            "f1": 0.6512
+          },
+          "passes": false
+        },
+        "+ round 9 + written 1, 2": {
+          "training_sentences": 5879,
+          "training_reports": 533,
+          "validation_reports": 33,
+          "threshold": 0.941,
+          "rules_or_model": {
+            "tp": 46,
+            "fp": 8,
+            "fn": 18,
+            "precision": 0.8519,
+            "recall": 0.7188,
+            "f1": 0.7797
+          },
+          "added_right": 0,
+          "added_wrong": 2,
+          "model_alone": {
+            "tp": 45,
+            "fp": 26,
+            "fn": 19,
+            "precision": 0.6338,
+            "recall": 0.7031,
+            "f1": 0.6667
+          },
+          "passes": false
+        }
+      }
+    },
+    "not_as_described": {
+      "held_out_reports": 87,
+      "rules_alone": {
+        "tp": 47,
+        "fp": 4,
+        "fn": 40,
+        "precision": 0.9216,
+        "recall": 0.5402,
+        "f1": 0.6812
+      },
+      "steps": {
+        "rounds 1-8": {
+          "training_sentences": 2623,
+          "training_reports": 133,
+          "validation_reports": 35,
+          "threshold": 0.831,
+          "rules_or_model": {
+            "tp": 48,
+            "fp": 9,
+            "fn": 39,
+            "precision": 0.8421,
+            "recall": 0.5517,
+            "f1": 0.6667
+          },
+          "added_right": 1,
+          "added_wrong": 5,
+          "model_alone": {
+            "tp": 26,
+            "fp": 21,
+            "fn": 61,
+            "precision": 0.5532,
+            "recall": 0.2989,
+            "f1": 0.3881
+          },
+          "passes": false
+        },
+        "+ round 9": {
+          "training_sentences": 3409,
+          "training_reports": 276,
+          "validation_reports": 69,
+          "threshold": 0.96,
+          "rules_or_model": {
+            "tp": 47,
+            "fp": 4,
+            "fn": 40,
+            "precision": 0.9216,
+            "recall": 0.5402,
+            "f1": 0.6812
+          },
+          "added_right": 0,
+          "added_wrong": 0,
+          "model_alone": {
+            "tp": 55,
+            "fp": 69,
+            "fn": 32,
+            "precision": 0.4435,
+            "recall": 0.6322,
+            "f1": 0.5213
+          },
+          "passes": false
+        },
+        "rounds 1-8 + written": {
+          "training_sentences": 5137,
+          "training_reports": 540,
+          "validation_reports": 35,
+          "threshold": 0.834,
+          "rules_or_model": {
+            "tp": 50,
+            "fp": 8,
+            "fn": 37,
+            "precision": 0.8621,
+            "recall": 0.5747,
+            "f1": 0.6897
+          },
+          "added_right": 3,
+          "added_wrong": 4,
+          "model_alone": {
+            "tp": 43,
+            "fp": 41,
+            "fn": 44,
+            "precision": 0.5119,
+            "recall": 0.4943,
+            "f1": 0.5029
+          },
+          "passes": false
+        },
+        "+ round 9 + written 1": {
+          "training_sentences": 4777,
+          "training_reports": 438,
+          "validation_reports": 69,
+          "threshold": 0.923,
+          "rules_or_model": {
+            "tp": 48,
+            "fp": 5,
+            "fn": 39,
+            "precision": 0.9057,
+            "recall": 0.5517,
+            "f1": 0.6857
+          },
+          "added_right": 1,
+          "added_wrong": 1,
+          "model_alone": {
+            "tp": 59,
+            "fp": 74,
+            "fn": 28,
+            "precision": 0.4436,
+            "recall": 0.6782,
+            "f1": 0.5364
+          },
+          "passes": false
+        },
+        "+ round 9 + written 1, 2": {
+          "training_sentences": 5923,
+          "training_reports": 683,
+          "validation_reports": 69,
+          "threshold": 0.92,
+          "rules_or_model": {
+            "tp": 48,
+            "fp": 5,
+            "fn": 39,
+            "precision": 0.9057,
+            "recall": 0.5517,
+            "f1": 0.6857
+          },
+          "added_right": 1,
+          "added_wrong": 1,
+          "model_alone": {
+            "tp": 53,
+            "fp": 58,
+            "fn": 34,
+            "precision": 0.4775,
+            "recall": 0.6092,
+            "f1": 0.5354
+          },
+          "passes": false
+        }
+      }
+    }
+  }
+}

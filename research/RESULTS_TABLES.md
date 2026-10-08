@@ -1212,10 +1212,281 @@ additions are wrong, the label has no human-labelled sentence to check it
 against, and its gain on ordinary listings is two more reports for two more
 false flags.
 
-**Decision.** `hazard_classifier_v5` is the app default, on the owner's
-instruction and not by a pre-registered test (`PREREGISTRATION_final_v6.md`,
-departure 2). `DEFAKETIVE_HAZARD_MODEL` selects the others: `team_labels`
-(v2b), `keywords` (no learned model), `five_labels` (v5 with rules c2).
+**8. Written (synthetic) training sentences** (`synthetic_data.py`,
+`train_with_synthetic.py`, `synthetic_training.json`; 8 Oct 2026). The
+adviser approved AI labels and synthetic data (departure 4), so the assistant
+wrote 1,368 training sentences: short reports of each problem and look-alikes
+that are not reports (denials, praise, questions, figures of speech), three
+sentences from each of 456 core phrases. They are training only: never
+scored, never used to set a threshold, never shown by the app. Same left-out
+rounds as step 7, real sentences only. Rule written first: as in step 7, and
+in addition at least 70 in 100 of the flags a design raises beyond the served
+checker must be right. Caught / false (F1), summed:
+
+| Label | Served | Best design trained with the written sentences | Passes? |
+|---|---|---|---|
+| Safety problem | 66 / 42 (0.698) | Filter keeping 95 in 100 flagged reports: 66 / 34 (0.729) | Yes |
+| Poor quality | 190 / 11 (0.734) | Rules OR model: 215 / 50 (0.739) | No: 25 of its 64 additions are right |
+| Possible fake | 50 / 14 (0.699) | Rules AND model: 50 / 13 (0.704) | No: gain under 0.02 |
+| Not as advertised | 76 / 6 (0.652) | Rules OR model: 87 / 16 (0.685) | No: 11 of its 21 additions are right |
+
+Faulty or broken: with the written sentences the left-out figure is 686 / 170
+against 675 / 169 without, and on the live-check listings false flags do not
+fall, so no new defect model was built.
+
+Safety, in detail. The result took three looks at the same left-out rounds,
+which is a limit. The best-F1 filter kept every report in the team's rounds
+and cut false flags (60 / 27 overall) but lost six reports in the AI-labelled
+rounds and missed the margin. The two looser filters of step 7 were then
+tried, and the one that keeps 95 in 100 of the flagged real reports passed.
+One safeguard was added before serving: the filter may not remove a flag
+stronger than mild heat (manifest key `filter_spares_severity_above`), so a
+fire, smoke or shock report always stays. The figures above include it. On
+the team's labels: round 2 finds 10 of 16 either way, false flags 15 → 12;
+round 3 finds 14 of 19 either way, false flags 15 → 11. Without the written
+sentences the same filter lost two real reports on those rounds (step 7).
+
+In cross-validation over every real round the frozen filter keeps 88 of the
+92 real reports the keywords flag and removes 19 of their 64 false flags. The
+four it drops are all mild-heat remarks ("mabilis lang uminit", "Lakas pa mag
+init ng phone"); two of them are team-labelled sentences of round 1. On 9,662
+ordinary unused sentences the keywords raise 7 safety flags and the filter
+keeps all 7: its effect is on heat words in harmless sentences, which
+ordinary reviews rarely contain.
+
+**9. Raising the low F1 scores: a rule revision and a fine-tuned
+transformer** (8 Oct 2026; `improve_label_rules.py`,
+`label_rules_revision.json`, `finetune_label_transformer.py`,
+`label_transformer_experiment.json`). Poor quality, possible fake and not as
+advertised have the lowest F1 because their rules are precise and miss
+reports. Split fixed first: one review in three, by a hash of its id, is held
+out and only scored; the other two thirds ("dev") were read. Rule fixed
+first: a label's revision is kept only if held-out F1 rises and the share of
+flags that are right falls by at most 0.05. Caught / false, F1:
+
+| Label | Dev, before → after | Held out, before | Held out, after | Kept? |
+|---|---|---|---|---|
+| Poor quality | 187 / 9, 0.754 → 231 / 13, 0.849 | 93 of 175 / 5, 0.681 | 105 of 175 / 8, 0.729 | Yes |
+| Possible fake | 93 / 21, 0.713 → 108 / 15, 0.800 | 46 of 64 / 7, 0.786 | 46 of 64 / 6, 0.793 | Yes |
+| Not as advertised | 86 / 4, 0.667 → 127 / 6, 0.844 | 47 of 87 / 4, 0.681 | 47 of 87 / 5, 0.676 | No |
+
+The not-as-advertised revision is the clearest overfit in this file: 41 more
+reports caught where the patterns were written, none where they were not. It
+was removed, and that label's patterns are as before. The poor-quality
+revision (noise, lag, stiffness, looks used, marks and stains, with two
+guards: a condition is not a complaint, and slow charging is a defect)
+generalises about half as well as it fits. The fake revision (more ways of
+calling something a copy, a brand denial, and guards for "fake reviews",
+"fake seller" and questions) changes one held-out sentence. The served
+version string gains `r2`, so saved reports are redone once.
+
+A fine-tuned XLM-RoBERTa was then scored on the same held-out third: the
+sentiment model's encoder, one model with five yes/no outputs, trained on
+four fifths of the dev part plus the synthetic sentences, thresholds from the
+remaining fifth, 32 minutes on the GPU.
+
+| Label | Rules | Transformer alone | Rules OR transformer |
+|---|---|---|---|
+| Poor quality | 105 / 8, 0.729 | 123 / 115, 0.596 | No addition met the 80-in-100 bar |
+| Possible fake | 46 / 6, 0.793 | 47 / 23, 0.702 | 51 / 21, 0.750 |
+| Not as advertised | 47 / 4, 0.681 | 49 / 27, 0.601 | 55 / 12, 0.714 (8 additions right, 8 wrong) |
+| Faulty or broken (keywords as the rules) | 149 / 26, 0.488 | 353 / 97, 0.797 | 297 / 47, 0.761 |
+| Safety problem (keywords as the rules) | 33 / 21, 0.725 | 23 / 14, 0.622 | No addition |
+
+It beats the rules on none of the three labels, and for faulty-or-broken it
+only matches the far smaller TF-IDF design. Nothing was saved or served.
+
+Four ways of finding more of these reports have now been tried: a model on
+all rounds, written sentences, new patterns and a transformer. Only new
+patterns helped, and only for poor quality. The limit is the data: a few
+hundred examples per label, worded in many ways, from one labeller. More real
+examples of these reports would be the next thing to try, not another model.
+
+**10. More data for the three weak labels** (8 Oct 2026, night;
+`build_round9.py`, `label_round9_ai.py`, `train_with_more_data.py`,
+`more_data_training.json`, `synthetic_data.py --v2`, `rule_revision_3/`,
+`label_self_check/`). The owner asked for exactly that: more data. Fixed
+before anything was built:
+
+- The yardstick is the held-out third of step 9 and does not move: 1,748
+  sentences of rounds 1–8. Later rounds and written sentences are training
+  material only.
+- Something is switched on only if held-out F1 is at least 0.02 above the
+  served rules and at least 70 in 100 of the flags it adds are right.
+- Real sentences are labelled in batches of about 1,000, up to three, and
+  labelling stops early if a batch adds less than 0.01 F1 to every label.
+
+*Round 9: 989 more real sentences.* Pool: 15,935 gadget sentences no round
+had used (the training listings of our own scans and the public Shopee set;
+the live-check listings stay untouched). A pointer model (the design in use,
+trained on the dev part and the written sentences) chose what to read; the
+assistant then labelled every sentence without seeing why it was picked.
+Result: poor quality 208, not as advertised 177, possible fake 35, faulty or
+broken 161, safety 0; 189 sentences carry an unsure answer.
+
+| Why the sentence was picked | Read | Real reports of that label |
+|---|---|---|
+| Model scores it high for poor quality, rules silent | 200 | 92 |
+| Model scores it high for not as advertised, rules silent | 250 | 85 |
+| Model scores it high for possible fake, rules silent | 150 | 10 |
+| Rules flag poor quality | 60 | 51 |
+| Rules flag not as advertised | 60 | 56 |
+| Rules flag possible fake | 19 | 17 |
+
+So on text nobody had seen, the rules' flags were right about 9 times in 10,
+and the reports they miss do exist in quantity. Fakes are the exception: the
+unused gadget reviews hold few.
+
+*Written sentences, second set.* 1,146 sentences
+(`research/synthetic/synthetic_sentences_v2.csv`), each written whole as a
+variation on a real wording or, for the look-alikes, on a sentence a trained
+model wrongly scored high: 247 poor-quality, 234 fake and 234
+not-as-advertised reports, and 431 look-alikes. Fifteen lines were left out
+because they matched a real sentence word for word.
+
+*As training data.* The design in use, as an add-on to the rules: it may add
+a flag only above the score at which 80 in 100 of its additions are right on
+a validation fifth. Held-out third, caught / false, F1; in brackets the F1 of
+the model on its own.
+
+| Trained on | Poor quality | Possible fake | Not as advertised |
+|---|---|---|---|
+| (rules alone) | 105 / 8, 0.729 | 46 / 6, 0.793 | 47 / 4, 0.681 |
+| Rounds 1–8 | 105 / 8, 0.729 (0.497) | 46 / 6, 0.793 (0.650) | 48 / 9, 0.667 (0.388) |
+| + round 9 | 106 / 8, 0.734 (0.501) | 46 / 6, 0.793 (0.689) | 47 / 4, 0.681 (0.521) |
+| Rounds 1–8 + both written sets | 105 / 8, 0.729 (0.543) | 46 / 6, 0.793 (0.652) | 50 / 8, 0.690 (0.503) |
+| + round 9 + written set 1 | 109 / 9, 0.744 (0.534) | 46 / 9, 0.773 (0.651) | 48 / 5, 0.686 (0.536) |
+| + round 9 + both written sets | 110 / 10, 0.746 (0.558) | 46 / 8, 0.780 (0.667) | 48 / 5, 0.686 (0.535) |
+
+More data does make the model better on its own, most of all for not as
+advertised (0.388 to 0.535). It stays far below the rules, and what it adds
+to them is small: at best 5 more poor-quality reports for 2 more false flags.
+Nothing reaches the 0.02 bar. Poor quality comes closest (0.746 against the
+0.749 needed), on seven sentences.
+
+*As material for new patterns* (`rule_revision_3/`). Step 9 showed that
+patterns fit the sentences they are written from. So each pattern was checked
+on sentences it was not written from, and kept only if it found at least one
+report there and was right at least 3 times in 4: the 22 not-as-advertised
+patterns dropped in step 9 (written from dev) were checked on round 9; 31
+not-as-advertised and 26 poor-quality patterns written from the round 9
+misses were checked on dev. Two sets were then scored on the held-out third,
+both fixed first: A, the patterns that passed (1 + the shared number and
+feature pieces of the dropped revision, 4 and 2); B, A plus every round-9
+pattern that was right at least twice where written and wrong nowhere.
+
+| | Where written (round 9) | Held-out third | Held-out, gadgets only |
+|---|---|---|---|
+| Not as advertised, served | 65 / 4 | 47 / 4, 0.681 | 29 / 2, 0.682 |
+| Not as advertised, A | 85 / 4 | 47 / 5, 0.676 | 29 / 3, 0.674 |
+| Not as advertised, B | 112 / 4 | 48 / 5, 0.686 | 30 / 3, 0.690 |
+| Poor quality, served | 69 / 10 | 105 / 8, 0.729 | 59 / 6, 0.690 |
+| Poor quality, A | 77 / 11 | 105 / 10, 0.724 | 59 / 7, 0.686 |
+| Poor quality, B | 155 / 11 | 110 / 12, 0.741 | 62 / 8, 0.705 |
+
+The widest set catches 86 more poor-quality and 47 more not-as-advertised
+reports in the sentences it was written from, and 5 and 1 more in the
+held-out third. Of 57 patterns written from round 9, 10 found any report in
+the dev part and 6 passed the check. Neither set reaches the bar and the served rules are unchanged
+(`extra_labels.EXTRA_RULES_REVISION` is still `r2`). The 16 fake reports the
+rules missed in round 9 are each worded their own way; no pattern was tried.
+
+*How consistent is the answer key?* (`label_self_check/`) 315 dev sentences
+(up to 50 labelled yes per label, 15 that the rules flag and the labels call
+nothing, 150 others at random) were labelled a second time by the assistant
+with the first labels hidden.
+
+| Label | Yes both times | Yes first time only | Yes second time only | Agreement (F1), these sentences |
+|---|---|---|---|---|
+| Poor quality | 56 | 5 | 15 | 0.848 |
+| Not as advertised | 54 | 1 | 8 | 0.923 |
+| Possible fake | 49 | 11 | 6 | 0.852 |
+
+Weighted back to all dev sentences the agreement is roughly 0.79, 0.87 and
+0.79, with wide margins: a single random sentence stands for 16. Two things
+follow. The same labeller reading the same sentence twice agrees with itself
+at about 0.8 to 0.9, so no checker can be expected to score higher than that
+against these labels; the rules are at 0.73, 0.68 and 0.79. And some early
+fake labels are wrong on their face: rounds 1–2 carry over the team's "fake"
+answer on sentences such as "ok lng" and "ok naman cya" (9 of the 60
+fake-labelled sentences in the sample), which no sentence checker can find.
+Of the rules' poor-quality flags in the sample, 41 of 50 are right by the
+first labels and 48 of 50 by the second reading.
+
+*The fine-tuned transformer again, with round 9*
+(`finetune_label_transformer.py --tag round9`,
+`label_transformer_experiment_round9.json`; same settings and seed as step 9,
+trained on the dev part, round 9 and the first written set; 42 minutes).
+Held-out third, caught / false, F1:
+
+| Label | Rules | Transformer alone, step 9 → with round 9 | Rules OR transformer, step 9 → with round 9 |
+|---|---|---|---|
+| Poor quality | 105 / 8, 0.729 | 0.596 → 124 / 91, 0.636 | no addition met the 80-in-100 bar, either time |
+| Possible fake | 46 / 6, 0.793 | 0.702 → 51 / 28, 0.713 | 0.750 → 49 / 12, 0.784 (3 additions right, 6 wrong) |
+| Not as advertised | 47 / 4, 0.681 | 0.601 → 51 / 18, 0.654 | 0.714 → 54 / 7, 0.730 (7 additions right, 3 wrong) |
+
+The transformer gains more from the new sentences than the TF-IDF design
+does, and for not as advertised "rules OR transformer" meets the rule: F1
+0.049 above the rules, 7 of 10 additions right. It meets it at the edge, on
+ten sentences and one seed; a repeat with another seed and a run with both
+written sets were started to see whether it holds
+(`--tag round9_seed7 --seed 7`, `--tag round9_written2 --written v1,v2`).
+
+The owner's answer (8 Oct, 22:25, before either repeat had finished an
+epoch): go with the recommendation, which was to serve it only if the result
+holds. "Holds" was fixed then: the repeat with seed 7 must meet the same rule
+for not as advertised (F1 at least 0.02 above the rules, at least 70 in 100
+additions right). The second written set joins the training data only if its
+run meets the rule too and scores at least as high. The model that is saved
+for the app is scored once more on the held-out third and must meet the rule
+itself. If the repeat fails, nothing is served and no more batches are
+labelled.
+
+The repeat (`label_transformer_experiment_round9_seed7.json`), rules OR
+transformer on the held-out third:
+
+| Label | Rules | Seed 42 | Seed 7 |
+|---|---|---|---|
+| Poor quality | 105 / 8, 0.729 | no addition allowed | 111 / 9, 0.752 (6 additions right, 1 wrong) |
+| Possible fake | 46 / 6, 0.793 | 49 / 12, 0.784 (3 right, 6 wrong) | 46 / 10, 0.767 (0 right, 4 wrong) |
+| Not as advertised | 47 / 4, 0.681 | 54 / 7, 0.730 (7 right, 3 wrong) | 57 / 11, 0.736 (10 right, 7 wrong) |
+
+It does not hold. For not as advertised the F1 gain repeats (about 0.05 both
+times) but the second run's additions are right 10 times in 17, under the 70
+in 100 required; over both runs, 17 in 27. Which label passes depends on the
+seed: poor quality fails with one and passes with the other. That is what a
+result resting on ten or twenty sentences looks like.
+
+The run with both written sets
+(`label_transformer_experiment_round9_written2.json`) fails as well: not as
+advertised 54 / 11, 0.711, 7 additions right and 7 wrong; poor quality 109 /
+10, 0.742; possible fake 51 / 17, 0.773.
+
+What serving it would have cost, measured on the development PC with the
+served int8 sentiment model standing in for a slimmed label model: about 127
+ms more per review on top of 111 ms (a review has 1.8 sentences on average
+and each would go through the second model), and about 175 MB more memory,
+taking the app from about 352 MB to about 530 MB.
+
+*Outcome.* Nothing is switched on, and batches two and three were not
+labelled. With the TF-IDF design and with new patterns nothing reached the
+bar: what the data shows is a long tail. These complaints are worded
+differently almost every time, so a thousand more labelled sentences teach
+the rules and a word-counting model the wordings in those sentences and few
+of the wordings in the next thousand. The transformer, which does not depend
+on exact wording, is the one design that more data visibly helps (not as
+advertised alone: 0.601, then 0.654 and 0.663 with round 9), and its F1 as an
+add-on is above the rules both times. But about 4 in 10 of the flags it adds
+are wrong, it would double the analysis time, and the label it helps only
+informs the shopper. Round 9, its labels and both written sets stay in the
+repository as training material.
+
+**Decision.** `hazard_classifier_v6` is the app default: the defect model of
+`hazard_classifier_v5`, unchanged, and the safety filter of step 8. Like v5
+it is served on the owner's instruction and not by a pre-registered test
+(`PREREGISTRATION_final_v6.md`, departures 2 and 4). `DEFAKETIVE_HAZARD_MODEL` selects the others: `team_labels`
+(v2b), `keywords` (no learned model); `five_labels` is now the same as the
+default.
 
 **Limits.**
 
@@ -1259,6 +1530,117 @@ the Wilson lower bound) is now applied on its own. **Those floor values are
 marked PLACEHOLDER in the parameter file** and should be set from the reference
 corpus when it exists.
 
+## Table 12b. The verdict each saved listing gets (8 Oct 2026)
+
+All work since Table 11c was on single sentences. `research/verdict_check.py
+--saved` puts every saved listing with 30 or more written reviews through the
+app's own path with the served checker (68 listings, 7,192 reviews;
+`verdict_check_saved_scans.json`).
+
+| Verdict | As the app shows it today | As if each sample were a complete listing |
+|---|---|---|
+| Not enough reviews to judge | 62 | 3 |
+| No warning signs found | 2 | 7 |
+| Reviewers report fakes or defects | 0 | 35 |
+| Some reviewers mention safety concerns | 0 | 8 |
+| Reviewers report safety problems | 4 | 15 |
+
+- 65 of the 68 scans were collected one star level at a time without the
+  listing's per-star counts, so the app rightly marks them incomplete. The
+  saved catalogue therefore says almost nothing at verdict level; only fresh
+  scans exercise the verdict rules.
+- The right-hand column is too harsh by construction, because low-star
+  reviews are over-represented, and it judges no listing. It shows that,
+  unweighted, the "faulty" share has a median of 21% and its lower bound
+  clears the 3% floor for 57 of 68 listings. The fake floor (2%) is cleared
+  by 2.
+- The two listings that carry per-star counts are weighted back to the
+  listing. There the faulty rate is 6.0% and 3.9%, with lower bounds of 1.9%
+  and 1.3%, and both read "No warning signs found". Weighting, not the
+  floor, is what keeps the warning rare. Two listings are too few to say
+  more.
+- Fresh scans of a fixed set of 28 listings
+  (`research/scan_reference_listings.py`, selection rule written first) are
+  needed to measure this properly and to build the typical rates that the
+  "Caution" verdict is meant to compare against. Two trial scans on 8 Oct
+  2026 collected no reviews: the product page opened but the review section
+  never loaded for the automated browser. Not retried; open.
+
+## Table 12c. What is typical, measured (8–9 Oct 2026)
+
+The fresh scans turned out not to be needed. The saved listings have real
+reviews from every star level (about 40 five-star reviews each); what they
+lacked was the number of ratings per star level, five numbers a listing.
+`research/fetch_star_totals.py` read those from Lazada's review feed, the way
+the app's own scan does, for all 67 saved Lazada listings without collecting
+a review (`research/data/reference_scans/star_totals.json`). Lazada did not
+block it.
+
+`research/verdict_check.py --star-totals` then weights every review by how
+many ratings its star level stands for, with the app's own weights
+(`analyze_reviews._stratum_weights`). Rule fixed first: a listing is used
+only if the sampled star levels hold 90 in 100 of its ratings and its rating
+count moved by no more than a quarter since the scan. 61 of 68 listings are
+usable (6 lack a five-star sample, 1 is not on Lazada); 59 after counting an
+item scanned under two links once.
+
+`research/build_reference_baselines.py` (`reference_baselines_report.json`),
+choices fixed before the leave-one-out counts: typical is the median
+listing's rate; the app's rule is unchanged (warn when the lower bound of a
+listing's rate is above the larger of typical and the floor); each listing
+is judged against the median of the others.
+
+| | Faulty or broken | Possible fake |
+|---|---|---|
+| Typical listing (median), share of reviews flagged | 4.7% (95% interval 3.3%–6.0%) | 0.0% |
+| Mean | 6.4% | 0.2% |
+| 75th / 90th percentile | 8.2% / 14.5% | 0.03% / 0.3% |
+| Listings with none at all | 0 of 59 | 43 of 59 |
+| Placeholder line | 3% | 2% |
+| Listings warned under the placeholder | 15 of 59 | 0 |
+| Listings warned under the measured line, leave-one-out | 10 of 59 | 0 |
+
+The placeholder for faulty was below what is normal: one listing in four
+would have been warned for an ordinary rate. With at least 10 usable
+listings (the rule set beforehand), the measured line replaces it:
+`sentiment-analysis/models/reference_baselines_v1.json`, type `gadget`, which
+`ProductBadgeAggregator` now uses for a listing that names no product type
+(`default_product_type`). For fakes typical is zero, so the 2% floor remains
+the line. The baseline's version joins the checker's version string, so
+saved reports are redone once, and a test fails if the checker changes
+without the rates being measured again.
+
+Verdicts for the 61 usable listings, weighted (two are the same item twice):
+
+| Verdict | Placeholder line | Measured line |
+|---|---|---|
+| No warning signs found | 29 | 31 |
+| Reviewers report fakes or defects | 8 | 6 |
+| Some reviewers mention safety concerns | 9 | 9 |
+| Reviewers report safety problems | 12 | 12 |
+| Not enough reviews to judge | 3 | 3 |
+
+Limits.
+
+- The rates are the checker's flags, not verified faults, so the line is in
+  the checker's own units. That is the right unit for the comparison and the
+  wrong one for a claim such as "4.7% of gadgets are faulty".
+- Star totals were read on 8 October and the reviews were collected in
+  September. A listing's five-star level is about 40 reviews standing for
+  thousands of ratings, so one listing's rate is rough; the median over 59
+  is not.
+- The listings were chosen for labelling, not at random, and lean to audio,
+  chargers and power banks.
+- **Safety is the open part.** 21 of 61 listings carry a safety message. The
+  alert counts reports and does not use a rate, and these samples read up to
+  40 one-star reviews of listings with thousands of ratings, so one or two
+  burn reports are easy to find. Most of the evidence read is real ("smell
+  burning", "umusok", "nasunog agad", "sumabog"). Some is not: "grounded"
+  said of a buzzing sound, "kuryente" where no shock is meant, and a report
+  about the product this one replaced. Whether two reports should carry the
+  same message on a listing of 40,000 ratings as on one of 200 is a design
+  question that was not decided here.
+
 ---
 
 ## Outstanding
@@ -1289,8 +1671,9 @@ corpus when it exists.
   further. When the sheets return: `measure_hazard_tagger.py --round 3`, then
   `train_defect_gate.py --adopt`. Adjudication of the disagreements in
   both rounds (168 + 102 defect, 79 + 24 counterfeit) is still open.
-- Product-type baselines for counterfeit and defect, and real values for the
-  placeholder floors.
+- ~~Product-type baselines for counterfeit and defect.~~ Measured for gadgets
+  as one type (Table 12c). Still open: separate types (59 listings are too
+  few to split), and the safety alert on large listings (Table 12c, limits).
 - Normalized-text ablation for the transformer, to separate architecture from
   preprocessing.
 - Ceiling estimate from the blind 30-row sample
@@ -1308,3 +1691,9 @@ corpus when it exists.
   Team-label fake scores use only sentences both annotators agreed on.
 - The landing page still says "3 separate checks". Three labels drive
   warnings; "poor quality" and "not as advertised" appear in the report only.
+- **The early fake labels need a second reading.** Rounds 1–2 carry the
+  team's "fake" answer on sentences that say nothing about fakes ("ok lng";
+  Table 11j, step 10). Re-reading them would change the held-out third that
+  steps 9 and 10 are scored on, so it was not done there. Such labels count
+  as misses for any checker that reads one sentence at a time, so the fake
+  scores in this file are somewhat lower than the checker deserves.

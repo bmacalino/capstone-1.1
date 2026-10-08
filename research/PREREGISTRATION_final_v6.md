@@ -150,3 +150,22 @@ after a check on the team's rounds 2–3 that it changes no safety or defect
 answer and loses no agreed fake report (RESULTS_TABLES.md, Table 11i). A
 fresh round labelled by two team members is still the only real test of
 `hazard_classifier_v5` and of those rules.
+
+### Departure 4 (8 October 2026)
+
+The owner reported that the adviser approved the use of AI labels and of
+synthetic data. Two things follow.
+
+AI labels. The labels of rounds 5–8 and of the re-read earlier rounds are
+accepted for the study by the adviser as well as the owner. They are still
+described as what they are, labels proposed by an AI assistant with no second
+annotator, and figures on them are reported as agreement with those labels,
+beside the figures on the team's own labels.
+
+Synthetic data. The assistant wrote 1,368 training sentences
+(`research/synthetic_data.py`, `research/synthetic/`). Rules fixed before any
+model was trained with them: they are used for training only and are never
+part of a test or a left-out round; they are not reviews and the app never
+shows them; and they are kept for a label only if a model trained with them
+beats the served checker on real reviews under the rule written in
+`research/train_with_synthetic.py`.

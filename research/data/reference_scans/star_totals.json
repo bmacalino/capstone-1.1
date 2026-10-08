@@ -1,0 +1,943 @@
+{
+ "what": "Read how many ratings each star level has, for listings already scanned.",
+ "listings": {
+  "https://www.lazada.com.ph/products/pdp-i5261974515.html": {
+   "name": "Lenovo ERAZER XF22 Sports Wireless Headphones With Mic Waterproof Bone",
+   "read_at": "2026-10-08T15:22:37+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 3,
+    "2": 3,
+    "3": 8,
+    "4": 14,
+    "5": 431
+   },
+   "ratings_total": 459,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html": {
+   "name": "PORTABLE MK-102 SUPER BASS BLUETOOTH WIRELESS SPEAKER WITH RGB LIGHT",
+   "read_at": "2026-10-08T15:22:42+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 233,
+    "2": 68,
+    "3": 85,
+    "4": 64,
+    "5": 2738
+   },
+   "ratings_total": 3188,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html": {
+   "name": "K12 Mini High End Wireless Audio Mini Home With 1 Microphones Professi",
+   "read_at": "2026-10-08T15:22:46+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 80,
+    "2": 35,
+    "3": 47,
+    "4": 64,
+    "5": 3027
+   },
+   "ratings_total": 3253,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html": {
+   "name": "Computer Wired Bluetooth Speakers Audio Sound Bully Speaker Wired USB-",
+   "read_at": "2026-10-08T15:23:16+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 10,
+    "2": 8,
+    "3": 12,
+    "4": 35,
+    "5": 1815
+   },
+   "ratings_total": 1880,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3431056306.html": {
+   "name": "M10 TWS Bluetooth Headphone Waterproof With Changing Case Music Gaming",
+   "read_at": "2026-10-08T15:23:20+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 1658,
+    "2": 447,
+    "3": 795,
+    "4": 975,
+    "5": 37694
+   },
+   "ratings_total": 41569,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4590800496.html": {
+   "name": "X55 Sleeping Earbuds Wireless Mini Headphones For Work TWS Bluetooth E",
+   "read_at": "2026-10-08T15:23:24+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 159,
+    "2": 74,
+    "3": 135,
+    "4": 228,
+    "5": 10657
+   },
+   "ratings_total": 11253,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4136508203.html": {
+   "name": "KIMP Pro 6 TWS Wireless Earphones Bluetooth Game Headsets Sport Waterp",
+   "read_at": "2026-10-08T15:23:29+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 396,
+    "2": 118,
+    "3": 245,
+    "4": 288,
+    "5": 9944
+   },
+   "ratings_total": 10991,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3430740731.html": {
+   "name": "M10 TWS Bluetooth Headphone Waterproof With Changing Case Music Gaming",
+   "read_at": "2026-10-08T15:23:33+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 139,
+    "2": 41,
+    "3": 103,
+    "4": 117,
+    "5": 5163
+   },
+   "ratings_total": 5563,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4523101417.html": {
+   "name": "Single ear Earbuds bluetooth Open Wearable Stereo wireless Bluetooth e",
+   "read_at": "2026-10-08T15:23:38+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 103,
+    "2": 33,
+    "3": 51,
+    "4": 109,
+    "5": 4492
+   },
+   "ratings_total": 4788,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4340186782.html": {
+   "name": "ACE AC-1000 Professional UHF Wireless Rechargeable Microphone",
+   "read_at": "2026-10-08T15:23:42+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 78,
+    "2": 31,
+    "3": 53,
+    "4": 92,
+    "5": 6497
+   },
+   "ratings_total": 6751,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4738552392.html": {
+   "name": "USB Rechargeable Speaker 3 Inch GTS - 1346, 1349, 1360 & 1361 Bluetoot",
+   "read_at": "2026-10-08T15:23:47+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 545,
+    "2": 122,
+    "3": 286,
+    "4": 370,
+    "5": 23573
+   },
+   "ratings_total": 24896,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3169275025.html": {
+   "name": "✅100% Original AMZ 2 Inch ZQS-1202 Multicolor Luminous Portable Blueto",
+   "read_at": "2026-10-08T15:23:51+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 1818,
+    "2": 448,
+    "3": 648,
+    "4": 531,
+    "5": 20538
+   },
+   "ratings_total": 23983,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4991072731.html": {
+   "name": "Lazy People 3 in 1 BlueTooth Speaker Power bank With Phone Stand Adjus",
+   "read_at": "2026-10-08T15:23:56+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 87,
+    "2": 31,
+    "3": 62,
+    "4": 74,
+    "5": 3773
+   },
+   "ratings_total": 4027,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3252473210.html": {
+   "name": "PORTABLE MK-102 SUPER BASS BLUETOOTH WIRELESS SPEAKER WITH RGB LIGHT",
+   "read_at": "2026-10-08T15:24:00+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 233,
+    "2": 68,
+    "3": 85,
+    "4": 64,
+    "5": 2738
+   },
+   "ratings_total": 3188,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i1120920366-s3883420275.html": {
+   "name": "Vention Cat 6 Ethernet Cable Lan Cable 20 10 Meter UTP Cat6 RJ45 Inter",
+   "read_at": "2026-10-08T15:24:05+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 34,
+    "2": 16,
+    "3": 45,
+    "4": 124,
+    "5": 9298
+   },
+   "ratings_total": 9517,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i2531734184-s11692871562.html": {
+   "name": "New U24 Macaron Universal Headset with In-Line Multi-Function Answer/C",
+   "read_at": "2026-10-08T15:24:10+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 213,
+    "2": 79,
+    "3": 177,
+    "4": 259,
+    "5": 10920
+   },
+   "ratings_total": 11648,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4153633764-s23123240208.html": {
+   "name": "Ethernet Cable High Speed RJ45 CAT5e Internet Cable Lan Network Wire I",
+   "read_at": "2026-10-08T15:24:14+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 75,
+    "2": 27,
+    "3": 57,
+    "4": 94,
+    "5": 5086
+   },
+   "ratings_total": 5339,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4495459414-s25675568835.html": {
+   "name": "Buy 1 take 1 YS SAMSG Universal Headset with Microphone with mic In-Li",
+   "read_at": "2026-10-08T15:24:19+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 33,
+    "2": 31,
+    "3": 43,
+    "4": 56,
+    "5": 2303
+   },
+   "ratings_total": 2466,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4578043495-s26385163838.html": {
+   "name": "100W 3 in 1 Super Charging Cable 6A Type C Fast Charger Type-C Cable D",
+   "read_at": "2026-10-08T15:24:23+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 59,
+    "2": 30,
+    "3": 51,
+    "4": 41,
+    "5": 1641
+   },
+   "ratings_total": 1822,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4034782758-s23176345712.html": {
+   "name": "Mini Pocket 2000 - 5000mAH Power Bank Four LED Indicators With Bracket",
+   "read_at": "2026-10-08T15:24:28+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 214,
+    "2": 78,
+    "3": 96,
+    "4": 98,
+    "5": 3712
+   },
+   "ratings_total": 4198,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4438825585-s28647533233.html": {
+   "name": "DANYCASE Stylus Pen 3 in 1 Universal Pencil for Mobile Android ios Pho",
+   "read_at": "2026-10-08T15:24:32+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 19,
+    "2": 8,
+    "3": 12,
+    "4": 21,
+    "5": 827
+   },
+   "ratings_total": 887,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3646051280-s19178250284.html": {
+   "name": "DoubleShock Bluetooth Gamepad Exquisite Simulation Level and Trigger E",
+   "read_at": "2026-10-08T15:24:37+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 55,
+    "2": 14,
+    "3": 42,
+    "4": 78,
+    "5": 2204
+   },
+   "ratings_total": 2393,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3999327536-s21580063905.html": {
+   "name": "【Fast Deliver】Original For PS4 DualShock Controller PS 4 Controller Wi",
+   "read_at": "2026-10-08T15:24:42+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 28,
+    "2": 16,
+    "3": 30,
+    "4": 52,
+    "5": 1670
+   },
+   "ratings_total": 1796,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i1994197909-s16736135959.html": {
+   "name": "Terios T3 / X3 Wireless Bluetooth Joystick Controller with Phone Holde",
+   "read_at": "2026-10-08T15:24:46+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 91,
+    "2": 17,
+    "3": 45,
+    "4": 97,
+    "5": 2837
+   },
+   "ratings_total": 3087,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4584110073-s26378214035.html": {
+   "name": "Essager 2.5W Apple Watch Wireless Chargers Fast Charging Portable Zinc",
+   "read_at": "2026-10-08T15:24:50+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 18,
+    "2": 5,
+    "3": 14,
+    "4": 13,
+    "5": 1295
+   },
+   "ratings_total": 1345,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i650518893-s1844600535.html": {
+   "name": "Multi Port USB Hub ON/OFF Switch Splitter High Speed USB 2.0 Hub Exten",
+   "read_at": "2026-10-08T15:24:55+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 56,
+    "2": 28,
+    "3": 65,
+    "4": 121,
+    "5": 1969
+   },
+   "ratings_total": 2239,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i1676918812-s7239250812.html": {
+   "name": "Omni Adapter / Adaptor Plug Socket (Universal, w/ Switch, Swing Type, ",
+   "read_at": "2026-10-08T15:25:00+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 4,
+    "2": 4,
+    "3": 10,
+    "4": 41,
+    "5": 2700
+   },
+   "ratings_total": 2759,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i394848395-s18218268464.html": {
+   "name": "Ultra Thin 8.5 inch LCD Writing Tablet Smart Notebook One Button Erase",
+   "read_at": "2026-10-08T15:25:04+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 488,
+    "2": 192,
+    "3": 408,
+    "4": 733,
+    "5": 13663
+   },
+   "ratings_total": 15484,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5211290661-s30884518178.html": {
+   "name": "HUABAO | Wireless Lapel Clip-on Microphone Amplifier",
+   "read_at": "2026-10-08T15:25:09+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 3,
+    "2": 2,
+    "3": 6,
+    "4": 62,
+    "5": 693
+   },
+   "ratings_total": 766,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3401407254-s19465854553.html": {
+   "name": "Ring light 18 inches With 3*Cellphone holder LED Fill Light photograph",
+   "read_at": "2026-10-08T15:25:13+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 8,
+    "2": 2,
+    "3": 5,
+    "4": 6,
+    "5": 554
+   },
+   "ratings_total": 575,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i527362407-s7642718627.html": {
+   "name": "【Local seller +COD】3D Movies/Games VR Box Immersive Virtual Reality gl",
+   "read_at": "2026-10-08T15:25:18+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 20,
+    "2": 9,
+    "3": 24,
+    "4": 48,
+    "5": 436
+   },
+   "ratings_total": 537,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4946943100-s28840192818.html": {
+   "name": "Essager PD 60W Fast Charging Type C Cable Audio Adapters Type C to 3.5",
+   "read_at": "2026-10-08T15:25:22+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 6,
+    "2": 8,
+    "3": 13,
+    "4": 14,
+    "5": 493
+   },
+   "ratings_total": 534,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4975340062.html": {
+   "name": "Anker Laptop Power Bank, 25,000mAh Portable Charger with Triple 100W U",
+   "read_at": "2026-10-08T15:25:27+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 33,
+    "2": 9,
+    "3": 28,
+    "4": 46,
+    "5": 4492
+   },
+   "ratings_total": 4608,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5184191214.html": {
+   "name": "【3C Certification】Vention 45W 20000mAh Powerbank Fast Charging with Bu",
+   "read_at": "2026-10-08T15:25:31+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 13,
+    "2": 4,
+    "3": 8,
+    "4": 31,
+    "5": 1918
+   },
+   "ratings_total": 1974,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i2310520201.html": {
+   "name": "UGREEN 20000mAh 25000mAh Powerbank PD 145W Fast Charging Powerbank 100",
+   "read_at": "2026-10-08T15:25:36+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 58,
+    "2": 27,
+    "3": 56,
+    "4": 155,
+    "5": 11337
+   },
+   "ratings_total": 11633,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4693560169.html": {
+   "name": "Fast Charging KC58 20000mAh Battery Capacity Power Bank with Multi Cab",
+   "read_at": "2026-10-08T15:25:40+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 496,
+    "2": 175,
+    "3": 156,
+    "4": 159,
+    "5": 5449
+   },
+   "ratings_total": 6435,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5233328698.html": {
+   "name": "4 IN 1 Spring Cable Ultra Fast Charging 65W for IOS/Type C - USB/TYPE ",
+   "read_at": "2026-10-08T15:25:45+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 64,
+    "2": 24,
+    "3": 53,
+    "4": 51,
+    "5": 2242
+   },
+   "ratings_total": 2434,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3991929010.html": {
+   "name": "[Leslye] Durable Type C Cables, 120W 10A Fast Charging data Cable Cord",
+   "read_at": "2026-10-08T15:25:49+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 30,
+    "2": 12,
+    "3": 26,
+    "4": 43,
+    "5": 1815
+   },
+   "ratings_total": 1926,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i2310520201-s24895520153.html": {
+   "name": "UGREEN 20000mAh 25000mAh Powerbank PD 145W Fast Charging Powerbank 100",
+   "read_at": "2026-10-08T15:25:54+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 58,
+    "2": 27,
+    "3": 56,
+    "4": 155,
+    "5": 11337
+   },
+   "ratings_total": 11633,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/essager-10w-usb-charger-portable-dual-usb-ports-travel-charger-adapter-wall-charger-for-huawei-xiaomi-phone-charging-for-iphone-samsung-i3408401105-s17423442017.html": {
+   "name": "Essager 10W USB Charger Portable Dual USB Ports Travel Charger Adapter",
+   "read_at": "2026-10-08T15:25:58+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 8,
+    "2": 8,
+    "3": 9,
+    "4": 30,
+    "5": 2106
+   },
+   "ratings_total": 2161,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4719061313-s28618408375.html": {
+   "name": "Orashare PNC03 3000mAh Super Mini Capsule Fast Charging Powerbank With",
+   "read_at": "2026-10-08T15:26:03+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 152,
+    "2": 53,
+    "3": 161,
+    "4": 266,
+    "5": 16136
+   },
+   "ratings_total": 16768,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i2547980428-s132980732121.html": {
+   "name": "Inplay Computer Power Supply 450W 550W 650W 750W PSU 80 PLUS Bronze Ce",
+   "read_at": "2026-10-08T15:26:07+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 18,
+    "2": 11,
+    "3": 25,
+    "4": 51,
+    "5": 3463
+   },
+   "ratings_total": 3568,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3729774469-s19664066045.html": {
+   "name": "DC12V 3A 5A CCTV Power Supply Adapter 12V Power Adaptor",
+   "read_at": "2026-10-08T15:26:12+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 12,
+    "2": 4,
+    "3": 7,
+    "4": 13,
+    "5": 1033
+   },
+   "ratings_total": 1069,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i2313989346-s10483987214.html": {
+   "name": "Realme RAM-130 20000mAh Universal Compatibility Power Bank with LED Di",
+   "read_at": "2026-10-08T15:26:17+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 786,
+    "2": 240,
+    "3": 226,
+    "4": 166,
+    "5": 7130
+   },
+   "ratings_total": 8548,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4738702087-s27393155968.html": {
+   "name": "Anker Zolo 10000mAh Magnetic Power Bank Wireless Portable Charger with",
+   "read_at": "2026-10-08T15:26:21+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 5,
+    "2": 3,
+    "3": 8,
+    "4": 11,
+    "5": 924
+   },
+   "ratings_total": 951,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3075012546-s133100712220.html": {
+   "name": "KASIDA Bluetooth WIFI Tuya smart lock 6 in 1 Biometric fingerprint doo",
+   "read_at": "2026-10-08T15:26:26+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 14,
+    "2": 3,
+    "3": 2,
+    "4": 3,
+    "5": 818
+   },
+   "ratings_total": 840,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3626751806-s19094066174.html": {
+   "name": "V380 PRO Q16S Smart Camera Bulb 1080P HD Night Vision Wifi IP Camera c",
+   "read_at": "2026-10-08T15:26:30+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 90,
+    "2": 19,
+    "3": 58,
+    "4": 116,
+    "5": 5180
+   },
+   "ratings_total": 5463,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4474319488-s25490790848.html": {
+   "name": "Xiaomi Smart Camera C301 2K 3MP IP Security Camera 360° Pan Tilt AI Hu",
+   "read_at": "2026-10-08T15:26:35+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 13,
+    "2": 6,
+    "3": 11,
+    "4": 51,
+    "5": 3739
+   },
+   "ratings_total": 3820,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4547888367-s29807638342.html": {
+   "name": "🎖 TP-Link Official Store | Tapo C200C | 1080p Indoor 360 Degrees Pan a",
+   "read_at": "2026-10-08T15:26:43+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 37,
+    "2": 9,
+    "3": 34,
+    "4": 65,
+    "5": 8891
+   },
+   "ratings_total": 9036,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5381386541-s32234823319.html": {
+   "name": "Original Genuine A9 IP Security CCTV camera connect cellphone 1080P Ul",
+   "read_at": "2026-10-08T15:27:33+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 63,
+    "2": 17,
+    "3": 20,
+    "4": 16,
+    "5": 641
+   },
+   "ratings_total": 757,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5037745180-s133372094930.html": {
+   "name": "【Local Stock & 360° Phone View】V380 PRO 100% Original dual lens CCTV c",
+   "read_at": "2026-10-08T15:27:37+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 48,
+    "2": 20,
+    "3": 41,
+    "4": 74,
+    "5": 2888
+   },
+   "ratings_total": 3071,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4507172427-s25784906580.html": {
+   "name": "MISN Doorbell Wireless With Camera Waterproof Remote Home Monitoring V",
+   "read_at": "2026-10-08T15:27:42+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 11,
+    "2": 2,
+    "3": 9,
+    "4": 8,
+    "5": 569
+   },
+   "ratings_total": 599,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4363184044-s24476607936.html": {
+   "name": "Doorbell Wireless With Camera and 4.3-inch display screen Waterproof V",
+   "read_at": "2026-10-08T15:27:46+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 7,
+    "2": 5,
+    "3": 13,
+    "4": 11,
+    "5": 1214
+   },
+   "ratings_total": 1250,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i2386662601.html": {
+   "name": "luckluck Adjustable Laptop Stand with Phone Holder 360° Rotating Heigh",
+   "read_at": "2026-10-08T15:27:51+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 0,
+    "2": 0,
+    "3": 4,
+    "4": 7,
+    "5": 176
+   },
+   "ratings_total": 187,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5166282734.html": {
+   "name": "Jiditech Laptop Stand 360° With Fan and Tablet Holder - 360° Rotating ",
+   "read_at": "2026-10-08T15:27:55+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 2,
+    "2": 1,
+    "3": 2,
+    "4": 6,
+    "5": 202
+   },
+   "ratings_total": 213,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i15491115146-s133143582497.html": {
+   "name": "MOFOX S7 Pro Motorcycle Helmet Intercom Headset 2in1 Mic earphone Musi",
+   "read_at": "2026-10-08T15:27:59+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 5,
+    "2": 0,
+    "3": 3,
+    "4": 2,
+    "5": 145
+   },
+   "ratings_total": 155,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5246060610-s31099995054.html": {
+   "name": "Type C Fast Charging Cable 120W Super Charge Angled Design Bendable Br",
+   "read_at": "2026-10-08T15:28:04+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 36,
+    "2": 20,
+    "3": 26,
+    "4": 20,
+    "5": 625
+   },
+   "ratings_total": 727,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4644812363-s27518600306.html": {
+   "name": "Anker Zolo GaN 30W USB C Charger PIQ 3.0 Foldable PPS FastCharger for ",
+   "read_at": "2026-10-08T15:28:08+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 35,
+    "2": 9,
+    "3": 44,
+    "4": 103,
+    "5": 13829
+   },
+   "ratings_total": 14020,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4983206125-s29079712739.html": {
+   "name": "X55 Sleeping Earbuds Wireless Mini Headphones For Work TWS Bluetooth E",
+   "read_at": "2026-10-08T15:28:13+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 104,
+    "2": 46,
+    "3": 53,
+    "4": 77,
+    "5": 2928
+   },
+   "ratings_total": 3208,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4382617587-s31891484844.html": {
+   "name": "Original LCD For Infinix Smart 8 / Smart 8 HD / Smart 8 Pro X6525 X652",
+   "read_at": "2026-10-08T15:28:17+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 46,
+    "2": 7,
+    "3": 6,
+    "4": 12,
+    "5": 1634
+   },
+   "ratings_total": 1705,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html": {
+   "name": "Original LCD For Oppo Realme Note 50/Note 60 RMX3834 LCD Display with ",
+   "read_at": "2026-10-08T15:28:22+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 33,
+    "2": 2,
+    "3": 6,
+    "4": 9,
+    "5": 870
+   },
+   "ratings_total": 920,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3041489531-s14980556359.html": {
+   "name": "Lenovo M20 Laptop Office Wired Mouse Desktop Computer Mouse Gaming Mou",
+   "read_at": "2026-10-08T15:28:26+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 94,
+    "2": 36,
+    "3": 112,
+    "4": 203,
+    "5": 7080
+   },
+   "ratings_total": 7525,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i3034831887-s14941077788.html": {
+   "name": "U19 Macaron Color 3.5mm HIFI Headset Over Ear 1.2mm Earphones",
+   "read_at": "2026-10-08T15:28:31+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 45,
+    "2": 16,
+    "3": 29,
+    "4": 55,
+    "5": 3937
+   },
+   "ratings_total": 4082,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html": {
+   "name": "✅100% Original Smilee Platinum Dynamic Microphone Professional Wired K",
+   "read_at": "2026-10-08T15:28:35+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 5,
+    "2": 3,
+    "3": 6,
+    "4": 8,
+    "5": 440
+   },
+   "ratings_total": 462,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5084402409.html": {
+   "name": "X55 Sleeping Earbuds Wireless Headphones For Work TWS Bluetooth Earpho",
+   "read_at": "2026-10-08T15:28:40+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 57,
+    "2": 19,
+    "3": 22,
+    "4": 28,
+    "5": 1409
+   },
+   "ratings_total": 1535,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5014079183.html": {
+   "name": "X55 Sleeping Earbuds Wireless Mini Headphones For Work TWS Bluetooth E",
+   "read_at": "2026-10-08T15:28:44+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 18,
+    "2": 3,
+    "3": 9,
+    "4": 10,
+    "5": 414
+   },
+   "ratings_total": 454,
+   "source": "lazada_review_feed"
+  },
+  "https://www.lazada.com.ph/products/pdp-i5256422305.html": {
+   "name": "Smart 5G Max Home WiFi",
+   "read_at": "2026-10-08T15:28:49+00:00",
+   "status": "read",
+   "ratings_by_star": {
+    "1": 13,
+    "2": 2,
+    "3": 9,
+    "4": 7,
+    "5": 1197
+   },
+   "ratings_total": 1228,
+   "source": "lazada_review_feed"
+  }
+ }
+}

@@ -1,0 +1,28 @@
+{
+  "what": "Training sentences written by the AI assistant. Not reviews. Training only, never a test.",
+  "approved_by": "adviser, as reported by the owner on 8 October 2026",
+  "seed": 20261009,
+  "variants_per_core": 3,
+  "cores": 456,
+  "sentences": 1368,
+  "by_family": {
+    "safety_positive": 180,
+    "safety_negative": 141,
+    "counterfeit_positive": 150,
+    "counterfeit_negative": 126,
+    "not_as_described_positive": 156,
+    "not_as_described_negative": 105,
+    "quality_positive": 156,
+    "quality_negative": 102,
+    "defect_positive": 75,
+    "defect_negative": 177
+  },
+  "yes_per_label": {
+    "safety": 180,
+    "defect": 255,
+    "quality": 156,
+    "counterfeit": 150,
+    "not_as_described": 162
+  },
+  "sha256": "1dcec24081530fce3656f3c99c9f28efdb9aa714d2d1ad6ccaa23d50f7bcff27"
+}

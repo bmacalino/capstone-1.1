@@ -226,11 +226,42 @@ class TestExtraLabelsC2(unittest.TestCase):
         # A checker without the two labels says nothing about them.
         self.assertNotIn("review_extra_tags", HazardBadgeModel(allow_unqualified=True).analyze("Mahina yung tunog."))
 
+    def test_second_revision_of_the_poor_quality_patterns(self):
+        for sentence in (
+            "medyo maingay lang gamitin", "medyo delay yung mic", "parang gamit na yung dumating",
+            "hnd sya ganun katibay", "hirap pindutin ng buttons",
+        ):
+            with self.subTest(sentence=sentence):
+                self.assertIn("quality", self.tags(sentence)[1])
+        # A condition is not a complaint, and slow charging is a defect, not poor quality.
+        for sentence in ("pag mahina lang ang volume ok naman", "ang hina na nya mag charge"):
+            with self.subTest(sentence=sentence):
+                self.assertNotIn("quality", self.tags(sentence)[1])
+
+    def test_second_revision_of_the_fake_rules(self):
+        for sentence in (
+            "i know di to original", "pekeng pekeng product nyo", "sd card not sandisk",
+            "akala ko legit na orig ang dumating", "quite similar to the original", "buhangin ang laman ng battery",
+        ):
+            with self.subTest(sentence=sentence):
+                self.assertIn("counterfeit", self.tags(sentence)[0])
+        # "Fake" about the reviews or the seller, a question, the reviewer's own phone.
+        for sentence in ("fake ba to", "fake seller", "hindi samsung ang phone ko"):
+            with self.subTest(sentence=sentence):
+                self.assertNotIn("counterfeit", self.tags(sentence)[0])
+        # Rules c1 know none of this, so earlier measurements reproduce.
+        self.assertNotIn("counterfeit", LexiconHazardTagger().tag_sentence("sd card not sandisk")["tags"])
+
+    def test_the_not_as_advertised_patterns_were_left_as_they_were(self):
+        # A revision of them found nothing new on held-out sentences and was dropped.
+        self.assertEqual(self.tags("it is not ultra fast charging")[1], set())
+        self.assertIn("not_as_described", self.tags("hindi totoo ang 20000mah")[1])
+
     def test_the_version_names_the_rules(self):
         from defaketive_sentiment.hazard_model import HazardBadgeModel
 
         model = HazardBadgeModel(allow_unqualified=True, tagger=self.tagger)
-        self.assertIn("+c2", model.model_version)
+        self.assertIn("+c2r2", model.model_version)
 
 
 class TestKeywordRules04(unittest.TestCase):

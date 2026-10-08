@@ -50,8 +50,12 @@ MODELS_ROOT = Path(__file__).resolve().parents[1] / "models"
 # research/live_check.py). Most of v5's defect labels were proposed by the AI
 # assistant; it is the default on the owner's instruction of 7 Oct 2026 and is
 # NOT a pre-registered adoption (PREREGISTRATION_final_v6.md, departure 2).
+# v6 = v5's defect model unchanged, with a new safety model: a filter trained on
+# every labelled round plus sentences written by the AI assistant (synthetic,
+# training only; research/train_with_synthetic.py; departure 4). It can only
+# remove a keyword safety flag, and never one above mild heat.
 # DEFAKETIVE_HAZARD_MODEL=team_labels serves v2b instead.
-DEFAULT_MODEL_DIR = MODELS_ROOT / "hazard_classifier_v5"
+DEFAULT_MODEL_DIR = MODELS_ROOT / "hazard_classifier_v6"
 MANIFEST_NAME = "manifest.json"
 CANDIDATES = ("T", "TK", "E", "EK")
 # How a category's learned model combines with the keyword checker:
@@ -236,6 +240,9 @@ class LearnedHazardScorer:
         self.models: dict[str, LearnedCategoryModel] = {}
         self.combine: dict[str, str] = {}
         self.high_star_threshold: dict[str, float] = {}
+        # For a filter ("and") category: keyword flags above this severity are never
+        # removed by the model, whatever its score (a fire or shock report stays).
+        self.filter_spares: dict[str, int] = {}
         for category, entry in (self.manifest.get("categories") or {}).items():
             mode = entry.get("combine", "decide")
             if mode not in COMBINE_MODES:
@@ -245,6 +252,10 @@ class LearnedHazardScorer:
                 if mode != "or_gated":
                     raise LearnedModelError(f"threshold_high_star only applies to an or_gated category, not {category}.")
                 self.high_star_threshold[category] = float(entry["threshold_high_star"])
+            if entry.get("filter_spares_severity_above") is not None:
+                if mode != "and":
+                    raise LearnedModelError(f"filter_spares_severity_above only applies to a filter category, not {category}.")
+                self.filter_spares[category] = int(entry["filter_spares_severity_above"])
             path = self.model_dir / entry["file"]
             if not path.is_file() or file_sha256(path) != entry["sha256"]:
                 raise LearnedModelError(f"{path} is missing or does not match its manifest.")
@@ -270,6 +281,7 @@ class LearnedHazardScorer:
             "|".join(
                 f"{c}:{e['sha256']}"
                 + (f":stars{e['threshold_high_star']}" if e.get("threshold_high_star") is not None else "")
+                + (f":spares{e['filter_spares_severity_above']}" if e.get("filter_spares_severity_above") is not None else "")
                 for c, e in sorted(self.manifest["categories"].items())
             ).encode("utf-8")
         ).hexdigest()[:8]

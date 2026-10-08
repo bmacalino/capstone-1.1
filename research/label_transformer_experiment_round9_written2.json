@@ -1,0 +1,181 @@
+{
+  "generated_at": "2026-10-08T15:52:51+00:00",
+  "warning": "An experiment. Agreement with AI labels on a held-out third; nothing was saved for the app.",
+  "model": "cardiffnlp__twitter-xlm-roberta-base-sentiment",
+  "seed": 42,
+  "written_sets": [
+    "v1",
+    "v2"
+  ],
+  "epochs": 4,
+  "batch": 16,
+  "max_length": 64,
+  "learning_rate": 2e-05,
+  "training_sentences": 5923,
+  "of_which_synthetic": 2514,
+  "validation_sentences": 875,
+  "seconds": 3025,
+  "note": "Safety and defect rows compare with the keywords alone: the served models were trained on these sentences.",
+  "labels": {
+    "safety": {
+      "held_out_sentences": 1604,
+      "held_out_reports": 37,
+      "rules": {
+        "tp": 33,
+        "fp": 21,
+        "fn": 4,
+        "precision": 0.6111,
+        "recall": 0.8919,
+        "f1": 0.7253
+      },
+      "model_alone": {
+        "tp": 29,
+        "fp": 37,
+        "fn": 8,
+        "precision": 0.4394,
+        "recall": 0.7838,
+        "f1": 0.5631,
+        "threshold": 0.45399999618530273
+      },
+      "rules_or_model": {
+        "tp": 33,
+        "fp": 21,
+        "fn": 4,
+        "precision": 0.6111,
+        "recall": 0.8919,
+        "f1": 0.7253,
+        "threshold": null,
+        "added_right": 0,
+        "added_wrong": 0
+      }
+    },
+    "defect": {
+      "held_out_sentences": 1528,
+      "held_out_reports": 436,
+      "rules": {
+        "tp": 149,
+        "fp": 26,
+        "fn": 287,
+        "precision": 0.8514,
+        "recall": 0.3417,
+        "f1": 0.4877
+      },
+      "model_alone": {
+        "tp": 358,
+        "fp": 92,
+        "fn": 78,
+        "precision": 0.7956,
+        "recall": 0.8211,
+        "f1": 0.8081,
+        "threshold": 0.5350000262260437
+      },
+      "rules_or_model": {
+        "tp": 340,
+        "fp": 68,
+        "fn": 96,
+        "precision": 0.8333,
+        "recall": 0.7798,
+        "f1": 0.8057,
+        "threshold": 0.8370000123977661,
+        "added_right": 191,
+        "added_wrong": 42
+      }
+    },
+    "quality": {
+      "held_out_sentences": 1748,
+      "held_out_reports": 175,
+      "rules": {
+        "tp": 105,
+        "fp": 8,
+        "fn": 70,
+        "precision": 0.9292,
+        "recall": 0.6,
+        "f1": 0.7292
+      },
+      "model_alone": {
+        "tp": 113,
+        "fp": 71,
+        "fn": 62,
+        "precision": 0.6141,
+        "recall": 0.6457,
+        "f1": 0.6295,
+        "threshold": 0.8050000071525574
+      },
+      "rules_or_model": {
+        "tp": 109,
+        "fp": 10,
+        "fn": 66,
+        "precision": 0.916,
+        "recall": 0.6229,
+        "f1": 0.7415,
+        "threshold": 0.9929999709129333,
+        "added_right": 4,
+        "added_wrong": 2
+      }
+    },
+    "counterfeit": {
+      "held_out_sentences": 1731,
+      "held_out_reports": 64,
+      "rules": {
+        "tp": 46,
+        "fp": 6,
+        "fn": 18,
+        "precision": 0.8846,
+        "recall": 0.7188,
+        "f1": 0.7931
+      },
+      "model_alone": {
+        "tp": 51,
+        "fp": 29,
+        "fn": 13,
+        "precision": 0.6375,
+        "recall": 0.7969,
+        "f1": 0.7083,
+        "threshold": 0.8220000267028809
+      },
+      "rules_or_model": {
+        "tp": 51,
+        "fp": 17,
+        "fn": 13,
+        "precision": 0.75,
+        "recall": 0.7969,
+        "f1": 0.7727,
+        "threshold": 0.9539999961853027,
+        "added_right": 5,
+        "added_wrong": 11
+      }
+    },
+    "not_as_described": {
+      "held_out_sentences": 1748,
+      "held_out_reports": 87,
+      "rules": {
+        "tp": 47,
+        "fp": 4,
+        "fn": 40,
+        "precision": 0.9216,
+        "recall": 0.5402,
+        "f1": 0.6812
+      },
+      "model_alone": {
+        "tp": 56,
+        "fp": 36,
+        "fn": 31,
+        "precision": 0.6087,
+        "recall": 0.6437,
+        "f1": 0.6257,
+        "threshold": 0.8669999837875366
+      },
+      "rules_or_model": {
+        "tp": 54,
+        "fp": 11,
+        "fn": 33,
+        "precision": 0.8308,
+        "recall": 0.6207,
+        "f1": 0.7105,
+        "threshold": 0.9879999756813049,
+        "added_right": 7,
+        "added_wrong": 7
+      }
+    }
+  }
+}

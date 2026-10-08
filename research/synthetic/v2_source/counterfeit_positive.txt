@@ -1,0 +1,237 @@
+# Possible fake, reports. One written sentence per line. "## label" adds a label.
+# Written one by one by the AI assistant as variations on how real reviewers
+# word the complaint (dev rounds and round 9). Not reviews. Training only.
+hindi original yung charger, halata sa bigat
+di sya original na samsung, iba yung font sa likod
+hindi to original na jbl, tunog lata
+hindi orig yung airpods, ayaw ma detect ng iphone
+di original, class a lang
+hindi naman to tunay na anker
+hindi tunay na sandisk, ibang iba sa binili ko sa mall
+not original, the logo is slightly off
+not an original sony controller
+this is not a genuine apple cable
+not genuine, serial number does not exist
+definitely not authentic logitech
+these are not real airpods
+this is not the real xiaomi powerbank
+fake to, wag kayong maniwala sa reviews na 5 star
+fake yung earbuds, ayaw mag pop up sa iphone
+fake na jbl, walang serial sa ilalim
+fake po ito, kinumpara ko sa original ko
+fake ang dumating, hindi realme
+peke yung charger, nag iinit agad ## safety
+peke to guys, iba yung logo
+peke ang binebenta nila dito
+pekeng sandisk, 8gb lang totoong laman ## not_as_described
+pekeng airpods, walang noise cancelling ## not_as_described
+pekeng peke, sayang pera
+halatang fake, mali yung spelling sa box
+halatang peke kasi malabo yung print ng logo
+halata na hindi orig sa tunog pa lang
+obvious na fake, ang gaan at ang lutong ng plastic
+obviously fake, the packaging has typos
+clearly a fake, the box print is blurry
+mukhang fake, iba yung kulay ng logo
+mukhang peke kasi walang hologram sticker
+mukhang hindi original, walang seal
+parang fake kasi hindi ma verify sa website
+parang hindi orig, iba yung amoy ng plastic
+it looks fake, the font is different from the real one
+seems like a knock off, not the real brand
+class a lang to, hindi original
+class a daw pero mukhang class c
+kind of class a, not the real thing
+replica lang, wag umasa na original
+replica lang pala kahit sabi original
+imitation lang ng apple charger
+imitation lang, ibang iba sa tunay
+clone lang ng dualshock, hindi sony
+clone lang pala, akala ko orig
+copy lang to ng anker
+kopya lang ng original, mas magaan
+gaya gaya lang ng jbl
+knock off version, not the real jbl
+it is a replica of the original controller
+just an imitation of the real product
+a cheap copy of the samsung charger
+oem lang daw pero binenta as original
+sabi original pero oem lang pala
+sabi orig, hindi naman
+ang sabi legit na samsung, hindi naman pala
+sabi authentic, pero fake yung dumating
+nakalagay original, peke naman
+original daw pero walang tatak ng brand
+they said original but it is clearly a copy
+sold as authentic but it is not
+listed as genuine but this is counterfeit
+akala ko original, hindi pala
+akala ko orig na realme, peke pala
+akala ko legit kasi mall, fake pala
+kala ko tunay na anker, gaya lang pala
+akala ko authentic, class a lang pala
+i thought it was original, turns out it is fake
+i thought this was genuine sony, it is not
+walang tatak na samsung sa mismong charger
+walang logo ng jbl sa likod, sa box lang meron
+walang realme na nakasulat sa unit
+walang brand name sa mismong item, sa picture meron ## not_as_described
+walang serial number, kaya alam mong peke
+walang hologram, hindi authentic
+no logo on the unit itself, only on the box
+there is no serial number anywhere, so it is not genuine
+the brand name is misspelled on the box
+mali yung spelling ng brand sa box, sansung nakalagay
+samsnug ang nakasulat haha halatang peke
+iba yung logo, mas mataba yung letra
+iba yung font ng logo kumpara sa original ko
+iba yung box sa original na binili ko sa store
+iba sa binili ko sa official store, mas magaan to
+ibang iba sa nabili ko sa mall na tunay
+hindi kapareho ng original ko, iba yung timbang at kulay
+kinumpara ko sa original, magkaiba yung port at logo
+compared to my original one, the weight and logo are different
+side by side with the real one, this is clearly fake
+different from the one i got at the official store, this one is fake
+hindi ma verify sa app ng brand
+ayaw ma scan yung qr sa box, fake daw sabi ng site
+nung chineck ko sa website invalid yung serial
+invalid serial number sa official site
+serial number is not recognized by the manufacturer
+the verification code says it is not authentic
+failed the authenticity check on the official website
+hindi nade detect ng iphone as airpods, fake
+walang pop up sa iphone, hindi tunay na airpods
+di lumalabas sa find my, peke
+does not show up as airpods on my iphone, fake
+my phone says this accessory is not supported, not original
+lumabas sa phone ko na hindi original na charger
+sabi ng cp ko slow charging, hindi daw original cable
+unknown brand yung dumating, hindi yung nasa listing
+ibang brand yung pinadala, hindi jbl
+hindi sony ang dumating, walang pangalan
+they delivered an unbranded one instead of the anker
+came in a brand i have never heard of, not the one advertised
+di sya tunay na realme, sticker lang yung logo
+sticker lang yung tatak, natatanggal
+dinikit lang yung logo ng brand
+printed lang yung logo, hindi naka emboss gaya ng original
+the logo is just a sticker
+the logo peels off, real ones are engraved
+binuksan ko, buhangin yung laman ng battery
+pagbukas ko may bakal lang na pampabigat sa loob
+may semento sa loob para bumigat, peke
+nung binuksan ko maliit lang yung battery at may pabigat
+opened it and found a tiny cell with weights, fake
+inside is sand and a small battery, counterfeit
+fake products ang tinda ng shop na to
+puro peke tinda nila
+nagbebenta sila ng peke
+wag kayo bumili dito peke mga item
+this shop sells counterfeit items
+they are selling fakes here
+hindi authorized seller, peke yung binebenta
+legit daw na store pero fake yung item
+naka mall pa pero fake naman yung dumating
+flagship store daw pero peke binigay
+official store kuno pero hindi original
+ok naman kahit hindi original
+gumagana naman kahit fake
+working naman kahit class a lang
+pwede na kahit imitation lang
+okay na rin kahit hindi tunay na jbl
+maganda naman tunog kahit replica
+sulit pa rin kahit di orig
+good enough even though it is not original
+works fine for a fake
+not bad for a replica
+decent for a copy but do not expect the real thing
+alam ko namang hindi original sa presyong yan
+sa presyo pa lang alam mo nang hindi orig
+sa ganyang presyo imposibleng original yan
+mura kasi kaya malamang hindi original
+at this price it is obviously not genuine
+too cheap to be real, and it is not
+wag umasa na original sa 99 pesos
+don't expect an original for that price, it is a copy
+fake pala, sayang binayad ko
+fake pala to, na scam ako
+peke pala, kaya pala mura
+replica pala, hindi sinabi sa description ## not_as_described
+hindi pala original, sana sinabi nyo
+fake ata to, iba sa dati kong binili
+peke ata kasi mabilis uminit
+fake yata kasi walang tatak
+i think it is fake, the sound is nothing like my old pair
+pretty sure this is counterfeit
+medyo fake ang dating, magaan at walang serial
+duda ako kung original to, iba yung box
+nagdududa ako na tunay to, iba yung kulay
+i doubt this is authentic, the box looks reprinted
+reprint lang yung box, hindi original packaging
+recycled box tapos peke yung laman
+yung box original pero yung laman hindi
+original box pero fake yung unit sa loob
+the box is real but what's inside is not
+fake yung battery, hindi samsung
+fake yung cable na kasama, hindi apple
+hindi original yung adapter na kasama
+yung earbuds peke, yung case lang ata ang tunay
+hindi orig yung lcd na pinalit
+not an original screen, colors are off
+the battery is not genuine, it swells ## defect
+after market lang yung battery, hindi original
+generic lang, nilagyan lang ng tatak
+rebranded generic, hindi totoong ugreen
+it is a generic unit with a brand sticker
+just a rebranded no name product
+di talaga sya jbl, walang jbl app na maka detect
+ayaw kumonekta sa official app, peke
+does not connect to the official app, so it is fake
+the official app says device not recognized, counterfeit
+hindi nag a update sa app ng brand, fake
+bootleg lang
+bootleg version of the real one
+budol, fake yung airpods
+na budol ako, hindi original
+scam, peke yung pinadala
+scammer, fake na realme ang binigay
+niloko kami, class a lang pala
+pinalabas na original pero imitation
+dinaya kami, hindi tunay na brand
+they tricked us, it is a fake
+false claim of authenticity, this is a clone
+kung gusto nyo ng original wag dito
+bili na lang kayo sa official store, peke dito
+go to the official store, this one is fake
+buy from the mall instead, these are not real
+di na ko uulit, fake yung una at pangalawa
+dalawang beses na ako nabigyan ng peke dito
+second time ordering and both are fake
+i returned it because it is counterfeit
+nireport ko na kasi fake
+ibabalik ko, hindi original
+refund please, this is not authentic
+gusto ko i refund kasi peke
+hindi siya gaya ng original na ps4 controller, iba yung materyal
+it has a different material from an original controller
+the light bar does not behave like an original
+iba yung ilaw kumpara sa tunay
+iba yung tunog kumpara sa totoong jbl
+tunog peke, malayo sa totoong bose
+yung tunog hindi pang original
+sound is far from the real thing, it is fake
+iba yung timbang sa original, mas magaan ng kalahati
+half the weight of the genuine one
+mas magaan sa tunay, kaya alam kong peke
+logo is crooked, real ones are centered
+the box has no barcode, real ones do
+walang barcode yung box, peke
+walang warranty card na galing sa brand, fake
+walang manual at walang seal ng brand, mukhang peke
+di sya realme, ibang charger na nilagyan lang ng box ng realme
+lalagyan lang yung realme, yung laman iba
+realme yung box pero walang tatak yung powerbank
+samsung ang box pero walang samsung sa adapter
+the box says apple but the cable inside is unbranded
+anker box, no name charger inside

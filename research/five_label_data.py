@@ -13,6 +13,9 @@ One loader for the comparison and training scripts, so they cannot drift:
               reviews. Only its "mining" listings are returned by default; the
               "live_check" listings are kept out of every training set and
               come back only with include_live_check=True
+  rounds 9+   more real sentences picked for the three weak labels
+              (research/build_round9.py), all five labels proposed by the
+              assistant. Training only: never part of a held-out set
 
 Only the team's safety answers here are human ground truth. The rest is
 AI-proposed, and the owner accepted it on 8 Oct 2026 without auditing it
@@ -62,7 +65,13 @@ def load_five_label_records(include_live_check: bool = False) -> list[dict[str, 
 
     records: list[dict[str, Any]] = []
     master: dict[str, dict[str, str]] = {}
-    for number in range(1, 9):
+    # Rounds 5 and up carry the assistant's labels; any further round is picked up when it has them.
+    ai_rounds = sorted(
+        int(folder.name.rsplit("_", 1)[1]) for folder in OUTPUTS.glob("labelling_queue_round_*")
+        if folder.name.rsplit("_", 1)[1].isdigit() and int(folder.name.rsplit("_", 1)[1]) >= 5
+        and (folder / "ai_labels.csv").is_file()
+    )
+    for number in [1, 2, 3, 4, *ai_rounds]:
         master.update({row["row_id"]: row for row in _read(OUTPUTS / f"labelling_queue_round_{number}" / "queue_master.csv")})
     extra = {
         row["row_id"]: {label: row[f"ai_{label}"] == "yes" for label in ("quality", "not_as_described")}
@@ -90,7 +99,7 @@ def load_five_label_records(include_live_check: bool = False) -> list[dict[str, 
             "row_id": row["row_id"], "review_id": row["review_id"], "text": row["sentence_text"], "round": "4", "team": {},
             "labels": {"safety": None, "defect": None, "counterfeit": fake.get(row["row_id"]), **extra[row["row_id"]]},
         })
-    for number in (5, 6, 7, 8):
+    for number in ai_rounds:
         for row in _read(OUTPUTS / f"labelling_queue_round_{number}" / "ai_labels.csv"):
             part = master[row["row_id"]].get("part") or "round"
             if part == "live_check" and not include_live_check:

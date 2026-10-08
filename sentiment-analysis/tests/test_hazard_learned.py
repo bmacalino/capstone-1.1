@@ -209,6 +209,14 @@ class TestFilterMode(unittest.TestCase):
         tagged = LexiconHazardTagger(learned=FilterScorer(True)).tag_sentence("maganda naman")
         self.assertNotIn("safety", tagged["tags"])
 
+    def test_a_serious_flag_is_not_the_filters_to_remove(self):
+        # The model says no to both. Mild heat goes; a fire report stays.
+        scorer = FilterScorer(False)
+        scorer.filter_spares = {"safety": 2}
+        tagger = LexiconHazardTagger(learned=scorer)
+        self.assertNotIn("safety", tagger.tag_sentence("umiinit pa yung charger")["tags"])
+        self.assertIn("safety", tagger.tag_sentence("nasunog agad")["tags"])
+
 
 class TestFitting(unittest.TestCase):
     def test_a_tk_model_fits_and_scores(self):
@@ -225,9 +233,13 @@ class TestShippedModels(unittest.TestCase):
     def test_only_the_adopted_categories_ship(self):
         manifest = json.loads((DEFAULT_MODEL_DIR / "manifest.json").read_text(encoding="utf-8"))
         scorer = LearnedHazardScorer()
-        # Safety is the team-label model, unchanged; defect is retrained.
+        # Safety is a filter on the keyword flags; defect is the retrained model.
         self.assertEqual(sorted(scorer.categories), ["defect", "safety"])
-        self.assertEqual(scorer.combine, {"safety": "decide", "defect": "or_gated"})
+        self.assertEqual(scorer.combine, {"safety": "and", "defect": "or_gated"})
+        # The filter may never remove a flag stronger than mild heat.
+        self.assertEqual(scorer.filter_spares, {"safety": 2})
+        # Written (synthetic) sentences trained it and are declared as training only.
+        self.assertIn("Training only", manifest["synthetic_training_data"]["what"])
         self.assertEqual(manifest["keyword_rules"], "0.4")
         # Made the default on the owner's instruction, not by a pre-registered test.
         self.assertFalse(manifest["qualified_for_integration"])
@@ -355,6 +367,25 @@ class TestShippedModels(unittest.TestCase):
             shutil.copytree(DEFAULT_MODEL_DIR, copy)
             manifest = json.loads((copy / "manifest.json").read_text(encoding="utf-8"))
             manifest["categories"]["safety"]["threshold_high_star"] = 0.9
+            (copy / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaises(LearnedModelError):
+                LearnedHazardScorer(copy)
+
+    def test_the_shipped_safety_filter_keeps_reports_and_drops_figures_of_speech(self):
+        tagger = LexiconHazardTagger.for_scorer(LearnedHazardScorer(), sentiment_label=lambda text: "negative")
+        for report in ("nasunog yung charger pagka saksak", "umusok yung powerbank habang naka charge", "sobrang init ng charger hindi na mahawakan"):
+            with self.subTest(report=report):
+                self.assertIn("safety", tagger.tag_sentence(report)["tags"])
+        for harmless in ("apoy ang tunog ng speaker solid", "hindi naman umiinit kahit matagal gamitin"):
+            with self.subTest(harmless=harmless):
+                self.assertNotIn("safety", tagger.tag_sentence(harmless)["tags"])
+
+    def test_sparing_serious_flags_is_only_for_a_filter(self):
+        with tempfile.TemporaryDirectory() as folder:
+            copy = Path(folder) / "model"
+            shutil.copytree(DEFAULT_MODEL_DIR, copy)
+            manifest = json.loads((copy / "manifest.json").read_text(encoding="utf-8"))
+            manifest["categories"]["defect"]["filter_spares_severity_above"] = 2
             (copy / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaises(LearnedModelError):
                 LearnedHazardScorer(copy)

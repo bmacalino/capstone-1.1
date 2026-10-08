@@ -22,14 +22,22 @@ import re
 QUALITY = "quality"
 NOT_AS_DESCRIBED = "not_as_described"
 EXTRA_TAGS = (QUALITY, NOT_AS_DESCRIBED)
+# Part of the checker's version string, so saved reports are redone when the
+# patterns change. r2 = the second revision of 8 Oct 2026, which changed the
+# poor-quality patterns. A revision of the not-as-advertised patterns was
+# written at the same time and dropped: on held-out sentences it found nothing
+# new (research/label_rules_revision.json).
+EXTRA_RULES_REVISION = "r2"
 
 _NOT = r"(?:hindi|hinde|di|d|nd|ndi|not|isn't|isnt|wasn't|wasnt|ain't|aint|doesn't|doesnt|never)"
+# The poor-quality patterns also read three common misspellings of "hindi".
+_NOT_WIDE = r"(?:hindi|hinde|hind|hndi|hnd|di|d|nd|ndi|not|isn't|isnt|wasn't|wasnt|ain't|aint|doesn't|doesnt|never)"
 _FILL = r"(?:[\w']+\s+)"
 _NUM = r"\d[\d,.]*"
 _UNIT = r"(?:k\s*)?(?:mah|gb|tb|mbps|watts?|w|meters?|mtrs?|m|cm|liters?|litter|l|ml|inch(?:es)?|ribs)"
 _SHOWN = r"(?:pictures?|pics?|photos?|litrato|display|description|discription|thumbnail|ads?|post)"
 _SOFT = r"(?:(?:po|naman|nman|talaga|tlga|sya|siya|cya|xa|sia|rin|din|a|even|really|totally)\s+)"
-_DEGREE = r"(?:(?:sya|siya|ganun|ganoon|ganon|gaano|gaanong|ganung|masyado|masyadong|that|so|very|naman|talaga|look|looks)\s+)"
+_DEGREE = r"(?:(?:sya|siya|xa|cya|sia|sha|po|kc|kasi|ganun|ganoon|ganon|gaano|gaanong|ganung|masyado|masyadong|that|so|very|naman|talaga|look|looks)\s+)"
 
 
 def _compile(patterns: tuple[str, ...]) -> tuple[re.Pattern[str], ...]:
@@ -103,7 +111,7 @@ QUALITY_PATTERNS = _compile(
     (
         # weak
         r"(?:(?:ma|napaka)?hina|mahinang)(?!\w)",
-        rf"{_NOT}\s+{_DEGREE}{{0,2}}(?:ka)?(?:lakas|malakas|kalakasan|loud)(?!\w)",
+        rf"{_NOT_WIDE}\s+{_DEGREE}{{0,2}}(?:ka)?(?:lakas|malakas|kalakasan|loud)(?!\w)",
         r"(?:volume too low|mas tumutunog pa)(?!\w)",
         rf"mas malakas pa\s+{_FILL}{{0,5}}(?:kesa|kaysa)(?!\w)",
         r"mas malakas pa (?:ang )?(?:ihip|hininga)(?!\w)",
@@ -114,38 +122,71 @@ QUALITY_PATTERNS = _compile(
         rf"(?:tunog|sounds?)\s+{_FILL}{{0,2}}basag(?!\w)",
         r"(?:sabog sya|tunog lata|wasak sound|maugong|garalgal|not enough bass|bass is meh)(?!\w)",
         rf"(?:pangit|panget)\s+{_FILL}{{0,2}}(?:tunog|sounds?|boses)(?!\w)",
-        rf"{_NOT}\s+{_FILL}{{0,2}}(?:maganda|kaganda|ganda)\s+{_FILL}{{0,3}}(?:tunog|sounds?)(?!\w)",
+        rf"{_NOT_WIDE}\s+{_FILL}{{0,2}}(?:maganda|kaganda|ganda)\s+{_FILL}{{0,3}}(?:tunog|sounds?)(?!\w)",
         # quality words
         r"(?:low|poor|bad|cheap|awful) (?:sound |build |product )?quality(?!\w)",
         r"quality\s*:?\s*(?:is |was |nya |niya |ng \w+ )?(?:not good|awful|bad|poor|pangit|panget|low)(?!\w)",
         rf"(?:pangit|panget|baba|bulok)\s+{_FILL}{{0,2}}quality(?!\w)",
-        rf"{_NOT}\s+{_FILL}{{0,2}}(?:maganda|ganda|kaganda|good|high)\s+{_FILL}{{0,3}}quality(?!\w)",
+        rf"{_NOT_WIDE}\s+{_FILL}{{0,2}}(?:maganda|ganda|kaganda|good|high)\s+{_FILL}{{0,3}}quality(?!\w)",
         r"(?:low class|poor product|poor performance|poor performace|cheap plastic|mumurahin|substandard|cheaply made"
         r"|cheap material|flimsy|meh lang)(?!\w)",
         r"functionality\s*:?\s*(?:poor|pangit|panget)(?!\w)",
         # thin, fragile, toy-like
         r"(?:ma|ka|napaka)?nipis\w*",
         r"marupok(?!\w)",
-        r"(?:madali|madaling|mabilis|dali|bilis)\s+(?:(?:lang|lng|na|ma|sya|siya|nya)\s+){0,2}"
+        r"(?:madali|madaling|mabilis|dali|bilis)\s+(?:(?:lang|lng|na|ma|sya|siya|nya|nga)\s+){0,2}"
         r"(?:sira|masira|mapunit|punit|maputol|putol|matanggal|tanggal|mabura|mawala|kumupas|lumuwag|maluwag)(?!\w)",
-        rf"{_NOT}\s+{_DEGREE}{{0,3}}(?:ka)?(?:tibay|matibay|sturdy|durable|stable)(?!\w)",
+        rf"{_NOT_WIDE}\s+{_DEGREE}{{0,3}}(?:ka)?(?:tibay|matibay|sturdy|durable|stable)(?!\w)",
         r"(?:parang|para siyang|para syang|para lang|mukhang|mukang)\s+(?:laruan|laroan)(?!\w)",
         # does not hold or fit
         r"(?:nahuhulog|nalalaglag|lumalaylay|wobbly|super loose|sobrang luwag)(?!\w)",
         rf"(?:maluwag|maluwang|loose)\s+{_FILL}{{0,3}}(?:turnilyo|screws?|pagkakabit|rj45|saksak\w*|plug)(?!\w)",
         rf"(?:turnilyo|screws?|saksak\w*|plug)\s+{_FILL}{{0,3}}(?:maluwag|maluwang|loose)(?!\w)",
-        rf"{_NOT}\s+{_DEGREE}{{0,2}}(?:madikit|dumidikit|nakadikit|mahigpit|pantay|pare pareho|parehas ang|straight)(?!\w)",
+        rf"{_NOT_WIDE}\s+{_DEGREE}{{0,2}}(?:madikit|dumidikit|nakadikit|mahigpit|pantay|pare pareho|pareho|parehas|straight)(?!\w)",
         r"(?:hindi|hinde|di|d|nd|ndi)\s+(?:(?:rin|din|po|p|masyadong)\s+){0,2}maayos\s+(?:(?:ang|yung|ung)\s+)?"
         r"(?:tahi|pagka ?tahi|pagkakabit|pagkakadikit|pgkakadikit)(?!\w)",
         # does not last (scent, colour)
-        rf"(?:not long lasting|{_NOT}\s+(?:(?:sya|siya|naman)\s+)?(?:long lasting|naglalast|nagtatagal))(?!\w)",
+        rf"(?:not long lasting|{_NOT_WIDE}\s+(?:(?:sya|siya|naman)\s+)?(?:long lasting|naglalast|nagtatagal))(?!\w)",
+        # Second revision (8 Oct 2026): written from two thirds of the labelled
+        # sentences and checked on the third (research/improve_label_rules.py).
+        # noisy
+        r"(?:maingay|ang ingay|sobrang ingay|napaka ?ingay)(?!\w)",
+        # lag in sound or response
+        rf"delay(?:ed)?\s+{_FILL}{{0,2}}(?:mic|sound|tunog|audio|response|pagsulat)(?!\w)",
+        rf"(?:mic|sound|tunog|audio|feature)\s+{_FILL}{{0,2}}delay(?:ed)?(?!\w)",
+        # "material not that expected". "The item is not good" is left out: on the
+        # sentences read it was as often a fault as poor quality.
+        r"(?:material|materials)\s+(?:is |was |are )?not\s+(?:very |so |that |really )?(?:good|great|expected)(?!\w)",
+        # "panget gamitin", "pangit ang pagkakagawa"
+        rf"(?:pangit|panget)\s+{_FILL}{{0,2}}(?:gamitin|pagkakagawa|pagkagawa|gawa|materials?|tela|tahi|print|stiker|sticker)(?!\w)",
+        r"(?:napaka ?low|pucho pucho|puchu puchu)\s+quality(?!\w)",
+        # "palpak ang power bank ninyo". "Bulok ang item" is left out: usually said of something broken.
+        rf"palpak\s+{_FILL}{{0,2}}(?:item|product|power ?bank|unit|gawa|binigay)(?!\w)",
+        # looks used
+        r"(?:parang|mukhang|mukang)\s+(?:gamit na|ginamit|luma|second ?hand|used)(?!\w)",
+        r"(?:not brand new|second ?hand)(?!\w)",
+        # "medyo basag sya"
+        r"(?:medyo|mejo|medjo)\s+basag(?!\w)",
+        r"mas malakas pa\s+(?:ang\s+)?(?:sound|tunog|volume|speaker)\s+ng\s+(?:cp|phone|cellphone)(?!\w)",
+        # stiff or hard to use
+        r"(?:sobrang|masyadong|napaka)\s*tigas(?!\w)",
+        r"hard (?:to )?press(?!\w)",
+        r"hirap\s+(?:pa\s+)?(?:pindutin|buksan|hilahin|isaksak|ikabit|i ?connect|iapply)(?!\w)",
+        r"(?:wonky|difficult to connect)(?!\w)",
+        # too light, all plastic
+        r"masyado(?:ng)?\s+magaan(?!\w)",
+        r"(?:super|puro)\s+(?:fake\s+)?plastic(?!\w)",
+        # cannot carry the weight
+        rf"{_NOT_WIDE}\s+(?:nya\s+|niya\s+)?(?:kinakaya|kaya)\s+(?:yung|ung|ang)\s+bigat(?!\w)",
+        r"malabo\s+(?:ang\s+|yung\s+|ung\s+)?(?:print|screen|camera|video|tunog|sound|mic)(?!\w)",
+        r"expected ko\s+(?:makapal|matibay|malakas)(?!\w)",
     )
 )
 # Damage that leaves the product usable. Counted only when it is on the
 # product, not on the box.
 COSMETIC = re.compile(
     r"(?<!\w)(?:may (?:konti(?:ng)?|kunti(?:ng)?|maliit na) (?:basag|sira|damage|tama|crack)|dents?|dented|gasgas|scratch(?:es|ed)?|yupi|nayupi|may (?:mga )?butas|punit|tastas|cracks?|cracked|tuklap"
-    r"|ukab|kalawang|tabingi|baliko)(?!\w)",
+    r"|ukab|kalawang|tabingi|baliko|stains?|mantsa|dirty|dusty|madumi|marumi|kupas|nakaangat|umangat|nakabuka|meron(?:g)? butas)(?!\w)",
     re.IGNORECASE,
 )
 PACKAGING = frozenset(
@@ -167,7 +208,7 @@ NEGATED_INSIDE = re.compile(
 )
 # "may nababasa ako sa comments na mabilis nasira": someone else's report.
 HEARSAY_BEFORE = re.compile(
-    r"(?<!\w)(?:nababasa|nabasa|comments?|reviews?|sabi nila|sabi ng iba)\s+(?:[\w']+\s+){0,5}$", re.IGNORECASE
+    r"(?<!\w)(?:nababasa|nabasa|comments|reviews|sabi nila|sabi ng iba)\s+(?:[\w']+\s+){0,5}$", re.IGNORECASE
 )
 
 
@@ -194,6 +235,12 @@ def not_as_described_spans(normalized: str) -> list[tuple[int, int]]:
     return sorted(set(spans))
 
 
+# "pag mahina lang ang volume": a condition, not a complaint.
+CONDITION_BEFORE = re.compile(r"(?<!\w)(?:pag|kapag|kung|if|when)\s+(?:[\w']+\s+){0,1}$", re.IGNORECASE)
+# "ang hina na nya mag charge": slow charging is a defect (guide 1.3), not poor quality.
+CHARGING_AFTER = re.compile(r"\s*(?:[\w']+\s+){0,3}(?:mag ?charge|magcharge|charge)(?!\w)", re.IGNORECASE)
+
+
 def _on_the_box(normalized: str, span: tuple[int, int], reach: int = 5) -> bool:
     before = re.findall(r"[\w']+", normalized[: span[0]])[-reach:]
     after = re.findall(r"[\w']+", normalized[span[1]:])[:reach]
@@ -209,6 +256,8 @@ def quality_spans(normalized: str) -> list[tuple[int, int]]:
         if not NEGATED_BEFORE.search(normalized[: found.start()])
         and not NEGATED_INSIDE.search(found.group(0))
         and not HEARSAY_BEFORE.search(normalized[: found.start()])
+        and not CONDITION_BEFORE.search(normalized[: found.start()])
+        and not ("hina" in found.group(0).casefold() and CHARGING_AFTER.match(normalized[found.end():]))
     ]
     spans += [
         found.span()

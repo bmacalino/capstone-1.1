@@ -1,0 +1,152 @@
+# Possible fake, look-alikes: "fake", "original", "scam" and brand names used
+# without saying the product is not the real thing. Modelled on what the
+# trained model wrongly scored high on validation sentences.
+original talaga, na verify ko sa website
+legit na original, may serial at hologram
+100% authentic, chineck ko sa app
+tunay na samsung, lumabas sa phone ko na super fast charging
+orig na jbl, nag connect sa jbl app
+hindi fake, pinatingnan ko pa sa service center
+di sya peke, legit na legit
+not fake, verified on the official site
+this is the real deal, serial checks out
+genuine product, registered the warranty without issue
+authentic anker, works with my macbook
+original po ito, same sa binili ko sa mall
+kaparehong kapareho ng original ko kasi original din
+akala ko fake, original pala
+akala ko peke kasi mura, legit pala
+kala ko class a lang, tunay pala
+i thought it was fake because of the price but it is genuine
+i was worried it was a copy, it is not
+duda ako nung una pero original pala nung chineck ko
+nagduda ako kasi mura pero authentic naman
+pero mukhang puro peke yung mga 5 star review
+fake yung mga review, hindi naman maganda
+fake reviews lang yung nasa taas
+ang daming fake na feedback dito
+fake seller, hindi nagpapadala
+fake ang tracking number na binigay
+fake yung voucher hindi gumana
+fake news yung sabi na mabilis mag deliver
+those five star reviews look fake
+fake tracking, parcel never moved
+scam to, hindi dumating yung order ko
+scam, walang laman yung box
+scam, isa lang dumating sa dalawang order
+scammer yung seller, hindi nagre reply
+definitely a scam, they sent an empty box
+this is a scam, item never arrived
+scam talaga, sira yung pinadala ## defect
+scam, ayaw gumana pagdating ## defect
+na scam ako, kulang yung item
+budol, ang liit pala
+na budol ako sa free shipping haha
+budol is real, ang ganda kasi
+fake ung 20000mah, 5000 lang ata ## not_as_described
+fake yung capacity na nakalagay ## not_as_described
+peke yung 65w, 10w lang lumalabas ## not_as_described
+fake ads, hindi ganyan yung dumating ## not_as_described
+fake yung blood pressure reading nya ## not_as_described
+hindi totoong 5g to ## not_as_described
+hindi totoong 10 meters ## not_as_described
+parang original ang tunog, solid
+tunog original, ang lakas ng bass
+kasing ganda ng original
+kalidad pang original
+as good as the original one i had
+sounds just like my old jbl
+mas maganda pa sa original kong charger
+mas mabilis pa sa original na adapter ng cp ko
+better than the original cable that came with my phone
+pamalit sa original kong charger na nasira
+replacement to sa original na cable ko na naputol
+this replaces the original charger that broke after a year
+nasira na kasi yung original na remote kaya bumili ako
+nawala yung original kong earbuds kaya ito muna
+the original one stopped working so i got this
+yung original price 999, nabili ko ng 499
+ang taas ng original price pero naka sale
+original price is too high, wait for a sale
+nasa original box pa, sealed
+original packaging, walang sira
+may kasamang original na resibo
+original na kulay yung pinili ko, black
+bumili ako dati ng original sa mall, mas mahal pero pareho lang
+mas mura dito kesa sa official store pero pareho naman
+same lang sa binili ko sa mall
+sa official store ako bumili para sure
+sa flagship store ko binili kaya panatag ako
+bought from the official store so i know it is real
+thanks samsung ph
+salamat realme, mabilis dumating
+anker never disappoints
+jbl talaga pag dating sa tunog
+realme user ako kaya realme din ang charger
+compatible sa samsung at iphone
+pwede sa realme, oppo at vivo
+works with my sony tv
+gamit ko sa xiaomi ko, ok naman
+local brand lang pero matibay
+hindi sikat yung brand pero maganda
+unbranded pero ok naman, yun naman talaga nakalagay
+generic lang pero yun naman ang binili ko, ok
+no name brand but works well, as listed
+oem naman talaga nakalagay sa listing, ok lang
+replica naman talaga nakasulat kaya alam ko na
+class 10 yung sd card, mabilis mag save
+class 10 at u3, pwede sa 4k
+na copy ko agad lahat ng files
+mabilis mag copy ng movies sa flashdrive
+copy paste lang ng files, walang error
+kopya lang ako ng review ng iba haha ok naman kasi
+pwede mag clone ng app sa phone na to
+dual apps or clone apps supported
+imitation leather yung strap pero komportable
+faux leather case, maganda
+iba sa picture
+iba yung kulay na dumating
+not the item i ordered
+hindi yan yung order ko
+wrong item
+sayang pera
+huwag na kayong bibili
+not impressed
+ang pangit ng customer service
+gusto pa dalhin sa service center e malayo kami
+sulit binayad ko
+ok naman sya
+gumagana naman po
+hindi totoo yung sabi na mahina, malakas naman
+di naman totoo na madaling masira
+legit seller, mabilis mag ship
+legit na mabilis mag charge
+legit ang ganda
+super legit, recommended
+legit check: pasado
+mukhang legit naman, wala akong napansing kakaiba
+i checked for signs of a fake and found none
+no signs of being counterfeit
+box, logo and serial all match the real one
+tinignan ko yung logo at serial, tama lahat
+may hologram at warranty card, kumpleto
+na register ko yung warranty sa site ng brand
+nag pop up agad sa iphone, tunay
+lumabas sa find my, original nga
+detected agad ng jbl app
+sabi ng cp ko fast charging, original cable nga
+hindi ko alam kung original pero ang ganda ng tunog
+di ko sure kung orig, di ko pa na check
+original ba to? di ko pa alam
+is this original? i have not checked yet
+paano malalaman kung original?
+sana original
+sana hindi fake yung dumating sa susunod
+hope it is authentic
+may nabasa akong fake daw pero sa akin tunay
+sabi ng iba peke daw, pero na verify ko naman
+others say it is fake but mine passed the check
+yung nabili ko sa ibang shop ang peke, ito tunay
+sa ibang store ako na fake, dito legit
+the one from the other shop was a replica, this one is real
+di tulad ng nabili ko sa iba na class a, ito original

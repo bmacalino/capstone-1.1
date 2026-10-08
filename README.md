@@ -76,11 +76,14 @@ To run the older TF-IDF model instead (the research baseline), set
 `$env:DEFAKETIVE_SENTIMENT_MODEL = "tfidf"` before starting the app.
 
 The safety and defect checks also use small learned models, stored in git under
-`sentiment-analysis\models\`. The app serves `hazard_classifier_v5` (rebuild with
-`research\train_candidate_v4.py --ordinary`): a safety model trained on the
-team's labels, and a defect model trained on every labelled round, most of them
-labelled by the AI assistant and not yet audited (`research\RESULTS_TABLES.md`,
-Table 11j). A folder refuses to load if its files, the keyword lists or the
+`sentiment-analysis\models\`. The app serves `hazard_classifier_v6`: a defect
+model trained on every labelled round (rebuild with
+`research\train_candidate_v4.py --ordinary`) and a safety filter that can only
+remove a keyword safety flag, never one about fire, smoke or shock (rebuild with
+`research\train_with_synthetic.py --freeze-safety`). Most of the labels were
+proposed by the AI assistant, and the safety filter also learned from sentences
+the assistant wrote, which are used for training only
+(`research\RESULTS_TABLES.md`, Table 11j). A folder refuses to load if its files, the keyword lists or the
 sentiment model it was built with have changed. Fake-product reports come from
 keyword rules, and so do two labels that only inform: "poor quality" and "not
 as advertised" are shown in the report and never change a verdict. To choose

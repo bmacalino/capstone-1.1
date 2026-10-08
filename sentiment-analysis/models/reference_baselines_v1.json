@@ -1,0 +1,28 @@
+{
+ "version": "reference-baselines-1.0.0",
+ "built_at": "2026-10-08T15:52:50+00:00",
+ "measured_with": "defaketive-hazard-lexicon-0.3.0+rules0.4+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "source": "research/build_reference_baselines.py (research/reference_baselines_report.json)",
+ "note": "Median flagged-review rate over saved gadget listings, star-weighted. In the checker's own units: rebuild when the checker changes.",
+ "default_product_type": "gadget",
+ "product_types": {
+  "gadget": {
+   "defect": {
+    "pooled_rate": 0.046515,
+    "listings": 59,
+    "median_ci_95": [
+     0.032787,
+     0.059768
+    ]
+   },
+   "counterfeit": {
+    "pooled_rate": 0.0,
+    "listings": 59,
+    "median_ci_95": [
+     0.0,
+     0.0
+    ]
+   }
+  }
+ }
+}

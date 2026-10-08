@@ -1,0 +1,117 @@
+{
+ "quality": {
+  "yes_both_readings": 56,
+  "yes_first_only": 5,
+  "yes_second_only": 15,
+  "first_yes_kept": 0.918,
+  "second_yes_that_were_yes_before": 0.789,
+  "f1_in_sample": 0.848,
+  "f1_weighted_to_all_dev": 0.792,
+  "weighted": [
+   257,
+   23,
+   112
+  ],
+  "rule_flags_in_sample": 50,
+  "rule_flags_right_first": 41,
+  "rule_flags_right_second": 48,
+  "disagreements": {
+   "first_only": [
+    5,
+    78,
+    108,
+    222,
+    230
+   ],
+   "second_only": [
+    1,
+    57,
+    74,
+    100,
+    114,
+    120,
+    136,
+    156,
+    175,
+    206,
+    235,
+    260,
+    262,
+    294,
+    297
+   ]
+  }
+ },
+ "not_as_described": {
+  "yes_both_readings": 54,
+  "yes_first_only": 1,
+  "yes_second_only": 8,
+  "first_yes_kept": 0.982,
+  "second_yes_that_were_yes_before": 0.871,
+  "f1_in_sample": 0.923,
+  "f1_weighted_to_all_dev": 0.867,
+  "weighted": [
+   180,
+   3,
+   52
+  ],
+  "rule_flags_in_sample": 34,
+  "rule_flags_right_first": 31,
+  "rule_flags_right_second": 33,
+  "disagreements": {
+   "first_only": [
+    215
+   ],
+   "second_only": [
+    36,
+    63,
+    124,
+    125,
+    141,
+    237,
+    310,
+    311
+   ]
+  }
+ },
+ "counterfeit": {
+  "yes_both_readings": 49,
+  "yes_first_only": 11,
+  "yes_second_only": 6,
+  "first_yes_kept": 0.817,
+  "second_yes_that_were_yes_before": 0.891,
+  "f1_in_sample": 0.852,
+  "f1_weighted_to_all_dev": 0.792,
+  "weighted": [
+   141,
+   32,
+   42
+  ],
+  "rule_flags_in_sample": 54,
+  "rule_flags_right_first": 45,
+  "rule_flags_right_second": 47,
+  "disagreements": {
+   "first_only": [
+    10,
+    15,
+    49,
+    75,
+    107,
+    161,
+    260,
+    263,
+    282,
+    308,
+    310
+   ],
+   "second_only": [
+    50,
+    124,
+    129,
+    189,
+    194,
+    228
+   ]
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "rule": "Which listings, written before any was scanned: from each of the seven\nLazada discovery files in research/data, the four listings with the most\nreported reviews whose name passes the gadget word test\n(gadget_scope.mentions_gadget); ties go to the link that sorts first, and a\nlisting is taken once. Up to 28.",
+ "listings": {
+  "5261974515": {
+   "type": "audio",
+   "item_id": "5261974515",
+   "link": "https://www.lazada.com.ph/products/pdp-i5261974515.html",
+   "name": "Lenovo ERAZER XF22 Sports Wireless Headphones With Mic Waterproof Bone Conduction Headsets 5.4 Sports Bluetooth Earphones",
+   "reported_reviews": 426,
+   "status": "skipped",
+   "reviews": 0,
+   "exit": 0,
+   "seconds": 292,
+   "last_lines": [
+    "Processing Lazada products:   0%|          | 0/1 [00:00<?, ?it/s]",
+    "Processing Lazada products: 100%|##########| 1/1 [04:40<00:00, 280.87s/it]",
+    "Processing Lazada products: 100%|##########| 1/1 [04:40<00:00, 280.87s/it]"
+   ],
+   "scanned_at": "2026-10-08T03:07:33+00:00"
+  }
+ }
+}

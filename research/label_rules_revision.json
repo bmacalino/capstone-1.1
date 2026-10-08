@@ -1,0 +1,234 @@
+{
+  "split": "one review in three held out by a hash of its id; only the dev part was read",
+  "rule": "keep a label's revised rules only if held-out F1 rises and precision falls by at most 0.05",
+  "before": {
+    "at": "2026-10-08T08:55:16+00:00",
+    "labels": {
+      "quality": {
+        "dev": {
+          "sentences": 3295,
+          "tp": 187,
+          "fp": 9,
+          "fn": 113,
+          "precision": 0.9541,
+          "recall": 0.6233,
+          "f1": 0.754
+        },
+        "held_out": {
+          "sentences": 1748,
+          "tp": 93,
+          "fp": 5,
+          "fn": 82,
+          "precision": 0.949,
+          "recall": 0.5314,
+          "f1": 0.6813
+        }
+      },
+      "counterfeit": {
+        "dev": {
+          "sentences": 3244,
+          "tp": 93,
+          "fp": 21,
+          "fn": 54,
+          "precision": 0.8158,
+          "recall": 0.6327,
+          "f1": 0.7126
+        },
+        "held_out": {
+          "sentences": 1731,
+          "tp": 46,
+          "fp": 7,
+          "fn": 18,
+          "precision": 0.8679,
+          "recall": 0.7188,
+          "f1": 0.7863
+        }
+      },
+      "not_as_described": {
+        "dev": {
+          "sentences": 3295,
+          "tp": 86,
+          "fp": 4,
+          "fn": 82,
+          "precision": 0.9556,
+          "recall": 0.5119,
+          "f1": 0.6667
+        },
+        "held_out": {
+          "sentences": 1748,
+          "tp": 47,
+          "fp": 4,
+          "fn": 40,
+          "precision": 0.9216,
+          "recall": 0.5402,
+          "f1": 0.6812
+        }
+      }
+    }
+  },
+  "after": {
+    "at": "2026-10-08T09:04:27+00:00",
+    "labels": {
+      "quality": {
+        "dev": {
+          "sentences": 3295,
+          "tp": 231,
+          "fp": 13,
+          "fn": 69,
+          "precision": 0.9467,
+          "recall": 0.77,
+          "f1": 0.8493
+        },
+        "held_out": {
+          "sentences": 1748,
+          "tp": 105,
+          "fp": 8,
+          "fn": 70,
+          "precision": 0.9292,
+          "recall": 0.6,
+          "f1": 0.7292
+        }
+      },
+      "counterfeit": {
+        "dev": {
+          "sentences": 3244,
+          "tp": 107,
+          "fp": 11,
+          "fn": 40,
+          "precision": 0.9068,
+          "recall": 0.7279,
+          "f1": 0.8075
+        },
+        "held_out": {
+          "sentences": 1731,
+          "tp": 46,
+          "fp": 6,
+          "fn": 18,
+          "precision": 0.8846,
+          "recall": 0.7188,
+          "f1": 0.7931
+        }
+      },
+      "not_as_described": {
+        "dev": {
+          "sentences": 3295,
+          "tp": 127,
+          "fp": 6,
+          "fn": 41,
+          "precision": 0.9549,
+          "recall": 0.756,
+          "f1": 0.8439
+        },
+        "held_out": {
+          "sentences": 1748,
+          "tp": 47,
+          "fp": 5,
+          "fn": 40,
+          "precision": 0.9038,
+          "recall": 0.5402,
+          "f1": 0.6763
+        }
+      }
+    }
+  },
+  "decision": {
+    "quality": {
+      "held_out_f1": [
+        0.6813,
+        0.7292
+      ],
+      "held_out_precision": [
+        0.949,
+        0.9292
+      ],
+      "keep": true
+    },
+    "counterfeit": {
+      "held_out_f1": [
+        0.7863,
+        0.7931
+      ],
+      "held_out_precision": [
+        0.8679,
+        0.8846
+      ],
+      "keep": true
+    },
+    "not_as_described": {
+      "held_out_f1": [
+        0.6812,
+        0.6763
+      ],
+      "held_out_precision": [
+        0.9216,
+        0.9038
+      ],
+      "keep": false
+    }
+  },
+  "final": {
+    "at": "2026-10-08T09:05:53+00:00",
+    "labels": {
+      "quality": {
+        "dev": {
+          "sentences": 3295,
+          "tp": 231,
+          "fp": 13,
+          "fn": 69,
+          "precision": 0.9467,
+          "recall": 0.77,
+          "f1": 0.8493
+        },
+        "held_out": {
+          "sentences": 1748,
+          "tp": 105,
+          "fp": 8,
+          "fn": 70,
+          "precision": 0.9292,
+          "recall": 0.6,
+          "f1": 0.7292
+        }
+      },
+      "counterfeit": {
+        "dev": {
+          "sentences": 3244,
+          "tp": 108,
+          "fp": 15,
+          "fn": 39,
+          "precision": 0.878,
+          "recall": 0.7347,
+          "f1": 0.8
+        },
+        "held_out": {
+          "sentences": 1731,
+          "tp": 46,
+          "fp": 6,
+          "fn": 18,
+          "precision": 0.8846,
+          "recall": 0.7188,
+          "f1": 0.7931
+        }
+      },
+      "not_as_described": {
+        "dev": {
+          "sentences": 3295,
+          "tp": 86,
+          "fp": 4,
+          "fn": 82,
+          "precision": 0.9556,
+          "recall": 0.5119,
+          "f1": 0.6667
+        },
+        "held_out": {
+          "sentences": 1748,
+          "tp": 47,
+          "fp": 4,
+          "fn": 40,
+          "precision": 0.9216,
+          "recall": 0.5402,
+          "f1": 0.6812
+        }
+      }
+    }
+  }
+}

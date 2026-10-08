@@ -33,7 +33,14 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from . import hazard_taxonomy as taxonomy
 from . import text_norm
-from .extra_labels import EXTRA_TAGS, NOT_AS_DESCRIBED, QUALITY, not_as_described_spans, quality_spans
+from .extra_labels import (
+    EXTRA_RULES_REVISION,
+    EXTRA_TAGS,
+    NOT_AS_DESCRIBED,
+    QUALITY,
+    not_as_described_spans,
+    quality_spans,
+)
 from .model import DefaketiveSentimentModel
 from .product_badges import (
     CATEGORIES,
@@ -240,6 +247,41 @@ PICTURE_TERM = "iba sa picture"
 # Served by the app since 8 Oct 2026, when the report screens gained the two
 # labels (research/RESULTS_TABLES.md, Table 11i).
 SHIPPED_COUNTERFEIT_RULES = EXTRA_RULES
+
+# Rules c2, second revision (8 Oct 2026): more ways of calling something a
+# copy, and three uses of "fake" that are not about the product. Written from
+# two thirds of the labelled sentences and checked on the third
+# (research/improve_label_rules.py). Used only under c2.
+_BRAND = (
+    r"(?:samsung|realme|sandisk|jbl|apple|anker|xiaomi|oppo|vivo|sony|lenovo|ugreen|baseus|logitech|kingston|nokia"
+    r"|iphone|airpods)"
+)
+# "hindi samsung", "sd card not sandisk", "di realme to"
+BRAND_DENIAL = re.compile(rf"(?<!\w)(?:{_NOT}\s+(?:(?:sya|siya|to|ito|naman|po)\s+)?{_BRAND})(?!\w)", re.IGNORECASE)
+# ...unless it is the reviewer's own device: "hindi samsung ang phone ko"
+BRAND_OF_OWN_DEVICE = re.compile(r"\s+(?:(?:ang|yung|ung)\s+)?(?:phone|cp|cellphone|gamit|unit|charger)\s+ko(?!\w)", re.IGNORECASE)
+COUNTERFEIT_PHRASES_C2 = tuple(
+    re.compile(rf"(?<!\w)(?:{pattern})(?!\w)", re.IGNORECASE)
+    for pattern in (
+        # "i know di to original"
+        rf"{_NOT}\s+to\s+{_REAL}",
+        # "akala ko legit na orig ang dumating"
+        rf"(?:akala|kala)\s*(?:ko|q)\s+(?:pa naman\s+)?{_REAL}",
+        # "quite similar to the original", "almost original"
+        rf"(?:similar to|almost)\s+(?:the\s+)?{_REAL}",
+        r"copy ?cut|copycat|parang xerox|xerox (?:copy )?(?:lang|lng)",
+        # "pekeng pekeng product nyo", but not "pekeng reviews"
+        r"pekeng(?:\s+pekeng)?\s+(?!reviews?\b|account\b|seller\b|news\b)\w+",
+        # a battery filled with sand
+        r"buhangin\s+(?:lang\s+)?(?:ang\s+)?laman",
+    )
+) + (BRAND_DENIAL,)
+# "fake reviews", "fake seller", "fake ba to?", "it seems fake", "did i get a fake one?"
+FAKE_NOT_THE_PRODUCT = re.compile(
+    r"(?<!\w)(?:(?:fake|peke)\s+(?:\w+\s+){0,2}(?:reviews?|seller|account|news)|reviews?\s+(?:\w+\s+){0,2}(?:fake|peke)"
+    r"|(?:fake|peke)\s+ba|seems?\s+(?:\w+\s+)?(?:fake|peke)|(?:fake|peke)\s+one\s*\?)(?!\w)",
+    re.IGNORECASE,
+)
 
 
 def _merged(spans: Iterable[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -648,8 +690,11 @@ class LexiconHazardTagger:
                             confidence[category] = about_the_product
                     continue
                 if combine.get(category) == "and":
-                    # A filter: it can drop a keyword flag, never add one.
-                    if not on and category in tags:
+                    # A filter: it can drop a keyword flag, never add one. Where the
+                    # folder says so, a flag above a given severity is not its to drop.
+                    spare = getattr(self.learned, "filter_spares", {}).get(category)
+                    serious = spare is not None and severities.get(category, 0) > spare
+                    if not on and category in tags and not serious:
                         tags.remove(category)
                         scores.pop(category, None)
                         confidence.pop(category, None)
@@ -689,10 +734,13 @@ class LexiconHazardTagger:
                         "rule": COUNTERFEIT_RULES,
                     }
                 )
+            # Rules c2: "fake reviews", "fake seller", "fake ba to?" are not about the product.
+            elsewhere = self.counterfeit_rules == EXTRA_RULES and bool(FAKE_NOT_THE_PRODUCT.search(normalized))
             strong = [
                 match
                 for match in counted
                 if match["ngram"] not in WEAK_COUNTERFEIT_TERMS
+                and not (elsewhere and match["ngram"] in ("fake", "peke"))
                 and not ("legit" in match["ngram"] and self._spec_claim(raw, match))
                 and not self._described_term(match, shown)
             ]
@@ -706,6 +754,8 @@ class LexiconHazardTagger:
                     if all(m["ngram"] in WEAK_COUNTERFEIT_TERMS for m in counted)
                     else NOT_AS_DESCRIBED
                     if any(self._described_term(m, shown) for m in counted)
+                    else "not_about_the_product"
+                    if elsewhere
                     else "spec_claim"
                 )
             elif COUNTERFEIT not in tags and phrase is not None:
@@ -745,6 +795,10 @@ class LexiconHazardTagger:
         if not shown:
             return False
         if match["ngram"] == PICTURE_TERM:
+            return True
+        # "hindi photochromic ... hindi naman legit": beside a disputed feature or
+        # photo, "not legit" is about the claim (second revision of rules c2).
+        if "legit" in match["ngram"]:
             return True
         span = match.get("span")
         if match["ngram"] not in ("fake", "peke") or not span:
@@ -791,11 +845,14 @@ class LexiconHazardTagger:
 
     def _counterfeit_phrase(self, normalized: str) -> tuple[int, int] | None:
         """The first comparison-with-the-original phrase that is a report."""
-        for pattern in COUNTERFEIT_PHRASES:
+        patterns = COUNTERFEIT_PHRASES + (COUNTERFEIT_PHRASES_C2 if self.counterfeit_rules == EXTRA_RULES else ())
+        for pattern in patterns:
             for found in pattern.finditer(normalized):
                 if _speculative(normalized, found.start()):
                     continue
                 if SPEC_CLAIM_AFTER.match(normalized[found.end() :]):
+                    continue
+                if pattern is BRAND_DENIAL and BRAND_OF_OWN_DEVICE.match(normalized[found.end() :]):
                     continue
                 return found.span()
         return None
@@ -866,10 +923,20 @@ class HazardBadgeModel:
             gated_rules = f"+{LEARNED_ADD_RULES}" if getattr(learned, "needs_sentiment", False) else ""
             hazard_version = f"{base_version}+{learned.version}{gated_rules}"
         if getattr(self.tagger, "counterfeit_rules", None):
-            hazard_version = f"{hazard_version}+{self.tagger.counterfeit_rules}"
+            # The two informational labels' patterns carry their own revision.
+            revision = EXTRA_RULES_REVISION if self.tagger.counterfeit_rules == EXTRA_RULES else ""
+            hazard_version = f"{hazard_version}+{self.tagger.counterfeit_rules}{revision}"
         self.model_version = (
             f"{hazard_version}+{sentiment_version}" if sentiment_version else hazard_version
         )
+        # The typical rates a verdict is compared with are measured with one
+        # checker (research/build_reference_baselines.py). `checker_version` is
+        # what they are matched against; the baseline's own version joins
+        # model_version so saved reports are redone when the line moves.
+        self.checker_version = self.model_version
+        baselines_version = (getattr(self.aggregator, "baselines", None) or {}).get("version")
+        if baselines_version:
+            self.model_version = f"{self.model_version}+{baselines_version}"
 
     def fingerprint(self, review: object) -> str:
         return self.sentiment.fingerprint(review)

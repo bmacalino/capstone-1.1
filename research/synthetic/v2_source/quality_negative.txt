@@ -1,0 +1,153 @@
+# Poor quality, look-alikes: the same words, not a poor-quality report.
+# Modelled on what the trained model wrongly scored high on validation
+# sentences. "## defect" marks a line that is a fault report instead.
+malakas yung tunog ng speaker, hindi basag
+maganda ang sound hindi sabog kahit todo
+ok naman tunog walang crack kahit malakas
+sound quality: maganda, malinaw ang bass
+sound quality: 5
+sound quality: sakto lang sa presyo
+sound quality: very good
+sound quality: yes
+quality: ok naman
+quality is okay
+maganda ang quality niya, makapal yung plastic
+high quality materials, solid sa kamay
+good quality for the price, sturdy
+hindi manipis yung cable, makapal at matibay
+makapal yung wire di gaya ng iba
+matibay yung stand kahit mabigat yung tablet
+hindi mahina yung hangin, malamig pa
+di naman maingay yung fan tahimik nga eh
+walang gasgas pagdating, maayos lahat
+wala namang yupi o dent ang unit
+no scratches, no dents, looks brand new
+walang delay yung mic sabay sa tugtog
+hindi delay yung sound sa games
+no lag at all when gaming
+malinaw yung camera kahit gabi
+malinaw ang boses sa call sabi ng kausap ko
+hindi malabo yung screen, sharp nga
+hindi maluwag yung saksakan sakto lang
+mahigpit ang kapit ng holder
+magaan kaya madaling dalhin sa byahe
+ang gaan sa kamay di nakakangalay gamitin
+manipis sya kaya kasya sa bulsa, gusto ko yun
+slim at magaan, perfect sa bag
+lightweight and easy to carry around
+thin design, fits in my laptop sleeve
+tahimik yung keys, di maingay mag type
+malambot pindutin yung keys, ang sarap gamitin
+smooth yung scroll ng mouse
+mabilis yung response ng remote
+mabilis mag transfer ng files
+pag mahina lang yung volume ok na ok sya
+kapag malayo ka sa router syempre hihina signal
+kung mahina yung wifi nyo wag nyo isisi sa item
+if you keep the volume low it sounds fine
+mahina lang muna pinatugtog ko kasi gabi na
+hininaan ko lang kasi tulog na si baby
+nilakasan ko todo, walang basag
+sana matibay to at tumagal
+sana di madaling masira
+hope it lasts long
+di ko pa alam kung matibay, kakarating lang
+di ko pa na try yung mic
+hindi ko pa nasusubukan sa malakas na volume
+will update kung matibay
+nabasa ko sa reviews na mahina daw pero sakin ok naman
+sabi ng iba madali daw masira, sa akin isang taon na
+may nababasa ako na maingay daw, hindi naman
+others say the sound is weak but mine is loud
+mahina ba talaga to o sa cp ko lang?
+ganito ba talaga kaingay yung fan?
+normal lang ba na medyo magaan?
+is it supposed to be this light?
+yung luma kong speaker mahina na kaya bumili ako nito
+mahina na kasi yung dati kong powerbank
+yung dati kong headset ang nipis ng wire, ito makapal
+my old mouse was laggy, this one is not
+sira yung mic pagdating ## defect
+kaso basag po yung screen pagkabukas ## defect
+basag ang lcd upon opening ## defect
+basag yung isang earbud ayaw na tumunog ## defect
+sira yung left side walang tunog ## defect
+hindi gumagana yung remote ## defect
+di na nag oon after 2 days ## defect
+ayaw mag charge kahit anong cable ## defect
+yung isang speaker walang tunog ## defect
+biglang namatay tapos di na nabuhay ## defect
+namamatay bigla yung mouse habang ginagamit ## defect
+putol putol yung sounds tapos nawala na ## defect
+dead on arrival ## defect
+one side stopped working after a week ## defect
+the mic does not work at all ## defect
+sira yung cord ng remote pagdating ## defect
+ang tagal mag charge inabot ng 8 hours ## defect
+mabagal mag charge yung powerbank ## defect
+slow charging even with the original adapter ## defect
+mabilis malowbat wala pang isang oras ## defect
+yupi yung box pero ok naman yung laman
+sira yung karton pero walang damage ang unit
+basag yung packaging, buti buo yung item
+gasgas yung box lang, yung item makinis
+box was dented but the product is fine
+walang bubble wrap pero buo naman dumating
+hindi naka bubble wrap, pasalamat na lang at ok
+poor packaging, nilagay lang sa plastic
+di maayos pagkakabalot ni seller
+punit yung plastic ng parcel
+mabagal dumating, isang linggo bago na deliver
+ang bagal ng shipping pero ok yung item
+mabagal mag reply si seller
+slow delivery but the product is good
+delay yung delivery ng tatlong araw
+may delay sa courier pero dumating naman
+maingay yung rider kumatok ng madaling araw haha
+maingay sa labas kaya nilakasan ko, rinig pa rin
+maingay kasi yung luma kong fan kaya ito binili ko
+manipis lang yung bubble wrap pero ok naman
+manipis yung karton na pinaglagyan
+maliit lang pala sya kesa sa inaakala ko
+mas maliit kaysa sa picture pero ayos lang
+maliit pero malakas
+mura lang pero maganda
+mura na matibay pa
+cheap but works great
+mura kaya di na ako nag expect, pero nagulat ako maganda
+ang hirap lang ibalik kasi malayo kami
+hirap kausap ng seller
+mahirap hanapin sa mall kaya dito ako bumili
+medyo mahirap intindihin yung manual chinese kasi
+hindi kita masyado sa pic pero maganda sya
+di ko makuhanan ng maayos na picture sorry
+malabo yung video ko pasensya na
+malabo kuha ko kasi gabi na
+pasensya malabo camera ng cp ko
+may plastic cover pa pala yung screen akala ko gasgas
+akala ko gasgas, protective film lang pala
+akala ko mahina, malakas pala
+akala ko basag, sticker lang pala
+i thought it was scratched but it was just the film
+i thought the quality would be bad, but it's actually solid
+ok sana quality kaso mali yung kulay na pinadala
+maganda sana kaso kulang yung laman ng box
+okay yung unit, yung free gift lang ang wala
+loose lang yung turnilyo kaya hinigpitan ko, ok na
+niluwagan ko lang ng konti yung strap
+pinahina ko yung bass sa equalizer, mas ok
+tinodo ko yung bass ang lakas ng dagundong
+noise cancelling nya ok, tahimik sa loob
+may konting ingay sa labas pero di rinig pag suot
+static free at malinaw yung tawag
+hindi sya tunog lata, buo ang tunog
+di sya mukhang mumurahin, premium ang dating
+does not feel cheap at all
+doesn't wobble even on full extension
+hindi umuuga kahit naka full extend
+di natutumba kahit mahangin
+hindi natatanggal yung earbuds kahit tumakbo
+kapit na kapit yung magnet
+3 star lang kasi wala yung remote na kasama
+3 stars kasi late dumating
+binawasan ko ng star dahil sa courier

@@ -461,6 +461,76 @@ class TestMissingBaselines(unittest.TestCase):
         self.assertEqual(summary["safety"]["likelihood_basis"], "absolute_fallback")
 
 
+class TestDefaultProductType(unittest.TestCase):
+    """A baseline file may name the type every unnamed listing is compared with."""
+
+    DEFAULT = {
+        "version": "test-baselines-2",
+        "default_product_type": "gadget",
+        "product_types": {
+            "gadget": {"defect": {"pooled_rate": 0.05}, "counterfeit": {"pooled_rate": 0.0}},
+            "power_bank": {"defect": {"pooled_rate": 0.20}},
+        },
+    }
+
+    def reviews(self, faulty):
+        return [review(f"d{i}", ("defect", True, None, "sira agad")) for i in range(faulty)] + [
+            clean(f"c{i}") for i in range(100 - faulty)
+        ]
+
+    def test_an_unnamed_listing_is_compared_with_the_default_type(self):
+        summary = ProductBadgeAggregator(baselines=self.DEFAULT).summarize(self.reviews(6))
+        flag = summary["flags"]["defect"]
+        # 6 in 100 is above the old 3% floor on its face; its lower bound is
+        # not above the 5% typical rate, so it is not a warning.
+        self.assertEqual(flag["state"], badges.NOT_FLAGGED)
+        self.assertEqual(flag["baseline_rate"], 0.05)
+        self.assertEqual(flag["baseline_source"], "test-baselines-2/gadget")
+        self.assertEqual(summary["verdict"]["state"], badges.NO_WARNING_SIGNS)
+
+    def test_a_rate_clearly_above_typical_still_warns(self):
+        summary = ProductBadgeAggregator(baselines=self.DEFAULT).summarize(self.reviews(20))
+        self.assertEqual(summary["flags"]["defect"]["state"], badges.FLAGGED)
+
+    def test_a_named_type_keeps_its_own_baseline(self):
+        summary = ProductBadgeAggregator(baselines=self.DEFAULT).summarize(self.reviews(20), product_type="power_bank")
+        self.assertEqual(summary["flags"]["defect"]["baseline_source"], "test-baselines-2/power_bank")
+        self.assertEqual(summary["flags"]["defect"]["state"], badges.NOT_FLAGGED)
+
+    def test_the_floor_still_holds_where_typical_is_zero(self):
+        fakes = [review(f"f{i}", ("counterfeit", True, None, "peke to")) for i in range(3)]
+        summary = ProductBadgeAggregator(baselines=self.DEFAULT).summarize(fakes + [clean(f"c{i}") for i in range(97)])
+        self.assertEqual(summary["flags"]["counterfeit"]["state"], badges.NOT_FLAGGED)
+
+    def test_without_a_default_an_unnamed_listing_has_no_baseline(self):
+        summary = ProductBadgeAggregator(baselines=BASELINES).summarize(self.reviews(6))
+        self.assertEqual(summary["flags"]["defect"]["state"], badges.NO_BASELINE)
+
+
+class TestShippedBaselines(unittest.TestCase):
+    """The measured line is in the checker's own units, so it goes stale with it."""
+
+    def test_the_baseline_file_was_measured_with_the_served_checker(self):
+        import json
+
+        if not badges.DEFAULT_BASELINES_PATH.is_file():
+            self.skipTest("no baseline file is installed")
+        baselines = json.loads(badges.DEFAULT_BASELINES_PATH.read_bytes().decode("utf-8"))
+        from defaketive_sentiment import registry
+        from defaketive_sentiment.transformer_sentiment import TransformerModelError
+
+        try:
+            model = registry.load_model(registry.HAZARD_BADGES)
+        except TransformerModelError:
+            self.skipTest("the sentiment model is not installed")
+        self.assertEqual(
+            baselines["measured_with"], model.checker_version,
+            "The checker changed since the typical rates were measured. Rebuild them: "
+            "python research/verdict_check.py --star-totals, then "
+            "python research/build_reference_baselines.py --write",
+        )
+
+
 class TestSimilarity(unittest.TestCase):
     def test_identical_text_is_maximally_similar(self):
         self.assertAlmostEqual(badges.cosine_similarity("nasunog agad", "nasunog agad"), 1.0)

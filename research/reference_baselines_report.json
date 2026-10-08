@@ -1,0 +1,59 @@
+{
+ "generated_at": "2026-10-08T16:18:51+00:00",
+ "measured_with": "defaketive-hazard-lexicon-0.3.0+rules0.4+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "listings": 59,
+ "enough_listings": true,
+ "rule": "typical = median listing rate; warn when a listing's lower bound is above max(typical, floor); leave-one-out",
+ "flags": {
+  "defect": {
+   "listings": 59,
+   "typical_rate_median": 0.046515,
+   "median_ci_95": [
+    0.032787,
+    0.059768
+   ],
+   "mean": 0.064105,
+   "percentiles": {
+    "25": 0.018259,
+    "50": 0.046515,
+    "75": 0.08193,
+    "90": 0.144676
+   },
+   "listings_with_rate_zero": 0,
+   "placeholder_floor": 0.03,
+   "warned_under_placeholder_floor": 15,
+   "warned_under_measured_line_leave_one_out": 10,
+   "line_in_use_if_written": 0.046515
+  },
+  "counterfeit": {
+   "listings": 59,
+   "typical_rate_median": 0.0,
+   "median_ci_95": [
+    0.0,
+    0.0
+   ],
+   "mean": 0.002104,
+   "percentiles": {
+    "25": 0.0,
+    "50": 0.0,
+    "75": 0.000272,
+    "90": 0.003141
+   },
+   "listings_with_rate_zero": 43,
+   "placeholder_floor": 0.02,
+   "warned_under_placeholder_floor": 0,
+   "warned_under_measured_line_leave_one_out": 0,
+   "line_in_use_if_written": 0.02
+  }
+ },
+ "safety": {
+  "listings_with_any_safety_flagged_review": 23,
+  "weighted_verdicts": {
+   "insufficient_evidence": 3,
+   "no_warning_signs": 31,
+   "possible_counterfeit_or_defect": 5,
+   "possible_safety_issue": 9,
+   "safety_warning": 11
+  }
+ }
+}

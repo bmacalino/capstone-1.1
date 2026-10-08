@@ -328,7 +328,12 @@ against 168. The models trained on the team's labels alone stay available
 as `hazard_classifier_v2b`. Since 8 Oct 2026 the report shows all five
 labels; the two rule-based newer ones inform only and never change a
 verdict (Table 11i). The owner accepted the AI labels unaudited the same
-day (departure 3), which changes no figure's status.
+day (departure 3), which changes no figure's status. With the adviser's
+approval (departure 4) the assistant then wrote 1,368 training sentences.
+Scored on real reviews only, they helped one label: a safety filter that
+keeps every real report in the held-back rounds and cuts false safety flags
+from 42 to 34 (`hazard_classifier_v6`, the app default; Table 11j, step 8).
+For the other four labels they changed nothing worth serving.
 
 ## 7b. Review sampling for product reports (Lazada)
 
