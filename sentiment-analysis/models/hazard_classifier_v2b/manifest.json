@@ -1,0 +1,89 @@
+{
+  "version": "hazard-learned-2.1.0",
+  "trained_at": "2026-10-07T15:15:11+00:00",
+  "refit_of": "hazard_classifier_v2: same data and recipes, keyword features taken under rules 0.4",
+  "keyword_rules": "0.4",
+  "categories": {
+    "safety": {
+      "file": "safety.joblib",
+      "sha256": "67b8fbbd16883ab950236cdc5ffe5112c4eb03dbcb7afd5bf24025352e715d11",
+      "candidate": "TK",
+      "threshold": 0.818933,
+      "combine": "decide",
+      "needs_embedding": false,
+      "training_rows": 873,
+      "training_positives": 30,
+      "training_data": "labelling round 1 (A1, A2)"
+    },
+    "defect": {
+      "file": "defect.joblib",
+      "sha256": "9806153404ab665219038b1e800f755cd121d554bc2e1d08b76f128fac2fa233",
+      "candidate": "TK",
+      "threshold": 0.479863,
+      "combine": "or_gated",
+      "gate": "sentence sentiment is not positive",
+      "needs_embedding": false,
+      "training_rows": 1322,
+      "training_positives": 323,
+      "training_data": "labelling rounds 1 (A1, A2) and 2 (A1, A2, A3)"
+    }
+  },
+  "keyword_files": {
+    "risk_lexicon.tsv": "c46a844844dc73e487dd3ce9684f0f6b9f5259ad83ea51a270a7616a19e26282",
+    "safety_false_friends_v1.tsv": "9754b41c50112893e9a3fa007921dc8b2317b78381dc3ffa32d3ce2db1ad918a",
+    "hazard_phrase_exclusions_v1.tsv": "bbcc404373f4f2e2655945b9a89d63831ba5d16413dcd7feccb2b4a9099a8dcd"
+  },
+  "embedding_model": null,
+  "sentiment_model": {
+    "model_version": "defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+    "model_sha256": "e04da4c268bc8ab94e27da2e0fb4206f38dadc43e9cfb52050818a5bb40c3478"
+  },
+  "qualified_for_integration": true,
+  "adoption": {
+    "adopted": true,
+    "checks": {
+      "defect_f1_not_lower": true,
+      "defect_recall_not_lower": true,
+      "safety_f1_not_lower": true,
+      "safety_recall_not_lower": true
+    },
+    "round3_shipped": {
+      "safety": {
+        "true_positives": 14,
+        "false_positives": 14,
+        "false_negatives": 5,
+        "precision": 0.5,
+        "recall": 0.7368,
+        "f1": 0.5957
+      },
+      "defect": {
+        "true_positives": 126,
+        "false_positives": 16,
+        "false_negatives": 53,
+        "precision": 0.8873,
+        "recall": 0.7039,
+        "f1": 0.785
+      }
+    },
+    "round3_refit": {
+      "safety": {
+        "true_positives": 14,
+        "false_positives": 14,
+        "false_negatives": 5,
+        "precision": 0.5,
+        "recall": 0.7368,
+        "f1": 0.5957
+      },
+      "defect": {
+        "true_positives": 126,
+        "false_positives": 15,
+        "false_negatives": 53,
+        "precision": 0.8936,
+        "recall": 0.7039,
+        "f1": 0.7875
+      }
+    },
+    "decided_at": "2026-10-07T15:18:36+00:00",
+    "report": "research\\hazard_tagger_measurement_round3_rules04.json"
+  }
+}

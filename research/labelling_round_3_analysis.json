@@ -1,0 +1,294 @@
+{
+  "generated_at": "2026-10-05T14:11:25+00:00",
+  "worksheets": [
+    "worksheet_A1_rhean_done.csv",
+    "GUYO_worksheet_A2_round3.xlsx",
+    "worksheet_Part3_A3_ryan.xlsx"
+  ],
+  "coverage": {
+    "rows_with_any_label": 600,
+    "rows_with_two_labels": 592,
+    "rows_with_consensus_on_any_category": 600,
+    "rows_agreed_on_all_categories": 438,
+    "consensus_rows_by_stratum": {
+      "defect_disagreement": 120,
+      "low_star": 130,
+      "random_all": 130,
+      "seed_hit": 220
+    },
+    "queue_rows_total": 600
+  },
+  "inter_annotator_agreement": {
+    "safety": {
+      "doubly_labelled_rows": 592,
+      "raw_agreement": 0.973,
+      "cohens_kappa": 0.6897,
+      "kappa_note": null,
+      "positives_annotator_a": 24,
+      "positives_annotator_b": 30,
+      "disagreement_rows": 16
+    },
+    "defect": {
+      "doubly_labelled_rows": 592,
+      "raw_agreement": 0.7635,
+      "cohens_kappa": 0.5213,
+      "kappa_note": null,
+      "positives_annotator_a": 215,
+      "positives_annotator_b": 283,
+      "disagreement_rows": 140
+    },
+    "counterfeit": {
+      "doubly_labelled_rows": 592,
+      "raw_agreement": 0.9848,
+      "cohens_kappa": 0.0,
+      "kappa_note": null,
+      "positives_annotator_a": 9,
+      "positives_annotator_b": 0,
+      "disagreement_rows": 9
+    }
+  },
+  "adjudication_queue": {
+    "safety": [
+      "r3-00100",
+      "r3-00103",
+      "r3-00135",
+      "r3-00163",
+      "r3-00253",
+      "r3-00306",
+      "r3-00347",
+      "r3-00358",
+      "r3-00387",
+      "r3-00447",
+      "r3-00450",
+      "r3-00460",
+      "r3-00494",
+      "r3-00497",
+      "r3-00541",
+      "r3-00557"
+    ],
+    "defect": [
+      "r3-00001",
+      "r3-00003",
+      "r3-00014",
+      "r3-00021",
+      "r3-00023",
+      "r3-00028",
+      "r3-00030",
+      "r3-00036",
+      "r3-00055",
+      "r3-00059",
+      "r3-00074",
+      "r3-00076",
+      "r3-00079",
+      "r3-00080",
+      "r3-00081",
+      "r3-00084",
+      "r3-00086",
+      "r3-00088",
+      "r3-00090",
+      "r3-00092",
+      "r3-00094",
+      "r3-00100",
+      "r3-00104",
+      "r3-00119",
+      "r3-00122",
+      "r3-00128",
+      "r3-00133",
+      "r3-00134",
+      "r3-00136",
+      "r3-00139",
+      "r3-00143",
+      "r3-00145",
+      "r3-00160",
+      "r3-00163",
+      "r3-00172",
+      "r3-00177",
+      "r3-00178",
+      "r3-00180",
+      "r3-00195",
+      "r3-00202",
+      "r3-00207",
+      "r3-00213",
+      "r3-00215",
+      "r3-00216",
+      "r3-00217",
+      "r3-00221",
+      "r3-00222",
+      "r3-00225",
+      "r3-00226",
+      "r3-00228",
+      "r3-00230",
+      "r3-00235",
+      "r3-00257",
+      "r3-00258",
+      "r3-00260",
+      "r3-00261",
+      "r3-00271",
+      "r3-00276",
+      "r3-00288",
+      "r3-00290",
+      "r3-00298",
+      "r3-00300",
+      "r3-00301",
+      "r3-00305",
+      "r3-00306",
+      "r3-00307",
+      "r3-00308",
+      "r3-00313",
+      "r3-00314",
+      "r3-00315",
+      "r3-00319",
+      "r3-00320",
+      "r3-00332",
+      "r3-00333",
+      "r3-00335",
+      "r3-00338",
+      "r3-00340",
+      "r3-00342",
+      "r3-00347",
+      "r3-00351",
+      "r3-00358",
+      "r3-00367",
+      "r3-00373",
+      "r3-00379",
+      "r3-00383",
+      "r3-00395",
+      "r3-00396",
+      "r3-00400",
+      "r3-00402",
+      "r3-00404",
+      "r3-00406",
+      "r3-00411",
+      "r3-00415",
+      "r3-00421",
+      "r3-00424",
+      "r3-00429",
+      "r3-00436",
+      "r3-00438",
+      "r3-00446",
+      "r3-00450",
+      "r3-00455",
+      "r3-00457",
+      "r3-00463",
+      "r3-00464",
+      "r3-00465",
+      "r3-00466",
+      "r3-00467",
+      "r3-00473",
+      "r3-00478",
+      "r3-00479",
+      "r3-00481",
+      "r3-00484",
+      "r3-00491",
+      "r3-00494",
+      "r3-00497",
+      "r3-00502",
+      "r3-00518",
+      "r3-00520",
+      "r3-00522",
+      "r3-00529",
+      "r3-00531",
+      "r3-00532",
+      "r3-00533",
+      "r3-00535",
+      "r3-00537",
+      "r3-00541",
+      "r3-00548",
+      "r3-00549",
+      "r3-00559",
+      "r3-00562",
+      "r3-00564",
+      "r3-00565",
+      "r3-00567",
+      "r3-00568",
+      "r3-00572",
+      "r3-00573",
+      "r3-00585",
+      "r3-00586",
+      "r3-00589",
+      "r3-00600"
+    ],
+    "counterfeit": [
+      "r3-00015",
+      "r3-00016",
+      "r3-00047",
+      "r3-00158",
+      "r3-00231",
+      "r3-00298",
+      "r3-00314",
+      "r3-00439",
+      "r3-00490"
+    ]
+  },
+  "keyword_screen_precision": {
+    "safety": {
+      "screen_positives_with_consensus": 0,
+      "human_confirmed": 0,
+      "precision": null,
+      "note": "no screened positives have consensus labels yet"
+    },
+    "defect": {
+      "screen_positives_with_consensus": 0,
+      "human_confirmed": 0,
+      "precision": null,
+      "note": "no screened positives have consensus labels yet"
+    },
+    "counterfeit": {
+      "screen_positives_with_consensus": 0,
+      "human_confirmed": 0,
+      "precision": null,
+      "note": "no screened positives have consensus labels yet"
+    }
+  },
+  "prevalence_random_all_only": {
+    "safety": {
+      "labelled_rows": 130,
+      "positive_rows": 0,
+      "weighted_prevalence": 0.0,
+      "note": null
+    },
+    "defect": {
+      "labelled_rows": 122,
+      "positive_rows": 3,
+      "weighted_prevalence": 0.02459,
+      "note": null
+    },
+    "counterfeit": {
+      "labelled_rows": 130,
+      "positive_rows": 0,
+      "weighted_prevalence": 0.0,
+      "note": null
+    }
+  },
+  "anchoring_check": {
+    "blind": {
+      "safety": {
+        "labelled_rows": 584,
+        "positive_rate": 0.0325
+      },
+      "defect": {
+        "labelled_rows": 460,
+        "positive_rate": 0.3891
+      },
+      "counterfeit": {
+        "labelled_rows": 591,
+        "positive_rate": 0.0
+      }
+    },
+    "pre_labelled": {
+      "safety": {
+        "labelled_rows": 0,
+        "positive_rate": null
+      },
+      "defect": {
+        "labelled_rows": 0,
+        "positive_rate": null
+      },
+      "counterfeit": {
+        "labelled_rows": 0,
+        "positive_rate": null
+      }
+    }
+  },
+  "claim_boundary": "Precision is measured on screened positives only. Recall and prevalence are valid only for the random_all stratum. Nothing here qualifies the hazard tagger for integration."
+}

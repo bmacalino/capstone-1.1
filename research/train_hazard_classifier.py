@@ -102,13 +102,16 @@ def load_round(queue_dir: Path, worksheets: list[Path] | None = None) -> list[di
     return records
 
 
-def featurize(records: list[dict[str, Any]], need_embeddings: bool = True) -> dict[str, Any]:
+def featurize(records: list[dict[str, Any]], need_embeddings: bool = True, rules: str = "0.3") -> dict[str, Any]:
     """Normalized text, keyword features and keyword tags (and embeddings)."""
     from defaketive_sentiment import text_norm
     from defaketive_sentiment.hazard_learned import keyword_features
     from defaketive_sentiment.hazard_model import LexiconHazardTagger
 
-    tagger = LexiconHazardTagger()
+    # Without the counterfeit rules: the app takes keyword features before
+    # those rules run, so training must too.
+    # `rules` is the keyword rule set the model will be served with.
+    tagger = LexiconHazardTagger(rules=rules, counterfeit_rules=None)
     tagged = [tagger.tag_sentence(record["text"]) for record in records]
     features = {
         "normalized": np.array([text_norm.normalize_text(record["text"]) for record in records], dtype=object),

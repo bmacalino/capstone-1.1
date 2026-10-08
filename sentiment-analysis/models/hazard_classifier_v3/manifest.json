@@ -1,0 +1,44 @@
+{
+  "version": "hazard-learned-3.0.0",
+  "trained_at": "2026-10-06T11:28:40+00:00",
+  "preregistration": "research/PREREGISTRATION_final_v6.md",
+  "categories": {
+    "safety": {
+      "file": "safety.joblib",
+      "sha256": "5eaa4fd1305587feed5bdfd12bbbe6efc772ee96354aabb82b4a2d4b35d969e6",
+      "candidate": "TK",
+      "threshold": 0.855365,
+      "combine": "and",
+      "needs_embedding": false,
+      "training_rows": 2033,
+      "training_positives": 65,
+      "training_data": "labelling rounds 1 (A1, A2), 2 and 3 (A1, A2, A3)"
+    },
+    "defect": {
+      "file": "defect.joblib",
+      "sha256": "6f5a12085a283175fee6fc99dbf0f33ef2eee75fd7d17aa75cd2134664f03e51",
+      "candidate": "TK",
+      "threshold": 0.460052,
+      "combine": "or_gated",
+      "needs_embedding": false,
+      "training_rows": 1782,
+      "training_positives": 502,
+      "training_data": "labelling rounds 1 (A1, A2), 2 and 3 (A1, A2, A3)",
+      "gate": "sentence sentiment is not positive"
+    }
+  },
+  "keyword_files": {
+    "risk_lexicon.tsv": "c46a844844dc73e487dd3ce9684f0f6b9f5259ad83ea51a270a7616a19e26282",
+    "safety_false_friends_v1.tsv": "9754b41c50112893e9a3fa007921dc8b2317b78381dc3ffa32d3ce2db1ad918a",
+    "hazard_phrase_exclusions_v1.tsv": "bbcc404373f4f2e2655945b9a89d63831ba5d16413dcd7feccb2b4a9099a8dcd"
+  },
+  "embedding_model": null,
+  "sentiment_model": {
+    "model_version": "defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+    "model_sha256": "e04da4c268bc8ab94e27da2e0fb4206f38dadc43e9cfb52050818a5bb40c3478"
+  },
+  "qualified_for_integration": false,
+  "adoption": {
+    "status": "pending: tested once on labelling round 5"
+  }
+}

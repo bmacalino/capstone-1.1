@@ -311,6 +311,60 @@ class TestVerdictOrder(unittest.TestCase):
         self.assertEqual(verdict["state"], badges.NO_WARNING_SIGNS)
 
 
+def informed(key, *labels, text="mahina yung tunog"):
+    """A review the five-label checker read; `labels` are its informational labels."""
+    sentence = {
+        "index": 0,
+        "text_raw": text,
+        "tags": [],
+        "extra_tags": list(labels),
+        "extra_terms": [{"ngram": "mahina", "category": label, "span": [0, 6]} for label in labels],
+    }
+    return {
+        "review_key": key,
+        "review_extra_tags": list(labels),
+        "sentences": [sentence] if labels else [],
+        "sentiment": {"label": "negative" if labels else "positive"},
+    }
+
+
+class TestInformationalReports(unittest.TestCase):
+    """Guide 1.4's two newer labels are counted and quoted, never judged."""
+
+    def test_reviews_are_counted_once_per_label_and_quoted(self):
+        summary = aggregator().summarize(
+            [informed("a", "quality"), informed("b", "quality", "not_as_described")]
+            + [informed(f"c{i}") for i in range(38)]
+        )
+        reports = summary["reports"]
+        self.assertEqual(reports["quality"]["flagged_reviews"], 2)
+        self.assertEqual(reports["not_as_described"]["flagged_reviews"], 1)
+        self.assertAlmostEqual(reports["quality"]["rate"], 0.05)
+        quote = reports["not_as_described"]["evidence"][0]
+        self.assertEqual(quote["text"], "mahina yung tunog")
+        # Only the words behind this label, so the right ones are highlighted.
+        self.assertEqual(quote["terms"], [{"ngram": "mahina", "category": "not_as_described", "span": [0, 6]}])
+
+    def test_a_label_that_was_checked_and_not_found_reports_zero(self):
+        summary = aggregator().summarize([informed(f"c{i}") for i in range(40)])
+        self.assertEqual(summary["reports"]["not_as_described"]["flagged_reviews"], 0)
+
+    def test_a_checker_without_the_two_labels_reports_nothing_about_them(self):
+        summary = aggregator().summarize([clean(f"c{i}") for i in range(40)])
+        self.assertNotIn("reports", summary)
+
+    def test_they_never_change_the_verdict_or_the_flags(self):
+        plain = aggregator().summarize([clean(f"c{i}") for i in range(40)])
+        many = aggregator().summarize(
+            [informed(f"q{i}", "quality", "not_as_described") for i in range(30)]
+            + [informed(f"c{i}") for i in range(10)]
+        )
+        self.assertEqual(many["reports"]["quality"]["flagged_reviews"], 30)
+        self.assertEqual(many["verdict"], plain["verdict"])
+        self.assertEqual(many["verdict"]["state"], badges.NO_WARNING_SIGNS)
+        self.assertEqual(set(many["flags"]), {"counterfeit", "defect"})
+
+
 class TestOutputContract(unittest.TestCase):
     def test_no_combined_risk_number_is_produced(self):
         # The whole point of the redesign. Nothing may map a badge back to a

@@ -1,0 +1,110 @@
+{
+  "generated_at": "2026-10-07T16:11:34+00:00",
+  "warning": "Agreement with AI-proposed labels (research/five_label_data.py), cross-validated. Not accuracy.",
+  "cross_validation": {
+    "folds": 5,
+    "grouped_by": "review_id",
+    "seed": 42
+  },
+  "defect": {
+    "threshold": 0.43962,
+    "sentences": 3643,
+    "reports": 843,
+    "candidate": {
+      "all_rounds": {
+        "tp": 656,
+        "fp": 233,
+        "fn": 187,
+        "precision": 0.7379,
+        "recall": 0.7782,
+        "f1": 0.7575
+      },
+      "gadget_sentences": {
+        "tp": 517,
+        "fp": 149,
+        "fn": 148,
+        "precision": 0.7763,
+        "recall": 0.7774,
+        "f1": 0.7769
+      },
+      "rounds_5_7": {
+        "tp": 277,
+        "fp": 91,
+        "fn": 72,
+        "precision": 0.7527,
+        "recall": 0.7937,
+        "f1": 0.7727
+      },
+      "rounds_6_7_gadget_rounds": {
+        "tp": 198,
+        "fp": 66,
+        "fn": 48,
+        "precision": 0.75,
+        "recall": 0.8049,
+        "f1": 0.7765
+      },
+      "round_7": {
+        "tp": 84,
+        "fp": 27,
+        "fn": 23,
+        "precision": 0.7568,
+        "recall": 0.785,
+        "f1": 0.7706
+      },
+      "rounds_1_3_relabelled": {
+        "tp": 379,
+        "fp": 142,
+        "fn": 115,
+        "precision": 0.7274,
+        "recall": 0.7672,
+        "f1": 0.7468
+      }
+    },
+    "team_label_models": {
+      "rounds_5_7": {
+        "tp": 194,
+        "fp": 73,
+        "fn": 155,
+        "precision": 0.7266,
+        "recall": 0.5559,
+        "f1": 0.6299
+      },
+      "round_7": {
+        "tp": 61,
+        "fp": 27,
+        "fn": 46,
+        "precision": 0.6932,
+        "recall": 0.5701,
+        "f1": 0.6256
+      },
+      "keywords_alone_rounds_5_7": {
+        "tp": 92,
+        "fp": 16,
+        "fn": 257,
+        "precision": 0.8519,
+        "recall": 0.2636,
+        "f1": 0.4026
+      }
+    },
+    "round_3_team_labels_held_out_for_both": {
+      "sentences": 460,
+      "threshold_without_round_3": 0.485231,
+      "team_label_models": {
+        "tp": 126,
+        "fp": 17,
+        "fn": 53,
+        "precision": 0.8811,
+        "recall": 0.7039,
+        "f1": 0.7826
+      },
+      "this_design_without_round_3": {
+        "tp": 132,
+        "fp": 19,
+        "fn": 47,
+        "precision": 0.8742,
+        "recall": 0.7374,
+        "f1": 0.8
+      }
+    }
+  }
+}

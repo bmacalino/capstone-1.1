@@ -603,6 +603,639 @@ combination (`research/hazard_tagger_measurement_round2_shipped.json`):
 safety 10 of 16 caught, 10 of 24 flags real (F1 0.500); defect and
 counterfeit as Table 11c.
 
+## Table 11e. Gated defect model — held-out test on labelling round 3
+
+Protocol: `research/PREREGISTRATION_defect_v5.md`. Round 3: 600 blind
+sentences, no review from rounds 1–2; 592 labelled twice, 438 agreed on all
+three categories (κ: safety 0.690, defect 0.521; counterfeit had no agreed
+positive, so κ is 0 and counterfeit cannot be scored). Sources:
+`research/hazard_tagger_measurement_round3.json`,
+`research/labelling_round_3_analysis.json`.
+
+| Defect check | Flags real | Reports caught | F1 [95% CI] | Weighted precision | Weighted recall |
+|---|---|---|---|---|---|
+| Keywords 0.3.0 | 75 of 86 | 75 of 179 | 0.566 [0.486, 0.637] | 0.891 | 0.377 |
+| **Gated learned model** | **126 of 142** | **126 of 179** | **0.785** [0.735, 0.831] | 0.848 | **0.527** |
+
+McNemar: the gated model alone was right on 51 sentences, the keywords alone
+on 5 (p < 0.001). In the disagreement stratum the gated model caught 50 of 64
+reports with 3 false flags (keywords: 7 of 64, 1 false).
+
+**Decision: adopted.** All three pre-registered conditions hold: F1 higher;
+recall not lower; weighted precision 0.848 ≥ 0.891 − 0.05 = 0.841 (met by a
+narrow margin). Shipped as `hazard_classifier_v2` (safety model unchanged).
+
+Safety on round 3 (second held-out check, unchanged model): 14 of 19 reports
+caught, 14 of 28 flags real, F1 0.596.
+
+**Limits.** Round 3 over-samples disagreement sentences, so the unweighted F1
+flatters both the gain and the model; the weighted figures are the estimate
+for ordinary reviews. Precision of added flags is lower outside the test: on
+a mostly five-star charger listing the model raised flagged reviews from 5 to
+20, and roughly half the additions were not defects (packaging, seller
+replies, neutral remarks about charging speed).
+
+**Post-hoc rule (5 Oct 2026, after the test).** The learned model may not add
+a defect flag to a sentence about the box, courier, seller or their replies
+unless the sentence still reads as a defect with those words and their two
+neighbours on each side removed (guide rule 1; `hazard_model.without_non_product_words`).
+A first version that dropped every such sentence removed five real round-3
+reports and no false one, so it was replaced. With the final rule the round-3
+figures are identical to the table above (126 caught, 16 false;
+`research/hazard_tagger_measurement_round3_rule1_posthoc.json`), and on the
+charger listing the packaging and seller sentences are no longer quoted
+(flagged reviews 20 → 16). The rule was written after round 3 was read, so
+this is a check that it does no harm there, not a held-out result.
+
+## Table 11f. Counterfeit rules "c1" — built from round 4, checked on rounds 2 and 3
+
+**Round 4 is a development set, not a test.** 391 sentences drawn for the
+counterfeit category only (`research/build_counterfeit_round4.py`, seed
+20261005): all 116 sentences the 0.3.0 keywords flagged, 200 of 410 that
+mention authenticity words, 75 of 10,767 from one- to three-star reviews.
+Labels are **AI-assisted and owner-adjudicated**: the assistant labelled every
+sentence with the tagging guide and marked 43 as unsure; the project owner
+decided those 43 and blind-audited 40 random "sure" labels (15 yes, 25 no),
+agreeing on 36 (90%). Thirteen owner answers that departed from the guide
+(false size or capacity claims, "scam" alone, "parang original" as praise)
+were set back to the guide's rule at the owner's decision
+(`outputs/labelling_queue_round_4/labels_adjudicated.csv`, column
+`label_source`). Because most labels are machine-proposed, **no figure from
+round 4 is reported as accuracy**; it was used only to see where the keyword
+check goes wrong.
+
+What it showed: of 80 sentences flagged through the word "scam", 5 were
+counterfeit reports (seller did not deliver, item missing, product broken
+are the usual meaning); the other counterfeit terms together gave 31 real
+matches and 6 false ones. The reports the list missed were comparisons with
+the original ("not 100% original", "hindi rin original", "copy lang",
+"anlayo sa original", "hindi sya kaamoy ng tunay").
+
+Rules c1 (`hazard_model.COUNTERFEIT_RULES`), applied after the keyword result
+and after the learned models, so the learned models' keyword features and
+every safety and defect figure are unchanged:
+
+1. "scam" no longer makes a counterfeit flag by itself.
+2. "hindi/not legit" followed by a number ("hindi legit na 20k mAh") is a
+   disputed specification, not a counterfeit report.
+3. Seven comparison-with-the-original patterns add a flag.
+
+Check on the human-labelled rounds (consensus labels, same scripts as Tables
+11c and 11e; `research/hazard_tagger_measurement_round{2,3}_counterfeit_c1.json`):
+
+| Round | Counterfeit reports | Keywords 0.3.0: caught / false flags | With c1: caught / false flags | Precision | F1 | McNemar |
+|---|---:|---:|---:|---:|---:|---|
+| 2 | 12 | 7 / 6 | 7 / 4 | 0.538 → 0.636 | 0.560 → 0.609 | 0 vs 2, p = 0.5 |
+| 3 | 0 | 0 / 3 | 0 / 0 | n/a | n/a | 0 vs 3, p = 0.25 |
+
+No report was lost and no new false flag appeared in either round; five
+false flags were removed. Safety and defect are identical to before.
+
+**Limits.** The rules were written after rounds 2 and 3 had been read, so this
+is a check that they do no harm on human labels, not a held-out result, and
+the differences are not statistically significant on 12 reports. None of the
+added patterns fired in rounds 2 or 3, so their benefit is unmeasured outside
+round 4, where the same rules were developed (there: 35 → 44 of 63 caught,
+81 → 5 false flags; in-sample). A fair test of the counterfeit check still
+needs a human-labelled round with enough counterfeit reports.
+
+## Table 11g. Another model, or more labels? (exploratory, 6 Oct 2026)
+
+**Exploratory, not a test.** Each figure trains on some of rounds 1–3 and
+scores on a round left out. Rounds 2 and 3 are therefore used up as tests;
+from here they are training data and round 5 is the only test
+(`research/PREREGISTRATION_final_v6.md`). Run once with fixed, untuned
+settings; scripts were ad hoc and the figures are recorded here as the reason
+for the v6 design, not as results of it.
+
+**Defect — other model types** (same rule: keywords OR model, never on
+praise; threshold from grouped cross-validation on the training rounds).
+
+| Model | Rounds 1+3 → round 2: P / R / F1 | Rounds 1+2 → round 3: P / R / F1 |
+|---|---|---|
+| Keywords 0.3.0 alone | 0.808 / 0.447 / 0.576 | 0.862 / 0.419 / 0.564 |
+| **TF-IDF + keyword features, logistic (shipped design)** | 0.756 / 0.682 / **0.717** | 0.875 / 0.704 / **0.780** |
+| Same features, linear SVM | 0.700 / 0.689 / 0.695 | 0.865 / 0.682 / 0.762 |
+| Sentence embedding (shipped XLM-R) + keyword features | 0.667 / 0.697 / 0.681 | 0.759 / 0.670 / 0.712 |
+| TF-IDF + embedding + keyword features | 0.679 / 0.674 / 0.677 | 0.784 / 0.670 / 0.723 |
+| TF-IDF only | 0.824 / 0.636 / 0.718 | 0.837 / 0.743 / 0.787 |
+
+No alternative beats the shipped design by more than noise; the embedding
+variants are clearly worse and would add a model pass per sentence.
+
+**Defect — more labelled rounds, same design.**
+
+| Trained on | Defect reports in training | Scored on | F1 | Recall |
+|---|---:|---|---:|---:|
+| Round 1 | 191 | round 2 | 0.643 | 0.538 |
+| Rounds 1 + 3 | 370 | round 2 | 0.717 | 0.682 |
+| Round 1 | 191 | round 3 | 0.739 | 0.631 |
+| Rounds 1 + 2 | 323 | round 3 | 0.780 | 0.704 |
+
+Each added round raised F1 by 0.04–0.07, almost all of it recall. The curve
+has not flattened, which is the case for retraining on all three rounds.
+
+**Safety.** Keywords alone score F1 0.476 (round 2) and 0.583 (round 3).
+Letting a model trained on two rounds decide, filter or add gave 0.476–0.526
+and 0.583; embedding variants 0.47–0.61. Nothing separates from keywords with
+65 agreed safety reports in total. The v4 threshold rule (highest threshold
+with out-of-fold recall ≥ 0.80) selects 0.04–0.05 on pooled rounds and raises
+168–241 false flags, so it is retired.
+
+**Counterfeit.** A learned model trained on every agreed label (with or
+without round 4) added 5 flags in cross-validation, none real, at thresholds
+0.5–0.6 and none at 0.7+. The limit is the labels: across rounds 1–3 only
+**25 sentences** have two annotators agreeing on a counterfeit report (13, 12
+and 0), 65 are unresolved disagreements (one annotator said fake in 46 of
+them), and 68 round-1 "fake" labels rest on one annotator because A3's sheet
+is missing. At review level — what the badge counts — rules c1 catch 6 of the
+8 agreed fake-report reviews in round 2 with 2 false flags (0.3.0: 6 and 4).
+
+**Not tried.** A transformer fine-tuned for hazard sentences. It would need
+more labelled reports than exist for safety and counterfeit, and a second
+95 MB model beside the sentiment model would take the app (about 352 MB) to
+the edge of a free host's memory.
+
+**Decision.** Keep the model type; retrain on rounds 1–3; test once on a new
+round. Candidates frozen in `sentiment-analysis/models/hazard_classifier_v3/`
+(`research/final_v6_training.json`; cross-validated, optimistic):
+
+| Check | Candidate | Training sentences / reports | Cross-validated: keywords → candidate (F1) |
+|---|---|---|---|
+| Defect | gated TK, threshold 0.460 | 1,782 / 502 | 0.603 → 0.765 |
+| Safety | TK as a filter on keyword flags, threshold 0.855 | 2,033 / 65 | 0.582 → 0.607 (precision 0.48 → 0.55, recall 0.74 → 0.68) |
+| Counterfeit | none; keywords + c1 scored as shipped | — | — |
+
+The safety filter trades four real reports for sixteen false flags in
+cross-validation, so under the pre-registered rule (recall must not fall) it
+is likely to be rejected; it is tested anyway because the rule was fixed
+before the candidate was trained.
+
+Round 5: `outputs/labelling_queue_round_5/`, drawn only from the public
+`scaredmeow/shopee-reviews-tl-stars` set (15,000 reviews, none used before),
+with `research/LABELLING_ROUND_5_INSTRUCTIONS.md` and guide 1.2. The 65
+counterfeit disagreements are in `outputs/adjudication_counterfeit/` for the
+third annotator. A training-script fault was fixed first: after c1 was added,
+`train_hazard_classifier.featurize` took keyword features after the
+counterfeit rules while the app takes them before; no shipped model was
+trained in that state.
+
+## Table 11h. Rounds 5 and 6 — AI-assisted checks, and the gadget scope (6–7 Oct 2026)
+
+**Not accuracy.** The project owner chose to have the AI assistant label
+round 5 instead of the team (`PREREGISTRATION_final_v6.md`, departure 1), and
+round 6 the same way. The assistant read each sentence without the stratum or
+any checker output, applied guide 1.2 and marked each answer sure or unsure
+(`research/label_round5_ai.py`, `label_round6_ai.py`); the owner decides the
+unsure sentences and blind-audits 50 sure ones per round
+(`outputs/labelling_queue_round_{5,6}/worksheet_for_you.csv`) — **that review
+is still open**, so the figures below use the assistant's labels as they
+stand. They are agreement with AI-proposed labels. The assistant also wrote
+the counterfeit rules and trained the candidates, so neither round is an
+independent test, and the v6 adoption rules are not applied. Source:
+`research/score_ai_rounds.py` → `research/ai_rounds_check.json`.
+
+- **Round 5:** 600 sentences from the public Shopee set (any product).
+- **Round 6:** 600 sentences, electronic gadgets only
+  (`research/gadget_scope.py`: our electronics scrapes, or text naming a
+  gadget or gadget part): 182 from unused Lazada scrapes, 418 from the Shopee
+  set, none from rounds 1–5. The Lazada part had been seen by earlier
+  unlabelled spot checks, so round 6 is development data in any case.
+
+**Two owner rules (7 Oct 2026), applied to both rounds.** The assistant had
+first labelled slow charging as not a defect and filed heat and "grounded"
+reports under safety only. The owner ruled that (1) slow charging on its own
+is a defect and (2) a safety report is a defect as well
+(`label_round5_ai.apply_owner_rules`; guide 1.3, Rule 9). Both match the
+team's own practice in rounds 1–3, checked afterwards: all 6 slow-charging
+sentences there were labelled defect, and 40 of the 54 agreed safety reports
+with a defect decision were also labelled defect. The rules moved 16 defect
+answers in round 5 and 19 in round 6. AI labels with the rules: round 5 —
+safety 16, defect 111, counterfeit 34 (91 sentences with an unsure answer);
+round 6 — safety 21, defect 164, counterfeit 25 (96 unsure).
+
+**Why the scope matters — round 5 split by product type** (caught of
+reports, false flags, F1):
+
+| Check | Gadget reviews (153 sentences) | Other reviews (447 sentences) |
+|---|---|---|
+| Defect, shipped | 37 of 62, 8 false, 0.692 | 22 of 49, 12 false, 0.530 |
+| Defect, v3 candidate | 44 of 62, 11 false, 0.752 | 30 of 49, 24 false, 0.583 |
+| Safety, shipped | 9 of 10, 2 false, 0.857 | 6 of 6, 4 false, 0.750 |
+| Counterfeit (rules c1) | 6 of 9, 6 false, 0.571 | 14 of 25, 2 false, 0.683 |
+
+**Round 6, gadgets only.**
+
+| Check | Shipped (v2 + c1) | v3 candidate (rounds 1–3) | On the sentences labelled "sure" |
+|---|---|---|---|
+| Safety | 20 of 21, 3 false, F1 0.909 | identical | 14 of 14, 2 false |
+| Defect | 77 of 164, 30 false, F1 0.568 | 106 of 164, 47 false, F1 0.669 | shipped 67 of 113; candidate 85 of 113 |
+| Counterfeit | 18 of 25, 4 false, F1 0.766 | same rules | 14 of 15, 1 false |
+
+The Lazada and Shopee parts of round 6 agree closely (defect F1 0.556 and
+0.573 shipped; 0.674 and 0.667 candidate).
+
+**Defect training dry run** (no model written). Same gated design; threshold
+= best out-of-fold F1; scored on round 6:
+
+| Trained on | Caught of 164 | False flags | F1 |
+|---|---:|---:|---:|
+| Keywords alone | 38 | 14 | 0.352 |
+| Rounds 1–3 (= v3 candidate) | 106 | 48 | 0.667 |
+| Rounds 1–3 + 5 | 98 | 35 | 0.660 |
+| Rounds 1–3 + 5 + 6 (cross-validated) | 120 | 44 | 0.732 |
+
+The model with every round, scored on the team-labelled sentences of rounds
+1–3 (cross-validated): F1 0.750 against 0.765 for the rounds-1–3 model
+(false flags 121 against 94); on their gadget sentences 0.765 against 0.768.
+So adding the AI-labelled rounds gains 0.065 on round 6, costs nothing
+measurable on the team's gadget sentences, and costs 0.015 on their
+non-gadget ones. Training on gadget sentences only was also tried before the
+rules (rounds 1–3 and 5, scored on gadget sentences, cross-validated): F1
+0.737 against 0.753 for training on everything, so the non-gadget sentences
+are kept in training and the scope is applied to what is tested and claimed,
+not to what is learned from.
+
+**What this does and does not show.**
+- Safety on gadgets agrees with the labels almost completely, and the v3
+  safety filter changes nothing there. Keywords stay.
+- Defect is where the checkers and the assistant differ most. Before the
+  owner's rules the candidate's precision against the assistant's labels was
+  about 0.60; with them it is 0.69 on round 6 and 0.80 on round 5's gadget
+  sentences, against 0.85–0.89 on the team's rounds. Reading the round-6
+  disagreements after the first labels were saved: about 37 of the
+  candidate's 51 flags on sentences the assistant was sure about were plain
+  errors (praise, hopes, returns, negation such as "Wala pong sira", "walang
+  ka sira sira", "lowbat lang pala", "hindi rin kami naka-experience ng
+  lag"); the rest were the two conventions the owner has now settled. The
+  first group is a real weakness of the checker on these reviews. One
+  transcription slip in the assistant's list (row 168) was found this way and
+  corrected; no other label was changed after the checkers' output was seen,
+  apart from the owner's two rules.
+- Nothing is adopted. v2 with rules c1 still ships. The v3 folder and the
+  dry-run models are not used by the app.
+
+## Table 11i. Five labels: "poor quality" and "not as advertised" (7 Oct 2026)
+
+**Why.** Three labels forced a yes/no on sentences that fit none. In the
+team's rounds 1–3 the defect answer for weak-but-working products was 8 yes /
+6 no / 6 disagreed, for dents and scratches 7 / 9 / 11, for "low quality" or
+flimsy 8 / 31 / 12; the counterfeit answer for "not like the picture" was
+6 / 4 / 2. Guide 1.4 (Rule 10) gives these their own labels and fixes the
+shopper wording: Safety problem; Faulty or broken; Poor quality; Possible
+fake; Not as advertised. One earlier answer changes: "iba sa picture" is now
+"not as advertised", no longer counterfeit. Rounds 1–3 keep their labels.
+
+**Labels.** Rounds 5 and 6 were relabelled by the assistant with all five
+(`label_round5_ai.FIVE`, `label_round6_ai.FIVE`); the owner's review is still
+open, so every figure below is agreement with AI labels, not accuracy.
+Round 5: safety 16, defect 103, quality 37, counterfeit 32, not as described
+24 (85 sentences with an unsure answer, 91 before). Round 6: 21, 139, 35, 23,
+25 (70 unsure, 96 before).
+
+**Learned models, cross-validated dry run** (`score_ai_rounds.py`,
+`five_label_dry_run`; nothing saved). Round 6, caught of reports / false / F1:
+
+| Label | Keywords or rules | Learned TK alone | Keywords OR learned |
+|---|---|---|---|
+| Safety | 20 of 21 / 3 / 0.909 | 20 of 21 / 3 / 0.909 | same as keywords |
+| Defect | 35 of 139 / 17 / 0.366 | 108 of 139 / 57 / 0.711 | 111 of 139 / 53 / 0.733 |
+| Counterfeit (c1) | 17 of 23 / 5 / 0.756 | 15 of 23 / 8 / 0.652 | same as rules |
+| Quality | — | 11 of 35 / 15 / 0.361 | — |
+| Not as described | — | 11 of 25 / 15 / 0.431 | — |
+
+With 72 and 49 examples the two new labels cannot be learned yet; on the
+team's rounds the all-rounds defect model scores 0.743 against 0.765 for the
+rounds-1–3 model.
+
+**Rules c2** (`hazard_model.EXTRA_RULES`; opt-in when this was written, served
+since 8 Oct 2026, see the end of this table). A separate
+`extra_tags` field carries the two labels; the badge categories, the keyword
+features and the learned models are untouched. Under c2 a picture mismatch
+or a disputed number no longer counts as a counterfeit report.
+
+| Label, shipped checker + c2 | Round 5 (all products) | Round 6 (gadgets) |
+|---|---|---|
+| Quality | 16 of 37, 1 false, F1 0.593 | 16 of 35, 0 false, F1 0.627 |
+| Not as described | 8 of 24, 3 false, F1 0.457 | 15 of 25, 4 false, F1 0.682 |
+| Counterfeit, c1 → c2 | 20 of 32, 8 → 6 false, 0.667 → 0.690 | 17 → 16 of 23, 5 → 3 false, 0.756 → 0.762 |
+
+On the team's rounds (`hazard_tagger_measurement_round{2,3}_counterfeit_c2.json`)
+safety and defect are identical under c2; counterfeit on round 2 keeps its 7
+of 12 and drops from 4 false flags to 3; round 3 is unchanged (0 and 0).
+
+**Limits.** The c2 patterns were written by the assistant after reading
+rounds 5 and 6, so their figures there are in-sample as well as
+AI-labelled: they show the rules are precise on what was seen and still miss
+about half, nothing more. The rules are not used by the app until the wording
+and the two new report tiles are reviewed. (Done on 8 Oct 2026: see the end
+of this table.)
+
+**Round 7 (7 Oct 2026): more gadget training data.** 600 more gadget-only
+sentences, none from rounds 1–6, 250 of them from reviews that mention
+quality, size, capacity or the photos (`aspect_focus`, a broad word test, not
+the checker's rules); labelled by the assistant with five labels
+(`research/label_round7_ai.py`; 48 unsure): safety 8, defect 107, quality 80,
+counterfeit 12, not as described 35. Owner review open, as for rounds 5–6.
+
+The c2 rules were written before round 7 existed, so round 7 is the first
+look at them on unseen sentences (still AI labels):
+
+| Label, rules c2 | Round 7: caught / false / precision / recall |
+|---|---|
+| Quality | 24 of 80 / 2 / 0.92 / 0.30 |
+| Not as described | 10 of 35 / 1 / 0.91 / 0.29 |
+| Counterfeit | 7 of 12 / 2 / 0.78 / 0.58 |
+
+Recall is well below the in-sample 0.46 and 0.60 of rounds 5–6, as warned:
+the rules are precise and cover under a third of what reviewers write.
+
+Dry run with round 7 added to training, scored on round 6 (cross-validated):
+quality learned model F1 0.361 → 0.500 (18 of 35 caught, 19 false); not as
+described 0.431 → 0.449; defect keywords-or-model 0.733 → 0.750 (false
+flags 53 → 41) with 0.745 on the team's rounds; safety and counterfeit
+unchanged, rules still ahead of a learned model. Across rounds 6–7 the
+quality model reaches 0.599 (62 of 115, 30 false). Quality is now close to
+learnable; not-as-described (84 examples) is not yet.
+
+**8 Oct 2026: the five labels are on the report screens.** The owner approved
+the wording step, so the app now serves rules c2
+(`hazard_model.SHIPPED_COUNTERFEIT_RULES`; the class default stays c1 so the
+figures above reproduce). The checker also returns the words behind each of
+the two labels (`extra_terms`) for highlighting; a product summary carries a
+`reports` block beside `flags`, which no verdict rule reads; and every label
+is worded once, in `dashboard_utils.BADGE_COPY`: Safety problem, Faulty or
+broken, Poor quality, Possible fake, Not as advertised.
+
+Check made before the switch, with its rule written first (go only if safety
+and defect are identical, no agreed fake report is lost and fake false flags
+do not rise): the served folder under c1 and under c2 on the team's rounds
+(`hazard_tagger_measurement_round{2,3}_served_c2.json`, configurations
+`v9_served_c1` and `v9_served_c2`).
+
+| Team labels | Safety: caught / false | Defect: caught / false | Fake: caught / false |
+|---|---|---|---|
+| Round 2, c1 | 10 of 16 / 14 | 108 of 132 / 19 | 7 of 12 / 4 |
+| Round 2, c2 | 10 of 16 / 14 | 108 of 132 / 19 | 7 of 12 / 3 |
+| Round 3, c1 | 14 of 19 / 14 | 153 of 179 / 15 | 0 of 0 / 0 |
+| Round 3, c2 | 14 of 19 / 14 | 153 of 179 / 15 | 0 of 0 / 0 |
+
+Passed. The defect columns are **not** a test: the served defect model was
+trained on these rounds. They are here only to show that c2 leaves them
+alone.
+
+The two rule-based labels on round 8, ordinary reviews their patterns were
+never fitted to (`live_check.json`, `rule_labels_round_8`; AI labels, 752
+sentences, unweighted):
+
+| Label | Caught / false / precision / recall |
+|---|---|
+| Poor quality | 21 of 38 / 6 / 0.78 / 0.55 |
+| Not as advertised | 12 of 43 / 1 / 0.92 / 0.28 |
+
+On ordinary reviews the report will show about half of the poor-quality
+remarks and under a third of the not-as-advertised ones, with few wrong ones.
+That is one reason the two labels only inform and never change a verdict.
+
+One pattern changed after a look at a whole listing: "yung isa kong gamit 20W
+lang" (my other charger is only 20W) was read as a disputed number. A guard
+for the reviewer's other or older device (`extra_labels.OWN_DEVICE_BEFORE`)
+removes it and changes no labelled sentence in rounds 1–8.
+
+## Table 11j. Fix, improve or replace (7–8 Oct 2026)
+
+The owner asked that any part of the hazard checker that performs poorly be
+fixed, improved or replaced. Six steps followed. **Only step 1 rests on the
+team's labels alone.** Steps 2–5 use labels proposed by the AI assistant that
+the owner has not audited yet: their figures are agreement with those labels,
+not accuracy, and the same assistant wrote the rules and trained the models
+they score. Step 6 is an attempt that did not pass its rule.
+
+**8 Oct 2026, later: the owner chose to proceed with these labels without
+auditing them** (`PREREGISTRATION_final_v6.md`, departure 3). The review
+sheets stay unfilled. That removes a pending step. It does not make the
+labels human-checked, and every figure below stays agreement with AI labels.
+
+**1. Keyword rules 0.4: a negation fault fixed (team labels).** The keyword
+checker read "Wala pong sira" (nothing is broken), "walang ka sira sira",
+"akala ko sira na … lowbat lang pala" and "pag nasira na" as defect reports.
+Rules 0.4 follow a negation across polite particles and a repeated word, and
+set aside a mistaken belief or a hypothetical
+(`hazard_model.NEGATION_TRANSPARENT_04`, `MISTAKEN_BELIEF_WORDS`,
+`HYPOTHETICAL_WORDS`). On the team's rounds 1–3 the keyword flags lose 3 false
+flags and no real report. The learned models take keyword features, so both
+were refitted with the unchanged recipe on the same rounds
+(`train_rules04_refit.py` → `hazard_classifier_v2b`) and checked on round 3,
+which neither version was trained on
+(`hazard_tagger_measurement_round3_rules04.json`):
+
+| Round 3, team labels | Safety: caught / false / F1 | Defect: caught / false / F1 |
+|---|---|---|
+| Shipped until then (v2, rules 0.3) | 14 of 19 / 14 / 0.596 | 126 of 179 / 16 / 0.785 |
+| Refit (v2b, rules 0.4) | 14 of 19 / 14 / 0.596 | 126 of 179 / 15 / 0.788 |
+
+Nothing lost and one false flag fewer, so v2b replaced v2 (four checks, all
+true, recorded in the folder's manifest). The checks were written the same
+day, and round 3 had already served as v2's test, so this is a second look at
+that round, not a new test. `DEFAKETIVE_HAZARD_MODEL=team_labels` serves v2b.
+
+**2. Earlier rounds re-read for training.** The team's sheets are untouched;
+the re-read answers are separate files used for training only.
+
+- Two new labels for rounds 1–4 (`label_previous_rounds_ai.py` →
+  `ai_extra_labels.csv`): poor quality 119 / 70 / 67 / 26, not as advertised
+  56 / 23 / 19 / 29, with 109 unsure answers.
+- The team's defect and counterfeit answers for rounds 1–3, re-read under
+  guide 1.4 (`ai_relabel.csv`): 83 defect answers became "poor quality" (weak
+  but working, or cosmetic), 18 counterfeit answers became "not as
+  advertised" (picture or number disputes), and 25 safety reports now also
+  count as defects (owner's rule of 7 Oct).
+- Owner sheet: `outputs/extra_labels_previous_rounds/worksheet_for_you.csv`
+  (168 rows).
+
+**3. Which kind of model** (`compare_label_models.py`,
+`label_model_comparison.json`). Grouped 5-fold cross-validation over every
+labelled round (1–7), F1:
+
+| Label (reports) | Rules or keywords | LR, TF-IDF + keyword features | Linear SVM, same features | LR, TF-IDF only | LR, character n-grams | Naive Bayes, words | LR, sentence embedding + keyword features | Rules OR LR |
+|---|---|---|---|---|---|---|---|---|
+| Safety problem (110) | 0.687 | **0.716** | 0.711 | 0.639 | 0.635 | 0.164 | 0.625 | 0.687 |
+| Faulty or broken (843) | 0.508 | 0.748 | 0.732 | 0.729 | 0.714 | 0.652 | 0.662 | **0.757** |
+| Poor quality (437) | 0.736 | 0.591 | 0.577 | 0.587 | 0.580 | 0.366 | 0.467 | **0.753** |
+| Possible fake (150) | **0.709** | 0.652 | 0.635 | 0.587 | 0.595 | 0.128 | 0.462 | 0.709 |
+| Not as advertised (212) | 0.712 | 0.519 | 0.543 | 0.539 | 0.532 | 0.205 | 0.422 | **0.732** |
+
+No other model type beats the design in use (logistic regression on TF-IDF
+and keyword features, combined with the keywords), so the type is kept. For
+fakes and the two new labels every learned model loses to written rules, so
+those labels are rule-based: the learned models for them were dropped and the
+patterns in `defaketive_sentiment/extra_labels.py` rewritten on rounds 1–6
+(in-sample there). On round 7, which the patterns were not fitted to: poor
+quality 49 of 80 caught with 2 false (F1 0.75; 24 of 80 before the rewrite),
+not as advertised 16 of 35 with 2 false (0.60; 10 of 35 before). Adding a
+learned model to those rules gains about 0.02 for 13–17 more false flags and
+was not taken.
+
+**4. The defect model retrained, and why the first retraining was replaced.**
+`train_candidate_v4.py` trains the design in use on rounds 1–3 (re-read) and
+5–7: 3,643 sentences, 843 reports (`hazard_classifier_v4`). Cross-validated on
+rounds 5–7 it scores 0.773 against 0.630 for the team-label models, and a
+copy trained without round 3 finds 132 of the team's 179 round-3 reports with
+19 false flags (0.800) against 126 and 17 (0.783). (This script's loader
+scores 460 round-3 sentences, the measurement script in step 1 scores 452,
+hence 17 false flags here and 15 there. Compare within one table only.)
+
+v4 was made the default and then tried on a whole listing. On 100 reviews of
+an Anker charger, all rated 4–5 stars, it added 20 defect flags, about half of
+them wrong ("Gumagana naman sya.", "Fast charging naman pala."). The labelled
+rounds come from complaint-heavy strata and hold few such plain remarks. In
+unused 4–5 star gadget sentences the keywords flag 2.0%, the team-label
+models 4.2% and v4 6.8%.
+
+**Round 8** (`ordinary_review_pool.py`, `build_ordinary_round8.py`,
+`label_round8_ai.py`): ordinary gadget reviews no round had used, 50 listings
+split by listing into 42 "mining" listings for training and 8 "live check"
+listings no model is trained on. 752 sentences labelled by the assistant (66
+unsure; owner sheet 116 rows): defect 375, poor quality 38, not as advertised
+43, safety 2, counterfeit 0.
+
+| Round 8 stratum | Sentences in the pool | Labelled |
+|---|---|---|
+| Mining: flagged by a model, not by a keyword, 4–5 stars | 204 | 150 |
+| Mining: the same, 1–3 stars | 702 | 150 |
+| Mining: flagged by neither model | 6,716 | 60 |
+| Live check: flagged by either model | 282 | 282 |
+| Live check: flagged by neither | 1,118 | 110 |
+
+`train_candidate_v4.py --ordinary` builds `hazard_classifier_v5`: the same
+design with the mining sentences added (4,003 sentences, 1,010 reports,
+threshold 0.501), and one new rule. **In a review rated 4 or 5 stars the
+model needs a higher score, 0.637, before it adds a flag the keywords did not
+raise.** Keyword flags, 1–3 star reviews and reviews without a rating are
+unaffected. The bar is the threshold at which right added flags outnumber
+wrong ones by the most, on out-of-fold scores of the training sentences: in
+4–5 star reviews 101 right and 97 wrong at the ordinary threshold, 76 and 33
+at the bar. Resampling the reviews 500 times puts the bar between 0.630 and
+0.750 (10th to 90th percentile, median 0.654). The same rule leaves 1–3 star
+reviews at the ordinary threshold (670 right, 171 wrong there). A stricter
+sentiment gate instead (negative sentences only) was tried on the mining
+sentences: the same precision, but it kept a third of the right flags where
+the score bar keeps two thirds, so the score bar was used.
+
+**5. Live check** (`live_check.py`, `live_check.json`): the 8 listings no
+version was trained on, each sentence tagged with its review's rating, as the
+app does. 392 labelled sentences stand for 1,400 and hold about 226 defect
+reports.
+
+| Checker | All reviews: flags / real / false / missed | Precision / recall / F1 | 4–5 stars: flags / real / false | 1–3 stars: flags / real / false |
+|---|---|---|---|---|
+| Keywords alone (rules 0.4) | 120 / 110 / 10 / 116 | 0.917 / 0.486 / 0.635 | 22 / 19 / 3 | 98 / 91 / 7 |
+| Team-label models (v2b) | 216 / 168 / 48 / 58 | 0.778 / 0.742 / 0.760 | 53 / 29 / 24 | 163 / 139 / 24 |
+| First retraining (v4) | 272 / 204 / 68 / 22 | 0.750 / 0.901 / 0.819 | 70 / 33 / 37 | 202 / 171 / 31 |
+| v5 without the 4–5 star bar | 249 / 196 / 53 / 30 | 0.787 / 0.866 / 0.825 | 61 / 32 / 29 | 188 / 164 / 24 |
+| **v5 (served)** | 223 / 193 / 30 / 33 | 0.866 / 0.853 / 0.859 | 35 / 29 / 6 | 188 / 164 / 24 |
+
+On the team's round-3 labels, held out for both, the v5 design trained
+without round 3 finds 129 of 179 reports with 17 false flags (0.794) against
+126 and 17 (0.783) for the team-label models. On the Anker listing, through
+the app's own path, v5 raises 2 defect flags (both wrong, one of them
+"Charging Speed:100") where v4 raised 20 and the team-label models 3.
+
+**6. Safety model: retraining tried, not adopted**
+(`check_safety_retrain.py`, `safety_retrain_check.json`). The served safety
+model learned from round 1 only (30 reports), and half of its flags on round
+3 are wrong. The same design was trained on more rounds and scored on the
+team's round-3 safety answers, with the rule written first: replace the
+served model only if a variant finds at least as many reports and raises
+fewer false flags.
+
+| Round 3, team labels (19 reports) | Reports it was trained on | Caught / false / F1 |
+|---|---|---|
+| Served safety model | 30 (round 1) | 14 / 15 / 0.583 |
+| Keywords alone | none | 14 / 15 / 0.583 |
+| Retrained, team labels of rounds 1–2 | 46 | 14 / 162 / 0.144 |
+| Retrained, rounds 1–2 and the AI-labelled rounds 5–8 | 92 | 13 / 8 / 0.650 |
+
+The last variant halves the false flags but loses one real report. The rule
+puts a missed hazard first, so the served safety model stays. The third row
+shows the threshold rule (highest threshold with out-of-fold recall of 0.80)
+breaking down: with 46 reports it falls to 0.05. (This loader finds 15 false
+flags for the served model where step 1's script finds 14, for the reason
+given in step 4.) Round 8 holds two safety reports, too few to say anything
+about ordinary reviews.
+
+**7. Every label trained on every round** (`train_all_rounds.py`,
+`all_rounds_training.json`; 8 Oct 2026, asked by the owner). The design in
+use was trained for each of the five labels on all rounds but one, six times
+(rounds 2, 3, 5, 6, 7 and round 8's live-check listings left out in turn),
+alone and combined with the label's keywords or rules. Round 4's fake labels
+joined the training data, two of them re-read under guide 1.4. Rule written
+first: replace what is served only if the summed F1 is at least 0.02 higher
+and, for safety and fakes, no real report the served checker finds in the
+team's rounds 2–3 is lost. Caught / false (F1), summed over the left-out
+rounds; truth is the team's labels where they exist and AI labels otherwise:
+
+| Label | Served now | Model alone | Rules OR model | Rules AND model | Result |
+|---|---|---|---|---|---|
+| Safety problem | 66 / 42 (0.698) | 62 / 24 (0.743) | 67 / 43 (0.702) | 62 / 24 (0.743) | Kept: the model loses 3 real reports on the team's rounds |
+| Poor quality | 190 / 11 (0.734) | 194 / 162 (0.577) | 203 / 28 (0.741) | 188 / 11 (0.729) | Kept: gain under 0.02 |
+| Possible fake | 50 / 14 (0.699) | 49 / 25 (0.640) | 50 / 14 (0.699) | 50 / 13 (0.704) | Kept: gain under 0.02 |
+| Not as advertised | 76 / 6 (0.652) | 72 / 63 (0.503) | 88 / 16 (0.690) | 74 / 6 (0.641) | Meets the rule: rules OR model |
+
+Faulty or broken is not in the table because its served model is already
+trained on all rounds. Left out in turn, the same design finds 131 of 179
+with 18 false flags on the team's round 3, and 97 of 132 with 36 on round 2.
+
+Reading. For three labels a model trained on everything still does not beat
+what is served. For "not as advertised" the rule is met, narrowly: 12 more
+real reports for 10 more false flags, so about half of what the model adds is
+wrong, where the rules alone are right 76 times in 82. The rule did not ask
+how often the additions are right, which is its weakness. It is not switched
+on, pending the owner's decision. For safety the model would cut false flags
+from 42 to 24 and miss 4 more real reports, 3 of them in the team's rounds.
+The rule keeps the served model; whether fewer false alarms are worth missed
+reports is the owner's call.
+
+Two looser safety filters were tried after that result
+(`train_all_rounds.py --lenient-safety`): one set to keep every real report
+the keywords flag in the training rounds removes nothing (66 / 43), and one
+set to keep 95 in 100 finds 64 with 30 false flags but loses 2 real reports
+in the team's rounds. Neither meets the rule. On this data, fewer false
+safety flags always cost real reports.
+
+The owner then asked for the best model to be used and left the choice to
+the assistant (8 Oct 2026). Outcome: nothing changes. The served safety model
+stays, because no option keeps every real report. "Not as advertised" stays
+rule-based although rules OR model met the F1 rule: this is a departure from
+that rule in the cautious direction, made because half of the model's
+additions are wrong, the label has no human-labelled sentence to check it
+against, and its gain on ordinary listings is two more reports for two more
+false flags.
+
+**Decision.** `hazard_classifier_v5` is the app default, on the owner's
+instruction and not by a pre-registered test (`PREREGISTRATION_final_v6.md`,
+departure 2). `DEFAKETIVE_HAZARD_MODEL` selects the others: `team_labels`
+(v2b), `keywords` (no learned model), `five_labels` (v5 with rules c2).
+
+**Limits.**
+
+- Steps 2–5 are AI-labelled, and v4 and v5 learned from the same assistant's
+  labels they are scored against, which favours them over the team-label
+  models. The round-3 line is the only human-labelled comparison, and there
+  the difference is small: three more reports, the same false flags.
+- The live-check listings are where the 4–5 star problem was first seen (the
+  split for v2b and v4 was read before the bar was designed), and they were
+  scored more than once. The bar's value was set on other listings, but these
+  eight are not a clean test of the idea.
+- Eight listings, one sample. The "missed" column leans on 2 reports found
+  among 110 sampled unflagged sentences, each standing for about 10.
+- The bar uses the star rating, so a fault described mildly in a 5-star
+  review is less likely to be found: in the live check 3 of 32 such reports
+  were lost for 23 fewer false flags.
+- Plain remarks can still be flagged: "Gumagana naman sya." is flagged in a
+  1–3 star or unrated review, and "Mabilis ma charge, matagal malowbatt."
+  (praise) scores 0.94.
+
 ## Table 12. Design consequence — why the interface shows reviews, not a verdict score
 
 | Property of the safety check | Value | Consequence for the interface |
@@ -663,3 +1296,15 @@ corpus when it exists.
 - Ceiling estimate from the blind 30-row sample
   (`research/neutral_ceiling_check.csv`), which determines whether the
   remaining 594 errors are worth pursuing.
+- **AI labels accepted unaudited** (owner, 8 Oct 2026; departure 3 of
+  `PREREGISTRATION_final_v6.md`). The `worksheet_for_you.csv` files of rounds
+  5–8 and of `outputs/extra_labels_previous_rounds/` stay unfilled, so every
+  figure in Tables 11h–11j, except step 1 of 11j and the lines scored on the
+  team's labels, is agreement with one labeller's AI-proposed labels, with no
+  second opinion. A fresh round labelled by two team members would be the
+  first real test of `hazard_classifier_v5` and of the two rule-based labels.
+- The third annotator's sheet for the 65 disputed fake sentences
+  (`outputs/adjudication_counterfeit/adjudication_sheet.csv`) is still open.
+  Team-label fake scores use only sentences both annotators agreed on.
+- The landing page still says "3 separate checks". Three labels drive
+  warnings; "poor quality" and "not as advertised" appear in the report only.

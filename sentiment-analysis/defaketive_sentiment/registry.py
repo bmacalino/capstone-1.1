@@ -58,9 +58,18 @@ DEFAULT_SENTIMENT = XLMR_SENTIMENT
 # keyword checker with the learned models adopted on labelling round 2
 # (research/PREREGISTRATION_hazard_v4.md) deciding their categories.
 # "keywords" is the keyword checker alone, kept for research comparison.
+# "team_labels" serves the models trained only on labels the team wrote
+# (models/hazard_classifier_v2b): the fallback if the default, whose defect
+# model also learned from AI-proposed labels, is not wanted. Every choice is
+# served with hazard_model.SHIPPED_COUNTERFEIT_RULES, which add the quality
+# and not-as-described labels the report screens show (8 Oct 2026).
+# "five_labels" was the opt-in name for that and is now the same as "learned".
 LEARNED_HAZARD = "learned"
 KEYWORD_HAZARD = "keywords"
-HAZARD_MODELS = (LEARNED_HAZARD, KEYWORD_HAZARD)
+TEAM_LABELS_HAZARD = "team_labels"
+FIVE_LABELS_HAZARD = "five_labels"
+HAZARD_MODELS = (LEARNED_HAZARD, KEYWORD_HAZARD, TEAM_LABELS_HAZARD, FIVE_LABELS_HAZARD)
+TEAM_LABELS_HAZARD_DIR = "hazard_classifier_v2b"
 HAZARD_ENVIRONMENT_VARIABLE = "DEFAKETIVE_HAZARD_MODEL"
 DEFAULT_HAZARD = LEARNED_HAZARD
 
@@ -114,22 +123,36 @@ def load_model(mode: str | None = None, sentiment: str | None = None) -> Any:
 
 
 def _hazard_tagger(choice: str, sentiment_model: Any) -> Any:
-    from .hazard_model import LexiconHazardTagger
+    from .hazard_model import SHIPPED_COUNTERFEIT_RULES, SHIPPED_RULES, LexiconHazardTagger
 
     if choice == KEYWORD_HAZARD:
-        return LexiconHazardTagger()
-    if choice != LEARNED_HAZARD:
+        return LexiconHazardTagger(rules=SHIPPED_RULES, counterfeit_rules=SHIPPED_COUNTERFEIT_RULES)
+    if choice not in (LEARNED_HAZARD, TEAM_LABELS_HAZARD, FIVE_LABELS_HAZARD):
         raise ModelUnavailableError(
             f"Unknown hazard model {choice!r}. Set {HAZARD_ENVIRONMENT_VARIABLE} "
             f"to one of: {', '.join(HAZARD_MODELS)}."
         )
-    from .hazard_learned import LearnedHazardScorer
+    from .hazard_learned import MODELS_ROOT, LearnedHazardScorer
 
     classifier = getattr(sentiment_model, "trained_classifier", None)
     encoder_sha = (getattr(classifier, "manifest", None) or {}).get("files", {}).get("model.onnx")
-    scorer = LearnedHazardScorer(embedding_model_sha256=encoder_sha)
+    scorer = LearnedHazardScorer(
+        MODELS_ROOT / TEAM_LABELS_HAZARD_DIR if choice == TEAM_LABELS_HAZARD else None,
+        embedding_model_sha256=encoder_sha,
+        sentiment_model_sha256=encoder_sha,
+    )
     embedder = getattr(classifier, "embed", None) if scorer.needs_embedding else None
-    return LexiconHazardTagger(learned=scorer, embedder=embedder)
+    # The gated defect model asks how the app's sentiment model reads one
+    # sentence (no star rating), exactly as when its threshold was set.
+    reader = (lambda text: sentiment_model.analyze(text)["label"]) if scorer.needs_sentiment else None
+    # Each model folder names the keyword rules it was built for. The label
+    # rules run after the models, so one set serves every folder.
+    return LexiconHazardTagger.for_scorer(
+        scorer,
+        counterfeit_rules=SHIPPED_COUNTERFEIT_RULES,
+        embedder=embedder,
+        sentiment_label=reader,
+    )
 
 
 def _sentiment_model(choice: str) -> Any:

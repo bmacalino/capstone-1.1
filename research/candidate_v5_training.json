@@ -1,0 +1,157 @@
+{
+  "generated_at": "2026-10-07T15:56:51+00:00",
+  "warning": "Agreement with AI-proposed labels (research/five_label_data.py), cross-validated. Not accuracy.",
+  "cross_validation": {
+    "folds": 5,
+    "grouped_by": "review_id",
+    "seed": 42
+  },
+  "defect": {
+    "threshold": 0.501276,
+    "sentences": 4003,
+    "reports": 1010,
+    "high_star_bar": {
+      "rule": "Among sentences of 4-5 star reviews that the keywords did not flag and that are not praise, the threshold - never below the ordinary one - at which the added flags that are right outnumber those that are wrong by the most (out-of-fold scores; round 8 rows count for the pool sentences they stand for; ties go to the lower threshold). Below it an added flag is more often wrong than right.",
+      "ordinary_threshold": 0.501276,
+      "bar": 0.637302,
+      "sentences_in_question": 160,
+      "resampled_reviews": {
+        "draws": 500,
+        "p10": 0.6302,
+        "median": 0.6537,
+        "p90": 0.7501
+      },
+      "added_flags_in_4_5_star_reviews": {
+        "at_the_ordinary_threshold": {
+          "right": 101.1,
+          "wrong": 97.1
+        },
+        "at_the_bar": {
+          "right": 76.4,
+          "wrong": 33.4
+        }
+      },
+      "added_flags_in_1_3_star_reviews": {
+        "at_the_ordinary_threshold": {
+          "right": 670.2,
+          "wrong": 171.0
+        },
+        "the_same_rule_would_set": 0.501276
+      }
+    },
+    "candidate": {
+      "all_rounds": {
+        "tp": 767,
+        "fp": 223,
+        "fn": 243,
+        "precision": 0.7747,
+        "recall": 0.7594,
+        "f1": 0.767
+      },
+      "gadget_sentences": {
+        "tp": 634,
+        "fp": 152,
+        "fn": 198,
+        "precision": 0.8066,
+        "recall": 0.762,
+        "f1": 0.7837
+      },
+      "rounds_5_7": {
+        "tp": 264,
+        "fp": 65,
+        "fn": 85,
+        "precision": 0.8024,
+        "recall": 0.7564,
+        "f1": 0.7788
+      },
+      "rounds_6_7_gadget_rounds": {
+        "tp": 191,
+        "fp": 46,
+        "fn": 55,
+        "precision": 0.8059,
+        "recall": 0.7764,
+        "f1": 0.7909
+      },
+      "round_7": {
+        "tp": 81,
+        "fp": 18,
+        "fn": 26,
+        "precision": 0.8182,
+        "recall": 0.757,
+        "f1": 0.7864
+      },
+      "rounds_1_3_relabelled": {
+        "tp": 370,
+        "fp": 118,
+        "fn": 124,
+        "precision": 0.7582,
+        "recall": 0.749,
+        "f1": 0.7536
+      },
+      "all_rounds_without_the_high_star_bar": {
+        "tp": 787,
+        "fp": 273,
+        "fn": 223,
+        "precision": 0.7425,
+        "recall": 0.7792,
+        "f1": 0.7604
+      }
+    },
+    "team_label_models": {
+      "rounds_5_7": {
+        "tp": 194,
+        "fp": 73,
+        "fn": 155,
+        "precision": 0.7266,
+        "recall": 0.5559,
+        "f1": 0.6299
+      },
+      "round_7": {
+        "tp": 61,
+        "fp": 27,
+        "fn": 46,
+        "precision": 0.6932,
+        "recall": 0.5701,
+        "f1": 0.6256
+      },
+      "keywords_alone_rounds_5_7": {
+        "tp": 92,
+        "fp": 16,
+        "fn": 257,
+        "precision": 0.8519,
+        "recall": 0.2636,
+        "f1": 0.4026
+      }
+    },
+    "round_3_team_labels_held_out_for_both": {
+      "sentences": 460,
+      "threshold_without_round_3": 0.537467,
+      "team_label_models": {
+        "tp": 126,
+        "fp": 17,
+        "fn": 53,
+        "precision": 0.8811,
+        "recall": 0.7039,
+        "f1": 0.7826
+      },
+      "this_design_without_round_3": {
+        "tp": 129,
+        "fp": 17,
+        "fn": 50,
+        "precision": 0.8836,
+        "recall": 0.7207,
+        "f1": 0.7938
+      },
+      "high_star_bar_without_round_3": 0.685252,
+      "round_3_sentences_from_4_5_star_reviews": 70,
+      "this_design_without_the_bar": {
+        "tp": 131,
+        "fp": 18,
+        "fn": 48,
+        "precision": 0.8792,
+        "recall": 0.7318,
+        "f1": 0.7988
+      }
+    }
+  }
+}

@@ -93,7 +93,27 @@ STRATA = ("seed_hit", "low_star", "random_all")
 # That is where a learned defect model gains or loses against the keywords, and
 # a uniform sample holds too few such sentences to measure it.
 DISAGREEMENT = "defect_disagreement"
-ALL_STRATA = (DISAGREEMENT,) + STRATA
+# Round 5 (research/PREREGISTRATION_final_v6.md): reviews with a sentence the
+# counterfeit check flags or that uses an authenticity word, and reviews
+# where the shipped checker and the retrained candidate disagree.
+COUNTERFEIT_FOCUS = "counterfeit_focus"
+MODEL_DISAGREEMENT = "model_disagreement"
+# Round 7: reviews that talk about quality, size, capacity or the photos, for
+# the two labels added in guide 1.4. A broad word test, not the checker's rules.
+ASPECT_FOCUS = "aspect_focus"
+ALL_STRATA = (COUNTERFEIT_FOCUS, ASPECT_FOCUS, MODEL_DISAGREEMENT, DISAGREEMENT) + STRATA
+ASPECT = re.compile(
+    r"(?<!\w)(\d+\s*(k\s*)?(mah|gb|tb|inch|inches|watts?|meters?)|picture|pic|photo|litrato|description|advertis\w*|"
+    r"misleading|quality|mahina|hina|weak|manipis|marupok|flimsy|dents?|gasgas|scratch\w*|yupi|sabog|maluwag|lumuwag|"
+    r"low class|matibay|durable)(?!\w)",
+    re.IGNORECASE,
+)
+AUTHENTICITY = re.compile(
+    r"(?<!\w)(fake|peke|orig|original|authentic|legit|genuine|replica|imitation|class a|counterfeit|"
+    r"copy|kopya|oem|totoo|tunay|scam|budol)(?!\w)",
+    re.IGNORECASE,
+)
+CANDIDATE_MODEL_DIR = SENTIMENT_ROOT / "models" / "hazard_classifier_v3"
 DISAGREEMENT_MODEL = ROOT / "research" / "models" / "defect_tk_round1.joblib"
 DEFAULT_BUDGET = {"seed_hit": 380, "low_star": 240, "random_all": 280}
 DEFAULT_BLIND_RATE = 0.15
@@ -118,11 +138,43 @@ ROUND_DEFAULTS = {
         "guide": "1.1",
     },
     3: {
-        "strata": ALL_STRATA,
+        "strata": (DISAGREEMENT,) + STRATA,
         "budget": {DISAGREEMENT: 120, "seed_hit": 220, "low_star": 130, "random_all": 130},
         "blind_rate": 1.0,
         "seed": 20261003,
         "guide": "1.1",
+    },
+    # The final test round: only reviews no earlier round and no earlier
+    # unlabelled check could have touched (the public Shopee set).
+    5: {
+        "strata": (COUNTERFEIT_FOCUS, MODEL_DISAGREEMENT) + STRATA,
+        "budget": {COUNTERFEIT_FOCUS: 280, MODEL_DISAGREEMENT: 110, "seed_hit": 120, "low_star": 45, "random_all": 45},
+        "blind_rate": 1.0,
+        "seed": 20261006,
+        "guide": "1.2",
+        "cohorts": ("shopee_hf",),
+    },
+    # Gadget-only (research/gadget_scope.py): unused own scrapes of electronics
+    # listings plus the gadget reviews of the Shopee set. The own scrapes were
+    # seen by earlier unlabelled spot checks, so this is development data.
+    6: {
+        "strata": (COUNTERFEIT_FOCUS, MODEL_DISAGREEMENT) + STRATA,
+        "budget": {COUNTERFEIT_FOCUS: 280, MODEL_DISAGREEMENT: 110, "seed_hit": 120, "low_star": 45, "random_all": 45},
+        "blind_rate": 1.0,
+        "seed": 20261007,
+        "guide": "1.2",
+        "cohorts": ("own_scrape", "shopee_hf"),
+        "scope": "gadget",
+    },
+    # More gadget-only training data, weighted towards the two new labels.
+    7: {
+        "strata": (COUNTERFEIT_FOCUS, ASPECT_FOCUS) + STRATA,
+        "budget": {COUNTERFEIT_FOCUS: 150, ASPECT_FOCUS: 250, "seed_hit": 90, "low_star": 80, "random_all": 30},
+        "blind_rate": 1.0,
+        "seed": 20261008,
+        "guide": "1.4",
+        "cohorts": ("own_scrape", "shopee_hf"),
+        "scope": "gadget",
     },
 }
 
@@ -140,7 +192,8 @@ def defect_disagreement_predicate():
     from defaketive_sentiment.hazard_model import LexiconHazardTagger
 
     model = joblib.load(DISAGREEMENT_MODEL)
-    tagger = LexiconHazardTagger()
+    # Keyword features as the app computes them: before the counterfeit rules.
+    tagger = LexiconHazardTagger(counterfeit_rules=None)
 
     def disagrees(text: str) -> bool:
         for sentence in sentences_for(text):
@@ -152,6 +205,69 @@ def defect_disagreement_predicate():
         return False
 
     return disagrees
+
+
+def counterfeit_focus_predicate():
+    """True for a review with a sentence either counterfeit check (0.3.0 or
+    c1) flags, or that uses an authenticity word."""
+    from defaketive_sentiment.hazard_model import LexiconHazardTagger
+
+    old, new = LexiconHazardTagger(counterfeit_rules=None), LexiconHazardTagger()
+
+    def focus(text: str) -> bool:
+        for sentence in sentences_for(text):
+            if AUTHENTICITY.search(sentence):
+                return True
+            if "counterfeit" in old.tag_sentence(sentence)["tags"] or "counterfeit" in new.tag_sentence(sentence)["tags"]:
+                return True
+        return False
+
+    return focus
+
+
+def aspect_focus_predicate():
+    """True for a review with a sentence about quality, size, capacity or photos."""
+
+    def focus(text: str) -> bool:
+        return any(ASPECT.search(sentence) for sentence in sentences_for(text))
+
+    return focus
+
+
+def model_disagreement_predicate():
+    """True for a review with a sentence where the shipped checker and the
+    retrained candidate differ on safety or defect."""
+    from defaketive_sentiment.hazard_learned import MODELS_ROOT, LearnedHazardScorer
+    from defaketive_sentiment.hazard_model import LexiconHazardTagger
+    from defaketive_sentiment.model import DefaketiveSentimentModel
+    from defaketive_sentiment.transformer_sentiment import TransformerSentimentClassifier
+
+    classifier = TransformerSentimentClassifier()
+    sentiment = DefaketiveSentimentModel(classifier=classifier)
+    seen: dict[str, str] = {}
+
+    def label(text: str) -> str:
+        if text not in seen:
+            seen[text] = sentiment.analyze(text)["label"]
+        return seen[text]
+
+    sha = classifier.manifest["files"]["model.onnx"]
+    taggers = [
+        LexiconHazardTagger(learned=LearnedHazardScorer(folder, sentiment_model_sha256=sha), sentiment_label=label)
+        # Pinned: the checker that shipped when rounds 5 and 6 were drawn.
+        for folder in (MODELS_ROOT / "hazard_classifier_v2", CANDIDATE_MODEL_DIR)
+    ]
+
+    def disagrees(text: str) -> bool:
+        for sentence in sentences_for(text):
+            a, b = (set(tagger.tag_sentence(sentence)["tags"]) & {"safety", "defect"} for tagger in taggers)
+            if a != b:
+                return True
+        return False
+
+    return disagrees
+
+
 # Files of an earlier round that hold review text, and the column holding it.
 PRIOR_ROUND_FILES = ("queue_master.csv", "practice_set_master.csv")
 PRIOR_ROUND_TEXT_COLUMN = "review_text_raw"
@@ -442,8 +558,17 @@ def load_shopee_hf(path: Path | None) -> tuple[list[dict[str, Any]], list[Path]]
     """Load a local copy of scaredmeow/shopee-reviews-tl-stars (columns text,label)."""
     if path is None:
         return [], []
-    if not path.is_file():
+    # A folder holds the dataset's splits (train/validation/test .csv).
+    files = sorted(path.glob("*.csv")) if path.is_dir() else [path]
+    if not files or not all(item.is_file() for item in files):
         raise FileNotFoundError(f"--shopee-hf given but not found: {path}")
+    rows: list[dict[str, Any]] = []
+    for item in files:
+        rows += _shopee_hf_rows(item)
+    return rows, files
+
+
+def _shopee_hf_rows(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     with path.open(encoding="utf-8", errors="replace", newline="") as handle:
         for record in csv.DictReader(handle):
@@ -468,7 +593,7 @@ def load_shopee_hf(path: Path | None) -> tuple[list[dict[str, Any]], list[Path]]
                     "review_text": text,
                 }
             )
-    return rows, [path]
+    return rows
 
 
 def round_dir(round_number: int) -> Path:
@@ -531,12 +656,14 @@ def build_pool(
     rows: Iterable[dict[str, Any]],
     matcher: SeedMatcher,
     excluded: set[str],
-    first_stratum: tuple[str, Any] | None = None,
+    first_stratum: tuple[str, Any] | list[tuple[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """De-duplicate, drop excluded rows, and assign every survivor a stratum."""
     pool: list[dict[str, Any]] = []
     seen: set[str] = set()
     counts = {"total": 0, "empty": 0, "duplicate": 0, "excluded": 0}
+    # Checked in order, before the seed list; the first that holds wins.
+    firsts = [first_stratum] if isinstance(first_stratum, tuple) else list(first_stratum or [])
     for row in rows:
         counts["total"] += 1
         text = str(row.get("review_text") or "").strip()
@@ -560,8 +687,9 @@ def build_pool(
         record["blocked_terms"] = hit["blocked"]
         record["seed_categories"] = hit["categories"]
         record["seed_subtype"] = hit["subtype"]
-        if first_stratum is not None and first_stratum[1](text):
-            record["stratum"] = first_stratum[0]
+        special = next((name for name, holds in firsts if holds(text)), None)
+        if special is not None:
+            record["stratum"] = special
         elif hit["terms"]:
             record["stratum"] = "seed_hit"
         elif is_low_star(record):
@@ -919,8 +1047,25 @@ def main(argv: Sequence[str] | None = None) -> int:
     excluded |= prior_keys
 
     strata = round_strata(args.round)
-    first = (DISAGREEMENT, defect_disagreement_predicate()) if DISAGREEMENT in strata else None
-    pool, drops = build_pool(scrape_rows + firecs_rows + shopee_rows, matcher, excluded, first)
+    predicates = {
+        COUNTERFEIT_FOCUS: counterfeit_focus_predicate,
+        ASPECT_FOCUS: aspect_focus_predicate,
+        MODEL_DISAGREEMENT: model_disagreement_predicate,
+        DISAGREEMENT: defect_disagreement_predicate,
+    }
+    first = [(name, predicates[name]()) for name in strata if name in predicates]
+    candidates = scrape_rows + firecs_rows + shopee_rows
+    cohorts = ROUND_DEFAULTS[args.round].get("cohorts")
+    if cohorts:
+        if not shopee_rows:
+            raise SystemExit(f"Round {args.round} draws only from {cohorts}; pass --shopee-hf.")
+        candidates = [row for row in candidates if row["cohort"] in cohorts]
+    scope = ROUND_DEFAULTS[args.round].get("scope")
+    if scope == "gadget":
+        from gadget_scope import is_gadget
+
+        candidates = [row for row in candidates if is_gadget(row)]
+    pool, drops = build_pool(candidates, matcher, excluded, first)
 
     by_stratum: dict[str, list[dict[str, Any]]] = {s: [] for s in strata}
     for row in pool:
@@ -1048,6 +1193,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 if DISAGREEMENT in strata
                 else {}
             ),
+            **(
+                {"candidate_model_manifest_sha256": sha256(CANDIDATE_MODEL_DIR / "manifest.json")}
+                if MODEL_DISAGREEMENT in strata
+                else {}
+            ),
+            "cohorts": list(cohorts) if cohorts else "all",
+            "scope": scope or "all",
         },
     }
 

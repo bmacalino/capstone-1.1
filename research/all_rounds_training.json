@@ -1,0 +1,1941 @@
+{
+  "generated_at": "2026-10-08T02:31:31+00:00",
+  "warning": "Only lines with truth 'team' are measured against human labels. The rest is agreement with AI labels.",
+  "served": "hazard_classifier_v5",
+  "margin": 0.02,
+  "cross_validation": {
+    "folds": 5,
+    "grouped_by": "review_id",
+    "seed": 42
+  },
+  "labels": {
+    "safety": {
+      "left_out_rounds": {
+        "2": {
+          "sentences": 576,
+          "reports": 16,
+          "truth": "team",
+          "served": {
+            "tp": 10,
+            "fp": 15,
+            "fn": 6,
+            "precision": 0.4,
+            "recall": 0.625,
+            "f1": 0.4878
+          },
+          "rules": {
+            "tp": 10,
+            "fp": 16,
+            "fn": 6,
+            "precision": 0.3846,
+            "recall": 0.625,
+            "f1": 0.4762
+          },
+          "decide": {
+            "tp": 9,
+            "fp": 11,
+            "fn": 7,
+            "precision": 0.45,
+            "recall": 0.5625,
+            "f1": 0.5,
+            "threshold": 0.951232,
+            "served_reports_lost": 1
+          },
+          "add": {
+            "tp": 10,
+            "fp": 16,
+            "fn": 6,
+            "precision": 0.3846,
+            "recall": 0.625,
+            "f1": 0.4762,
+            "threshold": 0.998475,
+            "served_reports_lost": 0
+          },
+          "filter": {
+            "tp": 9,
+            "fp": 11,
+            "fn": 7,
+            "precision": 0.45,
+            "recall": 0.5625,
+            "f1": 0.5,
+            "threshold": 0.951232,
+            "served_reports_lost": 1
+          }
+        },
+        "3": {
+          "sentences": 584,
+          "reports": 19,
+          "truth": "team",
+          "served": {
+            "tp": 14,
+            "fp": 15,
+            "fn": 5,
+            "precision": 0.4828,
+            "recall": 0.7368,
+            "f1": 0.5833
+          },
+          "rules": {
+            "tp": 14,
+            "fp": 15,
+            "fn": 5,
+            "precision": 0.4828,
+            "recall": 0.7368,
+            "f1": 0.5833
+          },
+          "decide": {
+            "tp": 12,
+            "fp": 5,
+            "fn": 7,
+            "precision": 0.7059,
+            "recall": 0.6316,
+            "f1": 0.6667,
+            "threshold": 0.953719,
+            "served_reports_lost": 2
+          },
+          "add": {
+            "tp": 14,
+            "fp": 15,
+            "fn": 5,
+            "precision": 0.4828,
+            "recall": 0.7368,
+            "f1": 0.5833,
+            "threshold": 0.998374,
+            "served_reports_lost": 0
+          },
+          "filter": {
+            "tp": 12,
+            "fp": 5,
+            "fn": 7,
+            "precision": 0.7059,
+            "recall": 0.6316,
+            "f1": 0.6667,
+            "threshold": 0.953719,
+            "served_reports_lost": 2
+          }
+        },
+        "5": {
+          "sentences": 600,
+          "reports": 16,
+          "truth": "assistant",
+          "served": {
+            "tp": 15,
+            "fp": 6,
+            "fn": 1,
+            "precision": 0.7143,
+            "recall": 0.9375,
+            "f1": 0.8108
+          },
+          "rules": {
+            "tp": 16,
+            "fp": 6,
+            "fn": 0,
+            "precision": 0.7273,
+            "recall": 1.0,
+            "f1": 0.8421
+          },
+          "decide": {
+            "tp": 15,
+            "fp": 5,
+            "fn": 1,
+            "precision": 0.75,
+            "recall": 0.9375,
+            "f1": 0.8333,
+            "threshold": 0.915072
+          },
+          "add": {
+            "tp": 16,
+            "fp": 6,
+            "fn": 0,
+            "precision": 0.7273,
+            "recall": 1.0,
+            "f1": 0.8421,
+            "threshold": 0.994111
+          },
+          "filter": {
+            "tp": 15,
+            "fp": 5,
+            "fn": 1,
+            "precision": 0.75,
+            "recall": 0.9375,
+            "f1": 0.8333,
+            "threshold": 0.915072
+          }
+        },
+        "6": {
+          "sentences": 600,
+          "reports": 21,
+          "truth": "assistant",
+          "served": {
+            "tp": 20,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.8696,
+            "recall": 0.9524,
+            "f1": 0.9091
+          },
+          "rules": {
+            "tp": 20,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.8696,
+            "recall": 0.9524,
+            "f1": 0.9091
+          },
+          "decide": {
+            "tp": 19,
+            "fp": 3,
+            "fn": 2,
+            "precision": 0.8636,
+            "recall": 0.9048,
+            "f1": 0.8837,
+            "threshold": 0.916346
+          },
+          "add": {
+            "tp": 20,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.8696,
+            "recall": 0.9524,
+            "f1": 0.9091,
+            "threshold": 0.997596
+          },
+          "filter": {
+            "tp": 19,
+            "fp": 3,
+            "fn": 2,
+            "precision": 0.8636,
+            "recall": 0.9048,
+            "f1": 0.8837,
+            "threshold": 0.916346
+          }
+        },
+        "7": {
+          "sentences": 600,
+          "reports": 8,
+          "truth": "assistant",
+          "served": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.7,
+            "recall": 0.875,
+            "f1": 0.7778
+          },
+          "rules": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.7,
+            "recall": 0.875,
+            "f1": 0.7778
+          },
+          "decide": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1.0,
+            "recall": 0.875,
+            "f1": 0.9333,
+            "threshold": 0.928948
+          },
+          "add": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.7,
+            "recall": 0.875,
+            "f1": 0.7778,
+            "threshold": 0.99538
+          },
+          "filter": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1.0,
+            "recall": 0.875,
+            "f1": 0.9333,
+            "threshold": 0.928948
+          }
+        },
+        "8_live": {
+          "sentences": 392,
+          "reports": 1,
+          "truth": "assistant",
+          "served": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "rules": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "decide": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.933286
+          },
+          "add": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.996294
+          },
+          "filter": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.933286
+          }
+        }
+      },
+      "summed": {
+        "served": {
+          "tp": 66,
+          "fp": 42,
+          "fn": 15,
+          "precision": 0.6111,
+          "recall": 0.8148,
+          "f1": 0.6984
+        },
+        "rules": {
+          "tp": 67,
+          "fp": 43,
+          "fn": 14,
+          "precision": 0.6091,
+          "recall": 0.8272,
+          "f1": 0.7016
+        },
+        "decide": {
+          "tp": 62,
+          "fp": 24,
+          "fn": 19,
+          "precision": 0.7209,
+          "recall": 0.7654,
+          "f1": 0.7425
+        },
+        "add": {
+          "tp": 67,
+          "fp": 43,
+          "fn": 14,
+          "precision": 0.6091,
+          "recall": 0.8272,
+          "f1": 0.7016
+        },
+        "filter": {
+          "tp": 62,
+          "fp": 24,
+          "fn": 19,
+          "precision": 0.7209,
+          "recall": 0.7654,
+          "f1": 0.7425
+        }
+      },
+      "served_reports_lost_on_team_rounds": {
+        "decide": 3,
+        "add": 0,
+        "filter": 3
+      },
+      "decided_here": true,
+      "passes_the_rule": [],
+      "choice": null,
+      "lenient_filters": {
+        "tried_after_the_first_result": true,
+        "left_out_rounds": {
+          "2": {
+            "reports": 16,
+            "served": {
+              "tp": 10,
+              "fp": 15,
+              "fn": 6,
+              "precision": 0.4,
+              "recall": 0.625,
+              "f1": 0.4878
+            },
+            "filter_keeping_every_report": {
+              "tp": 10,
+              "fp": 16,
+              "fn": 6,
+              "precision": 0.3846,
+              "recall": 0.625,
+              "f1": 0.4762,
+              "threshold": 0.6939667860736585
+            },
+            "filter_keeping_95_in_100": {
+              "tp": 9,
+              "fp": 13,
+              "fn": 7,
+              "precision": 0.4091,
+              "recall": 0.5625,
+              "f1": 0.4737,
+              "threshold": 0.9469129217643744
+            }
+          },
+          "3": {
+            "reports": 19,
+            "served": {
+              "tp": 14,
+              "fp": 15,
+              "fn": 5,
+              "precision": 0.4828,
+              "recall": 0.7368,
+              "f1": 0.5833
+            },
+            "filter_keeping_every_report": {
+              "tp": 14,
+              "fp": 15,
+              "fn": 5,
+              "precision": 0.4828,
+              "recall": 0.7368,
+              "f1": 0.5833,
+              "threshold": 0.2696233946940225
+            },
+            "filter_keeping_95_in_100": {
+              "tp": 13,
+              "fp": 8,
+              "fn": 6,
+              "precision": 0.619,
+              "recall": 0.6842,
+              "f1": 0.65,
+              "threshold": 0.9382181233345478
+            }
+          },
+          "5": {
+            "reports": 16,
+            "served": {
+              "tp": 15,
+              "fp": 6,
+              "fn": 1,
+              "precision": 0.7143,
+              "recall": 0.9375,
+              "f1": 0.8108
+            },
+            "filter_keeping_every_report": {
+              "tp": 15,
+              "fp": 6,
+              "fn": 1,
+              "precision": 0.7143,
+              "recall": 0.9375,
+              "f1": 0.8108,
+              "threshold": 0.8917093354279401
+            },
+            "filter_keeping_95_in_100": {
+              "tp": 15,
+              "fp": 5,
+              "fn": 1,
+              "precision": 0.75,
+              "recall": 0.9375,
+              "f1": 0.8333,
+              "threshold": 0.9151145708193364
+            }
+          },
+          "6": {
+            "reports": 21,
+            "served": {
+              "tp": 20,
+              "fp": 3,
+              "fn": 1,
+              "precision": 0.8696,
+              "recall": 0.9524,
+              "f1": 0.9091
+            },
+            "filter_keeping_every_report": {
+              "tp": 20,
+              "fp": 3,
+              "fn": 1,
+              "precision": 0.8696,
+              "recall": 0.9524,
+              "f1": 0.9091,
+              "threshold": 0.4677098241232032
+            },
+            "filter_keeping_95_in_100": {
+              "tp": 20,
+              "fp": 3,
+              "fn": 1,
+              "precision": 0.8696,
+              "recall": 0.9524,
+              "f1": 0.9091,
+              "threshold": 0.9096114617016638
+            }
+          },
+          "7": {
+            "reports": 8,
+            "served": {
+              "tp": 7,
+              "fp": 3,
+              "fn": 1,
+              "precision": 0.7,
+              "recall": 0.875,
+              "f1": 0.7778
+            },
+            "filter_keeping_every_report": {
+              "tp": 7,
+              "fp": 3,
+              "fn": 1,
+              "precision": 0.7,
+              "recall": 0.875,
+              "f1": 0.7778,
+              "threshold": 0.17967352674759451
+            },
+            "filter_keeping_95_in_100": {
+              "tp": 7,
+              "fp": 1,
+              "fn": 1,
+              "precision": 0.875,
+              "recall": 0.875,
+              "f1": 0.875,
+              "threshold": 0.9262892418021252
+            }
+          },
+          "8_live": {
+            "reports": 1,
+            "served": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "filter_keeping_every_report": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "threshold": 0.1667417067001351
+            },
+            "filter_keeping_95_in_100": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "threshold": 0.9270683106254137
+            }
+          }
+        },
+        "summed": {
+          "served": {
+            "tp": 66,
+            "fp": 42,
+            "fn": 15,
+            "precision": 0.6111,
+            "recall": 0.8148,
+            "f1": 0.6984
+          },
+          "filter_keeping_every_report": {
+            "tp": 66,
+            "fp": 43,
+            "fn": 15,
+            "precision": 0.6055,
+            "recall": 0.8148,
+            "f1": 0.6947
+          },
+          "filter_keeping_95_in_100": {
+            "tp": 64,
+            "fp": 30,
+            "fn": 17,
+            "precision": 0.6809,
+            "recall": 0.7901,
+            "f1": 0.7314
+          }
+        },
+        "served_reports_lost_on_team_rounds": {
+          "filter_keeping_every_report": 0,
+          "filter_keeping_95_in_100": 2
+        },
+        "passes_the_rule": []
+      }
+    },
+    "defect": {
+      "left_out_rounds": {
+        "2": {
+          "sentences": 498,
+          "reports": 132,
+          "truth": "team",
+          "served": {
+            "tp": 108,
+            "fp": 21,
+            "fn": 24,
+            "precision": 0.8372,
+            "recall": 0.8182,
+            "f1": 0.8276
+          },
+          "rules": {
+            "tp": 59,
+            "fp": 12,
+            "fn": 73,
+            "precision": 0.831,
+            "recall": 0.447,
+            "f1": 0.5813
+          },
+          "decide": {
+            "tp": 98,
+            "fp": 37,
+            "fn": 34,
+            "precision": 0.7259,
+            "recall": 0.7424,
+            "f1": 0.7341,
+            "threshold": 0.439799,
+            "served_reports_lost": 11
+          },
+          "add": {
+            "tp": 97,
+            "fp": 36,
+            "fn": 35,
+            "precision": 0.7293,
+            "recall": 0.7348,
+            "f1": 0.7321,
+            "threshold": 0.439799,
+            "served_reports_lost": 11
+          },
+          "filter": {
+            "tp": 59,
+            "fp": 11,
+            "fn": 73,
+            "precision": 0.8429,
+            "recall": 0.447,
+            "f1": 0.5842,
+            "threshold": 0.597822,
+            "served_reports_lost": 49
+          }
+        },
+        "3": {
+          "sentences": 460,
+          "reports": 179,
+          "truth": "team",
+          "served": {
+            "tp": 153,
+            "fp": 16,
+            "fn": 26,
+            "precision": 0.9053,
+            "recall": 0.8547,
+            "f1": 0.8793
+          },
+          "rules": {
+            "tp": 75,
+            "fp": 11,
+            "fn": 104,
+            "precision": 0.8721,
+            "recall": 0.419,
+            "f1": 0.566
+          },
+          "decide": {
+            "tp": 134,
+            "fp": 20,
+            "fn": 45,
+            "precision": 0.8701,
+            "recall": 0.7486,
+            "f1": 0.8048,
+            "threshold": 0.537467,
+            "served_reports_lost": 22
+          },
+          "add": {
+            "tp": 131,
+            "fp": 18,
+            "fn": 48,
+            "precision": 0.8792,
+            "recall": 0.7318,
+            "f1": 0.7988,
+            "threshold": 0.537467,
+            "served_reports_lost": 22
+          },
+          "filter": {
+            "tp": 74,
+            "fp": 9,
+            "fn": 105,
+            "precision": 0.8916,
+            "recall": 0.4134,
+            "f1": 0.5649,
+            "threshold": 0.612697,
+            "served_reports_lost": 79
+          }
+        },
+        "5": {
+          "sentences": 600,
+          "reports": 103,
+          "truth": "assistant",
+          "served": {
+            "tp": 95,
+            "fp": 10,
+            "fn": 8,
+            "precision": 0.9048,
+            "recall": 0.9223,
+            "f1": 0.9135
+          },
+          "rules": {
+            "tp": 21,
+            "fp": 4,
+            "fn": 82,
+            "precision": 0.84,
+            "recall": 0.2039,
+            "f1": 0.3281
+          },
+          "decide": {
+            "tp": 68,
+            "fp": 14,
+            "fn": 35,
+            "precision": 0.8293,
+            "recall": 0.6602,
+            "f1": 0.7351,
+            "threshold": 0.564169
+          },
+          "add": {
+            "tp": 69,
+            "fp": 21,
+            "fn": 34,
+            "precision": 0.7667,
+            "recall": 0.6699,
+            "f1": 0.715,
+            "threshold": 0.515603
+          },
+          "filter": {
+            "tp": 21,
+            "fp": 2,
+            "fn": 82,
+            "precision": 0.913,
+            "recall": 0.2039,
+            "f1": 0.3333,
+            "threshold": 0.599195
+          }
+        },
+        "6": {
+          "sentences": 600,
+          "reports": 139,
+          "truth": "assistant",
+          "served": {
+            "tp": 130,
+            "fp": 15,
+            "fn": 9,
+            "precision": 0.8966,
+            "recall": 0.9353,
+            "f1": 0.9155
+          },
+          "rules": {
+            "tp": 35,
+            "fp": 7,
+            "fn": 104,
+            "precision": 0.8333,
+            "recall": 0.2518,
+            "f1": 0.3867
+          },
+          "decide": {
+            "tp": 100,
+            "fp": 29,
+            "fn": 39,
+            "precision": 0.7752,
+            "recall": 0.7194,
+            "f1": 0.7463,
+            "threshold": 0.554921
+          },
+          "add": {
+            "tp": 99,
+            "fp": 21,
+            "fn": 40,
+            "precision": 0.825,
+            "recall": 0.7122,
+            "f1": 0.7645,
+            "threshold": 0.554921
+          },
+          "filter": {
+            "tp": 35,
+            "fp": 6,
+            "fn": 104,
+            "precision": 0.8537,
+            "recall": 0.2518,
+            "f1": 0.3889,
+            "threshold": 0.566476
+          }
+        },
+        "7": {
+          "sentences": 600,
+          "reports": 107,
+          "truth": "assistant",
+          "served": {
+            "tp": 97,
+            "fp": 8,
+            "fn": 10,
+            "precision": 0.9238,
+            "recall": 0.9065,
+            "f1": 0.9151
+          },
+          "rules": {
+            "tp": 36,
+            "fp": 5,
+            "fn": 71,
+            "precision": 0.878,
+            "recall": 0.3364,
+            "f1": 0.4865
+          },
+          "decide": {
+            "tp": 83,
+            "fp": 21,
+            "fn": 24,
+            "precision": 0.7981,
+            "recall": 0.7757,
+            "f1": 0.7867,
+            "threshold": 0.515353
+          },
+          "add": {
+            "tp": 83,
+            "fp": 20,
+            "fn": 24,
+            "precision": 0.8058,
+            "recall": 0.7757,
+            "f1": 0.7905,
+            "threshold": 0.495667
+          },
+          "filter": {
+            "tp": 36,
+            "fp": 3,
+            "fn": 71,
+            "precision": 0.9231,
+            "recall": 0.3364,
+            "f1": 0.4932,
+            "threshold": 0.540558
+          }
+        },
+        "8_live": {
+          "sentences": 392,
+          "reports": 208,
+          "truth": "assistant",
+          "served": {
+            "tp": 193,
+            "fp": 30,
+            "fn": 15,
+            "precision": 0.8655,
+            "recall": 0.9279,
+            "f1": 0.8956
+          },
+          "rules": {
+            "tp": 110,
+            "fp": 10,
+            "fn": 98,
+            "precision": 0.9167,
+            "recall": 0.5288,
+            "f1": 0.6707
+          },
+          "decide": {
+            "tp": 196,
+            "fp": 53,
+            "fn": 12,
+            "precision": 0.7871,
+            "recall": 0.9423,
+            "f1": 0.8578,
+            "threshold": 0.501276
+          },
+          "add": {
+            "tp": 196,
+            "fp": 53,
+            "fn": 12,
+            "precision": 0.7871,
+            "recall": 0.9423,
+            "f1": 0.8578,
+            "threshold": 0.501276
+          },
+          "filter": {
+            "tp": 110,
+            "fp": 10,
+            "fn": 98,
+            "precision": 0.9167,
+            "recall": 0.5288,
+            "f1": 0.6707,
+            "threshold": 0.5667
+          }
+        }
+      },
+      "summed": {
+        "served": {
+          "tp": 776,
+          "fp": 100,
+          "fn": 92,
+          "precision": 0.8858,
+          "recall": 0.894,
+          "f1": 0.8899
+        },
+        "rules": {
+          "tp": 336,
+          "fp": 49,
+          "fn": 532,
+          "precision": 0.8727,
+          "recall": 0.3871,
+          "f1": 0.5363
+        },
+        "decide": {
+          "tp": 679,
+          "fp": 174,
+          "fn": 189,
+          "precision": 0.796,
+          "recall": 0.7823,
+          "f1": 0.7891
+        },
+        "add": {
+          "tp": 675,
+          "fp": 169,
+          "fn": 193,
+          "precision": 0.7998,
+          "recall": 0.7776,
+          "f1": 0.7886
+        },
+        "filter": {
+          "tp": 335,
+          "fp": 41,
+          "fn": 533,
+          "precision": 0.891,
+          "recall": 0.3859,
+          "f1": 0.5386
+        }
+      },
+      "served_reports_lost_on_team_rounds": null,
+      "decided_here": false,
+      "passes_the_rule": null,
+      "choice": null
+    },
+    "quality": {
+      "left_out_rounds": {
+        "2": {
+          "sentences": 600,
+          "reports": 70,
+          "truth": "assistant",
+          "served": {
+            "tp": 43,
+            "fp": 1,
+            "fn": 27,
+            "precision": 0.9773,
+            "recall": 0.6143,
+            "f1": 0.7544
+          },
+          "rules": {
+            "tp": 43,
+            "fp": 1,
+            "fn": 27,
+            "precision": 0.9773,
+            "recall": 0.6143,
+            "f1": 0.7544
+          },
+          "decide": {
+            "tp": 48,
+            "fp": 28,
+            "fn": 22,
+            "precision": 0.6316,
+            "recall": 0.6857,
+            "f1": 0.6575,
+            "threshold": 0.541002
+          },
+          "add": {
+            "tp": 45,
+            "fp": 3,
+            "fn": 25,
+            "precision": 0.9375,
+            "recall": 0.6429,
+            "f1": 0.7627,
+            "threshold": 0.863729
+          },
+          "filter": {
+            "tp": 43,
+            "fp": 1,
+            "fn": 27,
+            "precision": 0.9773,
+            "recall": 0.6143,
+            "f1": 0.7544,
+            "threshold": 0.054263
+          }
+        },
+        "3": {
+          "sentences": 600,
+          "reports": 67,
+          "truth": "assistant",
+          "served": {
+            "tp": 38,
+            "fp": 1,
+            "fn": 29,
+            "precision": 0.9744,
+            "recall": 0.5672,
+            "f1": 0.717
+          },
+          "rules": {
+            "tp": 38,
+            "fp": 1,
+            "fn": 29,
+            "precision": 0.9744,
+            "recall": 0.5672,
+            "f1": 0.717
+          },
+          "decide": {
+            "tp": 40,
+            "fp": 36,
+            "fn": 27,
+            "precision": 0.5263,
+            "recall": 0.597,
+            "f1": 0.5594,
+            "threshold": 0.541638
+          },
+          "add": {
+            "tp": 44,
+            "fp": 2,
+            "fn": 23,
+            "precision": 0.9565,
+            "recall": 0.6567,
+            "f1": 0.7788,
+            "threshold": 0.824058
+          },
+          "filter": {
+            "tp": 38,
+            "fp": 1,
+            "fn": 29,
+            "precision": 0.9744,
+            "recall": 0.5672,
+            "f1": 0.717,
+            "threshold": 0.100455
+          }
+        },
+        "5": {
+          "sentences": 600,
+          "reports": 40,
+          "truth": "assistant",
+          "served": {
+            "tp": 23,
+            "fp": 2,
+            "fn": 17,
+            "precision": 0.92,
+            "recall": 0.575,
+            "f1": 0.7077
+          },
+          "rules": {
+            "tp": 23,
+            "fp": 2,
+            "fn": 17,
+            "precision": 0.92,
+            "recall": 0.575,
+            "f1": 0.7077
+          },
+          "decide": {
+            "tp": 25,
+            "fp": 44,
+            "fn": 15,
+            "precision": 0.3623,
+            "recall": 0.625,
+            "f1": 0.4587,
+            "threshold": 0.49583
+          },
+          "add": {
+            "tp": 23,
+            "fp": 4,
+            "fn": 17,
+            "precision": 0.8519,
+            "recall": 0.575,
+            "f1": 0.6866,
+            "threshold": 0.81848
+          },
+          "filter": {
+            "tp": 22,
+            "fp": 2,
+            "fn": 18,
+            "precision": 0.9167,
+            "recall": 0.55,
+            "f1": 0.6875,
+            "threshold": 0.126841
+          }
+        },
+        "6": {
+          "sentences": 600,
+          "reports": 35,
+          "truth": "assistant",
+          "served": {
+            "tp": 22,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.6286,
+            "f1": 0.7719
+          },
+          "rules": {
+            "tp": 22,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.6286,
+            "f1": 0.7719
+          },
+          "decide": {
+            "tp": 21,
+            "fp": 19,
+            "fn": 14,
+            "precision": 0.525,
+            "recall": 0.6,
+            "f1": 0.56,
+            "threshold": 0.616712
+          },
+          "add": {
+            "tp": 24,
+            "fp": 10,
+            "fn": 11,
+            "precision": 0.7059,
+            "recall": 0.6857,
+            "f1": 0.6957,
+            "threshold": 0.70638
+          },
+          "filter": {
+            "tp": 22,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.6286,
+            "f1": 0.7719,
+            "threshold": 0.080521
+          }
+        },
+        "7": {
+          "sentences": 600,
+          "reports": 80,
+          "truth": "assistant",
+          "served": {
+            "tp": 49,
+            "fp": 2,
+            "fn": 31,
+            "precision": 0.9608,
+            "recall": 0.6125,
+            "f1": 0.7481
+          },
+          "rules": {
+            "tp": 49,
+            "fp": 2,
+            "fn": 31,
+            "precision": 0.9608,
+            "recall": 0.6125,
+            "f1": 0.7481
+          },
+          "decide": {
+            "tp": 45,
+            "fp": 19,
+            "fn": 35,
+            "precision": 0.7031,
+            "recall": 0.5625,
+            "f1": 0.625,
+            "threshold": 0.563869
+          },
+          "add": {
+            "tp": 51,
+            "fp": 3,
+            "fn": 29,
+            "precision": 0.9444,
+            "recall": 0.6375,
+            "f1": 0.7612,
+            "threshold": 0.85877
+          },
+          "filter": {
+            "tp": 49,
+            "fp": 2,
+            "fn": 31,
+            "precision": 0.9608,
+            "recall": 0.6125,
+            "f1": 0.7481,
+            "threshold": 0.063374
+          }
+        },
+        "8_live": {
+          "sentences": 392,
+          "reports": 25,
+          "truth": "assistant",
+          "served": {
+            "tp": 15,
+            "fp": 5,
+            "fn": 10,
+            "precision": 0.75,
+            "recall": 0.6,
+            "f1": 0.6667
+          },
+          "rules": {
+            "tp": 15,
+            "fp": 5,
+            "fn": 10,
+            "precision": 0.75,
+            "recall": 0.6,
+            "f1": 0.6667
+          },
+          "decide": {
+            "tp": 15,
+            "fp": 16,
+            "fn": 10,
+            "precision": 0.4839,
+            "recall": 0.6,
+            "f1": 0.5357,
+            "threshold": 0.493446
+          },
+          "add": {
+            "tp": 16,
+            "fp": 6,
+            "fn": 9,
+            "precision": 0.7273,
+            "recall": 0.64,
+            "f1": 0.6809,
+            "threshold": 0.804462
+          },
+          "filter": {
+            "tp": 14,
+            "fp": 5,
+            "fn": 11,
+            "precision": 0.7368,
+            "recall": 0.56,
+            "f1": 0.6364,
+            "threshold": 0.095627
+          }
+        }
+      },
+      "summed": {
+        "served": {
+          "tp": 190,
+          "fp": 11,
+          "fn": 127,
+          "precision": 0.9453,
+          "recall": 0.5994,
+          "f1": 0.7336
+        },
+        "rules": {
+          "tp": 190,
+          "fp": 11,
+          "fn": 127,
+          "precision": 0.9453,
+          "recall": 0.5994,
+          "f1": 0.7336
+        },
+        "decide": {
+          "tp": 194,
+          "fp": 162,
+          "fn": 123,
+          "precision": 0.5449,
+          "recall": 0.612,
+          "f1": 0.5765
+        },
+        "add": {
+          "tp": 203,
+          "fp": 28,
+          "fn": 114,
+          "precision": 0.8788,
+          "recall": 0.6404,
+          "f1": 0.7409
+        },
+        "filter": {
+          "tp": 188,
+          "fp": 11,
+          "fn": 129,
+          "precision": 0.9447,
+          "recall": 0.5931,
+          "f1": 0.7287
+        }
+      },
+      "served_reports_lost_on_team_rounds": null,
+      "decided_here": true,
+      "passes_the_rule": [],
+      "choice": null
+    },
+    "counterfeit": {
+      "left_out_rounds": {
+        "2": {
+          "sentences": 576,
+          "reports": 12,
+          "truth": "team",
+          "served": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 5,
+            "precision": 0.7,
+            "recall": 0.5833,
+            "f1": 0.6364
+          },
+          "rules": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 5,
+            "precision": 0.7,
+            "recall": 0.5833,
+            "f1": 0.6364
+          },
+          "decide": {
+            "tp": 7,
+            "fp": 4,
+            "fn": 5,
+            "precision": 0.6364,
+            "recall": 0.5833,
+            "f1": 0.6087,
+            "threshold": 0.864029,
+            "served_reports_lost": 0
+          },
+          "add": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 5,
+            "precision": 0.7,
+            "recall": 0.5833,
+            "f1": 0.6364,
+            "threshold": 1.0,
+            "served_reports_lost": 0
+          },
+          "filter": {
+            "tp": 7,
+            "fp": 3,
+            "fn": 5,
+            "precision": 0.7,
+            "recall": 0.5833,
+            "f1": 0.6364,
+            "threshold": 0.09622,
+            "served_reports_lost": 0
+          }
+        },
+        "3": {
+          "sentences": 591,
+          "reports": 0,
+          "truth": "team",
+          "served": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "rules": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "decide": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.782538,
+            "served_reports_lost": 0
+          },
+          "add": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 1.0,
+            "served_reports_lost": 0
+          },
+          "filter": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.035593,
+            "served_reports_lost": 0
+          }
+        },
+        "5": {
+          "sentences": 600,
+          "reports": 32,
+          "truth": "assistant",
+          "served": {
+            "tp": 20,
+            "fp": 6,
+            "fn": 12,
+            "precision": 0.7692,
+            "recall": 0.625,
+            "f1": 0.6897
+          },
+          "rules": {
+            "tp": 20,
+            "fp": 6,
+            "fn": 12,
+            "precision": 0.7692,
+            "recall": 0.625,
+            "f1": 0.6897
+          },
+          "decide": {
+            "tp": 20,
+            "fp": 12,
+            "fn": 12,
+            "precision": 0.625,
+            "recall": 0.625,
+            "f1": 0.625,
+            "threshold": 0.789485
+          },
+          "add": {
+            "tp": 20,
+            "fp": 6,
+            "fn": 12,
+            "precision": 0.7692,
+            "recall": 0.625,
+            "f1": 0.6897,
+            "threshold": 0.999799
+          },
+          "filter": {
+            "tp": 20,
+            "fp": 6,
+            "fn": 12,
+            "precision": 0.7692,
+            "recall": 0.625,
+            "f1": 0.6897,
+            "threshold": 0.053116
+          }
+        },
+        "6": {
+          "sentences": 600,
+          "reports": 23,
+          "truth": "assistant",
+          "served": {
+            "tp": 16,
+            "fp": 3,
+            "fn": 7,
+            "precision": 0.8421,
+            "recall": 0.6957,
+            "f1": 0.7619
+          },
+          "rules": {
+            "tp": 16,
+            "fp": 3,
+            "fn": 7,
+            "precision": 0.8421,
+            "recall": 0.6957,
+            "f1": 0.7619
+          },
+          "decide": {
+            "tp": 17,
+            "fp": 6,
+            "fn": 6,
+            "precision": 0.7391,
+            "recall": 0.7391,
+            "f1": 0.7391,
+            "threshold": 0.745351
+          },
+          "add": {
+            "tp": 16,
+            "fp": 3,
+            "fn": 7,
+            "precision": 0.8421,
+            "recall": 0.6957,
+            "f1": 0.7619,
+            "threshold": 0.945611
+          },
+          "filter": {
+            "tp": 16,
+            "fp": 2,
+            "fn": 7,
+            "precision": 0.8889,
+            "recall": 0.6957,
+            "f1": 0.7805,
+            "threshold": 0.066466
+          }
+        },
+        "7": {
+          "sentences": 600,
+          "reports": 12,
+          "truth": "assistant",
+          "served": {
+            "tp": 7,
+            "fp": 2,
+            "fn": 5,
+            "precision": 0.7778,
+            "recall": 0.5833,
+            "f1": 0.6667
+          },
+          "rules": {
+            "tp": 7,
+            "fp": 2,
+            "fn": 5,
+            "precision": 0.7778,
+            "recall": 0.5833,
+            "f1": 0.6667
+          },
+          "decide": {
+            "tp": 5,
+            "fp": 3,
+            "fn": 7,
+            "precision": 0.625,
+            "recall": 0.4167,
+            "f1": 0.5,
+            "threshold": 0.850577
+          },
+          "add": {
+            "tp": 7,
+            "fp": 2,
+            "fn": 5,
+            "precision": 0.7778,
+            "recall": 0.5833,
+            "f1": 0.6667,
+            "threshold": 1.0
+          },
+          "filter": {
+            "tp": 7,
+            "fp": 2,
+            "fn": 5,
+            "precision": 0.7778,
+            "recall": 0.5833,
+            "f1": 0.6667,
+            "threshold": 0.05292
+          }
+        },
+        "8_live": {
+          "sentences": 392,
+          "reports": 0,
+          "truth": "assistant",
+          "served": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "rules": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "decide": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.737304
+          },
+          "add": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.917626
+          },
+          "filter": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.07976
+          }
+        }
+      },
+      "summed": {
+        "served": {
+          "tp": 50,
+          "fp": 14,
+          "fn": 29,
+          "precision": 0.7812,
+          "recall": 0.6329,
+          "f1": 0.6993
+        },
+        "rules": {
+          "tp": 50,
+          "fp": 14,
+          "fn": 29,
+          "precision": 0.7812,
+          "recall": 0.6329,
+          "f1": 0.6993
+        },
+        "decide": {
+          "tp": 49,
+          "fp": 25,
+          "fn": 30,
+          "precision": 0.6622,
+          "recall": 0.6203,
+          "f1": 0.6405
+        },
+        "add": {
+          "tp": 50,
+          "fp": 14,
+          "fn": 29,
+          "precision": 0.7812,
+          "recall": 0.6329,
+          "f1": 0.6993
+        },
+        "filter": {
+          "tp": 50,
+          "fp": 13,
+          "fn": 29,
+          "precision": 0.7937,
+          "recall": 0.6329,
+          "f1": 0.7042
+        }
+      },
+      "served_reports_lost_on_team_rounds": {
+        "decide": 0,
+        "add": 0,
+        "filter": 0
+      },
+      "decided_here": true,
+      "passes_the_rule": [],
+      "choice": null
+    },
+    "not_as_described": {
+      "left_out_rounds": {
+        "2": {
+          "sentences": 600,
+          "reports": 23,
+          "truth": "assistant",
+          "served": {
+            "tp": 15,
+            "fp": 2,
+            "fn": 8,
+            "precision": 0.8824,
+            "recall": 0.6522,
+            "f1": 0.75
+          },
+          "rules": {
+            "tp": 15,
+            "fp": 2,
+            "fn": 8,
+            "precision": 0.8824,
+            "recall": 0.6522,
+            "f1": 0.75
+          },
+          "decide": {
+            "tp": 11,
+            "fp": 8,
+            "fn": 12,
+            "precision": 0.5789,
+            "recall": 0.4783,
+            "f1": 0.5238,
+            "threshold": 0.546314
+          },
+          "add": {
+            "tp": 17,
+            "fp": 4,
+            "fn": 6,
+            "precision": 0.8095,
+            "recall": 0.7391,
+            "f1": 0.7727,
+            "threshold": 0.809214
+          },
+          "filter": {
+            "tp": 15,
+            "fp": 2,
+            "fn": 8,
+            "precision": 0.8824,
+            "recall": 0.6522,
+            "f1": 0.75,
+            "threshold": 0.060488
+          }
+        },
+        "3": {
+          "sentences": 600,
+          "reports": 19,
+          "truth": "assistant",
+          "served": {
+            "tp": 9,
+            "fp": 1,
+            "fn": 10,
+            "precision": 0.9,
+            "recall": 0.4737,
+            "f1": 0.6207
+          },
+          "rules": {
+            "tp": 9,
+            "fp": 1,
+            "fn": 10,
+            "precision": 0.9,
+            "recall": 0.4737,
+            "f1": 0.6207
+          },
+          "decide": {
+            "tp": 7,
+            "fp": 8,
+            "fn": 12,
+            "precision": 0.4667,
+            "recall": 0.3684,
+            "f1": 0.4118,
+            "threshold": 0.563017
+          },
+          "add": {
+            "tp": 11,
+            "fp": 2,
+            "fn": 8,
+            "precision": 0.8462,
+            "recall": 0.5789,
+            "f1": 0.6875,
+            "threshold": 0.800966
+          },
+          "filter": {
+            "tp": 8,
+            "fp": 1,
+            "fn": 11,
+            "precision": 0.8889,
+            "recall": 0.4211,
+            "f1": 0.5714,
+            "threshold": 0.116473
+          }
+        },
+        "5": {
+          "sentences": 600,
+          "reports": 25,
+          "truth": "assistant",
+          "served": {
+            "tp": 13,
+            "fp": 0,
+            "fn": 12,
+            "precision": 1.0,
+            "recall": 0.52,
+            "f1": 0.6842
+          },
+          "rules": {
+            "tp": 13,
+            "fp": 0,
+            "fn": 12,
+            "precision": 1.0,
+            "recall": 0.52,
+            "f1": 0.6842
+          },
+          "decide": {
+            "tp": 9,
+            "fp": 7,
+            "fn": 16,
+            "precision": 0.5625,
+            "recall": 0.36,
+            "f1": 0.439,
+            "threshold": 0.614257
+          },
+          "add": {
+            "tp": 15,
+            "fp": 0,
+            "fn": 10,
+            "precision": 1.0,
+            "recall": 0.6,
+            "f1": 0.75,
+            "threshold": 0.856757
+          },
+          "filter": {
+            "tp": 13,
+            "fp": 0,
+            "fn": 12,
+            "precision": 1.0,
+            "recall": 0.52,
+            "f1": 0.6842,
+            "threshold": 0.051371
+          }
+        },
+        "6": {
+          "sentences": 600,
+          "reports": 25,
+          "truth": "assistant",
+          "served": {
+            "tp": 16,
+            "fp": 0,
+            "fn": 9,
+            "precision": 1.0,
+            "recall": 0.64,
+            "f1": 0.7805
+          },
+          "rules": {
+            "tp": 16,
+            "fp": 0,
+            "fn": 9,
+            "precision": 1.0,
+            "recall": 0.64,
+            "f1": 0.7805
+          },
+          "decide": {
+            "tp": 13,
+            "fp": 17,
+            "fn": 12,
+            "precision": 0.4333,
+            "recall": 0.52,
+            "f1": 0.4727,
+            "threshold": 0.531355
+          },
+          "add": {
+            "tp": 18,
+            "fp": 4,
+            "fn": 7,
+            "precision": 0.8182,
+            "recall": 0.72,
+            "f1": 0.766,
+            "threshold": 0.756884
+          },
+          "filter": {
+            "tp": 15,
+            "fp": 0,
+            "fn": 10,
+            "precision": 1.0,
+            "recall": 0.6,
+            "f1": 0.75,
+            "threshold": 0.108855
+          }
+        },
+        "7": {
+          "sentences": 600,
+          "reports": 35,
+          "truth": "assistant",
+          "served": {
+            "tp": 16,
+            "fp": 2,
+            "fn": 19,
+            "precision": 0.8889,
+            "recall": 0.4571,
+            "f1": 0.6038
+          },
+          "rules": {
+            "tp": 16,
+            "fp": 2,
+            "fn": 19,
+            "precision": 0.8889,
+            "recall": 0.4571,
+            "f1": 0.6038
+          },
+          "decide": {
+            "tp": 19,
+            "fp": 11,
+            "fn": 16,
+            "precision": 0.6333,
+            "recall": 0.5429,
+            "f1": 0.5846,
+            "threshold": 0.508578
+          },
+          "add": {
+            "tp": 18,
+            "fp": 3,
+            "fn": 17,
+            "precision": 0.8571,
+            "recall": 0.5143,
+            "f1": 0.6429,
+            "threshold": 0.862258
+          },
+          "filter": {
+            "tp": 16,
+            "fp": 2,
+            "fn": 19,
+            "precision": 0.8889,
+            "recall": 0.4571,
+            "f1": 0.6038,
+            "threshold": 0.081031
+          }
+        },
+        "8_live": {
+          "sentences": 392,
+          "reports": 24,
+          "truth": "assistant",
+          "served": {
+            "tp": 7,
+            "fp": 1,
+            "fn": 17,
+            "precision": 0.875,
+            "recall": 0.2917,
+            "f1": 0.4375
+          },
+          "rules": {
+            "tp": 7,
+            "fp": 1,
+            "fn": 17,
+            "precision": 0.875,
+            "recall": 0.2917,
+            "f1": 0.4375
+          },
+          "decide": {
+            "tp": 13,
+            "fp": 12,
+            "fn": 11,
+            "precision": 0.52,
+            "recall": 0.5417,
+            "f1": 0.5306,
+            "threshold": 0.480249
+          },
+          "add": {
+            "tp": 9,
+            "fp": 3,
+            "fn": 15,
+            "precision": 0.75,
+            "recall": 0.375,
+            "f1": 0.5,
+            "threshold": 0.766693
+          },
+          "filter": {
+            "tp": 7,
+            "fp": 1,
+            "fn": 17,
+            "precision": 0.875,
+            "recall": 0.2917,
+            "f1": 0.4375,
+            "threshold": 0.096277
+          }
+        }
+      },
+      "summed": {
+        "served": {
+          "tp": 76,
+          "fp": 6,
+          "fn": 75,
+          "precision": 0.9268,
+          "recall": 0.5033,
+          "f1": 0.6524
+        },
+        "rules": {
+          "tp": 76,
+          "fp": 6,
+          "fn": 75,
+          "precision": 0.9268,
+          "recall": 0.5033,
+          "f1": 0.6524
+        },
+        "decide": {
+          "tp": 72,
+          "fp": 63,
+          "fn": 79,
+          "precision": 0.5333,
+          "recall": 0.4768,
+          "f1": 0.5035
+        },
+        "add": {
+          "tp": 88,
+          "fp": 16,
+          "fn": 63,
+          "precision": 0.8462,
+          "recall": 0.5828,
+          "f1": 0.6902
+        },
+        "filter": {
+          "tp": 74,
+          "fp": 6,
+          "fn": 77,
+          "precision": 0.925,
+          "recall": 0.4901,
+          "f1": 0.6407
+        }
+      },
+      "served_reports_lost_on_team_rounds": null,
+      "decided_here": true,
+      "passes_the_rule": [
+        "add"
+      ],
+      "choice": "add"
+    }
+  }
+}

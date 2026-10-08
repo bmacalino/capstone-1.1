@@ -96,8 +96,25 @@ def read_worksheet(path: Path) -> list[dict[str, Any]]:
         return list(csv.DictReader(source))
 
 
-def build_truth(worksheets: list[Path]) -> dict[str, dict[str, bool]]:
-    """Consensus labels: both annotators labelled the category and agreed."""
+def read_adjudication(path: Path | None) -> dict[str, dict[str, bool]]:
+    """The third annotator's decisions: row_id -> {category: answer}."""
+    decided: dict[str, dict[str, bool]] = {}
+    for row in read_worksheet(path) if path else []:
+        row_id = str(row.get("row_id") or "").strip()
+        answers = {c: flag(row.get("adjudicated_" + c)) for c in CATEGORIES}
+        answers = {c: bool(v) for c, v in answers.items() if v is not None}
+        if row_id and answers:
+            decided[row_id] = answers
+    return decided
+
+
+def build_truth(
+    worksheets: list[Path], adjudicated: dict[str, dict[str, bool]] | None = None
+) -> dict[str, dict[str, bool]]:
+    """Consensus labels: both annotators labelled the category and agreed.
+
+    With `adjudicated`, a category the two disagreed on takes the third
+    annotator's decision instead of being left out."""
     labelled: dict[str, dict[str, dict[str, bool | None]]] = defaultdict(dict)
     for path in worksheets:
         for row in read_worksheet(path):
@@ -122,9 +139,58 @@ def build_truth(worksheets: list[Path]) -> dict[str, dict[str, bool]]:
             and second[category] is not None
             and first[category] == second[category]
         }
+        for category, answer in ((adjudicated or {}).get(row_id) or {}).items():
+            split = (
+                first[category] is not None
+                and second[category] is not None
+                and first[category] != second[category]
+            )
+            if split:
+                agreed[category] = answer
         if agreed:
             truth[row_id] = agreed
     return truth
+
+
+def review_scores(
+    truth: dict[str, dict[str, bool]], predicted: dict[str, set[str]], master: dict[str, dict[str, Any]]
+) -> dict[str, Any]:
+    """The same check counted per review, which is what a badge counts.
+
+    A review is a report when any of its sentences is; it is clear when every
+    one of its sentences has an agreed no. Reviews that are neither (a
+    sentence without an agreed answer, and no agreed yes) are left out."""
+    by_review: dict[str, list[str]] = defaultdict(list)
+    for row_id, row in master.items():
+        if str(row.get("is_practice") or "no").casefold() != "yes":
+            by_review[str(row.get("review_id") or row_id)].append(row_id)
+    out: dict[str, Any] = {}
+    for category in CATEGORIES:
+        tp = fp = fn = usable = 0
+        for rows in by_review.values():
+            answers = [truth.get(row_id, {}).get(category) for row_id in rows]
+            if any(answer is True for answer in answers):
+                real = True
+            elif all(answer is False for answer in answers):
+                real = False
+            else:
+                continue
+            usable += 1
+            flagged = any(category in predicted.get(row_id, set()) for row_id in rows)
+            tp += real and flagged
+            fp += (not real) and flagged
+            fn += real and not flagged
+        precision = tp / (tp + fp) if tp + fp else None
+        recall = tp / (tp + fn) if tp + fn else None
+        f1 = _f1(tp, fp, fn)
+        out[category] = {
+            "reviews": usable, "report_reviews": tp + fn, "true_positives": tp,
+            "false_positives": fp, "false_negatives": fn,
+            "precision": round(precision, 4) if precision is not None else None,
+            "recall": round(recall, 4) if recall is not None else None,
+            "f1": round(f1, 4) if f1 is not None else None,
+        }
+    return out
 
 
 def _f1(tp: float, fp: float, fn: float) -> float | None:
@@ -246,9 +312,104 @@ def configurations(v1_lexicon: Path) -> dict[str, Any]:
         "v1_plus_filter": LexiconHazardTagger(v1_lexicon, **old),
         "v2_lexicon": LexiconHazardTagger(V2_LEXICON, false_friends=False, **old),
         "v2_shipped": LexiconHazardTagger(V2_LEXICON, **old),
-        "v3_shipped": LexiconHazardTagger(),
+        "v3_shipped": LexiconHazardTagger(counterfeit_rules=None),
+        # Counterfeit rules c1 on the 0.3.0 keywords (no learned model holds
+        # the counterfeit category, so this is what the app shows for it).
+        "v6_counterfeit_c1": LexiconHazardTagger(),
+        # Rules c2 (guide 1.4): picture and number disputes are "not as
+        # described", no longer counterfeit. Safety and defect are untouched.
+        "v7_counterfeit_c2": LexiconHazardTagger(counterfeit_rules="c2"),
         **learned_configuration(),
         **gated_candidate_configuration(),
+        **final_configuration(),
+        **refit_configuration(),
+        **served_configuration(),
+    }
+
+
+def served_configuration() -> dict[str, Any]:
+    """v9_served_c1 / v9_served_c2: the folder the app serves, under
+    counterfeit rules c1 and under c2 (which add the two labels of guide 1.4
+    and move picture and number disputes out of counterfeit).
+
+    The pair exists to show what switching the app to c2 does to the three
+    badge categories. Its defect figures are NOT a test: the served defect
+    model was trained on rounds 1-3."""
+    from defaketive_sentiment.hazard_learned import DEFAULT_MODEL_DIR, MANIFEST_NAME, LearnedHazardScorer
+    from defaketive_sentiment.hazard_model import COUNTERFEIT_RULES, EXTRA_RULES, LexiconHazardTagger
+
+    if not (DEFAULT_MODEL_DIR / MANIFEST_NAME).is_file():
+        return {}
+    from defaketive_sentiment.model import DefaketiveSentimentModel
+    from defaketive_sentiment.transformer_sentiment import TransformerSentimentClassifier
+
+    classifier = TransformerSentimentClassifier()
+    sentiment = DefaketiveSentimentModel(classifier=classifier)
+    seen: dict[str, str] = {}
+
+    def label(text: str) -> str:
+        if text not in seen:
+            seen[text] = sentiment.analyze(text)["label"]
+        return seen[text]
+
+    sha = classifier.manifest["files"]["model.onnx"]
+    return {
+        name: LexiconHazardTagger.for_scorer(
+            LearnedHazardScorer(sentiment_model_sha256=sha), counterfeit_rules=rules, sentiment_label=label
+        )
+        for name, rules in (("v9_served_c1", COUNTERFEIT_RULES), ("v9_served_c2", EXTRA_RULES))
+    }
+
+
+def refit_configuration() -> dict[str, Any]:
+    """v8_rules04: the shipped models refitted on the same rounds with keyword
+    rules 0.4 (research/train_rules04_refit.py), served with rules 0.4 and c1."""
+    from defaketive_sentiment.hazard_learned import LearnedHazardScorer
+    from defaketive_sentiment.hazard_model import LexiconHazardTagger
+
+    folder = SENTIMENT_ROOT / "models" / "hazard_classifier_v2b"
+    if not (folder / "manifest.json").is_file():
+        return {}
+    from defaketive_sentiment.model import DefaketiveSentimentModel
+    from defaketive_sentiment.transformer_sentiment import TransformerSentimentClassifier
+
+    classifier = TransformerSentimentClassifier()
+    sentiment = DefaketiveSentimentModel(classifier=classifier)
+    scorer = LearnedHazardScorer(folder, sentiment_model_sha256=classifier.manifest["files"]["model.onnx"])
+    return {
+        "v8_rules04": LexiconHazardTagger(
+            rules=scorer.manifest["keyword_rules"], learned=scorer,
+            sentiment_label=lambda text: sentiment.analyze(text)["label"],
+        )
+    }
+
+
+def final_configuration() -> dict[str, Any]:
+    """v6_shipped: the app as it ships (hazard_classifier_v2 + counterfeit rules
+    c1). v6_candidate: the models retrained on rounds 1-3
+    (research/PREREGISTRATION_final_v6.md), once research/train_final_v6.py froze them."""
+    from defaketive_sentiment.hazard_learned import LearnedHazardScorer
+    from defaketive_sentiment.hazard_model import LexiconHazardTagger
+
+    folders = {"v6_shipped": SENTIMENT_ROOT / "models" / "hazard_classifier_v2", "v6_candidate": SENTIMENT_ROOT / "models" / "hazard_classifier_v3"}
+    if not all((folder / "manifest.json").is_file() for folder in folders.values()):
+        return {}
+    from defaketive_sentiment.model import DefaketiveSentimentModel
+    from defaketive_sentiment.transformer_sentiment import TransformerSentimentClassifier
+
+    classifier = TransformerSentimentClassifier()
+    sentiment = DefaketiveSentimentModel(classifier=classifier)
+    seen: dict[str, str] = {}
+
+    def label(text: str) -> str:
+        if text not in seen:
+            seen[text] = sentiment.analyze(text)["label"]
+        return seen[text]
+
+    sha = classifier.manifest["files"]["model.onnx"]
+    return {
+        name: LexiconHazardTagger(learned=LearnedHazardScorer(folder, sentiment_model_sha256=sha), sentiment_label=label)
+        for name, folder in folders.items()
     }
 
 
@@ -269,7 +430,7 @@ def gated_candidate_configuration() -> dict[str, Any]:
     scorer = LearnedHazardScorer(folder, sentiment_model_sha256=classifier.manifest["files"]["model.onnx"])
     return {
         "v5_candidate": LexiconHazardTagger(
-            learned=scorer, sentiment_label=lambda text: sentiment.analyze(text)["label"]
+            learned=scorer, sentiment_label=lambda text: sentiment.analyze(text)["label"], counterfeit_rules=None
         )
     }
 
@@ -281,24 +442,30 @@ def learned_configuration() -> dict[str, Any]:
     models. Categories are independent, so its per-category figures are those
     each category would have if its learned model were adopted.
     """
-    from defaketive_sentiment.hazard_learned import DEFAULT_MODEL_DIR, LearnedHazardScorer
+    from defaketive_sentiment.hazard_learned import LearnedHazardScorer
     from defaketive_sentiment.hazard_model import LexiconHazardTagger
 
-    if not (DEFAULT_MODEL_DIR / "manifest.json").is_file():
+    # Pinned to checker 0.4's folder (learned safety only), whatever ships now.
+    folder = SENTIMENT_ROOT / "models" / "hazard_classifier_v1"
+    if not (folder / "manifest.json").is_file():
         return {}
-    scorer = LearnedHazardScorer(DEFAULT_MODEL_DIR)
+    scorer = LearnedHazardScorer(folder)
     embedder = None
     if scorer.needs_embedding:
         from defaketive_sentiment.transformer_sentiment import TransformerSentimentClassifier
 
         embedder = TransformerSentimentClassifier().embed
-    return {"v4_learned": LexiconHazardTagger(learned=scorer, embedder=embedder)}
+    return {"v4_learned": LexiconHazardTagger(learned=scorer, embedder=embedder, counterfeit_rules=None)}
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
     from defaketive_sentiment.hazard_model import MODEL_VERSION
 
-    truth = build_truth(args.worksheets)
+    consensus = build_truth(args.worksheets)
+    adjudicated = read_adjudication(args.adjudication)
+    # Sentences are tagged once, for the larger set; `truth` is the primary one.
+    full = build_truth(args.worksheets, adjudicated) if adjudicated else consensus
+    truth = full
     master = {
         row["row_id"]: row
         for row in read_worksheet(args.queue)
@@ -318,22 +485,32 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     suppressed: dict[str, dict[str, int]] = {}
     all_predicted: dict[str, dict[str, set[str]]] = {}
     by_stratum: dict[str, Any] = {}
+    review_level: dict[str, Any] = {}
+    with_adjudication: dict[str, Any] = {}
     for name, tagger in configurations(args.v1_lexicon).items():
         predicted: dict[str, set[str]] = {}
         counts: dict[str, int] = defaultdict(int)
-        for row_id in truth:
-            tagged = tagger.tag_sentence(master[row_id]["sentence_text"])
+        # Every sentence of the queue, so a review can be judged as a whole.
+        for row_id in master:
+            # The review's stars matter only to a folder with a 4-5 star bar.
+            tagged = tagger.tag_sentence(master[row_id]["sentence_text"], master[row_id].get("rating"))
             predicted[row_id] = set(tagged.get("tags") or [])
+            if row_id not in truth:
+                continue
             for cue_class in (tagged.get("suppressed") or {}).values():
                 counts[cue_class] += 1
             for reasons in (tagged.get("excluded") or {}).values():
                 for reason in reasons:
                     counts[f"excluded:{reason}"] += 1
-        results[name] = score(truth, predicted, weights)
+        results[name] = score(consensus, predicted, weights)
+        review_level[name] = review_scores(consensus, predicted, master)
+        if adjudicated:
+            with_adjudication[name] = score(full, predicted, weights)
+            with_adjudication[name]["review_level"] = review_scores(full, predicted, master)
         strata = sorted({str(master[row_id].get("stratum") or "") for row_id in truth})
         by_stratum[name] = {
             stratum: score(
-                {row_id: labels for row_id, labels in truth.items() if master[row_id].get("stratum") == stratum},
+                {row_id: labels for row_id, labels in consensus.items() if master[row_id].get("stratum") == stratum},
                 predicted,
             )
             for stratum in strata
@@ -361,7 +538,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "source": [path.name for path in args.worksheets],
             "queue": str(args.queue.relative_to(ROOT)) if args.queue.is_relative_to(ROOT) else str(args.queue),
             "rule": "consensus of the two annotators who saw each sentence",
-            "rows_with_any_consensus": len(truth),
+            "rows_with_any_consensus": len(consensus),
+            "adjudication": args.adjudication.name if args.adjudication else None,
+            "rows_with_adjudication": len(full) if adjudicated else None,
         },
         "in_sample_warning": (
             "Round 1 is the development set: the v2 and v3 terms, cues and rules "
@@ -369,6 +548,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "in-sample and optimistic."
             if args.round == 1
             else "Round 2 is held out: no v3 term, cue or rule was chosen with it in view."
+            if args.round == 2
+            else f"Round {args.round}: see the pre-registration that names it as a test."
         ),
         "known_issue": (
             "Through 0.2.0, negation looked three words back, so 'not good umusok' "
@@ -378,7 +559,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "targets": {"recall": TARGET_RECALL, "precision_floor": PRECISION_FLOOR},
         "results": results,
         "safety_tags_suppressed_by_cue_class": suppressed,
-        "paired_comparisons": paired_comparisons(truth, all_predicted),
+        "results_review_level": review_level,
+        "results_with_adjudication": with_adjudication or None,
+        "paired_comparisons": paired_comparisons(consensus, all_predicted),
         "results_by_stratum": by_stratum,
     }
 
@@ -387,7 +570,7 @@ def paired_comparisons(truth: dict[str, dict[str, bool]], predicted: dict[str, d
     """McNemar's test between consecutive shipped releases, per category."""
     from research_utils import mcnemar_test
 
-    pairs = [("v2_shipped", "v3_shipped"), ("v3_shipped", "v4_learned"), ("v3_shipped", "v5_candidate")]
+    pairs = [("v2_shipped", "v3_shipped"), ("v3_shipped", "v4_learned"), ("v3_shipped", "v5_candidate"), ("v3_shipped", "v6_counterfeit_c1"), ("v6_shipped", "v6_candidate"), ("v6_counterfeit_c1", "v7_counterfeit_c2"), ("v6_shipped", "v8_rules04"), ("v9_served_c1", "v9_served_c2")]
     out: dict[str, Any] = {}
     for first, second in pairs:
         if first not in predicted or second not in predicted:
@@ -407,6 +590,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--queue", type=Path, default=DEFAULT_QUEUE)
     parser.add_argument("--round", type=int, default=1, help="Labelling round the worksheets belong to.")
     parser.add_argument("--v1-lexicon", type=Path, default=DEFAULT_V1_LEXICON)
+    parser.add_argument("--adjudication", type=Path, default=None, help="Sheet of third-annotator decisions (row_id, adjudicated_<category>).")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     return parser
 

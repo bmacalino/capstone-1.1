@@ -37,7 +37,21 @@ import numpy as np
 from .product_badges import CATEGORIES
 
 MODELS_ROOT = Path(__file__).resolve().parents[1] / "models"
-DEFAULT_MODEL_DIR = MODELS_ROOT / "hazard_classifier_v1"
+# v2 = the v1 safety model plus the gated defect model adopted on labelling
+# round 3 (research/PREREGISTRATION_defect_v5.md). v2b = the same two models
+# refitted on the same rounds under keyword rules 0.4, which fix negation the
+# keyword checker missed (research/train_rules04_refit.py; RESULTS_TABLES.md,
+# Table 11j). Round 3, held out for both, shows no report lost. v4 = keyword
+# rules 0.4 with the defect model retrained on every labelled round
+# (research/train_candidate_v4.py); on whole listings it over-flagged 4-5 star
+# reviews and is kept for the record only. v5 = the same design, also given
+# the sentences the models wrongly flag in ordinary reviews (round 8), with a
+# higher bar for adding a flag in a 4-5 star review (HIGH_STAR_FROM below;
+# research/live_check.py). Most of v5's defect labels were proposed by the AI
+# assistant; it is the default on the owner's instruction of 7 Oct 2026 and is
+# NOT a pre-registered adoption (PREREGISTRATION_final_v6.md, departure 2).
+# DEFAKETIVE_HAZARD_MODEL=team_labels serves v2b instead.
+DEFAULT_MODEL_DIR = MODELS_ROOT / "hazard_classifier_v5"
 MANIFEST_NAME = "manifest.json"
 CANDIDATES = ("T", "TK", "E", "EK")
 # How a category's learned model combines with the keyword checker:
@@ -45,7 +59,17 @@ CANDIDATES = ("T", "TK", "E", "EK")
 #   or_gated  keywords' flag stands; the learned model may only ADD a flag,
 #             and only to a sentence the sentiment model does not read as
 #             positive (research/PREREGISTRATION_defect_v5.md)
-COMBINE_MODES = ("decide", "or_gated")
+#   and       the learned model is a filter: a keyword flag stands only if
+#             the model agrees, and the model never adds a flag
+#             (research/PREREGISTRATION_final_v6.md)
+COMBINE_MODES = ("decide", "or_gated", "and")
+# Reviews rated this many stars or more. In them a sentence the keywords did
+# not flag is seldom a defect report, and the defect model's added flags were
+# right only about half the time (research/live_check.py). An or_gated
+# category may therefore carry a second, higher bar for adding a flag in such
+# a review: "threshold_high_star" in its manifest entry. Keyword flags are
+# untouched, and a review without a rating uses the ordinary threshold.
+HIGH_STAR_FROM = 4
 LEXICON_DIR = Path(__file__).with_name("lexicons")
 # Files whose content shapes the keyword features.
 KEYWORD_FILES = (
@@ -57,6 +81,14 @@ KEYWORD_FILES = (
 
 class LearnedModelError(RuntimeError):
     """Raised when a learned hazard model is missing, altered or mismatched."""
+
+
+def is_high_star(rating: object) -> bool:
+    """Whether a review's star rating is 4 or 5. Unknown ratings are not."""
+    try:
+        return float(rating) >= HIGH_STAR_FROM  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return False
 
 
 def file_sha256(path: Path) -> str:
@@ -203,11 +235,16 @@ class LearnedHazardScorer:
             )
         self.models: dict[str, LearnedCategoryModel] = {}
         self.combine: dict[str, str] = {}
+        self.high_star_threshold: dict[str, float] = {}
         for category, entry in (self.manifest.get("categories") or {}).items():
             mode = entry.get("combine", "decide")
             if mode not in COMBINE_MODES:
                 raise LearnedModelError(f"Unknown combine mode {mode!r} for {category}.")
             self.combine[category] = mode
+            if entry.get("threshold_high_star") is not None:
+                if mode != "or_gated":
+                    raise LearnedModelError(f"threshold_high_star only applies to an or_gated category, not {category}.")
+                self.high_star_threshold[category] = float(entry["threshold_high_star"])
             path = self.model_dir / entry["file"]
             if not path.is_file() or file_sha256(path) != entry["sha256"]:
                 raise LearnedModelError(f"{path} is missing or does not match its manifest.")
@@ -227,9 +264,14 @@ class LearnedHazardScorer:
                 "with it. Retrain it."
             )
         # The file hashes are part of the version, so a retrained model is a new
-        # version and saved analyses are redone.
+        # version and saved analyses are redone. So is a high-star bar, where a
+        # folder has one; folders without one keep the version they always had.
         digest = hashlib.sha256(
-            "|".join(f"{c}:{e['sha256']}" for c, e in sorted(self.manifest["categories"].items())).encode("utf-8")
+            "|".join(
+                f"{c}:{e['sha256']}"
+                + (f":stars{e['threshold_high_star']}" if e.get("threshold_high_star") is not None else "")
+                for c, e in sorted(self.manifest["categories"].items())
+            ).encode("utf-8")
         ).hexdigest()[:8]
         self.version = f"{self.manifest.get('version') or 'hazard-learned'}-{'-'.join(self.categories)}-{digest}"
 

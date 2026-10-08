@@ -298,6 +298,38 @@ screen with measured precision, because training a classifier on a few dozen
 positives and reporting an accuracy figure would reproduce the circular
 labelling problem this work exists to correct.
 
+## 7a. Hazard models: another type, or more labels?
+
+Tested on 6 Oct 2026 by training on some labelled rounds and scoring on a
+round left out (RESULTS_TABLES.md, Table 11g; exploratory). For defects the
+shipped design (TF-IDF and keyword features, logistic regression, never adding
+a flag to praise) scored F1 0.717 and 0.780 on the two left-out rounds; a
+linear SVM on the same features 0.695 and 0.762; the sentiment transformer's
+sentence embedding with keyword features 0.681 and 0.712. Adding a labelled
+round to the same design raised F1 by 0.04–0.07. For safety and counterfeit
+no learned variant separated from the keyword lists, because agreed reports
+are too few (65 and 25). The model type is therefore kept, all three rounds
+are used for training, and one new round (round 5, a public Shopee set no
+earlier step used) is the single test: `research/PREREGISTRATION_final_v6.md`.
+
+Repeated on 7–8 Oct 2026 over all seven labelled rounds and five labels
+(RESULTS_TABLES.md, Table 11j; most labels AI-proposed, so agreement, not
+accuracy). For defects the same design still leads: F1 0.757 with the
+keywords, against 0.732 for the SVM and 0.662 for sentence embeddings. For
+the fake, poor-quality and not-as-advertised labels written rules beat
+every learned variant, so those three are rule-based. The pre-registered
+round-5 test was not run as planned (departure 2): on the owner's
+instruction the defect model was retrained on every round plus sentences
+from ordinary reviews, and given a higher threshold in 4–5 star reviews,
+where half of its added flags had been wrong (`hazard_classifier_v5`, the
+app default). On eight listings it was not trained on it raises 30 false
+defect flags where the team-label models raise 48, and finds 193 reports
+against 168. The models trained on the team's labels alone stay available
+as `hazard_classifier_v2b`. Since 8 Oct 2026 the report shows all five
+labels; the two rule-based newer ones inform only and never change a
+verdict (Table 11i). The owner accepted the AI labels unaudited the same
+day (departure 3), which changes no figure's status.
+
 ## 7b. Review sampling for product reports (Lazada)
 
 Until 27 Sept 2026 a scan read the first 100 written reviews in Lazada's

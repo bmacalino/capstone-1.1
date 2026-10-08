@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-10-07T16:12:33+00:00",
+  "rule": "replace the served safety model only if on round 3 a variant finds at least as many reports and raises fewer false flags",
+  "round_3_sentences": 584,
+  "round_3_reports": 19,
+  "results": {
+    "served_round_1_only": {
+      "round_3_team_labels": {
+        "tp": 14,
+        "fp": 15,
+        "fn": 5,
+        "precision": 0.4828,
+        "recall": 0.7368,
+        "f1": 0.5833
+      },
+      "round_8_live_check_ai_labels": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    "keywords_alone": {
+      "round_3_team_labels": {
+        "tp": 14,
+        "fp": 15,
+        "fn": 5,
+        "precision": 0.4828,
+        "recall": 0.7368,
+        "f1": 0.5833
+      },
+      "round_8_live_check_ai_labels": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    "team_rounds_1_2": {
+      "training_sentences": 1449,
+      "training_reports": 46,
+      "threshold": 0.054924,
+      "cross_validated": {
+        "tp": 37,
+        "fp": 369,
+        "fn": 9,
+        "precision": 0.0911,
+        "recall": 0.8043,
+        "f1": 0.1637
+      },
+      "round_3_team_labels": {
+        "tp": 14,
+        "fp": 162,
+        "fn": 5,
+        "precision": 0.0795,
+        "recall": 0.7368,
+        "f1": 0.1436
+      },
+      "round_8_live_check_ai_labels": {
+        "tp": 1,
+        "fp": 150,
+        "fn": 0,
+        "precision": 0.0066,
+        "recall": 1.0,
+        "f1": 0.0132
+      },
+      "qualifies": false
+    },
+    "all_but_round_3": {
+      "training_sentences": 3609,
+      "training_reports": 92,
+      "threshold": 0.938614,
+      "cross_validated": {
+        "tp": 74,
+        "fp": 40,
+        "fn": 18,
+        "precision": 0.6491,
+        "recall": 0.8043,
+        "f1": 0.7184
+      },
+      "round_3_team_labels": {
+        "tp": 13,
+        "fp": 8,
+        "fn": 6,
+        "precision": 0.619,
+        "recall": 0.6842,
+        "f1": 0.65
+      },
+      "round_8_live_check_ai_labels": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "qualifies": false
+    }
+  }
+}

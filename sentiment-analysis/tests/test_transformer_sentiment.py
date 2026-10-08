@@ -125,7 +125,7 @@ class TestVersionComposition(unittest.TestCase):
         # saved analyses stale.
         sentiment = DefaketiveSentimentModel(classifier=RecordingClassifier(True))
         model = HazardBadgeModel(allow_unqualified=True, sentiment_model=sentiment)
-        self.assertEqual(model.model_version, f"{hazard_model.MODEL_VERSION}+fake-sentiment-1")
+        self.assertEqual(model.model_version, f"{hazard_model.MODEL_VERSION}+{hazard_model.COUNTERFEIT_RULES}+fake-sentiment-1")
         self.assertEqual(model.analyze("ok naman")["model_version"], model.model_version)
 
 

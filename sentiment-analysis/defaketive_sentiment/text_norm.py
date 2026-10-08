@@ -505,7 +505,7 @@ NEGATION_COORDINATORS = frozenset({"o", "or", "nor"})
 
 
 def is_negated_adjacent(
-    normalized: str, start: int, extra_negators: Iterable[str] = ()
+    normalized: str, start: int, extra_negators: Iterable[str] = (), extra_transparent: Iterable[str] = ()
 ) -> bool:
     """Report whether a negator governs the term beginning at `start`.
 
@@ -518,8 +518,11 @@ def is_negated_adjacent(
     other word ends its reach, so "not good sira" is not negated. The clause
     limit is the same as `is_negated`'s. `is_negated` itself is left unchanged
     because the sentiment path and its recorded results depend on it.
+    `extra_transparent` adds words the negator may reach across, for a caller
+    that needs a wider reach without changing recorded behaviour.
     """
     negators = set(NEGATORS)
+    transparent = NEGATION_TRANSPARENT | {word.casefold() for word in extra_transparent} if extra_transparent else NEGATION_TRANSPARENT
     negators.update(word.casefold() for word in extra_negators)
     clause = re.split(
         r"[.!?;:]|(?<!\w)(?:at|and|but|pero|subalit|ngunit)(?!\w)",
@@ -542,7 +545,7 @@ def is_negated_adjacent(
         if word in NEGATION_LINKERS:
             linker_seen = True
             continue
-        if word in NEGATION_TRANSPARENT:
+        if word in transparent:
             continue
         if linker_seen and verb_allowance:
             verb_allowance -= 1

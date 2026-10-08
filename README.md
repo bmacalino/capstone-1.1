@@ -75,12 +75,24 @@ against the SHA-256 in `manifest.json`, so an edited or partial copy is refused.
 To run the older TF-IDF model instead (the research baseline), set
 `$env:DEFAKETIVE_SENTIMENT_MODEL = "tfidf"` before starting the app.
 
-The safety check also uses a small learned model, stored in git at
-`sentiment-analysis\models\hazard_classifier_v1\` (rebuild with
-`research\train_hazard_classifier.py`). It refuses to load if its files or the
-keyword lists it was trained with have changed. Defect and fake-product checks
-use the keyword lists. To run the keyword checker alone, set
-`$env:DEFAKETIVE_HAZARD_MODEL = "keywords"`.
+The safety and defect checks also use small learned models, stored in git under
+`sentiment-analysis\models\`. The app serves `hazard_classifier_v5` (rebuild with
+`research\train_candidate_v4.py --ordinary`): a safety model trained on the
+team's labels, and a defect model trained on every labelled round, most of them
+labelled by the AI assistant and not yet audited (`research\RESULTS_TABLES.md`,
+Table 11j). A folder refuses to load if its files, the keyword lists or the
+sentiment model it was built with have changed. Fake-product reports come from
+keyword rules, and so do two labels that only inform: "poor quality" and "not
+as advertised" are shown in the report and never change a verdict. To choose
+another checker, set `DEFAKETIVE_HAZARD_MODEL` before starting the app:
+
+- `$env:DEFAKETIVE_HAZARD_MODEL = "team_labels"`: the models trained on the
+  team's labels only (`hazard_classifier_v2b`);
+- `$env:DEFAKETIVE_HAZARD_MODEL = "keywords"`: the keyword checker alone.
+
+Every choice reports all five labels. The report words them in one place,
+`dashboard_utils.BADGE_COPY`: Safety problem, Faulty or broken, Poor quality,
+Possible fake, Not as advertised.
 
 ## Start the web app
 

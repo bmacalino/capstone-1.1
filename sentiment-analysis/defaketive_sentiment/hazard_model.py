@@ -33,6 +33,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from . import hazard_taxonomy as taxonomy
 from . import text_norm
+from .extra_labels import EXTRA_TAGS, NOT_AS_DESCRIBED, QUALITY, not_as_described_spans, quality_spans
 from .model import DefaketiveSentimentModel
 from .product_badges import (
     CATEGORIES,
@@ -54,8 +55,33 @@ MODEL_VERSION = "defaketive-hazard-lexicon-0.3.0"
 
 # Rule sets the tagger can run. "0.2" reproduces the previous release exactly,
 # for the before/after measurement; the application runs the current one.
-RULES = ("0.2", "0.3")
+RULES = ("0.2", "0.3", "0.4")
 CURRENT_RULES = "0.3"
+# What the application serves. The class default stays 0.3 so that research
+# code which builds a tagger without naming the rules reproduces 0.3.0.
+SHIPPED_RULES = "0.4"
+
+# Rules 0.4 (7 Oct 2026) fix keyword flags that reading the round-6
+# disagreements showed to be wrong: "Wala pong sira", "walang ka sira sira",
+# "hindi rin kami naka experience ng lag", "sana hindi agad madaling
+# malowbat" (negation that did not reach the term); "akala ko sira, lowbat
+# lang pala" (a mistaken belief); "pabili ulit pag nasira na" (something that
+# has not happened). They change the keyword features, so a learned model
+# names the rule set it was trained with and is refused under another.
+# Kept short on purpose. Pronouns ("kayo", "ako") and "namn" were tried and
+# cancelled real reports on the team's rounds ("wag na kayo bumili ang bilis
+# masira"), as did "kung" among the hypothetical words ("paano ito magagamit
+# kung sira").
+NEGATION_TRANSPARENT_04 = frozenset({"pong", "ho", "hong", "nga", "ngang", "namang", "agad"})
+# "hindi rin kami naka experience ng lag", "wala pa naman ako na encounter na defective"
+NEVER_EXPERIENCED = re.compile(
+    r"(?<!\w)(?:hindi|di|never|wala|walang|no|not)\s+(?:[\w']+\s+){0,5}"
+    r"(?:experience[ds]?|naranasan|encounter(?:ed)?|naencounter)\s+(?:(?:ng|na|of|any|a)\s+){0,2}$",
+    re.IGNORECASE,
+)
+MISTAKEN_BELIEF_WORDS = frozenset({"akala", "kala", "inakala", "akla", "thought"})
+HYPOTHETICAL_WORDS = frozenset({"pag", "kapag", "if", "once", "baka", "bka"})
+DENIED_REASONS = frozenset({"mistaken_belief", "hypothetical"})
 
 # A mild heat word ("umiinit", "mainit") is suppressed as a safety signal when
 # the sentence is about something worn, the weather or a venue, or a product
@@ -149,6 +175,103 @@ NON_PRODUCT_SUBJECT = re.compile(
     r")(?!\w)",
     re.IGNORECASE,
 )
+
+
+# Guide rule 1 for flags a learned model ADDS: a sentence about the box, the
+# courier, the seller or their replies is not a product defect. Added 5 Oct
+# 2026 after round 3, from the live check; its effect on round 3 is therefore
+# reported as post-hoc, not as a held-out result. Keyword flags are unaffected.
+SERVICE_SUBJECT = re.compile(
+    r"(?<!\w)(?:"
+    r"response|responses|respond|responds|responding|reply|replies|replied|"
+    r"refund|refunds|refunded|customer service|chat|"
+    r"arrived late|late delivery|na deliver|nadeliver|dumating"
+    r")(?!\w)",
+    re.IGNORECASE,
+)
+LEARNED_ADD_RULES = "r1b"
+NON_PRODUCT_WINDOW = 2
+
+# Counterfeit rules "c1", added 5 Oct 2026 from labelling round 4 (391
+# sentences, AI-labelled and owner-adjudicated; used to improve this check,
+# never to score it). They run after the keyword result and after any learned
+# model, so the keyword features the learned models were trained on are
+# unchanged. None reproduces 0.3.0 for the before/after measurement.
+COUNTERFEIT_RULES = "c1"
+# "scam" was 5 real reports against 75 false flags in round 4: reviewers use
+# it for a seller who did not deliver, a missing item or a broken product.
+# It no longer makes a counterfeit flag by itself.
+WEAK_COUNTERFEIT_TERMS = frozenset({"scam"})
+# "hindi legit na 20k mAh": a false size or capacity claim, not a copy.
+SPEC_CLAIM_AFTER = re.compile(r"\s*(?:(?:na|ng|ung|yung|ang|sinasabi|the|a)\s+){0,3}\d")
+_NOT = r"(?:hindi|di|nd|ndi|not|isn't|isnt|wasn't|wasnt)"
+_REAL = r"(?:original|orig|legit|authentic|genuine|tunay)"
+_FILLER = r"(?:rin|din|sya|siya|sia|ito|naman|po|talaga|yung|ung|ang|the|a|really|kasing|kcng)"
+COUNTERFEIT_PHRASES = tuple(
+    re.compile(rf"(?<!\w)(?:{pattern})(?!\w)", re.IGNORECASE)
+    for pattern in (
+        # "hindi rin original", "nd sia orig", "di ito yung original"
+        rf"{_NOT}\s+(?:{_FILLER}\s+){{1,3}}{_REAL}",
+        # "not 100% original"
+        rf"{_NOT}\s+\d+\s*%?\s*{_REAL}",
+        # "no longer original"
+        rf"no longer\s+{_REAL}",
+        # "not shiny as the original", "not like original", "not the same sa original"
+        rf"{_NOT}\s+(?:\w+\s+){{0,2}}(?:as|like|sa)\s+(?:the\s+)?{_REAL}",
+        # "anlayo sa original", "ang layu sa orig scent"
+        rf"(?:malayo|anlayo|layo|layu)\s+sa\s+{_REAL}",
+        # "hindi sya kaamoy ng tunay"
+        rf"{_NOT}\s+(?:\w+\s+){{0,2}}(?:kaamoy|katulad|kagaya|kamukha|kapareho)\s+(?:ng|nung|sa)\s+{_REAL}",
+        # "copy lang sya"
+        r"(?:copy|kopya)\s+lang",
+    )
+)
+
+
+# Rules "c2" (guide 1.4, 7 Oct 2026): two more labels, reported beside the three
+# badge categories in a separate "extra_tags" field. The badge categories, the
+# keyword features and the learned models are untouched; c2 only stops a
+# picture mismatch or a disputed number from counting as a counterfeit report,
+# because those now have their own label. The class default stays c1 so
+# earlier measurements reproduce; the app serves SHIPPED_COUNTERFEIT_RULES.
+EXTRA_RULES = "c2"
+COUNTERFEIT_RULE_SETS = (COUNTERFEIT_RULES, EXTRA_RULES)
+PICTURE_TERM = "iba sa picture"
+# Served by the app since 8 Oct 2026, when the report screens gained the two
+# labels (research/RESULTS_TABLES.md, Table 11i).
+SHIPPED_COUNTERFEIT_RULES = EXTRA_RULES
+
+
+def _merged(spans: Iterable[tuple[int, int]]) -> list[tuple[int, int]]:
+    """Overlapping matches joined, so one phrase is highlighted once."""
+    out: list[tuple[int, int]] = []
+    for start, end in sorted(spans):
+        if out and start <= out[-1][1]:
+            out[-1] = (out[-1][0], max(out[-1][1], end))
+        else:
+            out.append((start, end))
+    return out
+
+
+def without_non_product_words(normalized: str) -> str | None:
+    """The sentence with box/courier/seller words and their two neighbours on
+    each side removed, or None when it has no such word.
+
+    A first version dropped every sentence naming the seller or the box; on
+    round 3 that removed five real reports ("seller not responding ... 5 mins
+    lang lowbat na") and no false one. So the sentence is kept when what
+    remains still reads as a defect to the learned model.
+    """
+    hits = [m.span() for pattern in (NON_PRODUCT_SUBJECT, SERVICE_SUBJECT) for m in pattern.finditer(normalized)]
+    if not hits:
+        return None
+    words = [(m.start(), m.end()) for m in re.finditer(r"[\w']+", normalized)]
+    drop: set[int] = set()
+    for start, end in hits:
+        inside = [i for i, (a, b) in enumerate(words) if a < end and start < b]
+        if inside:
+            drop.update(range(max(0, inside[0] - NON_PRODUCT_WINDOW), min(len(words), inside[-1] + NON_PRODUCT_WINDOW + 1)))
+    return " ".join(normalized[a:b] for i, (a, b) in enumerate(words) if i not in drop)
 
 
 class HazardModelError(RuntimeError):
@@ -299,10 +422,16 @@ class LexiconHazardTagger:
         learned: Any | None = None,
         embedder: Any | None = None,
         sentiment_label: Any | None = None,
+        counterfeit_rules: str | None = COUNTERFEIT_RULES,
     ) -> None:
         if rules not in RULES:
             raise ValueError(f"rules must be one of {RULES}")
+        if counterfeit_rules not in (None, *COUNTERFEIT_RULE_SETS):
+            raise ValueError(f"counterfeit_rules must be None or one of {COUNTERFEIT_RULE_SETS}")
         self.rules = rules
+        # Research switch: measure the effect of the denied-defect block (rules 0.4).
+        self.block_denied = True
+        self.counterfeit_rules = counterfeit_rules if rules != "0.2" else None
         # Learned per-category models (hazard_learned.LearnedHazardScorer). For
         # each category they hold, they make the final yes/no; the keyword
         # matches still supply the highlighted words and the safety subtype.
@@ -313,6 +442,11 @@ class LexiconHazardTagger:
         self.sentiment_label = sentiment_label
         if learned is not None and learned.needs_embedding and embedder is None:
             raise HazardModelError("The learned hazard model needs sentence embeddings, but no embedder was given.")
+        trained_with = (getattr(learned, "manifest", None) or {}).get("keyword_rules", rules if learned is None or not hasattr(learned, "manifest") else "0.3")
+        if learned is not None and trained_with != rules:
+            raise HazardModelError(
+                f"The learned hazard model was trained with keyword rules {trained_with}, not {rules}; its keyword features would differ."
+            )
         if learned is not None and getattr(learned, "needs_sentiment", False) and sentiment_label is None:
             raise HazardModelError("The gated hazard model needs a sentiment reading, but none was given.")
         self.terms = _load_category_terms(lexicon_path)
@@ -325,9 +459,27 @@ class LexiconHazardTagger:
         self.normalizer_version = text_norm.NORMALIZER_VERSION
         self.segmenter_version = text_norm.SEGMENTER_VERSION
 
+    @classmethod
+    def for_scorer(cls, scorer: Any, counterfeit_rules: str | None = None, **kwargs: Any) -> "LexiconHazardTagger":
+        """A tagger served with the rule sets a learned-model folder was built for.
+
+        `counterfeit_rules` overrides the folder's own choice; the keyword rules
+        cannot be overridden, because the model's features depend on them."""
+        manifest = getattr(scorer, "manifest", None) or {}
+        return cls(
+            rules=manifest.get("keyword_rules", "0.3"),
+            counterfeit_rules=counterfeit_rules or manifest.get("counterfeit_rules", COUNTERFEIT_RULES),
+            learned=scorer,
+            **kwargs,
+        )
+
     def _is_negated(self, normalized: str, start: int) -> bool:
         if self.rules == "0.2":
             return text_norm.is_negated(normalized, start)
+        if self.rules == "0.4":
+            return text_norm.is_negated_adjacent(
+                normalized, start, extra_transparent=NEGATION_TRANSPARENT_04
+            ) or bool(NEVER_EXPERIENCED.search(normalized[:start]))
         return text_norm.is_negated_adjacent(normalized, start)
 
     def _excluded(
@@ -348,6 +500,13 @@ class LexiconHazardTagger:
             return "speculation"
         if category == DEFECT and term in DAMAGE_TERMS and _near_packaging(normalized, span):
             return "packaging"
+        if self.rules == "0.4" and category == DEFECT:
+            before = re.findall(r"[\w']+", re.split(r"[.!?;:,]", normalized[: span[0]])[-1])
+            after = re.findall(r"[\w']+", normalized[span[1] :])[:2]
+            if before and before[-1] in HYPOTHETICAL_WORDS:
+                return "hypothetical"
+            if any(word in MISTAKEN_BELIEF_WORDS for word in before[-4:]) and "pala" not in after:
+                return "mistaken_belief"
         return None
 
     def _false_friend(self, raw: str) -> str | None:
@@ -358,7 +517,7 @@ class LexiconHazardTagger:
                 return cue_class
         return None
 
-    def tag_sentence(self, raw: str) -> dict[str, Any]:
+    def tag_sentence(self, raw: str, rating: object = None) -> dict[str, Any]:
         normalized, spans = text_norm.normalize_with_spans(raw)
         scores: dict[str, float] = {}
         tags: list[str] = []
@@ -379,6 +538,7 @@ class LexiconHazardTagger:
             total = 0.0
             severity = 0
             for term, term_severity, pattern in entries:
+                repeated: dict[str, Any] = {}
                 for match in pattern.finditer(normalized):
                     if any(
                         match.start() < end and start < match.end()
@@ -389,6 +549,11 @@ class LexiconHazardTagger:
                     negated = not text_norm.starts_with_negator(term) and self._is_negated(
                         normalized, match.start()
                     )
+                    # "walang ka sira sira": a repeated word shares the first one's negation.
+                    if self.rules == "0.4" and not negated and repeated.get("end") is not None:
+                        gap = normalized[repeated["end"] : match.start()]
+                        negated = bool(repeated["negated"]) and not gap.strip()
+                    repeated = {"end": match.end(), "negated": negated}
                     raw_span = self._raw_span(match.span(), spans)
                     reason = self._excluded(category, term, normalized, match.span(), name_spans)
                     matches.append(
@@ -435,20 +600,45 @@ class LexiconHazardTagger:
         learned: dict[str, float] = {}
         gated: dict[str, str] = {}
         if self.learned is not None:
-            from .hazard_learned import keyword_features
+            from .hazard_learned import is_high_star, keyword_features
 
             # Features come from the keyword result as it stands here, before
             # any learned decision, exactly as in training.
             kw = keyword_features({"terms": matches, "tags": tags})
             embedding = self.embedder(raw) if self.learned.needs_embedding else None
             combine = getattr(self.learned, "combine", {})
+            # In a 4-5 star review the model must clear a higher bar to add a flag.
+            star_bars = getattr(self.learned, "high_star_threshold", {}) if is_high_star(rating) else {}
             for category, (on, probability) in self.learned.decide(normalized, kw, embedding).items():
                 learned[category] = round(probability, 4)
                 if combine.get(category) == "or_gated":
+                    bar = star_bars.get(category)
+                    if on and category not in tags and bar is not None and probability < bar:
+                        gated[category] = "below_high_star_bar"
+                        continue
                     # Keywords' flag stands; the model may only add one, and
                     # never to a sentence read as praise. The sentiment model
                     # runs only for the sentences where that is in question.
                     if on and category not in tags:
+                        # Rules 0.4: the keywords read a defect word here as imagined
+                        # or mistaken; the model may not put the flag back. Plain
+                        # negation is NOT blocked: on the labelled rounds that cost
+                        # three real reports ("wla na, sira na") for two false flags.
+                        if self.rules == "0.4" and self.block_denied and any(
+                            match["category"] == category and match.get("excluded") in DENIED_REASONS
+                            for match in matches
+                        ):
+                            gated[category] = "denied_by_keywords"
+                            continue
+                        rest = without_non_product_words(normalized)
+                        model = getattr(self.learned, "models", {}).get(category)
+                        if rest is not None and model is not None and (
+                            not rest
+                            or float(model.probability([rest], kw.reshape(1, -1), None)[0])
+                            < (model.threshold if bar is None else bar)
+                        ):
+                            gated[category] = "not_about_the_product"
+                            continue
                         label = self.sentiment_label(raw)
                         gated[category] = label
                         if label != "positive":
@@ -456,6 +646,14 @@ class LexiconHazardTagger:
                             scores[category] = probability
                             severities[category] = MIN_CONFIDENT_SEVERITY
                             confidence[category] = about_the_product
+                    continue
+                if combine.get(category) == "and":
+                    # A filter: it can drop a keyword flag, never add one.
+                    if not on and category in tags:
+                        tags.remove(category)
+                        scores.pop(category, None)
+                        confidence.pop(category, None)
+                        severities.pop(category, None)
                     continue
                 if on and category not in tags:
                     tags.append(category)
@@ -469,6 +667,54 @@ class LexiconHazardTagger:
                     severities.pop(category, None)
             tags.sort(key=CATEGORIES.index)
 
+        described: list[tuple[int, int]] = []
+        if self.counterfeit_rules in COUNTERFEIT_RULE_SETS:
+            if self.counterfeit_rules == EXTRA_RULES:
+                described = self._not_as_described(normalized)
+            shown = [self._raw_span(span, spans) for span in described]
+            counted = [
+                match
+                for match in matches
+                if match["category"] == COUNTERFEIT and not match["negated"] and not match.get("excluded")
+            ]
+            phrase = self._counterfeit_phrase(normalized)
+            if phrase is not None:
+                matches.append(
+                    {
+                        "ngram": normalized[phrase[0] : phrase[1]],
+                        "category": COUNTERFEIT,
+                        "severity": MIN_CONFIDENT_SEVERITY,
+                        "negated": False,
+                        "span": list(self._raw_span(phrase, spans) or ()) or None,
+                        "rule": COUNTERFEIT_RULES,
+                    }
+                )
+            strong = [
+                match
+                for match in counted
+                if match["ngram"] not in WEAK_COUNTERFEIT_TERMS
+                and not ("legit" in match["ngram"] and self._spec_claim(raw, match))
+                and not self._described_term(match, shown)
+            ]
+            if COUNTERFEIT in tags and not strong and phrase is None:
+                tags.remove(COUNTERFEIT)
+                scores.pop(COUNTERFEIT, None)
+                confidence.pop(COUNTERFEIT, None)
+                severities.pop(COUNTERFEIT, None)
+                suppressed[COUNTERFEIT] = (
+                    "scam_alone"
+                    if all(m["ngram"] in WEAK_COUNTERFEIT_TERMS for m in counted)
+                    else NOT_AS_DESCRIBED
+                    if any(self._described_term(m, shown) for m in counted)
+                    else "spec_claim"
+                )
+            elif COUNTERFEIT not in tags and phrase is not None:
+                tags.append(COUNTERFEIT)
+                scores[COUNTERFEIT] = float(MIN_CONFIDENT_SEVERITY)
+                severities[COUNTERFEIT] = MIN_CONFIDENT_SEVERITY
+                confidence[COUNTERFEIT] = about_the_product
+                tags.sort(key=CATEGORIES.index)
+
         return {
             "text_raw": raw,
             "text_normalized": normalized,
@@ -481,7 +727,78 @@ class LexiconHazardTagger:
             **({"excluded": excluded} if excluded else {}),
             **({"learned": learned} if learned else {}),
             **({"gate_sentiment": gated} if gated else {}),
+            **(
+                self._extra_labels(raw, normalized, matches, described, spans)
+                if self.counterfeit_rules == EXTRA_RULES
+                else {}
+            ),
         }
+
+    def _not_as_described(self, normalized: str) -> list[tuple[int, int]]:
+        """Spans where the reviewer disputes a number, a feature or the photos."""
+        return not_as_described_spans(normalized)
+
+    @staticmethod
+    def _described_term(match: Mapping[str, Any], shown: Sequence[tuple[int, int] | None]) -> bool:
+        """True for a counterfeit match that is really a not-as-described
+        report: the picture phrase, or "fake"/"peke" inside a disputed number."""
+        if not shown:
+            return False
+        if match["ngram"] == PICTURE_TERM:
+            return True
+        span = match.get("span")
+        if match["ngram"] not in ("fake", "peke") or not span:
+            return False
+        return any(area and area[0] <= span[0] and span[1] <= area[1] for area in shown)
+
+    def _extra_labels(
+        self,
+        raw: str,
+        normalized: str,
+        matches: Sequence[Mapping[str, Any]],
+        described: Sequence[tuple[int, int]],
+        spans: Sequence[text_norm.TokenSpan],
+    ) -> dict[str, Any]:
+        """The two labels of guide 1.4 for one sentence, with the words behind
+        them. Kept apart from "tags" and "terms": the badge categories, the
+        keyword features and the learned models never see them."""
+        terms: list[dict[str, Any]] = []
+        for category, found in ((QUALITY, quality_spans(normalized)), (NOT_AS_DESCRIBED, described)):
+            for start, end in _merged(found):
+                where = self._raw_span((start, end), spans)
+                terms.append(
+                    {"ngram": normalized[start:end], "category": category, "span": list(where) if where else None}
+                )
+        # "hindi legit na 20k mAh": a disputed number the keywords read as "legit".
+        # Listed once: skipped when a pattern above already covers the same words.
+        covered = [term["span"] for term in terms if term["category"] == NOT_AS_DESCRIBED and term["span"]]
+        for match in matches:
+            if match["category"] != COUNTERFEIT or "legit" not in match["ngram"] or not self._spec_claim(raw, match):
+                continue
+            span = match.get("span")
+            if span and any(area[0] <= span[0] and span[1] <= area[1] for area in covered):
+                continue
+            terms.append({"ngram": match["ngram"], "category": NOT_AS_DESCRIBED, "span": span})
+        present = {term["category"] for term in terms}
+        return {"extra_tags": [tag for tag in EXTRA_TAGS if tag in present], "extra_terms": terms}
+
+    @staticmethod
+    def _spec_claim(raw: str, match: Mapping[str, Any]) -> bool:
+        """True when the words after a "legit" match are a number: the
+        reviewer is disputing a size or capacity, not the brand."""
+        span = match.get("span")
+        return bool(span and SPEC_CLAIM_AFTER.match(str(raw)[span[1] :]))
+
+    def _counterfeit_phrase(self, normalized: str) -> tuple[int, int] | None:
+        """The first comparison-with-the-original phrase that is a report."""
+        for pattern in COUNTERFEIT_PHRASES:
+            for found in pattern.finditer(normalized):
+                if _speculative(normalized, found.start()):
+                    continue
+                if SPEC_CLAIM_AFTER.match(normalized[found.end() :]):
+                    continue
+                return found.span()
+        return None
 
     @staticmethod
     def _raw_span(
@@ -495,10 +812,10 @@ class LexiconHazardTagger:
             return None
         return (min(item.raw_start for item in covering), max(item.raw_end for item in covering))
 
-    def tag_review(self, text: Any) -> list[dict[str, Any]]:
+    def tag_review(self, text: Any, rating: object = None) -> list[dict[str, Any]]:
         tagged = []
         for index, sentence in enumerate(text_norm.segment_sentences(text)):
-            result = self.tag_sentence(sentence)
+            result = self.tag_sentence(sentence, rating)
             result["index"] = index
             tagged.append(result)
         return tagged
@@ -542,7 +859,14 @@ class HazardBadgeModel:
         # tagger does. Hence both versions in one string.
         sentiment_version = getattr(self.sentiment, "model_version", None)
         learned = getattr(self.tagger, "learned", None)
-        hazard_version = f"{MODEL_VERSION}+{learned.version}" if learned is not None else MODEL_VERSION
+        rules = getattr(self.tagger, "rules", "0.3")
+        base_version = MODEL_VERSION if rules == "0.3" else f"{MODEL_VERSION}+rules{rules}"
+        hazard_version = base_version
+        if learned is not None:
+            gated_rules = f"+{LEARNED_ADD_RULES}" if getattr(learned, "needs_sentiment", False) else ""
+            hazard_version = f"{base_version}+{learned.version}{gated_rules}"
+        if getattr(self.tagger, "counterfeit_rules", None):
+            hazard_version = f"{hazard_version}+{self.tagger.counterfeit_rules}"
         self.model_version = (
             f"{hazard_version}+{sentiment_version}" if sentiment_version else hazard_version
         )
@@ -551,8 +875,12 @@ class HazardBadgeModel:
         return self.sentiment.fingerprint(review)
 
     def analyze(self, review: object, rating: object = None) -> dict[str, Any]:
-        sentences = self.tagger.tag_review(review)
+        sentences = self.tagger.tag_review(review, rating)
         review_tags = sorted({tag for item in sentences for tag in item["tags"]})
+        # The two informational labels travel beside review_tags, never inside it:
+        # review_tags keeps meaning safety, defect or counterfeit wherever it is stored.
+        five_labels = getattr(self.tagger, "counterfeit_rules", None) == EXTRA_RULES
+        extra_tags = [tag for tag in EXTRA_TAGS if any(tag in (item.get("extra_tags") or ()) for item in sentences)]
         confident = sorted(
             {
                 tag
@@ -576,6 +904,7 @@ class HazardBadgeModel:
             "qualified_for_integration": self.qualified_for_integration,
             "sentences": sentences,
             "review_tags": review_tags,
+            **({"review_extra_tags": extra_tags} if five_labels else {}),
             "review_high_confidence": confident,
             "max_severity": max(
                 (taxonomy.SEVERITY.get(name, 0) for name in subtypes), default=0

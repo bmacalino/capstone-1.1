@@ -16,6 +16,7 @@ from defaketive_sentiment.hazard_learned import (
     LearnedHazardScorer,
     LearnedModelError,
     fit_category_model,
+    is_high_star,
     keyword_features,
 )
 from defaketive_sentiment.hazard_model import MODEL_VERSION, HazardBadgeModel, LexiconHazardTagger
@@ -131,6 +132,84 @@ class TestComplaintGate(unittest.TestCase):
             LexiconHazardTagger(learned=GatedScorer())
 
 
+class StarScorer(GatedScorer):
+    """Scores every sentence 0.6: over its ordinary threshold, under its 0.7 bar for 4-5 star reviews."""
+
+    high_star_threshold = {"defect": 0.7}
+
+    def decide(self, normalized, kw, embedding):
+        return {"defect": (True, 0.6)}
+
+
+class TestHighStarBar(unittest.TestCase):
+    PLAIN = "gumagana po cya"  # no defect keyword in it
+
+    def tagger(self, scorer=None):
+        return LexiconHazardTagger(learned=scorer or StarScorer(), sentiment_label=lambda text: "negative")
+
+    def test_which_ratings_are_high(self):
+        for rating, expected in ((5, True), ("4", True), (4.0, True), ("5.0", True), (3, False), ("1", False), (None, False), ("", False), ("n/a", False)):
+            with self.subTest(rating=rating):
+                self.assertEqual(is_high_star(rating), expected)
+
+    def test_a_weak_score_adds_no_flag_in_a_well_rated_review(self):
+        tagged = self.tagger().tag_sentence(self.PLAIN, 5)
+        self.assertNotIn("defect", tagged["tags"])
+        self.assertEqual(tagged["gate_sentiment"], {"defect": "below_high_star_bar"})
+
+    def test_the_same_score_adds_a_flag_in_a_low_rated_or_unrated_review(self):
+        for rating in (1, 3, None, ""):
+            with self.subTest(rating=rating):
+                self.assertIn("defect", self.tagger().tag_sentence(self.PLAIN, rating)["tags"])
+
+    def test_a_score_over_the_bar_still_adds_a_flag(self):
+        scorer = StarScorer()
+        scorer.high_star_threshold = {"defect": 0.55}
+        self.assertIn("defect", self.tagger(scorer).tag_sentence(self.PLAIN, 5)["tags"])
+
+    def test_a_keyword_flag_stands_whatever_the_rating(self):
+        self.assertIn("defect", self.tagger().tag_sentence("sira agad", 5)["tags"])
+
+    def test_the_rating_reaches_every_sentence_of_a_review(self):
+        tagged = self.tagger().tag_review("Gumagana po cya. Sira agad.", 5)
+        self.assertEqual(["defect" in sentence["tags"] for sentence in tagged], [False, True])
+
+    def test_the_badge_model_passes_the_rating_on(self):
+        model = HazardBadgeModel(allow_unqualified=True, tagger=self.tagger())
+        self.assertNotIn("defect", model.analyze(self.PLAIN, 5)["review_tags"])
+        self.assertIn("defect", model.analyze(self.PLAIN, 2)["review_tags"])
+        self.assertIn("defect", model.analyze(self.PLAIN)["review_tags"])
+
+
+class FilterScorer:
+    """A safety model in "and" mode: it may only remove a keyword flag."""
+
+    needs_embedding = False
+    categories = ["safety"]
+    combine = {"safety": "and"}
+    version = "filter-1"
+
+    def __init__(self, on):
+        self.on = on
+
+    def decide(self, normalized, kw, embedding):
+        return {"safety": (self.on, 0.9 if self.on else 0.1)}
+
+
+class TestFilterMode(unittest.TestCase):
+    def test_a_keyword_flag_the_model_rejects_is_removed(self):
+        tagged = LexiconHazardTagger(learned=FilterScorer(False)).tag_sentence("nasunog agad")
+        self.assertNotIn("safety", tagged["tags"])
+
+    def test_a_keyword_flag_the_model_accepts_stands(self):
+        tagged = LexiconHazardTagger(learned=FilterScorer(True)).tag_sentence("nasunog agad")
+        self.assertIn("safety", tagged["tags"])
+
+    def test_the_model_never_adds_a_flag(self):
+        tagged = LexiconHazardTagger(learned=FilterScorer(True)).tag_sentence("maganda naman")
+        self.assertNotIn("safety", tagged["tags"])
+
+
 class TestFitting(unittest.TestCase):
     def test_a_tk_model_fits_and_scores(self):
         texts = ["sira agad", "hindi gumagana", "maganda naman", "sulit salamat"] * 5
@@ -146,9 +225,13 @@ class TestShippedModels(unittest.TestCase):
     def test_only_the_adopted_categories_ship(self):
         manifest = json.loads((DEFAULT_MODEL_DIR / "manifest.json").read_text(encoding="utf-8"))
         scorer = LearnedHazardScorer()
-        self.assertEqual(sorted(scorer.categories), sorted(manifest["categories"]))
-        for category, decision in manifest["adoption"]["decisions"].items():
-            self.assertEqual(decision["adopted"], category in scorer.categories)
+        # Safety is the team-label model, unchanged; defect is retrained.
+        self.assertEqual(sorted(scorer.categories), ["defect", "safety"])
+        self.assertEqual(scorer.combine, {"safety": "decide", "defect": "or_gated"})
+        self.assertEqual(manifest["keyword_rules"], "0.4")
+        # Made the default on the owner's instruction, not by a pre-registered test.
+        self.assertFalse(manifest["qualified_for_integration"])
+        self.assertEqual(manifest["adoption"]["adopted_by"], "owner instruction")
 
     def test_a_changed_model_file_is_refused(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -193,8 +276,92 @@ class TestShippedModels(unittest.TestCase):
                 registry.load_model(registry.HAZARD_BADGES)
 
     def test_a_clear_defect_report_is_still_found(self):
-        tagger = LexiconHazardTagger(learned=LearnedHazardScorer())
+        tagger = LexiconHazardTagger.for_scorer(LearnedHazardScorer(), sentiment_label=lambda text: "negative")
         self.assertIn("defect", tagger.tag_sentence("sira agad, hindi na gumagana after 2 days")["tags"])
+
+    def test_box_and_seller_complaints_are_not_added_as_defects(self):
+        # Guide rule 1, from the live check after round 3.
+        tagger = LexiconHazardTagger.for_scorer(LearnedHazardScorer(), sentiment_label=lambda text: "negative")
+        for sentence in ("Poor packaging.", "No protective packaging.", "but all I get were automated responses."):
+            with self.subTest(sentence=sentence):
+                self.assertNotIn("defect", tagger.tag_sentence(sentence)["tags"])
+
+    def test_a_fault_mentioned_with_the_seller_is_still_found(self):
+        # The first, blunter rule lost these five round-3 reports.
+        tagger = LexiconHazardTagger.for_scorer(LearnedHazardScorer(), sentiment_label=lambda text: "negative")
+        tagged = tagger.tag_sentence("seller not responding sayang pera dto 5 mins lang lowbat na")
+        self.assertIn("defect", tagged["tags"])
+
+    def test_the_shipped_folder_names_its_keyword_rules(self):
+        scorer = LearnedHazardScorer()
+        self.assertEqual(scorer.manifest["keyword_rules"], "0.4")
+        with self.assertRaises(Exception):
+            # Served with the rules it was not trained with: refused.
+            LexiconHazardTagger(learned=scorer, sentiment_label=lambda text: "negative")
+
+    def test_the_app_no_longer_flags_denied_or_imagined_defects(self):
+        model = registry.load_model(registry.HAZARD_BADGES)
+        self.assertEqual(model.tagger.rules, "0.4")
+        self.assertIn("+rules0.4", model.model_version)
+        for sentence in (
+            "Wala pong sira ang mga na recieve ko.",
+            "original talaga, walang ka sira sira",
+            "Akala ko nung una sira na hahaha lowbat lang pala.",
+            "pabili ulit ako sa susunod pag nasira na.",
+        ):
+            with self.subTest(sentence=sentence):
+                self.assertNotIn("defect", model.tagger.tag_sentence(sentence)["tags"])
+
+    def test_the_team_label_models_stay_selectable(self):
+        registry.clear_cache()
+        self.addCleanup(registry.clear_cache)
+        with mock.patch.dict(os.environ, {registry.HAZARD_ENVIRONMENT_VARIABLE: registry.TEAM_LABELS_HAZARD}):
+            model = registry.load_model(registry.HAZARD_BADGES)
+        self.assertEqual(model.tagger.learned.model_dir.name, registry.TEAM_LABELS_HAZARD_DIR)
+        self.assertEqual(sorted(model.tagger.learned.categories), ["defect", "safety"])
+
+    def test_every_app_checker_reports_the_two_newer_labels(self):
+        # The report screens show five labels, so whichever checker is chosen must fill them.
+        self.addCleanup(registry.clear_cache)
+        for choice in ("", registry.TEAM_LABELS_HAZARD, registry.KEYWORD_HAZARD, registry.FIVE_LABELS_HAZARD):
+            registry.clear_cache()
+            with self.subTest(choice=choice or "default"), mock.patch.dict(os.environ, {registry.HAZARD_ENVIRONMENT_VARIABLE: choice}):
+                model = registry.load_model(registry.HAZARD_BADGES)
+                self.assertIn("quality", model.tagger.tag_sentence("sobrang hina")["extra_tags"])
+                self.assertIn("+c2", model.model_version)
+                self.assertEqual(model.analyze("sobrang hina")["review_extra_tags"], ["quality"])
+
+    def test_the_shipped_defect_model_is_stricter_in_well_rated_reviews(self):
+        scorer = LearnedHazardScorer()
+        self.assertGreater(scorer.high_star_threshold["defect"], scorer.models["defect"].threshold)
+        tagger = LexiconHazardTagger.for_scorer(scorer, sentiment_label=lambda text: "neutral")
+        # The Anker check: a plain remark the earlier retrained model quoted as a defect.
+        self.assertNotIn("defect", tagger.tag_sentence("Gumagana naman sya.", 5)["tags"])
+        # A real report in a 5-star review is still found.
+        self.assertIn("defect", tagger.tag_sentence("Ayaw na mag charge after 1 week.", 5)["tags"])
+
+    def test_the_star_bar_is_part_of_the_version(self):
+        with tempfile.TemporaryDirectory() as folder:
+            copy = Path(folder) / "model"
+            shutil.copytree(DEFAULT_MODEL_DIR, copy)
+            manifest = json.loads((copy / "manifest.json").read_text(encoding="utf-8"))
+            manifest["categories"]["defect"].pop("threshold_high_star")
+            (copy / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            self.assertNotEqual(LearnedHazardScorer(copy).version, LearnedHazardScorer().version)
+
+    def test_a_star_bar_on_a_category_that_cannot_use_it_is_refused(self):
+        with tempfile.TemporaryDirectory() as folder:
+            copy = Path(folder) / "model"
+            shutil.copytree(DEFAULT_MODEL_DIR, copy)
+            manifest = json.loads((copy / "manifest.json").read_text(encoding="utf-8"))
+            manifest["categories"]["safety"]["threshold_high_star"] = 0.9
+            (copy / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaises(LearnedModelError):
+                LearnedHazardScorer(copy)
+
+    def test_the_shipped_gate_keeps_praise_unflagged(self):
+        tagger = LexiconHazardTagger.for_scorer(LearnedHazardScorer(), sentiment_label=lambda text: "positive")
+        self.assertNotIn("defect", tagger.tag_sentence("gumagana po cya")["tags"])
 
 
 if __name__ == "__main__":

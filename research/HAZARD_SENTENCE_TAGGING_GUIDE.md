@@ -1,10 +1,16 @@
 # Hazard Sentence Tagging Guide
 
 For the three annotators labelling review sentences for DeFaketive.
-Version 1.1, 29 September 2026 (1.0 frozen 21 September 2026). If a rule here
+Version 1.4, 7 October 2026 (1.3: 7 October; 1.2: 6 October; 1.1: 29 September; 1.0 frozen 21 September 2026). If a rule here
 changes, the version changes and the sentences labelled under the old version
 are re-checked. Version 1.1 only adds worked examples (Rule 7) for the cases
 labelling round 1 split on; no rule changed, so round 1 labels stay valid.
+Version 1.2 (6 October 2026) adds worked counterfeit examples (Rule 8) for
+round 5, again without changing a rule.
+Version 1.3 writes down two answers the team was already giving (Rule 9).
+Version 1.4 adds two labels, "poor quality" and "not as advertised" (Rule 10).
+It changes one earlier answer: "iba sa picture" is now "not as advertised",
+no longer counterfeit. Rounds 1–3 keep the labels they were given.
 
 Read this once all the way through before you label anything. Then do the
 30-sentence practice set together and compare answers. Disagreements at that
@@ -210,6 +216,72 @@ In round 1 the two annotators on a sentence disagreed most often about defects
 | "kaso iba sa picture yung pinadala nyo" | counterfeit **yes** | "iba sa picture" is on the counterfeit list |
 | "ang hina ng init, matagal ko nang sinaksak" (a hair straightener) | defect **yes**, safety **no** | too little heat from a heating product is a failure, not a hazard |
 | "okay din, fake news, di naman nag-stop" | counterfeit **no** | "fake news" means "that claim was false", not "this is a fake" |
+
+### Rule 8 — Worked counterfeit examples (added in 1.2)
+
+Annotators agreed least on counterfeit (65 sentences split across rounds 1–3).
+These apply the definition above — *the reviewer says the item is fake or not
+the real brand* — and Rules 1, 4 and 5. None is new.
+
+| Sentence | Answer | Why |
+|---|---|---|
+| "Definitely scam." | counterfeit **no** | says nothing about the item being a copy |
+| "scam po yung seller, dalawa order ko isa lang dumating" | **no** to all | Rule 1: the seller and a missing item |
+| "hindi legit na 20k mAh, mabilis malowbat" | counterfeit **no**, defect **yes** | disputes a number on the listing, not the brand; the fast drain is the defect |
+| "maganda ang quality, parang original" | counterfeit **no** | praise: "like the original" is not "this is a copy" |
+| "I wonder if the reviews are fake" | counterfeit **no** | about the reviews, not the product |
+| "but you can feel it's not 100% original" | counterfeit **yes** | says it is not the real thing |
+| "hindi sya kaamoy ng tunay na Cloud" | counterfeit **yes** | compares with the real one and says it differs |
+| "pero copy lang sya" | counterfeit **yes** | calls it a copy |
+| "thank you seller, although hindi sya orig pwede na rin" | counterfeit **yes** | Rule 4: a happy review can still report a fake |
+
+Decide from the sentence in front of you. The rest of the review is there to
+help you understand the sentence, not to answer for it: if another sentence of
+the review says "fake", that sentence gets the yes, not this one.
+
+### Rule 9 — Slow charging and hazards are defects too (added in 1.3)
+
+Decided by the project owner on 7 October 2026. Both were already the team's
+usual answer in rounds 1–3 (all 6 slow-charging sentences, and 40 of the 54
+agreed safety reports), so earlier labels stay valid.
+
+| Sentence | Answer | Why |
+|---|---|---|
+| "pero mabagal syang mag charge" | defect **yes** | a charger or power bank that charges slowly is not working properly |
+| "Tagal-tagal ma-full charge" | defect **yes** | same |
+| "sobrang bilis uminit" (a charger) | safety **yes**, defect **yes** | a product that overheats is a hazard and is also faulty |
+| "grounded yung mic" | safety **yes**, defect **yes** | same |
+| "hindi naman umiinit" | **no** to both | Rule 2: negated |
+
+### Rule 10 — Two more labels: poor quality, and not as advertised (added in 1.4)
+
+Rounds 1–3 showed that three labels force a coin-flip on some sentences: the
+two annotators disagreed or split evenly on weak-but-working products, dents
+and scratches, "low quality", and "not like the picture". From 1.4 those have
+their own labels. Sheets that carry the two extra columns ask five questions:
+
+| Column | Shown to shoppers as | Say yes when the reviewer says… |
+|---|---|---|
+| `human_safety` | Safety problem | heat, fire, smoke, swelling, sparks, shock, "grounded" |
+| `human_defect` | Faulty or broken | it cannot do its job: dead, stops, won't charge or connect, drains fast, charges slowly, a part does not work |
+| `human_quality` | Poor quality | it works, but poorly; feels cheap or flimsy; arrived dented, scratched or dirty |
+| `human_counterfeit` | Possible fake | it is a copy: fake, replica, class A, not the original brand |
+| `human_not_as_described` | Not as advertised | a size, capacity, feature or look differs from what the listing says or shows |
+
+| Sentence | Answer | Why |
+|---|---|---|
+| "Sobrang hina yung fan" | quality **yes**, defect **no** | it runs, but weakly |
+| "Mahina lang pala speaker niya" | quality **yes**, defect **no** | same |
+| "gumana naman kahit may kunting basag ang speaker" | quality **yes**, defect **no** | damaged, still working |
+| "may dent agad yung mouse" | quality **yes**, defect **no** | cosmetic damage |
+| "pero mabagal syang mag charge" | defect **yes** | Rule 9 still holds |
+| "isa lang ka side ang tumutunog" | defect **yes** | part of it does not work |
+| "hindi legit na 20000 mAh, mabilis malowbat" | not as advertised **yes**, defect **yes**, counterfeit **no** | a false number on the listing, and it drains fast |
+| "Hindi Legit 24\" tv, 21\" lang talaga" | not as advertised **yes** | false size |
+| "Hindi totoo na motion sensor light to" | not as advertised **yes** | a feature that is not there |
+| "IBANG IBA SA PICTURE YUNG FAN" | not as advertised **yes**, counterfeit **no** | changed in 1.4 |
+| "black ang order ko, green ang dumating" | **no** to all | wrong item sent: Rule 1 |
+| "Not original, sound quality awful" | counterfeit **yes**, quality **yes** | two reports in one sentence |
 
 ---
 

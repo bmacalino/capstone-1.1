@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-10-07T15:15:11+00:00",
+  "keyword_rules": "0.4",
+  "safety": {
+    "threshold": 0.818933,
+    "shipped_threshold": 0.818933,
+    "cross_validated": {
+      "tp": 24,
+      "fp": 21,
+      "fn": 6,
+      "precision": 0.5333,
+      "recall": 0.8,
+      "f1": 0.64
+    }
+  },
+  "defect": {
+    "threshold": 0.479863,
+    "shipped_threshold": 0.484941,
+    "cross_validated": {
+      "tp": 215,
+      "fp": 62,
+      "fn": 108,
+      "precision": 0.7762,
+      "recall": 0.6656,
+      "f1": 0.7167
+    },
+    "keywords_alone": {
+      "tp": 157,
+      "fp": 22,
+      "fn": 166,
+      "precision": 0.8771,
+      "recall": 0.4861,
+      "f1": 0.6255
+    }
+  }
+}

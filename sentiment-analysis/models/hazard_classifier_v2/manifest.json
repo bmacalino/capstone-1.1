@@ -37,8 +37,92 @@
     "model_version": "defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
     "model_sha256": "e04da4c268bc8ab94e27da2e0fb4206f38dadc43e9cfb52050818a5bb40c3478"
   },
-  "qualified_for_integration": false,
+  "qualified_for_integration": true,
   "adoption": {
-    "status": "pending: tested once on labelling round 3"
+    "rule": "research/PREREGISTRATION_defect_v5.md",
+    "adopted": true,
+    "checks": {
+      "f1_higher": true,
+      "recall_not_lower": true,
+      "weighted_precision_within_margin": true
+    },
+    "round3_keywords": {
+      "precision": 0.8721,
+      "recall": 0.419,
+      "f1": 0.566,
+      "weighted": {
+        "precision": 0.8911,
+        "recall": 0.3774,
+        "f1": 0.5302
+      }
+    },
+    "round3_gated": {
+      "precision": 0.8873,
+      "recall": 0.7039,
+      "f1": 0.785,
+      "weighted": {
+        "precision": 0.8484,
+        "recall": 0.5273,
+        "f1": 0.6504
+      }
+    },
+    "mcnemar": {
+      "only_a_correct": 5,
+      "only_b_correct": 51,
+      "discordant": 56,
+      "statistic": 36.1607,
+      "p_value": 0.0,
+      "method": "chi_square_continuity_corrected"
+    },
+    "disagreement_stratum": {
+      "v3_shipped": {
+        "labelled_rows": 85,
+        "positives": 64,
+        "true_positives": 7,
+        "false_positives": 1,
+        "false_negatives": 57,
+        "precision": 0.875,
+        "recall": 0.1094,
+        "f1": 0.1944,
+        "f1_ci_95": [
+          0.08,
+          0.3291
+        ],
+        "accuracy": 0.3176,
+        "never_flag_accuracy": 0.2471,
+        "weighted": {
+          "precision": 0.875,
+          "recall": 0.1094,
+          "f1": 0.1944
+        },
+        "meets_recall_target": false,
+        "meets_precision_floor": true
+      },
+      "v5_candidate": {
+        "labelled_rows": 85,
+        "positives": 64,
+        "true_positives": 50,
+        "false_positives": 3,
+        "false_negatives": 14,
+        "precision": 0.9434,
+        "recall": 0.7812,
+        "f1": 0.8547,
+        "f1_ci_95": [
+          0.7833,
+          0.9217
+        ],
+        "accuracy": 0.8,
+        "never_flag_accuracy": 0.2471,
+        "weighted": {
+          "precision": 0.9434,
+          "recall": 0.7812,
+          "f1": 0.8547
+        },
+        "meets_recall_target": true,
+        "meets_precision_floor": true
+      }
+    },
+    "decided_at": "2026-10-05T14:12:24+00:00",
+    "report": "research\\hazard_tagger_measurement_round3.json"
   }
 }

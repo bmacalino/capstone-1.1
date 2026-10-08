@@ -38,6 +38,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from . import hazard_taxonomy as taxonomy
+from .extra_labels import EXTRA_TAGS
 from .proportions import wilson_interval, wilson_lower_bound
 
 SCHEMA_VERSION = "defaketive-summary-2.0"
@@ -324,6 +325,54 @@ class ProductBadgeAggregator:
                     )
                 )
         return found
+
+    def _extra_reports(
+        self,
+        records: Sequence[Mapping[str, Any]],
+        usable: int,
+        weight_by_key: Mapping[str, float] | None,
+    ) -> dict[str, Any]:
+        """Counts and quotes for "poor quality" and "not as advertised".
+
+        These two labels inform the shopper. They are returned beside `flags`,
+        never inside it, so no verdict rule can read them. Empty when the
+        checker did not run the five-label rules, so that a label which was
+        not checked is never shown as "0 reviews".
+        """
+        if not any("review_extra_tags" in record for record in records):
+            return {}
+        found: list[EvidenceSentence] = []
+        for position, record in enumerate(records):
+            review_key = self.review_key(record, position)
+            for sentence in record.get("sentences") or []:
+                for category in sentence.get("extra_tags") or []:
+                    if category not in EXTRA_TAGS:
+                        continue
+                    found.append(
+                        EvidenceSentence(
+                            review_key=review_key,
+                            sentence_index=int(sentence.get("index", 0)),
+                            text=str(sentence.get("text_raw") or sentence.get("text") or ""),
+                            category=category,
+                            terms=tuple(
+                                term for term in sentence.get("extra_terms") or () if term.get("category") == category
+                            ),
+                            rating=record.get("rating"),
+                            reviewed_at=record.get("reviewed_at"),
+                        )
+                    )
+        reports: dict[str, Any] = {}
+        for category in EXTRA_TAGS:
+            matching = [item for item in found if item.category == category]
+            flagged_reviews = {item.review_key for item in matching}
+            rate, interval, _lower = self._rate(flagged_reviews, usable, weight_by_key)
+            reports[category] = {
+                "flagged_reviews": len(flagged_reviews),
+                "rate": round(rate, 6),
+                "rate_ci_95": [round(interval[0], 6), round(interval[1], 6)],
+                "evidence": [item.as_dict() for item in matching],
+            }
+        return reports
 
     # -- rollup -----------------------------------------------------------
 
@@ -663,6 +712,8 @@ class ProductBadgeAggregator:
             for category in FLAG_CATEGORIES
         }
 
+        reports = self._extra_reports(records, usable, weight_by_key)
+
         coverage_block = dict(coverage or {})
         coverage_block.setdefault("reviews_analyzed", usable)
         coverage_block.setdefault("usable_reviews", usable)
@@ -718,6 +769,7 @@ class ProductBadgeAggregator:
             "coverage": coverage_block,
             "safety": safety.as_dict(),
             "flags": {name: flag.as_dict() for name, flag in flags.items()},
+            **({"reports": reports} if reports else {}),
             "review_quality": {
                 "enabled": self.review_quality_enabled,
                 "reviews_unreliable": reviews_unreliable,

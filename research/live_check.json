@@ -1,0 +1,174 @@
+{
+  "generated_at": "2026-10-08T02:04:54+00:00",
+  "warning": "Agreement with AI-proposed labels on listings no model was trained on. Not accuracy.",
+  "sentences_labelled": 392,
+  "sentences_represented": 1400,
+  "defect_reports_represented": 226,
+  "results": {
+    "keywords": {
+      "all_reviews": {
+        "flags": 120.0,
+        "real": 110.0,
+        "false": 10.0,
+        "missed": 116.3,
+        "precision": 0.9167,
+        "recall": 0.486,
+        "f1": 0.6352
+      },
+      "four_and_five_star": {
+        "flags": 22.0,
+        "real": 19.0,
+        "false": 3.0,
+        "missed": 24.2,
+        "precision": 0.8636,
+        "recall": 0.4402,
+        "f1": 0.5831
+      },
+      "one_to_three_star": {
+        "flags": 98.0,
+        "real": 91.0,
+        "false": 7.0,
+        "missed": 92.2,
+        "precision": 0.9286,
+        "recall": 0.4968,
+        "f1": 0.6473
+      }
+    },
+    "hazard_classifier_v2b": {
+      "all_reviews": {
+        "flags": 216.0,
+        "real": 168.0,
+        "false": 48.0,
+        "missed": 58.3,
+        "precision": 0.7778,
+        "recall": 0.7423,
+        "f1": 0.7596
+      },
+      "four_and_five_star": {
+        "flags": 53.0,
+        "real": 29.0,
+        "false": 24.0,
+        "missed": 14.2,
+        "precision": 0.5472,
+        "recall": 0.6719,
+        "f1": 0.6031
+      },
+      "one_to_three_star": {
+        "flags": 163.0,
+        "real": 139.0,
+        "false": 24.0,
+        "missed": 44.2,
+        "precision": 0.8528,
+        "recall": 0.7589,
+        "f1": 0.8031
+      }
+    },
+    "hazard_classifier_v4": {
+      "all_reviews": {
+        "flags": 272.0,
+        "real": 204.0,
+        "false": 68.0,
+        "missed": 22.3,
+        "precision": 0.75,
+        "recall": 0.9013,
+        "f1": 0.8187
+      },
+      "four_and_five_star": {
+        "flags": 70.0,
+        "real": 33.0,
+        "false": 37.0,
+        "missed": 10.2,
+        "precision": 0.4714,
+        "recall": 0.7645,
+        "f1": 0.5832
+      },
+      "one_to_three_star": {
+        "flags": 202.0,
+        "real": 171.0,
+        "false": 31.0,
+        "missed": 12.2,
+        "precision": 0.8465,
+        "recall": 0.9336,
+        "f1": 0.8879
+      }
+    },
+    "hazard_classifier_v5": {
+      "all_reviews": {
+        "flags": 223.0,
+        "real": 193.0,
+        "false": 30.0,
+        "missed": 33.3,
+        "precision": 0.8655,
+        "recall": 0.8527,
+        "f1": 0.8591
+      },
+      "four_and_five_star": {
+        "flags": 35.0,
+        "real": 29.0,
+        "false": 6.0,
+        "missed": 14.2,
+        "precision": 0.8286,
+        "recall": 0.6719,
+        "f1": 0.742
+      },
+      "one_to_three_star": {
+        "flags": 188.0,
+        "real": 164.0,
+        "false": 24.0,
+        "missed": 19.2,
+        "precision": 0.8723,
+        "recall": 0.8954,
+        "f1": 0.8837
+      }
+    },
+    "hazard_classifier_v5_without_the_bar": {
+      "all_reviews": {
+        "flags": 249.0,
+        "real": 196.0,
+        "false": 53.0,
+        "missed": 30.3,
+        "precision": 0.7871,
+        "recall": 0.866,
+        "f1": 0.8247
+      },
+      "four_and_five_star": {
+        "flags": 61.0,
+        "real": 32.0,
+        "false": 29.0,
+        "missed": 11.2,
+        "precision": 0.5246,
+        "recall": 0.7414,
+        "f1": 0.6144
+      },
+      "one_to_three_star": {
+        "flags": 188.0,
+        "real": 164.0,
+        "false": 24.0,
+        "missed": 19.2,
+        "precision": 0.8723,
+        "recall": 0.8954,
+        "f1": 0.8837
+      }
+    }
+  },
+  "rule_labels_round_8": {
+    "sentences": 752,
+    "quality": {
+      "reports": 38,
+      "caught": 21,
+      "false": 6,
+      "precision": 0.7778,
+      "recall": 0.5526,
+      "f1": 0.6462
+    },
+    "not_as_described": {
+      "reports": 43,
+      "caught": 12,
+      "false": 1,
+      "precision": 0.9231,
+      "recall": 0.2791,
+      "f1": 0.4286
+    }
+  },
+  "served": "hazard_classifier_v5"
+}
