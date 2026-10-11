@@ -88,7 +88,21 @@ NEVER_EXPERIENCED = re.compile(
 )
 MISTAKEN_BELIEF_WORDS = frozenset({"akala", "kala", "inakala", "akla", "thought"})
 HYPOTHETICAL_WORDS = frozenset({"pag", "kapag", "if", "once", "baka", "bka"})
-DENIED_REASONS = frozenset({"mistaken_belief", "hypothetical"})
+# Two more readings of a damage word that are not a fault of the product
+# (11 Oct 2026, from two reviews the owner found flagged in the app; revision
+# "g1" of rules 0.4, part of the version string).
+#   "sira, punit at wasak2 na ung box": a list of damage words that ends at the
+#   box. The three-word reach of the packaging rule stops short of it.
+#   "tumagal ng 2 years bago nasira": the earlier unit lasted years. Years
+#   only: "3 months pa lang sira na" is a report.
+KEYWORD_GUARDS_REVISION = "g1"
+DAMAGE_LIST_REACH = 8
+AFTER_YEARS_OF_USE = re.compile(
+    r"(?<!\w)(?:\d+|isang|dalawang|tatlong|apat na|limang|ilang|one|two|three|four|five|several|a few|few)\s*"
+    r"(?:years?|yrs?|taon)\s+(?:[\w']+\s+){0,2}(?:bago|before|until)\s+(?:[\w']+\s+){0,2}$",
+    re.IGNORECASE,
+)
+DENIED_REASONS = frozenset({"mistaken_belief", "hypothetical", "packaging_only", "after_years_of_use"})
 
 # A mild heat word ("umiinit", "mainit") is suppressed as a safety signal when
 # the sentence is about something worn, the weather or a venue, or a product
@@ -119,6 +133,11 @@ DAMAGE_TERMS = frozenset(
 PACKAGING_WORDS = frozenset(
     {"box", "boxes", "kahon", "package", "packaging", "packing", "parcel",
      "balot", "wrapper", "wrapping"}
+)
+# Words a list of damage may run through on its way to the box (revision g1).
+DAMAGE_LIST_WORDS = DAMAGE_TERMS | frozenset(
+    {"punit", "wasak", "yupi", "nayupi", "gasgas", "butas", "lukot", "durog", "dent", "dents", "dented", "torn",
+     "at", "and", "na", "ung", "yung", "ang", "mga", "pati", "din", "rin", "pa", "po", "the", "tapos", "tas"}
 )
 
 # The risk lexicon carries six categories; the badges use three. The mapping
@@ -394,6 +413,21 @@ def _near_packaging(normalized: str, span: tuple[int, int], reach: int = 3) -> b
     return any(word in PACKAGING_WORDS for word in before + after)
 
 
+def _damage_list_about_packaging(normalized: str, span: tuple[int, int]) -> bool:
+    """A run of damage words and joining words that reaches a packaging word."""
+    for words in (
+        re.findall(r"[\w']+", normalized[span[1]:])[:DAMAGE_LIST_REACH],
+        re.findall(r"[\w']+", normalized[: span[0]])[::-1][:DAMAGE_LIST_REACH],
+    ):
+        for word in words:
+            if word in PACKAGING_WORDS:
+                return True
+            # "wasak2", "yupi2x": written reduplication.
+            if re.sub(r"\d+x?$", "", word) not in DAMAGE_LIST_WORDS:
+                break
+    return False
+
+
 def _speculative(normalized: str, start: int, reach: int = 3) -> bool:
     clause = re.split(r"[.!?;:,]", normalized[:start])[-1]
     return any(word in SPECULATION_WORDS for word in re.findall(r"[\w']+", clause)[-reach:])
@@ -473,6 +507,8 @@ class LexiconHazardTagger:
         self.rules = rules
         # Research switch: measure the effect of the denied-defect block (rules 0.4).
         self.block_denied = True
+        # Revision g1 of rules 0.4 (KEYWORD_GUARDS_REVISION); False reproduces 0.4 as first served.
+        self.context_guards = True
         self.counterfeit_rules = counterfeit_rules if rules != "0.2" else None
         # Learned per-category models (hazard_learned.LearnedHazardScorer). For
         # each category they hold, they make the final yes/no; the keyword
@@ -542,6 +578,11 @@ class LexiconHazardTagger:
             return "speculation"
         if category == DEFECT and term in DAMAGE_TERMS and _near_packaging(normalized, span):
             return "packaging"
+        if self.rules == "0.4" and self.context_guards and category == DEFECT and term in DAMAGE_TERMS:
+            if _damage_list_about_packaging(normalized, span):
+                return "packaging_only"
+            if AFTER_YEARS_OF_USE.search(normalized[: span[0]]):
+                return "after_years_of_use"
         if self.rules == "0.4" and category == DEFECT:
             before = re.findall(r"[\w']+", re.split(r"[.!?;:,]", normalized[: span[0]])[-1])
             after = re.findall(r"[\w']+", normalized[span[1] :])[:2]
@@ -918,6 +959,8 @@ class HazardBadgeModel:
         learned = getattr(self.tagger, "learned", None)
         rules = getattr(self.tagger, "rules", "0.3")
         base_version = MODEL_VERSION if rules == "0.3" else f"{MODEL_VERSION}+rules{rules}"
+        if rules == "0.4" and getattr(self.tagger, "context_guards", False):
+            base_version += KEYWORD_GUARDS_REVISION
         hazard_version = base_version
         if learned is not None:
             gated_rules = f"+{LEARNED_ADD_RULES}" if getattr(learned, "needs_sentiment", False) else ""

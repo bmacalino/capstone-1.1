@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-08T16:18:51+00:00",
- "measured_with": "defaketive-hazard-lexicon-0.3.0+rules0.4+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "generated_at": "2026-10-11T14:01:59+00:00",
+ "measured_with": "defaketive-hazard-lexicon-0.3.0+rules0.4g1+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
  "listings": 59,
  "enough_listings": true,
  "rule": "typical = median listing rate; warn when a listing's lower bound is above max(typical, floor); leave-one-out",

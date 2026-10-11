@@ -1,0 +1,12 @@
+{
+ "generated_at": "2026-10-11T13:37:56+00:00",
+ "checker": "defaketive-hazard-lexicon-0.3.0+rules0.4g1+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "labelled_sentences": 5384,
+ "removed_wrong": 0,
+ "removed_right": 0,
+ "added_right": 0,
+ "added_wrong": 0,
+ "rule": "keep if no flag is added and removed_right <= removed_wrong / 3",
+ "meets_rule": true,
+ "changed": []
+}

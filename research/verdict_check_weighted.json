@@ -1,17 +1,18 @@
 {
- "generated_at": "2026-10-08T16:18:41+00:00",
- "model_version": "defaketive-hazard-lexicon-0.3.0+rules0.4+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
- "listings": 68,
+ "generated_at": "2026-10-11T14:01:58+00:00",
+ "model_version": "defaketive-hazard-lexicon-0.3.0+rules0.4g1+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "listings": 70,
  "which": "saved scans weighted by star totals read afterwards (research/fetch_star_totals.py)",
  "verdicts": {
   "insufficient_evidence": 62,
-  "safety_warning": 4,
-  "no_warning_signs": 2
+  "safety_warning": 5,
+  "no_warning_signs": 2,
+  "possible_safety_issue": 1
  },
  "usable_listings": 61,
  "left_out": {
   "the sampled star levels hold too few of the listing's ratings": 6,
-  "no star totals": 1
+  "no star totals": 3
  },
  "verdicts_weighted": {
   "no_warning_signs": 31,
@@ -3271,6 +3272,58 @@
    "ratings_at_scan": 3136,
    "usable": false,
    "why_not": "the sampled star levels hold too few of the listing's ratings"
+  },
+  {
+   "name": "Zeus M330 High Speed Gaming Mouse, Multifunctional Mouse",
+   "link": "https://www.lazada.com.ph/products/pdp-i792626014-s17624921651.html",
+   "file": "lazada_ph_direct_77f6d93183df.json",
+   "reviews_analysed": 297,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "safety_warning",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 59,
+   "defect_rate": 0.032547,
+   "defect_rate_lower_bound": 0.009833,
+   "counterfeit_flagged_reviews": 2,
+   "counterfeit_rate": 0.015395,
+   "counterfeit_rate_lower_bound": 0.002937,
+   "quality_reviews": 15,
+   "not_as_described_reviews": 0,
+   "verdict_as_if_complete": "safety_warning",
+   "defect_rate_as_if_complete": 0.198653,
+   "defect_lower_bound_as_if_complete": 0.157252,
+   "counterfeit_rate_as_if_complete": 0.006734,
+   "counterfeit_lower_bound_as_if_complete": 0.001849,
+   "usable": false,
+   "why_not": "no star totals"
+  },
+  {
+   "name": "DoubleShock Bluetooth Gamepad Exquisite Simulation Level and Trigger E",
+   "link": "https://www.lazada.com.ph/products/pdp-i3646051280-s19045899461.html",
+   "file": "lazada_ph_direct_902a95d65682.json",
+   "reviews_analysed": 171,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 53,
+   "defect_rate": 0.08121,
+   "defect_rate_lower_bound": 0.035864,
+   "counterfeit_flagged_reviews": 10,
+   "counterfeit_rate": 0.023243,
+   "counterfeit_rate_lower_bound": 0.005389,
+   "quality_reviews": 8,
+   "not_as_described_reviews": 1,
+   "verdict_as_if_complete": "possible_safety_issue",
+   "defect_rate_as_if_complete": 0.309942,
+   "defect_lower_bound_as_if_complete": 0.24544,
+   "counterfeit_rate_as_if_complete": 0.05848,
+   "counterfeit_lower_bound_as_if_complete": 0.032072,
+   "usable": false,
+   "why_not": "no star totals"
   },
   {
    "name": "Original LCD For Infinix Smart 8 / Smart 8 HD / Smart 8 Pro X6525 X652",

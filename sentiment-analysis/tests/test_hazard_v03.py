@@ -309,6 +309,37 @@ class TestKeywordRules04(unittest.TestCase):
             with self.subTest(sentence=sentence):
                 self.assertTrue(self.defect(self.new, sentence))
 
+    def test_damage_listed_up_to_the_box_is_about_the_box(self):
+        # Revision g1: two reviews the owner found flagged in the app.
+        tagged = self.new.tag_sentence("sira ,punit at wasak2 na ung box. 2.")
+        self.assertNotIn("defect", tagged["tags"])
+        self.assertEqual(tagged["excluded"]["defect"], ["packaging_only"])
+        self.assertFalse(self.defect(self.new, "yung kahon yupi, punit at sira na"))
+        # The list has to reach the box, and the product itself is still a report.
+        self.assertTrue(self.defect(self.new, "sira, punit at ayaw gumana"))
+        self.assertTrue(self.defect(self.new, "yupi at sira yung mouse mismo"))
+
+    def test_a_unit_that_lasted_years_is_not_a_fault_report(self):
+        sentence = (
+            "yung una kong order tumagal ng 2 years bago na sira ang turbo and ang left click "
+            "so I assume Ang life span netong mouse ay around that time"
+        )
+        tagged = self.new.tag_sentence(sentence)
+        self.assertNotIn("defect", tagged["tags"])
+        self.assertEqual(tagged["excluded"]["defect"], ["after_years_of_use"])
+        self.assertFalse(self.defect(self.new, "umabot ng tatlong taon bago nasira"))
+        # Months, or under a year, are reports.
+        for report in ("3 months pa lang sira na yung left click", "wala pang 1 year sira na", "2 weeks bago nasira"):
+            with self.subTest(sentence=report):
+                self.assertTrue(self.defect(self.new, report))
+
+    def test_the_guards_can_be_switched_off_to_reproduce_the_first_0_4(self):
+        tagger = LexiconHazardTagger(rules="0.4")
+        tagger.context_guards = False
+        self.assertTrue(self.defect(tagger, "sira ,punit at wasak2 na ung box."))
+        # Rules 0.3 never had them.
+        self.assertTrue(self.defect(self.old, "tumagal ng 2 years bago nasira"))
+
     def test_a_safety_report_is_untouched(self):
         sentence = "akala ko original hindi namn pa nag iinit yung adaptor"
         self.assertEqual(

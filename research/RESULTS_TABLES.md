@@ -1481,6 +1481,39 @@ are wrong, it would double the analysis time, and the label it helps only
 informs the shopper. Round 9, its labels and both written sets stay in the
 repository as training material.
 
+**11. Two false "faulty or broken" flags found in the app** (11 Oct 2026;
+`check_keyword_guards.py`, `keyword_guards_check.json`). The owner found two
+four-star reviews flagged for the word "sira" where the product was not at
+fault:
+
+- "sira ,punit at wasak2 na ung box": damage to the box. The packaging rule
+  looks three words either side of the damage word and the box is the sixth.
+- "yung una kong order tumagal ng 2 years bago na sira ang turbo": the
+  earlier unit lasted two years.
+
+Revision `g1` of keyword rules 0.4 (`hazard_model.KEYWORD_GUARDS_REVISION`)
+adds two readings of a damage word: a run of damage and joining words that
+reaches a packaging word is about the packaging; a damage word after "N
+years … bago / before / until" is wear after long use. Years only: "3 months
+pa lang sira na" stays a report. Once the keyword is read this way the
+learned model's score for both sentences falls from about 0.77 to under 0.2,
+so it does not put the flag back.
+
+Rule fixed before the check: keep the guards only if they add no flag and
+remove at most one right flag for every three wrong ones.
+
+| Where | Sentences or reviews | Flags changed |
+|---|---|---|
+| Every labelled sentence with a faulty-or-broken label | 5,384 | 0 |
+| Every review of the 68 saved listings | 7,112 (553 with a damage word) | 2, the two above |
+
+So the guards cost nothing that can be measured and fix exactly what was
+reported. They are narrow by design, and this is the limit of the method: a
+keyword flags "sira" whatever is broken, and each harmless use has to be
+written down before it is recognised. Others will turn up. The typical
+rates of Table 12c were measured again with the revised checker, as the
+version test requires.
+
 **Decision.** `hazard_classifier_v6` is the app default: the defect model of
 `hazard_classifier_v5`, unchanged, and the safety filter of step 8. Like v5
 it is served on the owner's instruction and not by a pre-registered test

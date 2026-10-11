@@ -324,6 +324,25 @@ class TestShippedModels(unittest.TestCase):
             with self.subTest(sentence=sentence):
                 self.assertNotIn("defect", model.tagger.tag_sentence(sentence)["tags"])
 
+    def test_the_app_reads_box_damage_and_years_of_use_as_no_fault(self):
+        # The two reviews the owner found flagged (11 Oct 2026). With "sira"
+        # read as no fault, the learned model no longer scores either
+        # sentence high enough to put the flag back.
+        model = registry.load_model(registry.HAZARD_BADGES)
+        self.assertIn("+rules0.4g1", model.model_version)
+        reviews = (
+            "1. HINDI MAGANDA YUNG PAGKABALUT. kita naman po sa picture. sira ,punit at wasak2 na ung box. 2. i give 4 stars "
+            "because the product is working properly naman. all of its button was functioning well.",
+            "okay naman ang mouse for the prize, pangalawang order ko na to ng Zeus gaming mouse yung una kong order tumagal "
+            "ng 2 years bago na sira ang turbo and ang left click tuwing mag pe-press ako so I assume Ang life span netong "
+            "mouse ay around that time bago ulit ako bumili ng bagong mouse.",
+        )
+        for text in reviews:
+            with self.subTest(review=text[:40]):
+                self.assertNotIn("defect", model.analyze(text, 4)["review_tags"])
+        # A fault said plainly in the same star range is still found.
+        self.assertIn("defect", model.analyze("3 months pa lang sira na yung left click", 4)["review_tags"])
+
     def test_the_team_label_models_stay_selectable(self):
         registry.clear_cache()
         self.addCleanup(registry.clear_cache)
