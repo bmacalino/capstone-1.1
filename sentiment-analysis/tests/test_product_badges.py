@@ -171,6 +171,87 @@ class TestAlertOverride(unittest.TestCase):
         summary = aggregator().summarize(reviews, product_type="power_bank")
         self.assertFalse(summary["safety"]["alert"])
 
+    def test_one_serious_report_on_a_large_listing_is_a_caution_not_a_warning(self):
+        # Decided 12 Oct 2026. The tier table gives High for a severity-4
+        # hazard however rare, so one report used to be a safety warning and
+        # 14 of 19 warned listings rested on one. A single safety flag is
+        # wrong about as often as it is right; a second report is asked for.
+        reviews = [fire("r1")] + [clean(f"c{i}") for i in range(399)]
+        summary = aggregator().summarize(reviews, product_type="power_bank")
+        safety = summary["safety"]
+        self.assertEqual((safety["severity"], safety["likelihood_bin"]), (4, "low"))
+        self.assertEqual(safety["tier"], "Moderate")
+        self.assertIn("1 separate high-confidence report of", safety["tier_held_reason"])
+        self.assertIn("2 are needed", safety["tier_held_reason"])
+        self.assertEqual(summary["verdict"]["state"], badges.POSSIBLE_SAFETY_ISSUE)
+        self.assertEqual(summary["verdict"]["detail"], safety["tier_held_reason"])
+
+    def test_the_same_report_copied_twice_is_still_one(self):
+        duplicated = "nasunog yung unit habang naka-charge sobrang delikado"
+        reviews = [fire("r1", text=duplicated), fire("r2", text=duplicated)] + [
+            clean(f"c{i}") for i in range(398)
+        ]
+        summary = aggregator().summarize(reviews, product_type="power_bank")
+        self.assertEqual(summary["verdict"]["state"], badges.POSSIBLE_SAFETY_ISSUE)
+
+    def test_one_serious_report_among_few_reviews_is_not_held_back(self):
+        # One report in thirty reviews is no longer rare (its lower bound is
+        # 0.6%), and the hold is only for rare reports: the table's Serious
+        # stands. Between 30 and about 37 reviews one report can still warn.
+        reviews = [fire("r1")] + [clean(f"c{i}") for i in range(29)]
+        summary = aggregator().summarize(reviews, product_type="power_bank")
+        safety = summary["safety"]
+        self.assertEqual((safety["likelihood_bin"], safety["tier"]), ("medium", "Serious"))
+        self.assertIsNone(safety["tier_held_reason"])
+        self.assertFalse(safety["alert"])
+        self.assertEqual(summary["verdict"]["state"], badges.SAFETY_WARNING)
+
+    def test_two_separate_reports_are_not_held_back(self):
+        reviews = [
+            fire("r1", text="nasunog yung unit habang naka-charge"),
+            fire("r2", text="sumabog at nagliyab ang powerbank ko"),
+        ] + [clean(f"c{i}") for i in range(398)]
+        safety = aggregator().summarize(reviews, product_type="power_bank")["safety"]
+        self.assertIsNone(safety["tier_held_reason"])
+        self.assertEqual(safety["tier"], "High")
+
+    def with_alert(self, **settings):
+        alert = dict(badges.load_parameters()["alert"])
+        alert.update({name: {"value": value} for name, value in settings.items()})
+        return aggregator(alert=alert)
+
+    def test_the_earlier_rule_can_be_restored_for_comparison(self):
+        reviews = [fire("r1")] + [clean(f"c{i}") for i in range(399)]
+        summary = self.with_alert(single_report_tier="High").summarize(reviews, product_type="power_bank")
+        self.assertEqual(summary["safety"]["tier"], "High")
+        self.assertIsNone(summary["safety"]["tier_held_reason"])
+        self.assertEqual(summary["verdict"]["state"], badges.SAFETY_WARNING)
+
+    def test_asking_for_three_reports_holds_two(self):
+        reviews = [
+            fire("r1", text="nasunog yung unit habang naka-charge"),
+            fire("r2", text="sumabog at nagliyab ang powerbank ko"),
+        ] + [clean(f"c{i}") for i in range(398)]
+        summary = self.with_alert(independent_high_confidence_reports=3).summarize(
+            reviews, product_type="power_bank"
+        )
+        self.assertIn("2 separate high-confidence reports of", summary["safety"]["tier_held_reason"])
+        self.assertEqual(summary["verdict"]["state"], badges.POSSIBLE_SAFETY_ISSUE)
+
+    def test_a_held_tier_must_be_a_real_tier(self):
+        with self.assertRaises(ValueError):
+            self.with_alert(single_report_tier="Medium")
+
+    def test_overheating_and_smoke_reports_are_judged_as_before(self):
+        # Only severity 4 is held. A severity-3 report was Moderate when rare
+        # and still is, by the table and with no hold recorded.
+        reviews = [review("r1", ("safety", True, "smoke_smell", "amoy sunog"))] + [
+            clean(f"c{i}") for i in range(399)
+        ]
+        safety = aggregator().summarize(reviews, product_type="power_bank")["safety"]
+        self.assertEqual(safety["tier"], "Moderate")
+        self.assertIsNone(safety["tier_held_reason"])
+
     def test_duplicated_text_counts_as_one_report(self):
         # Two copies of the same review are one piece of evidence.
         duplicated = "nasunog yung unit habang naka-charge sobrang delikado"
@@ -402,7 +483,7 @@ class TestOutputContract(unittest.TestCase):
         summary = aggregator().summarize([clean("c1")])
         self.assertEqual(summary["schema_version"], badges.SCHEMA_VERSION)
         self.assertEqual(summary["taxonomy_version"], taxonomy.TAXONOMY_VERSION)
-        self.assertEqual(summary["parameters_version"], "hazard-parameters-1.0.0")
+        self.assertEqual(summary["parameters_version"], "hazard-parameters-1.1.0")
 
     def test_recommender_ranking_value_is_a_lower_bound(self):
         summary = aggregator().summarize(

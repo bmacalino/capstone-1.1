@@ -1,0 +1,2995 @@
+{
+ "what": "Can the Lazada scan run with no Chrome window showing? A measurement.",
+ "runs": [
+  {
+   "mode": "visible",
+   "run": 1,
+   "started_at": "2026-10-12T11:26:46+00:00",
+   "listings": [
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+     "page_seconds": 6.0,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3239,
+      "total_pages": 648,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+     "page_seconds": 4.1,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       4,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3265,
+      "total_pages": 653,
+      "scores": [
+       3038,
+       64,
+       48,
+       35,
+       80
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+     "page_seconds": 3.8,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 1888,
+      "total_pages": 378,
+      "scores": [
+       1823,
+       35,
+       12,
+       8,
+       10
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+     "page_seconds": 3.6,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       4,
+       5
+      ],
+      "written": 5,
+      "total_items": 41681,
+      "total_pages": 8337,
+      "scores": [
+       37794,
+       977,
+       799,
+       449,
+       1662
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+     "page_seconds": 3.7,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 11259,
+      "total_pages": 2252,
+      "scores": [
+       10661,
+       228,
+       135,
+       74,
+       161
+      ]
+     },
+     "passed": true
+    }
+   ],
+   "chrome_major": 154,
+   "window": {
+    "at_start": {
+     "height": 1080,
+     "width": 1920,
+     "x": 10,
+     "y": 10
+    },
+    "after_placing": {
+     "height": 820,
+     "width": 1050,
+     "x": 854,
+     "y": 40
+    },
+    "says_headless": false,
+    "screen_width": 1920,
+    "screen_x": 854,
+    "screen_y": 40,
+    "visibility": "visible",
+    "webdriver_flag": false
+   },
+   "home": {
+    "seconds": 9.6,
+    "session_restored": true,
+    "logged_in": true,
+    "verification_page": false
+   },
+   "feed_questions": {
+    "review_fields": {
+     "reviewRateId": "int",
+     "reviewType": "str",
+     "tradeOrderId": "NoneType",
+     "boughtDate": "str",
+     "zonedBoughtDate": "NoneType",
+     "reviewStatus": "str",
+     "reviewTitle": "NoneType",
+     "reviewContent": "str",
+     "reviewContentList": [
+      {
+       "attribute": "str",
+       "content": "str",
+       "selected": "NoneType"
+      }
+     ],
+     "reviewTime": "str",
+     "zonedReviewTime": "NoneType",
+     "imageQCStatus": "str",
+     "images": [
+      {
+       "title": "NoneType",
+       "url": "str",
+       "sort": "int",
+       "uploadTime": "NoneType",
+       "legal": "bool",
+       "status": "str",
+       "checkedByPeople": "NoneType",
+       "width": "int",
+       "height": "int",
+       "size": "int"
+      }
+     ],
+     "videoId": "int",
+     "isVideoReady": "bool",
+     "videoCoverUrl": "str",
+     "reviewRateThreadId": "NoneType",
+     "mediaList": [
+      {
+       "reviewRateId": "int",
+       "reviewType": "str",
+       "mediaType": "int",
+       "coverUrl": "str",
+       "videoId": "int",
+       "videoUrl": "str",
+       "width": "NoneType",
+       "height": "NoneType",
+       "size": "NoneType"
+      }
+     ],
+     "buyerId": "int",
+     "buyerName": "str",
+     "buyerEmail": "NoneType",
+     "realBuyerName": "NoneType",
+     "isAnonymous": "bool",
+     "source": "str",
+     "clientType": "NoneType",
+     "rating": "int",
+     "originalRating": "NoneType",
+     "likeCount": "int",
+     "likeText": "NoneType",
+     "isMeLike": "NoneType",
+     "helpful": "bool",
+     "rejected": "bool",
+     "rejectionReason": "NoneType",
+     "resubmissionTooltip": "NoneType",
+     "resubmissionMessage": "NoneType",
+     "qcReasonId": "NoneType",
+     "qcDate": "NoneType",
+     "isPurchased": "bool",
+     "isGuest": "bool",
+     "sellerId": "int",
+     "sellerName": "NoneType",
+     "isBuyerShowEnabled": "bool",
+     "qcScore": "NoneType",
+     "isQced": "bool",
+     "itemId": "int",
+     "itemPic": "str",
+     "itemTitle": "str",
+     "itemUrl": "str",
+     "originPrice": "NoneType",
+     "salesPrice": "NoneType",
+     "promotion": "NoneType",
+     "skuInfo": "str",
+     "tags": "NoneType",
+     "skuId": "str",
+     "configSku": "str",
+     "lastReviewer": "NoneType",
+     "isReportable": "int",
+     "reportStatus": "NoneType",
+     "reportDate": "NoneType",
+     "reportTimes": "int",
+     "upVotes": "int",
+     "downVotes": "int",
+     "isExternal": "int",
+     "replies": [],
+     "isSocialCommentsEnabled": "bool",
+     "comments": "NoneType",
+     "canEdit": "bool",
+     "isAlreadyRevised": "NoneType",
+     "submitInfo": "NoneType",
+     "imageHost": "str",
+     "showUploader": "bool",
+     "showVideoUploader": "bool",
+     "relevanceScore": "float",
+     "isCompleted": "int",
+     "avatar": "str",
+     "reviewerType": "NoneType",
+     "replyAuthor": "NoneType",
+     "sourceReviewTags": "NoneType",
+     "reviewTags": "NoneType",
+     "contentTag": "NoneType",
+     "contentTags": "NoneType",
+     "canDownloadImage": "NoneType",
+     "commentsCount": "int",
+     "originalCountry": "NoneType",
+     "isCrossVenture": "bool",
+     "isAutoTranslated": "NoneType",
+     "viewCounts": "int",
+     "isGoodReview": "bool",
+     "categoryId": "int",
+     "imageCount": "NoneType",
+     "videoCount": "NoneType",
+     "followUpReviews": "NoneType",
+     "reviewBenefit": "NoneType",
+     "gradeItems": {
+      "LOGISTICS_REVIEW": "int",
+      "PRODUCT_REVIEW": "int",
+      "SELLER_REVIEW": "int"
+     },
+     "foreignContent": "NoneType",
+     "targetId": "int",
+     "targetType": "str"
+    },
+    "examples": [
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "24 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 1,
+      "isPurchased": true,
+      "rating": 4
+     },
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "26 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 5,
+      "isPurchased": true,
+      "rating": 5
+     }
+    ],
+    "seller_reply_fields": "none on this page",
+    "filter": {
+     "1": {
+      "kind": "reviews",
+      "seconds": 0.19,
+      "items": 5,
+      "ratings": [
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "written": 5,
+      "total_items": 234,
+      "total_pages": 47,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "2": {
+      "kind": "reviews",
+      "seconds": 0.19,
+      "items": 5,
+      "ratings": [
+       2,
+       1,
+       1,
+       2,
+       1
+      ],
+      "written": 5,
+      "total_items": 306,
+      "total_pages": 62,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "3": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       3,
+       3,
+       3,
+       3,
+       3
+      ],
+      "written": 5,
+      "total_items": 87,
+      "total_pages": 18,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "4": {
+      "kind": "reviews",
+      "seconds": 0.17,
+      "items": 5,
+      "ratings": [
+       4,
+       4,
+       4,
+       4,
+       4
+      ],
+      "written": 5,
+      "total_items": 64,
+      "total_pages": 13,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "5": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 2782,
+      "total_pages": 557,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_size": {
+     "10": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 10,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 10,
+      "total_items": 3239,
+      "total_pages": 324,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "20": {
+      "kind": "reviews",
+      "seconds": 0.23,
+      "items": 20,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3
+      ],
+      "written": 20,
+      "total_items": 3239,
+      "total_pages": 162,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "50": {
+      "kind": "reviews",
+      "seconds": 0.37,
+      "items": 50,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 50,
+      "total_items": 3239,
+      "total_pages": 65,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_2_differs_from_page_1": true,
+    "page_against_feed": {
+     "review_section_loaded": true,
+     "seconds": 1.3,
+     "all_stars": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 1,
+      "same_order": false
+     },
+     "one_star": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 4,
+      "same_order": false
+     }
+    }
+   },
+   "passed": 5,
+   "all_passed": true
+  },
+  {
+   "mode": "offscreen",
+   "run": 1,
+   "started_at": "2026-10-12T11:28:40+00:00",
+   "listings": [
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+     "page_seconds": 6.1,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 5,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3239,
+      "total_pages": 648,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+     "page_seconds": 3.9,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       5,
+       4,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3264,
+      "total_pages": 653,
+      "scores": [
+       3038,
+       64,
+       47,
+       35,
+       80
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+     "page_seconds": 3.9,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 1888,
+      "total_pages": 378,
+      "scores": [
+       1823,
+       35,
+       12,
+       8,
+       10
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+     "page_seconds": 3.4,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       4,
+       5
+      ],
+      "written": 5,
+      "total_items": 41679,
+      "total_pages": 8336,
+      "scores": [
+       37792,
+       977,
+       799,
+       449,
+       1662
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+     "page_seconds": 3.7,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 11259,
+      "total_pages": 2252,
+      "scores": [
+       10661,
+       228,
+       135,
+       74,
+       161
+      ]
+     },
+     "passed": true
+    }
+   ],
+   "chrome_major": 154,
+   "window": {
+    "at_start": {
+     "height": 1080,
+     "width": 1920,
+     "x": -20000,
+     "y": 0
+    },
+    "after_placing": {
+     "height": 1080,
+     "width": 1920,
+     "x": -20000,
+     "y": 0
+    },
+    "says_headless": false,
+    "screen_width": 1920,
+    "screen_x": -20000,
+    "screen_y": 0,
+    "visibility": "visible",
+    "webdriver_flag": false
+   },
+   "home": {
+    "seconds": 10.1,
+    "session_restored": true,
+    "logged_in": true,
+    "verification_page": false
+   },
+   "feed_questions": {
+    "review_fields": {
+     "reviewRateId": "int",
+     "reviewType": "str",
+     "tradeOrderId": "NoneType",
+     "boughtDate": "str",
+     "zonedBoughtDate": "NoneType",
+     "reviewStatus": "str",
+     "reviewTitle": "NoneType",
+     "reviewContent": "str",
+     "reviewContentList": [
+      {
+       "attribute": "str",
+       "content": "str",
+       "selected": "NoneType"
+      }
+     ],
+     "reviewTime": "str",
+     "zonedReviewTime": "NoneType",
+     "imageQCStatus": "str",
+     "images": [
+      {
+       "title": "NoneType",
+       "url": "str",
+       "sort": "int",
+       "uploadTime": "NoneType",
+       "legal": "bool",
+       "status": "str",
+       "checkedByPeople": "NoneType",
+       "width": "int",
+       "height": "int",
+       "size": "int"
+      }
+     ],
+     "videoId": "int",
+     "isVideoReady": "bool",
+     "videoCoverUrl": "str",
+     "reviewRateThreadId": "NoneType",
+     "mediaList": [
+      {
+       "reviewRateId": "int",
+       "reviewType": "str",
+       "mediaType": "int",
+       "coverUrl": "str",
+       "videoId": "int",
+       "videoUrl": "str",
+       "width": "NoneType",
+       "height": "NoneType",
+       "size": "NoneType"
+      }
+     ],
+     "buyerId": "int",
+     "buyerName": "str",
+     "buyerEmail": "NoneType",
+     "realBuyerName": "NoneType",
+     "isAnonymous": "bool",
+     "source": "str",
+     "clientType": "NoneType",
+     "rating": "int",
+     "originalRating": "NoneType",
+     "likeCount": "int",
+     "likeText": "NoneType",
+     "isMeLike": "NoneType",
+     "helpful": "bool",
+     "rejected": "bool",
+     "rejectionReason": "NoneType",
+     "resubmissionTooltip": "NoneType",
+     "resubmissionMessage": "NoneType",
+     "qcReasonId": "NoneType",
+     "qcDate": "NoneType",
+     "isPurchased": "bool",
+     "isGuest": "bool",
+     "sellerId": "int",
+     "sellerName": "NoneType",
+     "isBuyerShowEnabled": "bool",
+     "qcScore": "NoneType",
+     "isQced": "bool",
+     "itemId": "int",
+     "itemPic": "str",
+     "itemTitle": "str",
+     "itemUrl": "str",
+     "originPrice": "NoneType",
+     "salesPrice": "NoneType",
+     "promotion": "NoneType",
+     "skuInfo": "str",
+     "tags": "NoneType",
+     "skuId": "str",
+     "configSku": "str",
+     "lastReviewer": "NoneType",
+     "isReportable": "int",
+     "reportStatus": "NoneType",
+     "reportDate": "NoneType",
+     "reportTimes": "int",
+     "upVotes": "int",
+     "downVotes": "int",
+     "isExternal": "int",
+     "replies": [],
+     "isSocialCommentsEnabled": "bool",
+     "comments": "NoneType",
+     "canEdit": "bool",
+     "isAlreadyRevised": "NoneType",
+     "submitInfo": "NoneType",
+     "imageHost": "str",
+     "showUploader": "bool",
+     "showVideoUploader": "bool",
+     "relevanceScore": "float",
+     "isCompleted": "int",
+     "avatar": "str",
+     "reviewerType": "NoneType",
+     "replyAuthor": "NoneType",
+     "sourceReviewTags": "NoneType",
+     "reviewTags": "NoneType",
+     "contentTag": "NoneType",
+     "contentTags": "NoneType",
+     "canDownloadImage": "NoneType",
+     "commentsCount": "int",
+     "originalCountry": "NoneType",
+     "isCrossVenture": "bool",
+     "isAutoTranslated": "NoneType",
+     "viewCounts": "int",
+     "isGoodReview": "bool",
+     "categoryId": "int",
+     "imageCount": "NoneType",
+     "videoCount": "NoneType",
+     "followUpReviews": "NoneType",
+     "reviewBenefit": "NoneType",
+     "gradeItems": {
+      "LOGISTICS_REVIEW": "int",
+      "PRODUCT_REVIEW": "int",
+      "SELLER_REVIEW": "int"
+     },
+     "foreignContent": "NoneType",
+     "targetId": "int",
+     "targetType": "str"
+    },
+    "examples": [
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "24 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 1,
+      "isPurchased": true,
+      "rating": 4
+     },
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "26 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 5,
+      "isPurchased": true,
+      "rating": 5
+     }
+    ],
+    "seller_reply_fields": "none on this page",
+    "filter": {
+     "1": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "written": 5,
+      "total_items": 234,
+      "total_pages": 47,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "2": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 5,
+      "ratings": [
+       2,
+       1,
+       1,
+       2,
+       1
+      ],
+      "written": 5,
+      "total_items": 306,
+      "total_pages": 62,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "3": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       3,
+       3,
+       3,
+       3,
+       3
+      ],
+      "written": 5,
+      "total_items": 87,
+      "total_pages": 18,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "4": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 5,
+      "ratings": [
+       4,
+       4,
+       4,
+       4,
+       4
+      ],
+      "written": 5,
+      "total_items": 64,
+      "total_pages": 13,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "5": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 2782,
+      "total_pages": 557,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_size": {
+     "10": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 10,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 10,
+      "total_items": 3239,
+      "total_pages": 324,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "20": {
+      "kind": "reviews",
+      "seconds": 0.25,
+      "items": 20,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3
+      ],
+      "written": 20,
+      "total_items": 3239,
+      "total_pages": 162,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "50": {
+      "kind": "reviews",
+      "seconds": 0.41,
+      "items": 50,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 50,
+      "total_items": 3239,
+      "total_pages": 65,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_2_differs_from_page_1": true,
+    "page_against_feed": {
+     "review_section_loaded": true,
+     "seconds": 0.6,
+     "all_stars": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 1,
+      "same_order": false
+     },
+     "one_star": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 4,
+      "same_order": false
+     }
+    }
+   },
+   "passed": 5,
+   "all_passed": true
+  },
+  {
+   "mode": "headless",
+   "run": 1,
+   "started_at": "2026-10-12T11:30:01+00:00",
+   "listings": [
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+     "page_seconds": 6.4,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.18,
+      "items": 5,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3239,
+      "total_pages": 648,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+     "page_seconds": 4.2,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       4,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3265,
+      "total_pages": 653,
+      "scores": [
+       3038,
+       64,
+       48,
+       35,
+       80
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+     "page_seconds": 3.9,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 1888,
+      "total_pages": 378,
+      "scores": [
+       1823,
+       35,
+       12,
+       8,
+       10
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+     "page_seconds": 3.9,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       4,
+       5
+      ],
+      "written": 5,
+      "total_items": 41681,
+      "total_pages": 8337,
+      "scores": [
+       37794,
+       977,
+       799,
+       449,
+       1662
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+     "page_seconds": 4.6,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 11259,
+      "total_pages": 2252,
+      "scores": [
+       10661,
+       228,
+       135,
+       74,
+       161
+      ]
+     },
+     "passed": true
+    }
+   ],
+   "chrome_major": 154,
+   "window": {
+    "at_start": {
+     "height": 1080,
+     "width": 1920,
+     "x": 10,
+     "y": 10
+    },
+    "after_placing": {
+     "height": 1080,
+     "width": 1920,
+     "x": 10,
+     "y": 10
+    },
+    "says_headless": true,
+    "screen_width": 800,
+    "screen_x": 10,
+    "screen_y": 10,
+    "visibility": "visible",
+    "webdriver_flag": false
+   },
+   "home": {
+    "seconds": 9.9,
+    "session_restored": true,
+    "logged_in": true,
+    "verification_page": false
+   },
+   "feed_questions": {
+    "review_fields": {
+     "reviewRateId": "int",
+     "reviewType": "str",
+     "tradeOrderId": "NoneType",
+     "boughtDate": "str",
+     "zonedBoughtDate": "NoneType",
+     "reviewStatus": "str",
+     "reviewTitle": "NoneType",
+     "reviewContent": "str",
+     "reviewContentList": [
+      {
+       "attribute": "str",
+       "content": "str",
+       "selected": "NoneType"
+      }
+     ],
+     "reviewTime": "str",
+     "zonedReviewTime": "NoneType",
+     "imageQCStatus": "str",
+     "images": [
+      {
+       "title": "NoneType",
+       "url": "str",
+       "sort": "int",
+       "uploadTime": "NoneType",
+       "legal": "bool",
+       "status": "str",
+       "checkedByPeople": "NoneType",
+       "width": "int",
+       "height": "int",
+       "size": "int"
+      }
+     ],
+     "videoId": "int",
+     "isVideoReady": "bool",
+     "videoCoverUrl": "str",
+     "reviewRateThreadId": "NoneType",
+     "mediaList": [
+      {
+       "reviewRateId": "int",
+       "reviewType": "str",
+       "mediaType": "int",
+       "coverUrl": "str",
+       "videoId": "int",
+       "videoUrl": "str",
+       "width": "NoneType",
+       "height": "NoneType",
+       "size": "NoneType"
+      }
+     ],
+     "buyerId": "int",
+     "buyerName": "str",
+     "buyerEmail": "NoneType",
+     "realBuyerName": "NoneType",
+     "isAnonymous": "bool",
+     "source": "str",
+     "clientType": "NoneType",
+     "rating": "int",
+     "originalRating": "NoneType",
+     "likeCount": "int",
+     "likeText": "NoneType",
+     "isMeLike": "NoneType",
+     "helpful": "bool",
+     "rejected": "bool",
+     "rejectionReason": "NoneType",
+     "resubmissionTooltip": "NoneType",
+     "resubmissionMessage": "NoneType",
+     "qcReasonId": "NoneType",
+     "qcDate": "NoneType",
+     "isPurchased": "bool",
+     "isGuest": "bool",
+     "sellerId": "int",
+     "sellerName": "NoneType",
+     "isBuyerShowEnabled": "bool",
+     "qcScore": "NoneType",
+     "isQced": "bool",
+     "itemId": "int",
+     "itemPic": "str",
+     "itemTitle": "str",
+     "itemUrl": "str",
+     "originPrice": "NoneType",
+     "salesPrice": "NoneType",
+     "promotion": "NoneType",
+     "skuInfo": "str",
+     "tags": "NoneType",
+     "skuId": "str",
+     "configSku": "str",
+     "lastReviewer": "NoneType",
+     "isReportable": "int",
+     "reportStatus": "NoneType",
+     "reportDate": "NoneType",
+     "reportTimes": "int",
+     "upVotes": "int",
+     "downVotes": "int",
+     "isExternal": "int",
+     "replies": [],
+     "isSocialCommentsEnabled": "bool",
+     "comments": "NoneType",
+     "canEdit": "bool",
+     "isAlreadyRevised": "NoneType",
+     "submitInfo": "NoneType",
+     "imageHost": "str",
+     "showUploader": "bool",
+     "showVideoUploader": "bool",
+     "relevanceScore": "float",
+     "isCompleted": "int",
+     "avatar": "str",
+     "reviewerType": "NoneType",
+     "replyAuthor": "NoneType",
+     "sourceReviewTags": "NoneType",
+     "reviewTags": "NoneType",
+     "contentTag": "NoneType",
+     "contentTags": "NoneType",
+     "canDownloadImage": "NoneType",
+     "commentsCount": "int",
+     "originalCountry": "NoneType",
+     "isCrossVenture": "bool",
+     "isAutoTranslated": "NoneType",
+     "viewCounts": "int",
+     "isGoodReview": "bool",
+     "categoryId": "int",
+     "imageCount": "NoneType",
+     "videoCount": "NoneType",
+     "followUpReviews": "NoneType",
+     "reviewBenefit": "NoneType",
+     "gradeItems": {
+      "LOGISTICS_REVIEW": "int",
+      "PRODUCT_REVIEW": "int",
+      "SELLER_REVIEW": "int"
+     },
+     "foreignContent": "NoneType",
+     "targetId": "int",
+     "targetType": "str"
+    },
+    "examples": [
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "24 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 1,
+      "isPurchased": true,
+      "rating": 4
+     },
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "26 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 5,
+      "isPurchased": true,
+      "rating": 5
+     }
+    ],
+    "seller_reply_fields": "none on this page",
+    "filter": {
+     "1": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 5,
+      "ratings": [
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "written": 5,
+      "total_items": 234,
+      "total_pages": 47,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "2": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       2,
+       1,
+       1,
+       2,
+       1
+      ],
+      "written": 5,
+      "total_items": 306,
+      "total_pages": 62,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "3": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       3,
+       3,
+       3,
+       3,
+       3
+      ],
+      "written": 5,
+      "total_items": 87,
+      "total_pages": 18,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "4": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       4,
+       4,
+       4,
+       4,
+       4
+      ],
+      "written": 5,
+      "total_items": 64,
+      "total_pages": 13,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "5": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 2782,
+      "total_pages": 557,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_size": {
+     "10": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 10,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 10,
+      "total_items": 3239,
+      "total_pages": 324,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "20": {
+      "kind": "reviews",
+      "seconds": 0.29,
+      "items": 20,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3
+      ],
+      "written": 20,
+      "total_items": 3239,
+      "total_pages": 162,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "50": {
+      "kind": "reviews",
+      "seconds": 0.33,
+      "items": 50,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 50,
+      "total_items": 3239,
+      "total_pages": 65,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_2_differs_from_page_1": true,
+    "page_against_feed": {
+     "review_section_loaded": true,
+     "seconds": 0.6,
+     "all_stars": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 1,
+      "same_order": false
+     },
+     "one_star": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 4,
+      "same_order": false
+     }
+    }
+   },
+   "passed": 5,
+   "all_passed": true
+  },
+  {
+   "mode": "headless",
+   "run": 2,
+   "started_at": "2026-10-12T11:31:33+00:00",
+   "listings": [
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+     "page_seconds": 6.2,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3239,
+      "total_pages": 648,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+     "page_seconds": 4.1,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       5,
+       4,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3265,
+      "total_pages": 653,
+      "scores": [
+       3038,
+       64,
+       48,
+       35,
+       80
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+     "page_seconds": 3.7,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 1888,
+      "total_pages": 378,
+      "scores": [
+       1823,
+       35,
+       12,
+       8,
+       10
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+     "page_seconds": 5.2,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       4,
+       5
+      ],
+      "written": 5,
+      "total_items": 41681,
+      "total_pages": 8337,
+      "scores": [
+       37794,
+       977,
+       799,
+       449,
+       1662
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+     "page_seconds": 3.8,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 11259,
+      "total_pages": 2252,
+      "scores": [
+       10661,
+       228,
+       135,
+       74,
+       161
+      ]
+     },
+     "passed": true
+    }
+   ],
+   "chrome_major": 154,
+   "window": {
+    "at_start": {
+     "height": 1080,
+     "width": 1920,
+     "x": 10,
+     "y": 10
+    },
+    "after_placing": {
+     "height": 1080,
+     "width": 1920,
+     "x": 10,
+     "y": 10
+    },
+    "says_headless": true,
+    "screen_width": 800,
+    "screen_x": 10,
+    "screen_y": 10,
+    "visibility": "visible",
+    "webdriver_flag": false
+   },
+   "home": {
+    "seconds": 10.0,
+    "session_restored": true,
+    "logged_in": true,
+    "verification_page": false
+   },
+   "feed_questions": {
+    "review_fields": {
+     "reviewRateId": "int",
+     "reviewType": "str",
+     "tradeOrderId": "NoneType",
+     "boughtDate": "str",
+     "zonedBoughtDate": "NoneType",
+     "reviewStatus": "str",
+     "reviewTitle": "NoneType",
+     "reviewContent": "str",
+     "reviewContentList": [
+      {
+       "attribute": "str",
+       "content": "str",
+       "selected": "NoneType"
+      }
+     ],
+     "reviewTime": "str",
+     "zonedReviewTime": "NoneType",
+     "imageQCStatus": "str",
+     "images": [
+      {
+       "title": "NoneType",
+       "url": "str",
+       "sort": "int",
+       "uploadTime": "NoneType",
+       "legal": "bool",
+       "status": "str",
+       "checkedByPeople": "NoneType",
+       "width": "int",
+       "height": "int",
+       "size": "int"
+      }
+     ],
+     "videoId": "int",
+     "isVideoReady": "bool",
+     "videoCoverUrl": "str",
+     "reviewRateThreadId": "NoneType",
+     "mediaList": [
+      {
+       "reviewRateId": "int",
+       "reviewType": "str",
+       "mediaType": "int",
+       "coverUrl": "str",
+       "videoId": "int",
+       "videoUrl": "str",
+       "width": "NoneType",
+       "height": "NoneType",
+       "size": "NoneType"
+      }
+     ],
+     "buyerId": "int",
+     "buyerName": "str",
+     "buyerEmail": "NoneType",
+     "realBuyerName": "NoneType",
+     "isAnonymous": "bool",
+     "source": "str",
+     "clientType": "NoneType",
+     "rating": "int",
+     "originalRating": "NoneType",
+     "likeCount": "int",
+     "likeText": "NoneType",
+     "isMeLike": "NoneType",
+     "helpful": "bool",
+     "rejected": "bool",
+     "rejectionReason": "NoneType",
+     "resubmissionTooltip": "NoneType",
+     "resubmissionMessage": "NoneType",
+     "qcReasonId": "NoneType",
+     "qcDate": "NoneType",
+     "isPurchased": "bool",
+     "isGuest": "bool",
+     "sellerId": "int",
+     "sellerName": "NoneType",
+     "isBuyerShowEnabled": "bool",
+     "qcScore": "NoneType",
+     "isQced": "bool",
+     "itemId": "int",
+     "itemPic": "str",
+     "itemTitle": "str",
+     "itemUrl": "str",
+     "originPrice": "NoneType",
+     "salesPrice": "NoneType",
+     "promotion": "NoneType",
+     "skuInfo": "str",
+     "tags": "NoneType",
+     "skuId": "str",
+     "configSku": "str",
+     "lastReviewer": "NoneType",
+     "isReportable": "int",
+     "reportStatus": "NoneType",
+     "reportDate": "NoneType",
+     "reportTimes": "int",
+     "upVotes": "int",
+     "downVotes": "int",
+     "isExternal": "int",
+     "replies": [],
+     "isSocialCommentsEnabled": "bool",
+     "comments": "NoneType",
+     "canEdit": "bool",
+     "isAlreadyRevised": "NoneType",
+     "submitInfo": "NoneType",
+     "imageHost": "str",
+     "showUploader": "bool",
+     "showVideoUploader": "bool",
+     "relevanceScore": "float",
+     "isCompleted": "int",
+     "avatar": "str",
+     "reviewerType": "NoneType",
+     "replyAuthor": "NoneType",
+     "sourceReviewTags": "NoneType",
+     "reviewTags": "NoneType",
+     "contentTag": "NoneType",
+     "contentTags": "NoneType",
+     "canDownloadImage": "NoneType",
+     "commentsCount": "int",
+     "originalCountry": "NoneType",
+     "isCrossVenture": "bool",
+     "isAutoTranslated": "NoneType",
+     "viewCounts": "int",
+     "isGoodReview": "bool",
+     "categoryId": "int",
+     "imageCount": "NoneType",
+     "videoCount": "NoneType",
+     "followUpReviews": "NoneType",
+     "reviewBenefit": "NoneType",
+     "gradeItems": {
+      "LOGISTICS_REVIEW": "int",
+      "PRODUCT_REVIEW": "int",
+      "SELLER_REVIEW": "int"
+     },
+     "foreignContent": "NoneType",
+     "targetId": "int",
+     "targetType": "str"
+    },
+    "examples": [
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "24 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 1,
+      "isPurchased": true,
+      "rating": 4
+     },
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "26 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 5,
+      "isPurchased": true,
+      "rating": 5
+     }
+    ],
+    "seller_reply_fields": "none on this page",
+    "filter": {
+     "1": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "written": 5,
+      "total_items": 234,
+      "total_pages": 47,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "2": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       2,
+       1,
+       1,
+       2,
+       1
+      ],
+      "written": 5,
+      "total_items": 306,
+      "total_pages": 62,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "3": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       3,
+       3,
+       3,
+       3,
+       3
+      ],
+      "written": 5,
+      "total_items": 87,
+      "total_pages": 18,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "4": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       4,
+       4,
+       4,
+       4,
+       4
+      ],
+      "written": 5,
+      "total_items": 64,
+      "total_pages": 13,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "5": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 2782,
+      "total_pages": 557,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_size": {
+     "10": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 10,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 10,
+      "total_items": 3239,
+      "total_pages": 324,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "20": {
+      "kind": "reviews",
+      "seconds": 0.22,
+      "items": 20,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3
+      ],
+      "written": 20,
+      "total_items": 3239,
+      "total_pages": 162,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "50": {
+      "kind": "reviews",
+      "seconds": 0.34,
+      "items": 50,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 50,
+      "total_items": 3239,
+      "total_pages": 65,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_2_differs_from_page_1": true,
+    "page_against_feed": {
+     "review_section_loaded": true,
+     "seconds": 0.6,
+     "all_stars": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 1,
+      "same_order": false
+     },
+     "one_star": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 4,
+      "same_order": false
+     }
+    }
+   },
+   "passed": 5,
+   "all_passed": true
+  },
+  {
+   "mode": "offscreen",
+   "run": 2,
+   "started_at": "2026-10-12T11:32:49+00:00",
+   "listings": [
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+     "page_seconds": 6.9,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3239,
+      "total_pages": 648,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+     "page_seconds": 4.1,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       4,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 3266,
+      "total_pages": 654,
+      "scores": [
+       3039,
+       64,
+       48,
+       35,
+       80
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+     "page_seconds": 4.2,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 1888,
+      "total_pages": 378,
+      "scores": [
+       1823,
+       35,
+       12,
+       8,
+       10
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+     "page_seconds": 3.6,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.14,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       4,
+       5
+      ],
+      "written": 5,
+      "total_items": 41681,
+      "total_pages": 8337,
+      "scores": [
+       37794,
+       977,
+       799,
+       449,
+       1662
+      ]
+     },
+     "passed": true
+    },
+    {
+     "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+     "page_seconds": 3.4,
+     "title_found": true,
+     "verification_page": false,
+     "feed": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 11259,
+      "total_pages": 2252,
+      "scores": [
+       10661,
+       228,
+       135,
+       74,
+       161
+      ]
+     },
+     "passed": true
+    }
+   ],
+   "chrome_major": 154,
+   "window": {
+    "at_start": {
+     "height": 1080,
+     "width": 1920,
+     "x": -20000,
+     "y": 0
+    },
+    "after_placing": {
+     "height": 1080,
+     "width": 1920,
+     "x": -20000,
+     "y": 0
+    },
+    "says_headless": false,
+    "screen_width": 1920,
+    "screen_x": -20000,
+    "screen_y": 0,
+    "visibility": "visible",
+    "webdriver_flag": false
+   },
+   "home": {
+    "seconds": 9.4,
+    "session_restored": true,
+    "logged_in": true,
+    "verification_page": false
+   },
+   "feed_questions": {
+    "review_fields": {
+     "reviewRateId": "int",
+     "reviewType": "str",
+     "tradeOrderId": "NoneType",
+     "boughtDate": "str",
+     "zonedBoughtDate": "NoneType",
+     "reviewStatus": "str",
+     "reviewTitle": "NoneType",
+     "reviewContent": "str",
+     "reviewContentList": [
+      {
+       "attribute": "str",
+       "content": "str",
+       "selected": "NoneType"
+      }
+     ],
+     "reviewTime": "str",
+     "zonedReviewTime": "NoneType",
+     "imageQCStatus": "str",
+     "images": [
+      {
+       "title": "NoneType",
+       "url": "str",
+       "sort": "int",
+       "uploadTime": "NoneType",
+       "legal": "bool",
+       "status": "str",
+       "checkedByPeople": "NoneType",
+       "width": "int",
+       "height": "int",
+       "size": "int"
+      }
+     ],
+     "videoId": "int",
+     "isVideoReady": "bool",
+     "videoCoverUrl": "str",
+     "reviewRateThreadId": "NoneType",
+     "mediaList": [
+      {
+       "reviewRateId": "int",
+       "reviewType": "str",
+       "mediaType": "int",
+       "coverUrl": "str",
+       "videoId": "int",
+       "videoUrl": "str",
+       "width": "NoneType",
+       "height": "NoneType",
+       "size": "NoneType"
+      }
+     ],
+     "buyerId": "int",
+     "buyerName": "str",
+     "buyerEmail": "NoneType",
+     "realBuyerName": "NoneType",
+     "isAnonymous": "bool",
+     "source": "str",
+     "clientType": "NoneType",
+     "rating": "int",
+     "originalRating": "NoneType",
+     "likeCount": "int",
+     "likeText": "NoneType",
+     "isMeLike": "NoneType",
+     "helpful": "bool",
+     "rejected": "bool",
+     "rejectionReason": "NoneType",
+     "resubmissionTooltip": "NoneType",
+     "resubmissionMessage": "NoneType",
+     "qcReasonId": "NoneType",
+     "qcDate": "NoneType",
+     "isPurchased": "bool",
+     "isGuest": "bool",
+     "sellerId": "int",
+     "sellerName": "NoneType",
+     "isBuyerShowEnabled": "bool",
+     "qcScore": "NoneType",
+     "isQced": "bool",
+     "itemId": "int",
+     "itemPic": "str",
+     "itemTitle": "str",
+     "itemUrl": "str",
+     "originPrice": "NoneType",
+     "salesPrice": "NoneType",
+     "promotion": "NoneType",
+     "skuInfo": "str",
+     "tags": "NoneType",
+     "skuId": "str",
+     "configSku": "str",
+     "lastReviewer": "NoneType",
+     "isReportable": "int",
+     "reportStatus": "NoneType",
+     "reportDate": "NoneType",
+     "reportTimes": "int",
+     "upVotes": "int",
+     "downVotes": "int",
+     "isExternal": "int",
+     "replies": [],
+     "isSocialCommentsEnabled": "bool",
+     "comments": "NoneType",
+     "canEdit": "bool",
+     "isAlreadyRevised": "NoneType",
+     "submitInfo": "NoneType",
+     "imageHost": "str",
+     "showUploader": "bool",
+     "showVideoUploader": "bool",
+     "relevanceScore": "float",
+     "isCompleted": "int",
+     "avatar": "str",
+     "reviewerType": "NoneType",
+     "replyAuthor": "NoneType",
+     "sourceReviewTags": "NoneType",
+     "reviewTags": "NoneType",
+     "contentTag": "NoneType",
+     "contentTags": "NoneType",
+     "canDownloadImage": "NoneType",
+     "commentsCount": "int",
+     "originalCountry": "NoneType",
+     "isCrossVenture": "bool",
+     "isAutoTranslated": "NoneType",
+     "viewCounts": "int",
+     "isGoodReview": "bool",
+     "categoryId": "int",
+     "imageCount": "NoneType",
+     "videoCount": "NoneType",
+     "followUpReviews": "NoneType",
+     "reviewBenefit": "NoneType",
+     "gradeItems": {
+      "LOGISTICS_REVIEW": "int",
+      "PRODUCT_REVIEW": "int",
+      "SELLER_REVIEW": "int"
+     },
+     "foreignContent": "NoneType",
+     "targetId": "int",
+     "targetType": "str"
+    },
+    "examples": [
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "24 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 1,
+      "isPurchased": true,
+      "rating": 4
+     },
+     {
+      "reviewTime": "31 May 2026",
+      "boughtDate": "26 May 2026",
+      "skuInfo": "Variation:ZQS1202 SPEAKER",
+      "likeCount": 5,
+      "isPurchased": true,
+      "rating": 5
+     }
+    ],
+    "seller_reply_fields": "none on this page",
+    "filter": {
+     "1": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       1,
+       1,
+       1,
+       1,
+       1
+      ],
+      "written": 5,
+      "total_items": 234,
+      "total_pages": 47,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "2": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       2,
+       1,
+       1,
+       2,
+       1
+      ],
+      "written": 5,
+      "total_items": 306,
+      "total_pages": 62,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "3": {
+      "kind": "reviews",
+      "seconds": 0.15,
+      "items": 5,
+      "ratings": [
+       3,
+       3,
+       3,
+       3,
+       3
+      ],
+      "written": 5,
+      "total_items": 87,
+      "total_pages": 18,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "4": {
+      "kind": "reviews",
+      "seconds": 0.12,
+      "items": 5,
+      "ratings": [
+       4,
+       4,
+       4,
+       4,
+       4
+      ],
+      "written": 5,
+      "total_items": 64,
+      "total_pages": 13,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "5": {
+      "kind": "reviews",
+      "seconds": 0.13,
+      "items": 5,
+      "ratings": [
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 5,
+      "total_items": 2782,
+      "total_pages": 557,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_size": {
+     "10": {
+      "kind": "reviews",
+      "seconds": 0.16,
+      "items": 10,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 10,
+      "total_items": 3239,
+      "total_pages": 324,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "20": {
+      "kind": "reviews",
+      "seconds": 0.21,
+      "items": 20,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3
+      ],
+      "written": 20,
+      "total_items": 3239,
+      "total_pages": 162,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     },
+     "50": {
+      "kind": "reviews",
+      "seconds": 0.26,
+      "items": 50,
+      "ratings": [
+       4,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       3,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5,
+       5
+      ],
+      "written": 50,
+      "total_items": 3239,
+      "total_pages": 65,
+      "scores": [
+       2782,
+       64,
+       87,
+       72,
+       234
+      ]
+     }
+    },
+    "page_2_differs_from_page_1": true,
+    "page_against_feed": {
+     "review_section_loaded": true,
+     "seconds": 0.6,
+     "all_stars": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 1,
+      "same_order": false
+     },
+     "one_star": {
+      "on_page": 5,
+      "from_feed": 5,
+      "shared": 4,
+      "same_order": false
+     }
+    }
+   },
+   "passed": 5,
+   "all_passed": true
+  }
+ ]
+}

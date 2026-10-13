@@ -239,6 +239,19 @@ class TestLibrary(AccountsTestCase):
         self.assertEqual(response.json["activity"][link]["openedAt"], 50)
         self.assertEqual(response.json["wishlist"], [link])
 
+    def test_an_accounts_database_from_before_clearing_existed_still_opens(self):
+        # A database made by the first version has no history_cleared_at column.
+        with closing(sqlite3.connect(self.db)) as connection:
+            connection.executescript(
+                "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, full_name TEXT NOT NULL,"
+                " email TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL, created_at TEXT NOT NULL);"
+            )
+            connection.commit()
+        user = accounts.create_user(self.db, "Old Timer", "old@example.com", "password1")
+        self.assertEqual(accounts.library(self.db, user["id"])["clearedAt"], 0)
+        accounts.clear_activity(self.db, user["id"])
+        self.assertGreater(accounts.library(self.db, user["id"])["clearedAt"], 0)
+
     def test_unsafe_links_are_refused(self):
         self.signup()
         response = self.client.put("/api/me/wishlist", json={"link": "javascript:alert(1)"})
@@ -249,14 +262,17 @@ class TestLibrary(AccountsTestCase):
         self.client.put("/api/me/wishlist", json={"link": SAMPLE_PRODUCT["link"]})
         other = self.app.test_client()
         self.signup(other, email="other@example.com")
-        self.assertEqual(other.get("/api/me/library").json, {"activity": {}, "wishlist": []})
+        self.assertEqual(other.get("/api/me/library").json, {"activity": {}, "wishlist": [], "clearedAt": 0})
 
     def test_clearing_history_keeps_the_wishlist(self):
         self.signup()
         for link in (SAMPLE_PRODUCT["link"], "https://shopee.ph/two"):
             self.client.put("/api/me/activity", json={"link": link, "product": {**SAMPLE_PRODUCT, "link": link}, "openedAt": 9})
         self.client.put("/api/me/wishlist", json={"link": "https://shopee.ph/two"})
-        cleared = self.client.delete("/api/me/activity", json={}).json
+        self.assertEqual(self.client.get("/api/me/library").json["clearedAt"], 0)
+        cleared = self.client.delete("/api/me/activity", json={"clearedAt": 1790000000000}).json
+        # The moment is remembered, so older scans stay hidden on every browser.
+        self.assertEqual(cleared["clearedAt"], 1790000000000)
         self.assertEqual(list(cleared["activity"]), ["https://shopee.ph/two"])
         self.assertEqual(cleared["activity"]["https://shopee.ph/two"]["openedAt"], 0)
         self.assertEqual(cleared["wishlist"], ["https://shopee.ph/two"])

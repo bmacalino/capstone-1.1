@@ -1,0 +1,934 @@
+{
+ "generated_at": "2026-10-12T14:17:43+00:00",
+ "listings": 59,
+ "parameters_version": "hazard-parameters-1.1.0",
+ "rules": {
+  "one_report": {
+   "single_report_tier": "High"
+  },
+  "two_reports": "as shipped",
+  "three_reports": {
+   "independent_high_confidence_reports": 3
+  },
+  "rate_only": {
+   "independent_high_confidence_reports": 1000000
+  }
+ },
+ "verdicts": {
+  "one_report": {
+   "safety_warning": 19,
+   "possible_safety_issue": 9,
+   "no_safety_verdict": 31
+  },
+  "two_reports": {
+   "safety_warning": 5,
+   "possible_safety_issue": 23,
+   "no_safety_verdict": 31
+  },
+  "three_reports": {
+   "safety_warning": 3,
+   "possible_safety_issue": 25,
+   "no_safety_verdict": 31
+  },
+  "rate_only": {
+   "safety_warning": 1,
+   "possible_safety_issue": 27,
+   "no_safety_verdict": 31
+  }
+ },
+ "warned_under_one_report_by_separate_severity_4_reports": {
+  "0": 1,
+  "1": 14,
+  "2": 2,
+  "3": 1,
+  "4": 1
+ },
+ "moved_from_warning_to_caution_by_the_rule_in_use": 14,
+ "rows": [
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i1120920366-s3883420275.html",
+   "ratings": 9539,
+   "reviews_read": 150,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i15491115146-s133143582497.html",
+   "ratings": 157,
+   "reviews_read": 48,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i1676918812-s7239250812.html",
+   "ratings": 2761,
+   "reviews_read": 76,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i2310520201-s24895520153.html",
+   "ratings": 11703,
+   "reviews_read": 227,
+   "safety_flagged_reviews": 4,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i2313989346-s10483987214.html",
+   "ratings": 8549,
+   "reviews_read": 291,
+   "safety_flagged_reviews": 3,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i2386662601.html",
+   "ratings": 190,
+   "reviews_read": 64,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i2531734184-s11692871562.html",
+   "ratings": 11658,
+   "reviews_read": 292,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 2,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "safety_warning",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i2547980428-s132980732121.html",
+   "ratings": 3573,
+   "reviews_read": 120,
+   "safety_flagged_reviews": 4,
+   "separate_severity_4_reports": 4,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "safety_warning",
+    "three_reports": "safety_warning",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3075012546-s133100712220.html",
+   "ratings": 840,
+   "reviews_read": 77,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3169275025.html",
+   "ratings": 24083,
+   "reviews_read": 276,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+   "ratings": 3241,
+   "reviews_read": 199,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_counterfeit_or_defect",
+    "two_reports": "possible_counterfeit_or_defect",
+    "three_reports": "possible_counterfeit_or_defect",
+    "rate_only": "possible_counterfeit_or_defect"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3401407254-s19465854553.html",
+   "ratings": 575,
+   "reviews_read": 73,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/essager-10w-usb-charger-portable-dual-usb-ports-travel-charger-adapter-wall-charger-for-huawei-xiaomi-phone-charging-for-iphone-samsung-i3408401105-s17423442017.html",
+   "ratings": 2165,
+   "reviews_read": 88,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3430740731.html",
+   "ratings": 5580,
+   "reviews_read": 237,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+   "ratings": 41684,
+   "reviews_read": 298,
+   "safety_flagged_reviews": 3,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3626751806-s19094066174.html",
+   "ratings": 5476,
+   "reviews_read": 209,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3646051280-s19178250284.html",
+   "ratings": 2400,
+   "reviews_read": 171,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3729774469-s19664066045.html",
+   "ratings": 1076,
+   "reviews_read": 75,
+   "safety_flagged_reviews": 3,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "medium",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "safety_warning",
+    "three_reports": "safety_warning",
+    "rate_only": "safety_warning"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i394848395-s18218268464.html",
+   "ratings": 15484,
+   "reviews_read": 299,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3991929010.html",
+   "ratings": 1930,
+   "reviews_read": 90,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i3999327536-s21580063905.html",
+   "ratings": 1800,
+   "reviews_read": 136,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_counterfeit_or_defect",
+    "two_reports": "possible_counterfeit_or_defect",
+    "three_reports": "possible_counterfeit_or_defect",
+    "rate_only": "possible_counterfeit_or_defect"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4034782758-s23176345712.html",
+   "ratings": 4204,
+   "reviews_read": 247,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+   "ratings": 1888,
+   "reviews_read": 86,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4136508203.html",
+   "ratings": 11003,
+   "reviews_read": 290,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4153633764-s23123240208.html",
+   "ratings": 5351,
+   "reviews_read": 193,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4340186782.html",
+   "ratings": 6762,
+   "reviews_read": 176,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4363184044-s24476607936.html",
+   "ratings": 1250,
+   "reviews_read": 79,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4382617587-s31891484844.html",
+   "ratings": 1709,
+   "reviews_read": 96,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4438825585-s28647533233.html",
+   "ratings": 887,
+   "reviews_read": 91,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+   "ratings": 3266,
+   "reviews_read": 201,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_counterfeit_or_defect",
+    "two_reports": "possible_counterfeit_or_defect",
+    "three_reports": "possible_counterfeit_or_defect",
+    "rate_only": "possible_counterfeit_or_defect"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4474319488-s25490790848.html",
+   "ratings": 3836,
+   "reviews_read": 92,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4495459414-s25675568835.html",
+   "ratings": 2472,
+   "reviews_read": 126,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4507172427-s25784906580.html",
+   "ratings": 601,
+   "reviews_read": 74,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4523101417.html",
+   "ratings": 4793,
+   "reviews_read": 184,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4547888367-s29807638342.html",
+   "ratings": 9072,
+   "reviews_read": 142,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+   "ratings": 927,
+   "reviews_read": 90,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_counterfeit_or_defect",
+    "two_reports": "possible_counterfeit_or_defect",
+    "three_reports": "possible_counterfeit_or_defect",
+    "rate_only": "possible_counterfeit_or_defect"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4578043495-s26385163838.html",
+   "ratings": 1824,
+   "reviews_read": 143,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4584110073-s26378214035.html",
+   "ratings": 1346,
+   "reviews_read": 91,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+   "ratings": 11260,
+   "reviews_read": 280,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4644812363-s27518600306.html",
+   "ratings": 14078,
+   "reviews_read": 166,
+   "safety_flagged_reviews": 4,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4693560169.html",
+   "ratings": 6444,
+   "reviews_read": 296,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 2,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "safety_warning",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4719061313-s28618408375.html",
+   "ratings": 16803,
+   "reviews_read": 265,
+   "safety_flagged_reviews": 7,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4738552392.html",
+   "ratings": 24975,
+   "reviews_read": 275,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4738702087-s27393155968.html",
+   "ratings": 959,
+   "reviews_read": 78,
+   "safety_flagged_reviews": 2,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4946943100-s28840192818.html",
+   "ratings": 535,
+   "reviews_read": 82,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4975340062.html",
+   "ratings": 4647,
+   "reviews_read": 144,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_counterfeit_or_defect",
+    "two_reports": "possible_counterfeit_or_defect",
+    "three_reports": "possible_counterfeit_or_defect",
+    "rate_only": "possible_counterfeit_or_defect"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i4991072731.html",
+   "ratings": 4039,
+   "reviews_read": 176,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5014079183.html",
+   "ratings": 460,
+   "reviews_read": 79,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_counterfeit_or_defect",
+    "two_reports": "possible_counterfeit_or_defect",
+    "three_reports": "possible_counterfeit_or_defect",
+    "rate_only": "possible_counterfeit_or_defect"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5037745180-s133372094930.html",
+   "ratings": 3091,
+   "reviews_read": 149,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5166282734.html",
+   "ratings": 214,
+   "reviews_read": 59,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 1,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5184191214.html",
+   "ratings": 1998,
+   "reviews_read": 89,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5211290661-s30884518178.html",
+   "ratings": 766,
+   "reviews_read": 128,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5233328698.html",
+   "ratings": 2453,
+   "reviews_read": 136,
+   "safety_flagged_reviews": 1,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 3,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "possible_safety_issue",
+    "two_reports": "possible_safety_issue",
+    "three_reports": "possible_safety_issue",
+    "rate_only": "possible_safety_issue"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5246060610-s31099995054.html",
+   "ratings": 763,
+   "reviews_read": 102,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5256422305.html",
+   "ratings": 1237,
+   "reviews_read": 81,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5261974515.html",
+   "ratings": 464,
+   "reviews_read": 77,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i527362407-s7642718627.html",
+   "ratings": 537,
+   "reviews_read": 114,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+   "ratings": 475,
+   "reviews_read": 68,
+   "safety_flagged_reviews": 0,
+   "separate_severity_4_reports": 0,
+   "worst_severity": 0,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "no_warning_signs",
+    "two_reports": "no_warning_signs",
+    "three_reports": "no_warning_signs",
+    "rate_only": "no_warning_signs"
+   }
+  },
+  {
+   "link": "https://www.lazada.com.ph/products/pdp-i650518893-s1844600535.html",
+   "ratings": 2239,
+   "reviews_read": 216,
+   "safety_flagged_reviews": 4,
+   "separate_severity_4_reports": 3,
+   "worst_severity": 4,
+   "how_common": "low",
+   "verdicts": {
+    "one_report": "safety_warning",
+    "two_reports": "safety_warning",
+    "three_reports": "safety_warning",
+    "rate_only": "possible_safety_issue"
+   }
+  }
+ ]
+}

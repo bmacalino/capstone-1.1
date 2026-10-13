@@ -27,22 +27,100 @@ PLATFORM_NAMES = {"shopee": "Shopee PH", "lazada": "Lazada PH", "temu": "Temu PH
 RECOMMENDATION_STOP_WORDS = {
     "a", "an", "and", "for", "from", "in", "more", "new", "of", "on",
     "original", "series", "the", "to", "with",
+    # Words every gadget name uses. Two names sharing "smart", "wifi" and
+    # "home" are not two of the same thing: a door lock was offered a WiFi
+    # router on those three words (13 Oct 2026).
+    "adjustable", "bluetooth", "fast", "hd", "high", "home", "led", "max",
+    "mini", "plus", "portable", "pro", "professional", "quality",
+    "rechargeable", "smart", "super", "ultra", "universal", "waterproof",
+    "wifi", "wireless",
+    # What a product works with, which half the catalogue lists: a stylus was
+    # offered a mouse on "iPad", "tablet" and "phone" (13 Oct 2026).
+    "android", "cellphone", "computer", "desktop", "device", "devices", "ios",
+    "ipad", "iphone", "mobile", "pc", "phone", "phones", "smartphone", "tablet",
 }
 
+RECOMMENDATION_PART = "part"
+RECOMMENDATION_CASE = "case"
+RECOMMENDATION_PHONE = "phone"
+# Kinds that fit one device. Two of them are alike only when they are for the
+# same model: a case for a Galaxy A07 is no alternative to one for a Realme
+# C21Y, however alike the two names read.
+RECOMMENDATION_FITS_ONE_DEVICE = (RECOMMENDATION_PART, RECOMMENDATION_CASE)
+
+# The kinds of product a name is read for: (words, label, kind). A name often
+# holds several ("Laptop Stand ... Monitor Lifter", "Speaker with Microphone");
+# _recommendation_type says which one the product is.
 RECOMMENDATION_PRODUCT_TYPES = (
     (("power bank", "powerbank", "portable charger"), "power bank", "powerbank"),
-    (("wireless earbuds", "earbuds", "earphones"), "wireless earbuds", "earbuds"),
+    (("helmet intercom", "motorcycle intercom", "intercom headset"), "helmet intercom", "intercom"),
+    (("doorbell",), "doorbell", "doorbell"),
+    (("vr box", "vr glasses", "vr headset", "virtual reality"), "VR headset", "vr"),
+    (("usb hub", "usb c hub", "usb-c hub", "port hub"), "USB hub", "hub"),
+    (
+        ("ethernet cable", "lan cable", "network cable", "rj45", "cat6", "cat 6", "cat5e"),
+        "network cable",
+        "network cable",
+    ),
+    (("wireless charger", "watch charger", "charging pad", "charging dock"), "wireless charger", "wireless charger"),
+    (("smart lock", "door lock"), "door lock", "lock"),
+    (("router", "home wifi", "pocket wifi", "modem"), "router", "router"),
+    (
+        ("phone case", "case for", "shockproof case", "back cover", "tempered glass", "screen protector"),
+        "phone case",
+        RECOMMENDATION_CASE,
+    ),
+    (
+        (
+            "laptop stand", "notebook stand", "monitor stand", "tablet stand", "phone stand", "universal stand",
+            "headphone stand", "headset stand", "microphone stand", "mic stand", "speaker stand",
+        ),
+        "stand",
+        "stand",
+    ),
+    (("wireless earbuds", "earbud", "earphone", "tws"), "wireless earbuds", "earbuds"),
     (("headphones", "headphone", "headset"), "headphones", "headphones"),
+    (("microphone",), "microphone", "microphone"),
     (("wall charger", "charger", "charging adapter"), "charger", "charger"),
     (("usb cable", "charging cable", "cable"), "cable", "cable"),
     (("mechanical keyboard", "keyboard"), "keyboard", "keyboard"),
     (("gaming mouse", "wireless mouse", "mouse"), "mouse", "mouse"),
-    (("smart watch", "smartwatch"), "smart watch", "smartwatch"),
+    (
+        ("smart watch", "smartwatch", "sport watch", "sports watch", "fitness watch", "digital watch"),
+        "smart watch",
+        "smartwatch",
+    ),
     (("bluetooth speaker", "speaker"), "speaker", "speaker"),
     (("monitor",), "monitor", "monitor"),
     (("laptop",), "laptop", "laptop"),
     (("camera",), "camera", "camera"),
+    (
+        ("lcd for", "lcd replacement", "replacement lcd", "screen replacement", "touch screen", "digitizer"),
+        "replacement part",
+        RECOMMENDATION_PART,
+    ),
 )
+# Kinds that are named after another product and are never that product: a
+# "laptop power bank", a "helmet intercom headset", a "doorbell with camera",
+# a "VR headset", a "USB hub for laptop", an "ethernet cable", a "wireless
+# charger", a "laptop stand". One of these wins over the ordinary kinds that
+# follow it in the name. An ordinary kind named before it wins instead: a
+# "Speaker Power Bank with Phone Stand" is sold as a speaker.
+RECOMMENDATION_COMPOUND_KINDS = (
+    "powerbank", "intercom", "doorbell", "vr", "hub", "network cable", "wireless charger", "lock", "router",
+    RECOMMENDATION_CASE, "stand",
+)
+# Kinds whose words mostly describe something else ("laptop mouse", "monitor
+# lifter", "touch screen"): the product is one of these only when its name
+# holds no other kind.
+RECOMMENDATION_LAST_RESORT_KINDS = ("monitor", "laptop", RECOMMENDATION_PART)
+# "Speaker with Microphone", "Doorbell with 1 Camera": what follows "with" is
+# something the product has, not what it is.
+_COMES_WITH = re.compile(r"(?:\bwith|\bw/)\s+(?:\S+\s+){0,2}$")
+# "... for Laptop", "... compatible with Monitors": what a product is for.
+_MADE_FOR = re.compile(r"\s(?:for|with|compatible)\s")
+# "8+256", "8GB+256GB": memory and storage, which only a phone or tablet lists.
+_MEMORY_AND_STORAGE = re.compile(r"\b\d{1,2}\s?(?:gb)?\s?\+\s?\d{2,4}\s?(?:gb)?\b")
 
 
 def detect_marketplace(value: str, default: str = "shopee") -> str:
@@ -208,14 +286,71 @@ def _recommendation_terms(product: dict[str, Any]) -> set[str]:
 
 
 def _recommendation_type(product: dict[str, Any]) -> str:
+    """The kind of product a listing is, read from its name and category.
+
+    A name leads with what the thing is and goes on to what it has or fits, so
+    of the ordinary kinds the one named first wins, and a kind that only comes
+    "with" the product is passed over while the name holds another:
+    "Microphone ... Speaker" is a microphone, "Speaker with Microphone" a
+    speaker. Two groups are exceptions (see the two tuples above). Before
+    13 Oct 2026 the first kind in the list won, which read a laptop stand with
+    a "monitor lifter" as a monitor and a helmet intercom headset as
+    headphones.
+    """
     text = " ".join(
         str(product.get(field) or "").casefold()
         for field in ("name", "category")
     )
-    for variants, _label, canonical in RECOMMENDATION_PRODUCT_TYPES:
-        if any(variant in text for variant in variants):
+    if _MEMORY_AND_STORAGE.search(text):
+        # A phone sold with a charger and earphones is still a phone.
+        return RECOMMENDATION_PHONE
+
+    def first_seen(skip_what_it_comes_with: bool) -> dict[str, int]:
+        found: dict[str, int] = {}
+        for variants, _label, canonical in RECOMMENDATION_PRODUCT_TYPES:
+            positions = [
+                match.start()
+                for variant in variants
+                for match in re.finditer(re.escape(variant), text)
+                if not (skip_what_it_comes_with and _COMES_WITH.search(text[: match.start()]))
+            ]
+            if positions:
+                found[canonical] = min(positions)
+        return found
+
+    # A name that holds nothing but what the product comes with is read by that.
+    seen = first_seen(True) or first_seen(False)
+    ordinary = [
+        kind for kind in seen
+        if kind not in RECOMMENDATION_COMPOUND_KINDS and kind not in RECOMMENDATION_LAST_RESORT_KINDS
+    ]
+    leading = min((seen[kind] for kind in ordinary), default=len(text))
+    for canonical in RECOMMENDATION_COMPOUND_KINDS:
+        if canonical in seen and seen[canonical] <= leading:
+            return canonical
+    if ordinary:
+        # The dict keeps the list's order, which settles a tie.
+        return min(ordinary, key=lambda kind: seen[kind])
+    made_for = _MADE_FOR.search(text)
+    for canonical in RECOMMENDATION_LAST_RESORT_KINDS:
+        # "USB adapter for laptop" is not a laptop: the word must lead the name.
+        leads = canonical == RECOMMENDATION_PART or not made_for or seen.get(canonical, 0) < made_for.start()
+        if canonical in seen and leads:
             return canonical
     return ""
+
+
+def _model_codes(product: dict[str, Any]) -> set[str]:
+    """Model numbers in a name: words that start with a letter and hold a digit.
+
+    "rmx3834", "a07", "c21y". A word that starts with a digit is a quantity
+    far more often than a model ("4in1", "30w", "5g", "20000mah"), and two
+    listings sharing "4in1" are not for the same phone.
+    """
+    return {
+        term for term in re.findall(r"[a-z0-9]+", str(product.get("name") or "").casefold())
+        if term[0].isalpha() and any(character.isdigit() for character in term)
+    }
 
 
 def rank_recommendations(
@@ -239,6 +374,7 @@ def rank_recommendations(
         return []
     target_terms = _recommendation_terms(product)
     target_type = _recommendation_type(product)
+    target_codes = _model_codes(product)
     target_category = str(product.get("category") or "").strip().casefold()
     target_brand = _recommendation_brand(product).casefold()
     ranked: list[tuple[float, float, int, int, dict[str, Any]]] = []
@@ -263,7 +399,17 @@ def rank_recommendations(
 
         candidate_terms = _recommendation_terms(candidate)
         candidate_type = _recommendation_type(candidate)
-        if target_type and candidate_type and target_type != candidate_type:
+        if target_type != candidate_type:
+            # Also when only one of the two has a kind the list knows: a name
+            # that says "mouse" and one that does not are not both mice.
+            continue
+        if (
+            target_type in RECOMMENDATION_FITS_ONE_DEVICE
+            and candidate_type == target_type
+            and not (target_codes & _model_codes(candidate))
+        ):
+            # A replacement part or a case fits one device. An LCD for another
+            # phone is not an alternative, however alike the two names are.
             continue
         overlap = target_terms & candidate_terms
         candidate_category = str(candidate.get("category") or "").strip().casefold()
@@ -324,8 +470,10 @@ def product_rows(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "Verdict": view["headline"],
                 "Reviews analyzed": view["reviews_analyzed"],
                 "Safety reports": view["counts"]["safety"],
-                "Counterfeit reports": view["counts"]["counterfeit"],
-                "Defect reports": view["counts"]["defect"],
+                "Faulty or broken reports": view["counts"]["defect"],
+                "Poor quality reports": view["counts"].get("quality"),
+                "Possible fake reports": view["counts"]["counterfeit"],
+                "Not as advertised reports": view["counts"].get("not_as_described"),
                 "Link": product.get("link", ""),
             }
         )
@@ -436,26 +584,58 @@ HAZARD_LABELS = {
     "safety_unspecified": "a safety problem",
 }
 
+# The labels a shopper sees, in the order they are shown, worded once here
+# (tagging guide 1.4, Rule 10). A label names what reviewers reported, never a
+# finding: "Possible fake", not "Fake". "helper" is the line under the label.
 # "verb" is (singular, plural): "1 review says", "3 reviews say".
 BADGE_COPY = {
     "safety": {
-        "label": "Safety",
+        "label": "Safety problem",
+        "helper": "Overheating, smoke, sparks or shocks",
         "verb": ("mentions", "mention"),
         "none": "No reviews mention fire, smoke, shocks or overheating",
     },
+    "defect": {
+        "label": "Faulty or broken",
+        "helper": "Doesn't work, stops working, drains fast or charges slowly",
+        "verb": ("says", "say"),
+        "claim": "it is faulty or stopped working",
+        "none": "No reviews say it is faulty or broken",
+    },
+    "quality": {
+        "label": "Poor quality",
+        "helper": "Works, but weak, flimsy or scratched",
+        "verb": ("says", "say"),
+        "claim": "it works but is weak, flimsy or marked",
+        "none": "No reviews call it weak, flimsy or scratched",
+    },
     "counterfeit": {
-        "label": "Genuine product",
+        "label": "Possible fake",
+        "helper": "Reviewers say it is a copy, not the original brand",
         "verb": ("says", "say"),
         "claim": "it may not be genuine",
         "none": "No reviews say it is fake",
     },
-    "defect": {
-        "label": "Works as expected",
+    "not_as_described": {
+        "label": "Not as advertised",
+        "helper": "Size, capacity, features or looks differ from the listing",
         "verb": ("says", "say"),
-        "claim": "it broke or did not work",
-        "none": "No reviews say it broke or stopped working",
+        "claim": "it differs from the listing",
+        "none": "No reviews say it differs from the listing",
     },
 }
+# Counted and quoted for the shopper, but no verdict rule reads them.
+INFORMS_ONLY = ("quality", "not_as_described")
+# Sent with every report so the screens never word a label themselves.
+BADGE_LABELS = [
+    {
+        "category": category,
+        "label": text["label"],
+        "helper": text["helper"],
+        "informs_only": category in INFORMS_ONLY,
+    }
+    for category, text in BADGE_COPY.items()
+]
 
 
 def is_badge_summary(summary: Any) -> bool:
@@ -547,6 +727,8 @@ def _safety_badge(safety: dict[str, Any], usable: int) -> dict[str, Any]:
     return {
         "category": "safety",
         "label": BADGE_COPY["safety"]["label"],
+        "helper": BADGE_COPY["safety"]["helper"],
+        "informs_only": False,
         "mentions": mentions,
         "reviews_analyzed": usable,
         "phrase": _report_phrase("safety", mentions, _hazard_phrase(safety)),
@@ -569,6 +751,8 @@ def _flag_badge(category: str, flag: Any, usable: int) -> dict[str, Any]:
     return {
         "category": category,
         "label": copy_text["label"],
+        "helper": copy_text["helper"],
+        "informs_only": category in INFORMS_ONLY,
         "mentions": mentions,
         "reviews_analyzed": usable,
         "phrase": phrase,
@@ -626,16 +810,27 @@ def badge_view(product: dict[str, Any]) -> dict[str, Any]:
             "reviews_analyzed": 0,
             "counts": {"safety": 0, "counterfeit": 0, "defect": 0},
             "badges": [],
+            "labels": BADGE_LABELS,
         }
 
     usable = _usable_reviews(summary)
     verdict = summary.get("verdict") or {}
     state = str(verdict.get("state") or "insufficient_evidence")
     flags = summary.get("flags") or {}
+    # "reports" is present only when the checker ran the five-label rules. A
+    # label that was not checked gets no badge, so it never reads "0 reviews".
+    reports = summary.get("reports")
+    found = {
+        "counterfeit": flags.get("counterfeit"),
+        "defect": flags.get("defect"),
+        **(reports if isinstance(reports, dict) else {}),
+    }
     badges = [
-        _safety_badge(summary.get("safety") or {}, usable),
-        _flag_badge("counterfeit", flags.get("counterfeit"), usable),
-        _flag_badge("defect", flags.get("defect"), usable),
+        _safety_badge(summary.get("safety") or {}, usable)
+        if category == "safety"
+        else _flag_badge(category, found[category], usable)
+        for category in BADGE_COPY
+        if category == "safety" or category in found
     ]
     return {
         "available": True,
@@ -646,6 +841,7 @@ def badge_view(product: dict[str, Any]) -> dict[str, Any]:
         "reviews_analyzed": usable,
         "counts": {badge["category"]: badge["mentions"] for badge in badges},
         "badges": badges,
+        "labels": BADGE_LABELS,
         "limits_notice": summary.get("limits_notice"),
         "safety_check_accuracy": SAFETY_CHECK_ACCURACY,
     }

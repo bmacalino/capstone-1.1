@@ -26,14 +26,23 @@ Two sets of listings:
             at least 90 in 100 of its ratings and its rating count has not
             moved by more than a quarter since the scan.
 
+  --feed-scans    the baseline listings scanned again from Lazada's review
+            feed, the way the app scans with it
+            (research/scan_baseline_listings.py). Each scan carries its own
+            ratings per star level, so the app weights it itself and nothing
+            is joined afterwards. A listing is used if the app treated its
+            collection as complete and weighted it.
+
     python research/verdict_check.py
     python research/verdict_check.py --saved
     python research/verdict_check.py --star-totals
+    python research/verdict_check.py --feed-scans
 """
 
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 from collections import Counter
@@ -46,12 +55,15 @@ for candidate in (ROOT, ROOT / "sentiment-analysis", ROOT / "research"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
+FEED = "--feed-scans" in sys.argv
 WEIGHTED = "--star-totals" in sys.argv
 SAVED = "--saved" in sys.argv or WEIGHTED
 REFERENCE = ROOT / "research" / "data" / "reference_scans"
 STAR_TOTALS = REFERENCE / "star_totals.json"
+FEED_ROWS = REFERENCE / "feed" / "rows_kept.json"
 REPORT = ROOT / "research" / (
-    "verdict_check_weighted.json" if WEIGHTED else "verdict_check_saved_scans.json" if SAVED else "verdict_check.json"
+    "verdict_check_feed.json" if FEED
+    else "verdict_check_weighted.json" if WEIGHTED else "verdict_check_saved_scans.json" if SAVED else "verdict_check.json"
 )
 SAMPLED_SHARE_AT_LEAST = 0.90
 TOTAL_MAY_MOVE = 0.25
@@ -60,6 +72,8 @@ FLAGS = ("defect", "counterfeit")
 
 
 def scan_files() -> list[Path]:
+    if FEED:
+        return sorted((REFERENCE / "feed").glob("lazada_i*.json"))
     if not SAVED:
         return sorted(path for path in REFERENCE.glob("lazada_*.json"))
     from build_labelling_queue import _iter_scrape_files
@@ -137,9 +151,24 @@ def main() -> int:
 
     model = registry.load_model(registry.HAZARD_BADGES)
     star_totals = json.loads(STAR_TOTALS.read_bytes().decode("utf-8"))["listings"] if WEIGHTED else {}
+    # Reading 10,000 reviews takes half an hour. A feed scan's row depends only on the scan file and the
+    # checker, so it is kept and reused while both are unchanged (the scans arrive over half an hour too).
+    kept_rows: dict[str, Any] = {}
+    if FEED and FEED_ROWS.is_file():
+        kept_rows = json.loads(FEED_ROWS.read_bytes().decode("utf-8"))
+    checker = getattr(model, "checker_version", model.model_version)
     rows = []
     for product in listings():
         source = {key: value for key, value in product.items() if not key.startswith("_")}
+        row_key = ""
+        if FEED:
+            scan_bytes = (REFERENCE / "feed" / product["_file"]).read_bytes()
+            row_key = f"{product['_file']}:{hashlib.sha256(scan_bytes).hexdigest()[:16]}:{checker}"
+            if row_key in kept_rows:
+                row = kept_rows[row_key]
+                rows.append(row)
+                print(f"{'USED' if row['usable'] else 'left out':8} (kept from an earlier run) | {row['name'][:50]}", flush=True)
+                continue
         analysed = analyze_product_json([copy.deepcopy(source)], model)[0]
         summary = analysed.get("sentiment_summary") or {}
         coverage = summary.get("coverage") or {}
@@ -167,11 +196,32 @@ def main() -> int:
             for name in FLAGS:
                 row[f"{name}_rate_as_if_complete"] = as_if["flags"][name]["rate"]
                 row[f"{name}_lower_bound_as_if_complete"] = as_if["flags"][name]["rate_lower_bound"]
+        if FEED:
+            # The app's own figures: it weighted the scan from the per-star counts the scan carries.
+            row["usable"] = row["weighted"] and row["collection"] == "stratified"
+            row["ratings_by_star"] = product.get("review_star_distribution")
+            row["collected_by_star"] = {
+                star: [entry.get("collected"), entry.get("stop_reason")]
+                for star, entry in sorted((product.get("star_collection") or {}).items())
+            }
+            if row["usable"]:
+                row["verdict_weighted"] = row["verdict"]
+                for name in FLAGS:
+                    for key in ("rate", "rate_lower_bound", "rate_ci_95"):
+                        row[f"{name}_{key}_weighted"] = (flags.get(name) or {}).get(key)
+                for name, value in (summary.get("reports") or {}).items():
+                    row[f"{name}_rate_weighted"] = value.get("rate")
+            else:
+                row["why_not"] = f"the app did not weight this scan (collection: {row['collection']})"
         if WEIGHTED:
             row.update(weighted_row(model, product, analysed, star_totals.get(product["link"])))
+        if WEIGHTED or FEED:
             print(f"{'USED' if row['usable'] else 'left out':8} {str(row.get('verdict_weighted', row.get('why_not')))[:44]:44} "
                   f"faulty {row.get('defect_rate_weighted')} fake {row.get('counterfeit_rate_weighted')} | {row['name'][:36]}", flush=True)
             rows.append(row)
+            if FEED:
+                kept_rows[row_key] = row
+                FEED_ROWS.write_bytes((json.dumps(kept_rows, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
             continue
         rows.append(row)
         print(f"{row['verdict']:30} {str(row.get('verdict_as_if_complete', '')):30} n {row['reviews_analysed']:4} "
@@ -183,13 +233,22 @@ def main() -> int:
         "which": "saved scans, mostly star-filtered and unweighted" if SAVED else "fresh reference scans, weighted to the listing",
         "verdicts": dict(verdicts),
     }
-    if WEIGHTED:
+    if WEIGHTED or FEED:
         used = [row for row in rows if row.get("usable")]
-        report["which"] = "saved scans weighted by star totals read afterwards (research/fetch_star_totals.py)"
+        report["which"] = (
+            "the baseline listings scanned again from the review feed (research/scan_baseline_listings.py), weighted by the app"
+            if FEED else "saved scans weighted by star totals read afterwards (research/fetch_star_totals.py)"
+        )
         report["usable_listings"] = len(used)
+        if FEED:
+            # listings() passes over a scan with fewer than MINIMUM_REVIEWS written reviews, as it always has.
+            report["scans_read"] = len(scan_files())
         report["left_out"] = dict(Counter(row["why_not"] for row in rows if not row.get("usable")))
         report["verdicts_weighted"] = dict(Counter(row["verdict_weighted"] for row in used))
-        report["rule"] = {"sampled_share_at_least": SAMPLED_SHARE_AT_LEAST, "total_may_move": TOTAL_MAY_MOVE}
+        report["rule"] = (
+            "used if the app treated the collection as complete and weighted it" if FEED
+            else {"sampled_share_at_least": SAMPLED_SHARE_AT_LEAST, "total_may_move": TOTAL_MAY_MOVE}
+        )
     elif SAVED:
         report["verdicts_as_if_complete"] = dict(Counter(row["verdict_as_if_complete"] for row in rows))
         report["warning"] = (

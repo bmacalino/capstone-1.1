@@ -28,6 +28,21 @@ listing's rate is rough; the median over listings is not.
 
     python research/build_reference_baselines.py            # report only
     python research/build_reference_baselines.py --write    # also write the baseline file
+
+With --feed the input is research/verdict_check_feed.json instead
+(`python research/verdict_check.py --feed-scans`): the same listings scanned
+again on 12 October 2026 from Lazada's review feed, as the app scans with it
+(research/scan_baseline_listings.py). The feed carries whole reviews where
+the page reader kept the first part of a review written in several parts,
+and the checker flags more in the whole text, so a listing read from the feed
+needs a line measured the same way. Every choice above is unchanged; the
+report goes to reference_baselines_feed_report.json and the baseline file is
+written as version 2.0.0. In these scans the reviews and the ratings per star
+level are read in the same half minute, and each star level holds up to 60
+reviews, not about 40.
+
+    python research/build_reference_baselines.py --feed
+    python research/build_reference_baselines.py --feed --write
 """
 
 from __future__ import annotations
@@ -43,8 +58,10 @@ from typing import Any
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "research" / "verdict_check_weighted.json"
-REPORT = ROOT / "research" / "reference_baselines_report.json"
+FEED = "--feed" in sys.argv
+PAGE_SOURCE = ROOT / "research" / "verdict_check_weighted.json"
+SOURCE = ROOT / "research" / "verdict_check_feed.json" if FEED else PAGE_SOURCE
+REPORT = ROOT / "research" / ("reference_baselines_feed_report.json" if FEED else "reference_baselines_report.json")
 BASELINES = ROOT / "sentiment-analysis" / "models" / "reference_baselines_v1.json"
 PARAMETERS = ROOT / "sentiment-analysis" / "defaketive_sentiment" / "lexicons" / "hazard_parameters_v1.json"
 PRODUCT_TYPE = "gadget"
@@ -68,6 +85,33 @@ def listings() -> tuple[list[dict[str, Any]], str]:
         if key not in best or (row.get("reviews_analysed") or 0) > (best[key].get("reviews_analysed") or 0):
             best[key] = row
     return list(best.values()), report["model_version"]
+
+
+def against_page_scans(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """The same listings as read off the page (Table 12c), listing by listing."""
+    earlier = {
+        item_id(row["link"]): row
+        for row in json.loads(PAGE_SOURCE.read_bytes().decode("utf-8"))["rows"] if row.get("usable")
+    }
+    pairs = [(earlier[item_id(row["link"])], row) for row in rows if item_id(row["link"]) in earlier]
+    result: dict[str, Any] = {"listings_in_both": len(pairs)}
+    for name in FLAGS:
+        before = [float(old[f"{name}_rate_weighted"]) for old, _ in pairs]
+        after = [float(new[f"{name}_rate_weighted"]) for _, new in pairs]
+        change = [b - a for a, b in zip(before, after)]
+        result[name] = {
+            "median_rate_page_scans": round(statistics.median(before), 6),
+            "median_rate_feed_scans": round(statistics.median(after), 6),
+            "median_change": round(statistics.median(change), 6),
+            "listings_higher": sum(1 for value in change if value > 0),
+            "listings_lower": sum(1 for value in change if value < 0),
+            "listings_same": sum(1 for value in change if value == 0),
+        }
+    result["reviews_analysed_median"] = {
+        "page_scans": statistics.median(old.get("reviews_analysed") or 0 for old, _ in pairs),
+        "feed_scans": statistics.median(new.get("reviews_analysed") or 0 for _, new in pairs),
+    }
+    return result
 
 
 def median_interval(values: list[float]) -> list[float]:
@@ -120,16 +164,36 @@ def main() -> int:
             },
         },
     }
+    if FEED:
+        report["against_page_scans"] = against_page_scans(rows)
+        print(f"against the page scans: {report['against_page_scans']}")
+        # The scans were analysed with the earlier line in force. A safety verdict uses no rate and
+        # stays; the others follow the app's rule (lower bound above the line) with this line.
+        lines = {name: result[name]["line_in_use_if_written"] for name in FLAGS}
+        under: dict[str, int] = {}
+        for row in rows:
+            verdict = row["verdict_weighted"]
+            if verdict in ("no_warning_signs", "possible_counterfeit_or_defect"):
+                warned = any(float(row[f"{name}_rate_lower_bound_weighted"]) > lines[name] for name in FLAGS)
+                verdict = "possible_counterfeit_or_defect" if warned else "no_warning_signs"
+            under[verdict] = under.get(verdict, 0) + 1
+        report["safety"]["verdicts_under_this_line"] = dict(sorted(under.items()))
     REPORT.write_bytes((json.dumps(report, indent=1) + "\n").encode("utf-8"))
     print(f"safety: {report['safety']}")
     print(f"wrote {REPORT.name}; enough listings: {enough}")
     if "--write" in sys.argv and enough:
         baselines = {
-            "version": "reference-baselines-1.0.0",
+            "version": "reference-baselines-2.0.0" if FEED else "reference-baselines-1.0.0",
             "built_at": report["generated_at"],
             "measured_with": version,
-            "source": "research/build_reference_baselines.py (research/reference_baselines_report.json)",
-            "note": "Median flagged-review rate over saved gadget listings, star-weighted. In the checker's own units: rebuild when the checker changes.",
+            "source": f"research/build_reference_baselines.py (research/{REPORT.name})",
+            "note": (
+                "Median flagged-review rate over gadget listings scanned from Lazada's review feed as the app scans them, "
+                "star-weighted. In the checker's own units, and for whole review text: rebuild when the checker or the "
+                "review source changes."
+                if FEED else
+                "Median flagged-review rate over saved gadget listings, star-weighted. In the checker's own units: rebuild when the checker changes."
+            ),
             "default_product_type": PRODUCT_TYPE,
             "product_types": {
                 PRODUCT_TYPE: {

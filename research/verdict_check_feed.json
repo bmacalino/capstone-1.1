@@ -1,0 +1,3800 @@
+{
+ "generated_at": "2026-10-13T10:02:22+00:00",
+ "model_version": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "listings": 59,
+ "which": "the baseline listings scanned again from the review feed (research/scan_baseline_listings.py), weighted by the app",
+ "verdicts": {
+  "no_warning_signs": 25,
+  "possible_safety_issue": 23,
+  "safety_warning": 5,
+  "possible_counterfeit_or_defect": 6
+ },
+ "usable_listings": 59,
+ "scans_read": 59,
+ "left_out": {},
+ "verdicts_weighted": {
+  "no_warning_signs": 25,
+  "possible_safety_issue": 23,
+  "safety_warning": 5,
+  "possible_counterfeit_or_defect": 6
+ },
+ "rule": "used if the app treated the collection as complete and weighted it",
+ "rows": [
+  {
+   "name": "Vention Cat 6 Ethernet Cable Lan Cable 20 10 Meter UTP Cat6 RJ45 Inter",
+   "link": "https://www.lazada.com.ph/products/pdp-i1120920366-s3883420275.html",
+   "file": "lazada_i1120920366.json",
+   "reviews_analysed": 150,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 16,
+   "defect_rate": 0.003012,
+   "defect_rate_lower_bound": 0.000133,
+   "counterfeit_flagged_reviews": 2,
+   "counterfeit_rate": 0.00031,
+   "counterfeit_rate_lower_bound": 2e-06,
+   "quality_reviews": 4,
+   "not_as_described_reviews": 8,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 34,
+    "2": 16,
+    "3": 45,
+    "4": 124,
+    "5": 9320
+   },
+   "collected_by_star": {
+    "1": [
+     23,
+     "feed_ended"
+    ],
+    "2": [
+     11,
+     "feed_ended"
+    ],
+    "3": [
+     17,
+     "feed_ended"
+    ],
+    "4": [
+     41,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.003012,
+   "defect_rate_lower_bound_weighted": 0.000133,
+   "defect_rate_ci_95_weighted": [
+    0.000133,
+    0.064077
+   ],
+   "counterfeit_rate_weighted": 0.00031,
+   "counterfeit_rate_lower_bound_weighted": 2e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    2e-06,
+    0.059121
+   ],
+   "quality_rate_weighted": 0.000957,
+   "not_as_described_rate_weighted": 0.00182
+  },
+  {
+   "name": "MOFOX S7 Pro Motorcycle Helmet Intercom Headset 2in1 Mic earphone Musi",
+   "link": "https://www.lazada.com.ph/products/pdp-i15491115146-s133143582497.html",
+   "file": "lazada_i15491115146.json",
+   "reviews_analysed": 48,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 3,
+   "defect_rate": 0.05594,
+   "defect_rate_lower_bound": 0.017516,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 2,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 5,
+    "2": 0,
+    "3": 3,
+    "4": 2,
+    "5": 147
+   },
+   "collected_by_star": {
+    "1": [
+     5,
+     "feed_ended"
+    ],
+    "2": [
+     0,
+     "none_listed"
+    ],
+    "3": [
+     2,
+     "feed_ended"
+    ],
+    "4": [
+     0,
+     "feed_ended"
+    ],
+    "5": [
+     43,
+     "feed_ended"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.05594,
+   "defect_rate_lower_bound_weighted": 0.017516,
+   "defect_rate_ci_95_weighted": [
+    0.017516,
+    0.164537
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.079012
+   ],
+   "quality_rate_weighted": 0.016129,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "Omni Adapter / Adaptor Plug Socket (Universal, w/ Switch, Swing Type, ",
+   "link": "https://www.lazada.com.ph/products/pdp-i1676918812-s7239250812.html",
+   "file": "lazada_i1676918812.json",
+   "reviews_analysed": 76,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 1,
+   "defect_rate": 0.000362,
+   "defect_rate_lower_bound": 2e-06,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.000362,
+   "counterfeit_rate_lower_bound": 2e-06,
+   "quality_reviews": 1,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 4,
+    "2": 4,
+    "3": 10,
+    "4": 41,
+    "5": 2702
+   },
+   "collected_by_star": {
+    "1": [
+     4,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     1,
+     "feed_ended"
+    ],
+    "4": [
+     11,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.000362,
+   "defect_rate_lower_bound_weighted": 2e-06,
+   "defect_rate_ci_95_weighted": [
+    2e-06,
+    0.060445
+   ],
+   "counterfeit_rate_weighted": 0.000362,
+   "counterfeit_rate_lower_bound_weighted": 2e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    2e-06,
+    0.060445
+   ],
+   "quality_rate_weighted": 0.00135,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "UGREEN 20000mAh 25000mAh Powerbank PD 145W Fast Charging Powerbank 100",
+   "link": "https://www.lazada.com.ph/products/pdp-i2310520201-s24895520153.html",
+   "file": "lazada_i2310520201.json",
+   "reviews_analysed": 227,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 4,
+   "defect_flagged_reviews": 84,
+   "defect_rate": 0.108186,
+   "defect_rate_lower_bound": 0.052953,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 18,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 58,
+    "2": 27,
+    "3": 56,
+    "4": 156,
+    "5": 11406
+   },
+   "collected_by_star": {
+    "1": [
+     48,
+     "feed_ended"
+    ],
+    "2": [
+     22,
+     "feed_ended"
+    ],
+    "3": [
+     37,
+     "feed_ended"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.108186,
+   "defect_rate_lower_bound_weighted": 0.052953,
+   "defect_rate_ci_95_weighted": [
+    0.052953,
+    0.208355
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.057344
+   ],
+   "quality_rate_weighted": 0.016921,
+   "not_as_described_rate_weighted": 0.002518
+  },
+  {
+   "name": "Realme RAM-130 20000mAh Universal Compatibility Power Bank with LED Di",
+   "link": "https://www.lazada.com.ph/products/pdp-i2313989346-s10483987214.html",
+   "file": "lazada_i2313989346.json",
+   "reviews_analysed": 291,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 3,
+   "defect_flagged_reviews": 133,
+   "defect_rate": 0.243094,
+   "defect_rate_lower_bound": 0.163753,
+   "counterfeit_flagged_reviews": 11,
+   "counterfeit_rate": 0.024181,
+   "counterfeit_rate_lower_bound": 0.006696,
+   "quality_reviews": 9,
+   "not_as_described_reviews": 20,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 786,
+    "2": 240,
+    "3": 226,
+    "4": 166,
+    "5": 7131
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     53,
+     "feed_limit"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.243094,
+   "defect_rate_lower_bound_weighted": 0.163753,
+   "defect_rate_ci_95_weighted": [
+    0.163753,
+    0.345016
+   ],
+   "counterfeit_rate_weighted": 0.024181,
+   "counterfeit_rate_lower_bound_weighted": 0.006696,
+   "counterfeit_rate_ci_95_weighted": [
+    0.006696,
+    0.083489
+   ],
+   "quality_rate_weighted": 0.024213,
+   "not_as_described_rate_weighted": 0.03957
+  },
+  {
+   "name": "luckluck Adjustable Laptop Stand with Phone Holder 360° Rotating Heigh",
+   "link": "https://www.lazada.com.ph/products/pdp-i2386662601.html",
+   "file": "lazada_i2386662601.json",
+   "reviews_analysed": 64,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 3,
+   "defect_rate": 0.03098,
+   "defect_rate_lower_bound": 0.008375,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 0,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 0,
+    "2": 0,
+    "3": 4,
+    "4": 7,
+    "5": 179
+   },
+   "collected_by_star": {
+    "1": [
+     0,
+     "none_listed"
+    ],
+    "2": [
+     0,
+     "none_listed"
+    ],
+    "3": [
+     1,
+     "feed_ended"
+    ],
+    "4": [
+     5,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.03098,
+   "defect_rate_lower_bound_weighted": 0.008375,
+   "defect_rate_ci_95_weighted": [
+    0.008375,
+    0.107958
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.057964
+   ],
+   "quality_rate_weighted": 0.0,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "New U24 Macaron Universal Headset with In-Line Multi-Function Answer/C",
+   "link": "https://www.lazada.com.ph/products/pdp-i2531734184-s11692871562.html",
+   "file": "lazada_i2531734184.json",
+   "reviews_analysed": 292,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "safety_warning",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 75,
+   "defect_rate": 0.124703,
+   "defect_rate_lower_bound": 0.065838,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 51,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 213,
+    "2": 80,
+    "3": 177,
+    "4": 259,
+    "5": 10929
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     56,
+     "feed_ended"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "safety_warning",
+   "defect_rate_weighted": 0.124703,
+   "defect_rate_lower_bound_weighted": 0.065838,
+   "defect_rate_ci_95_weighted": [
+    0.065838,
+    0.223601
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.053335
+   ],
+   "quality_rate_weighted": 0.02754,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "Inplay Computer Power Supply 450W 550W 650W 750W PSU 80 PLUS Bronze Ce",
+   "link": "https://www.lazada.com.ph/products/pdp-i2547980428-s132980732121.html",
+   "file": "lazada_i2547980428.json",
+   "reviews_analysed": 120,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "safety_warning",
+   "safety_reviews": 4,
+   "defect_flagged_reviews": 15,
+   "defect_rate": 0.02228,
+   "defect_rate_lower_bound": 0.004981,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 3,
+   "not_as_described_reviews": 3,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 18,
+    "2": 11,
+    "3": 25,
+    "4": 51,
+    "5": 3468
+   },
+   "collected_by_star": {
+    "1": [
+     15,
+     "feed_ended"
+    ],
+    "2": [
+     6,
+     "feed_ended"
+    ],
+    "3": [
+     14,
+     "feed_ended"
+    ],
+    "4": [
+     25,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "safety_warning",
+   "defect_rate_weighted": 0.02228,
+   "defect_rate_lower_bound_weighted": 0.004981,
+   "defect_rate_ci_95_weighted": [
+    0.004981,
+    0.093978
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.056936
+   ],
+   "quality_rate_weighted": 0.001335,
+   "not_as_described_rate_weighted": 0.001407
+  },
+  {
+   "name": "KASIDA Bluetooth WIFI Tuya smart lock 6 in 1 Biometric fingerprint doo",
+   "link": "https://www.lazada.com.ph/products/pdp-i3075012546-s133100712220.html",
+   "file": "lazada_i3075012546.json",
+   "reviews_analysed": 77,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 8,
+   "defect_rate": 0.026462,
+   "defect_rate_lower_bound": 0.006488,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 0,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 14,
+    "2": 3,
+    "3": 2,
+    "4": 3,
+    "5": 818
+   },
+   "collected_by_star": {
+    "1": [
+     11,
+     "feed_ended"
+    ],
+    "2": [
+     3,
+     "feed_ended"
+    ],
+    "3": [
+     2,
+     "feed_ended"
+    ],
+    "4": [
+     2,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.026462,
+   "defect_rate_lower_bound_weighted": 0.006488,
+   "defect_rate_ci_95_weighted": [
+    0.006488,
+    0.101636
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.058285
+   ],
+   "quality_rate_weighted": 0.0,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "✅100% Original AMZ 2 Inch ZQS-1202 Multicolor Luminous Portable Blueto",
+   "link": "https://www.lazada.com.ph/products/pdp-i3169275025.html",
+   "file": "lazada_i3169275025.json",
+   "reviews_analysed": 276,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 81,
+   "defect_rate": 0.187387,
+   "defect_rate_lower_bound": 0.116875,
+   "counterfeit_flagged_reviews": 6,
+   "counterfeit_rate": 0.019216,
+   "counterfeit_rate_lower_bound": 0.00451,
+   "quality_reviews": 53,
+   "not_as_described_reviews": 9,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 1835,
+    "2": 451,
+    "3": 651,
+    "4": 536,
+    "5": 20610
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     37,
+     "feed_limit"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.187387,
+   "defect_rate_lower_bound_weighted": 0.116875,
+   "defect_rate_ci_95_weighted": [
+    0.116875,
+    0.286633
+   ],
+   "counterfeit_rate_weighted": 0.019216,
+   "counterfeit_rate_lower_bound_weighted": 0.00451,
+   "counterfeit_rate_ci_95_weighted": [
+    0.00451,
+    0.078113
+   ],
+   "quality_rate_weighted": 0.135066,
+   "not_as_described_rate_weighted": 0.00668
+  },
+  {
+   "name": "PORTABLE MK-102 SUPER BASS BLUETOOTH WIRELESS SPEAKER WITH RGB LIGHT",
+   "link": "https://www.lazada.com.ph/products/pdp-i3252473210-s16378997359.html",
+   "file": "lazada_i3252473210.json",
+   "reviews_analysed": 199,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_counterfeit_or_defect",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 105,
+   "defect_rate": 0.319827,
+   "defect_rate_lower_bound": 0.228128,
+   "counterfeit_flagged_reviews": 2,
+   "counterfeit_rate": 0.002417,
+   "counterfeit_rate_lower_bound": 0.000111,
+   "quality_reviews": 33,
+   "not_as_described_reviews": 4,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 235,
+    "2": 72,
+    "3": 88,
+    "4": 64,
+    "5": 2782
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     34,
+     "feed_ended"
+    ],
+    "3": [
+     27,
+     "feed_ended"
+    ],
+    "4": [
+     18,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_counterfeit_or_defect",
+   "defect_rate_weighted": 0.319827,
+   "defect_rate_lower_bound_weighted": 0.228128,
+   "defect_rate_ci_95_weighted": [
+    0.228128,
+    0.427951
+   ],
+   "counterfeit_rate_weighted": 0.002417,
+   "counterfeit_rate_lower_bound_weighted": 0.000111,
+   "counterfeit_rate_ci_95_weighted": [
+    0.000111,
+    0.05008
+   ],
+   "quality_rate_weighted": 0.114525,
+   "not_as_described_rate_weighted": 0.004076
+  },
+  {
+   "name": "Ring light 18 inches With 3*Cellphone holder LED Fill Light photograph",
+   "link": "https://www.lazada.com.ph/products/pdp-i3401407254-s19465854553.html",
+   "file": "lazada_i3401407254.json",
+   "reviews_analysed": 73,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 4,
+   "defect_rate": 0.011884,
+   "defect_rate_lower_bound": 0.001726,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 8,
+    "2": 2,
+    "3": 5,
+    "4": 6,
+    "5": 554
+   },
+   "collected_by_star": {
+    "1": [
+     6,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     2,
+     "feed_ended"
+    ],
+    "4": [
+     3,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.011884,
+   "defect_rate_lower_bound_weighted": 0.001726,
+   "defect_rate_ci_95_weighted": [
+    0.001726,
+    0.077183
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.056484
+   ],
+   "quality_rate_weighted": 0.029391,
+   "not_as_described_rate_weighted": 0.004058
+  },
+  {
+   "name": "Essager 10W USB Charger Portable Dual USB Ports Travel Charger Adapter",
+   "link": "https://www.lazada.com.ph/products/essager-10w-usb-charger-portable-dual-usb-ports-travel-charger-adapter-wall-charger-for-huawei-xiaomi-phone-charging-for-iphone-samsung-i3408401105-s17423442017.html",
+   "file": "lazada_i3408401105.json",
+   "reviews_analysed": 88,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 15,
+   "defect_rate": 0.056767,
+   "defect_rate_lower_bound": 0.021206,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 2,
+   "not_as_described_reviews": 4,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 8,
+    "2": 8,
+    "3": 9,
+    "4": 30,
+    "5": 2110
+   },
+   "collected_by_star": {
+    "1": [
+     8,
+     "feed_ended"
+    ],
+    "2": [
+     6,
+     "feed_ended"
+    ],
+    "3": [
+     5,
+     "feed_ended"
+    ],
+    "4": [
+     9,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.056767,
+   "defect_rate_lower_bound_weighted": 0.021206,
+   "defect_rate_ci_95_weighted": [
+    0.021206,
+    0.143232
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.057425
+   ],
+   "quality_rate_weighted": 0.016705,
+   "not_as_described_rate_weighted": 0.018707
+  },
+  {
+   "name": "M10 TWS Bluetooth Headphone Waterproof With Changing Case Music Gaming",
+   "link": "https://www.lazada.com.ph/products/pdp-i3430740731.html",
+   "file": "lazada_i3430740731.json",
+   "reviews_analysed": 237,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 95,
+   "defect_rate": 0.112804,
+   "defect_rate_lower_bound": 0.057905,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 33,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 139,
+    "2": 43,
+    "3": 103,
+    "4": 117,
+    "5": 5178
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     26,
+     "feed_ended"
+    ],
+    "3": [
+     48,
+     "feed_ended"
+    ],
+    "4": [
+     48,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.112804,
+   "defect_rate_lower_bound_weighted": 0.057905,
+   "defect_rate_ci_95_weighted": [
+    0.057905,
+    0.208245
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.052354
+   ],
+   "quality_rate_weighted": 0.013116,
+   "not_as_described_rate_weighted": 0.000415
+  },
+  {
+   "name": "M10 TWS Bluetooth Headphone Waterproof With Changing Case Music Gaming",
+   "link": "https://www.lazada.com.ph/products/pdp-i3431056306.html",
+   "file": "lazada_i3431056306.json",
+   "reviews_analysed": 298,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 3,
+   "defect_flagged_reviews": 157,
+   "defect_rate": 0.152109,
+   "defect_rate_lower_bound": 0.087257,
+   "counterfeit_flagged_reviews": 3,
+   "counterfeit_rate": 0.001515,
+   "counterfeit_rate_lower_bound": 4.1e-05,
+   "quality_reviews": 20,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 1662,
+    "2": 449,
+    "3": 799,
+    "4": 977,
+    "5": 37797
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     58,
+     "feed_limit"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.152109,
+   "defect_rate_lower_bound_weighted": 0.087257,
+   "defect_rate_ci_95_weighted": [
+    0.087257,
+    0.251862
+   ],
+   "counterfeit_rate_weighted": 0.001515,
+   "counterfeit_rate_lower_bound_weighted": 4.1e-05,
+   "counterfeit_rate_ci_95_weighted": [
+    4.1e-05,
+    0.052996
+   ],
+   "quality_rate_weighted": 0.007659,
+   "not_as_described_rate_weighted": 0.000505
+  },
+  {
+   "name": "V380 PRO Q16S Smart Camera Bulb 1080P HD Night Vision Wifi IP Camera c",
+   "link": "https://www.lazada.com.ph/products/pdp-i3626751806-s19094066174.html",
+   "file": "lazada_i3626751806.json",
+   "reviews_analysed": 209,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 51,
+   "defect_rate": 0.046439,
+   "defect_rate_lower_bound": 0.016033,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 14,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 90,
+    "2": 19,
+    "3": 58,
+    "4": 117,
+    "5": 5192
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     10,
+     "feed_ended"
+    ],
+    "3": [
+     31,
+     "feed_ended"
+    ],
+    "4": [
+     51,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.046439,
+   "defect_rate_lower_bound_weighted": 0.016033,
+   "defect_rate_ci_95_weighted": [
+    0.016033,
+    0.127062
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.055359
+   ],
+   "quality_rate_weighted": 0.020561,
+   "not_as_described_rate_weighted": 0.000347
+  },
+  {
+   "name": "DoubleShock Bluetooth Gamepad Exquisite Simulation Level and Trigger E",
+   "link": "https://www.lazada.com.ph/products/pdp-i3646051280-s19178250284.html",
+   "file": "lazada_i3646051280.json",
+   "reviews_analysed": 171,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 55,
+   "defect_rate": 0.098796,
+   "defect_rate_lower_bound": 0.047115,
+   "counterfeit_flagged_reviews": 12,
+   "counterfeit_rate": 0.024415,
+   "counterfeit_rate_lower_bound": 0.005836,
+   "quality_reviews": 10,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 55,
+    "2": 14,
+    "3": 42,
+    "4": 78,
+    "5": 2211
+   },
+   "collected_by_star": {
+    "1": [
+     41,
+     "feed_ended"
+    ],
+    "2": [
+     11,
+     "feed_ended"
+    ],
+    "3": [
+     28,
+     "feed_ended"
+    ],
+    "4": [
+     37,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.098796,
+   "defect_rate_lower_bound_weighted": 0.047115,
+   "defect_rate_ci_95_weighted": [
+    0.047115,
+    0.195535
+   ],
+   "counterfeit_rate_weighted": 0.024415,
+   "counterfeit_rate_lower_bound_weighted": 0.005836,
+   "counterfeit_rate_ci_95_weighted": [
+    0.005836,
+    0.096404
+   ],
+   "quality_rate_weighted": 0.00769,
+   "not_as_described_rate_weighted": 0.000625
+  },
+  {
+   "name": "DC12V 3A 5A CCTV Power Supply Adapter 12V Power Adaptor",
+   "link": "https://www.lazada.com.ph/products/pdp-i3729774469-s19664066045.html",
+   "file": "lazada_i3729774469.json",
+   "reviews_analysed": 75,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "safety_warning",
+   "safety_reviews": 3,
+   "defect_flagged_reviews": 12,
+   "defect_rate": 0.067501,
+   "defect_rate_lower_bound": 0.027229,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.016382,
+   "counterfeit_rate_lower_bound": 0.002954,
+   "quality_reviews": 3,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 12,
+    "2": 4,
+    "3": 7,
+    "4": 13,
+    "5": 1040
+   },
+   "collected_by_star": {
+    "1": [
+     8,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     4,
+     "feed_ended"
+    ],
+    "4": [
+     2,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "safety_warning",
+   "defect_rate_weighted": 0.067501,
+   "defect_rate_lower_bound_weighted": 0.027229,
+   "defect_rate_ci_95_weighted": [
+    0.027229,
+    0.157684
+   ],
+   "counterfeit_rate_weighted": 0.016382,
+   "counterfeit_rate_lower_bound_weighted": 0.002954,
+   "counterfeit_rate_ci_95_weighted": [
+    0.002954,
+    0.08562
+   ],
+   "quality_rate_weighted": 0.009061,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "Ultra Thin 8.5 inch LCD Writing Tablet Smart Notebook One Button Erase",
+   "link": "https://www.lazada.com.ph/products/pdp-i394848395-s18218268464.html",
+   "file": "lazada_i394848395.json",
+   "reviews_analysed": 299,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 90,
+   "defect_rate": 0.066039,
+   "defect_rate_lower_bound": 0.028677,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 21,
+   "not_as_described_reviews": 3,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 488,
+    "2": 192,
+    "3": 408,
+    "4": 733,
+    "5": 13663
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     60,
+     "target_reached"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.066039,
+   "defect_rate_lower_bound_weighted": 0.028677,
+   "defect_rate_ci_95_weighted": [
+    0.028677,
+    0.144818
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.047721
+   ],
+   "quality_rate_weighted": 0.025774,
+   "not_as_described_rate_weighted": 0.001088
+  },
+  {
+   "name": "[Leslye] Durable Type C Cables, 120W 10A Fast Charging data Cable Cord",
+   "link": "https://www.lazada.com.ph/products/pdp-i3991929010.html",
+   "file": "lazada_i3991929010.json",
+   "reviews_analysed": 90,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 11,
+   "defect_rate": 0.032936,
+   "defect_rate_lower_bound": 0.009417,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 2,
+   "not_as_described_reviews": 5,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 30,
+    "2": 12,
+    "3": 26,
+    "4": 43,
+    "5": 1819
+   },
+   "collected_by_star": {
+    "1": [
+     13,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     10,
+     "feed_ended"
+    ],
+    "4": [
+     8,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.032936,
+   "defect_rate_lower_bound_weighted": 0.009417,
+   "defect_rate_ci_95_weighted": [
+    0.009417,
+    0.108743
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.055975
+   ],
+   "quality_rate_weighted": 0.002391,
+   "not_as_described_rate_weighted": 0.051743
+  },
+  {
+   "name": "【Fast Deliver】Original For PS4 DualShock Controller PS 4 Controller Wi",
+   "link": "https://www.lazada.com.ph/products/pdp-i3999327536-s21580063905.html",
+   "file": "lazada_i3999327536.json",
+   "reviews_analysed": 136,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_counterfeit_or_defect",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 22,
+   "defect_rate": 0.031236,
+   "defect_rate_lower_bound": 0.008814,
+   "counterfeit_flagged_reviews": 22,
+   "counterfeit_rate": 0.066819,
+   "counterfeit_rate_lower_bound": 0.027551,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 3,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 28,
+    "2": 16,
+    "3": 30,
+    "4": 52,
+    "5": 1674
+   },
+   "collected_by_star": {
+    "1": [
+     25,
+     "feed_ended"
+    ],
+    "2": [
+     14,
+     "feed_ended"
+    ],
+    "3": [
+     20,
+     "feed_ended"
+    ],
+    "4": [
+     21,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_counterfeit_or_defect",
+   "defect_rate_weighted": 0.031236,
+   "defect_rate_lower_bound_weighted": 0.008814,
+   "defect_rate_ci_95_weighted": [
+    0.008814,
+    0.104681
+   ],
+   "counterfeit_rate_weighted": 0.066819,
+   "counterfeit_rate_lower_bound_weighted": 0.027551,
+   "counterfeit_rate_ci_95_weighted": [
+    0.027551,
+    0.153235
+   ],
+   "quality_rate_weighted": 0.019584,
+   "not_as_described_rate_weighted": 0.002646
+  },
+  {
+   "name": "Mini Pocket 2000 - 5000mAH Power Bank Four LED Indicators With Bracket",
+   "link": "https://www.lazada.com.ph/products/pdp-i4034782758-s23176345712.html",
+   "file": "lazada_i4034782758.json",
+   "reviews_analysed": 247,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 112,
+   "defect_rate": 0.199941,
+   "defect_rate_lower_bound": 0.125072,
+   "counterfeit_flagged_reviews": 3,
+   "counterfeit_rate": 0.002138,
+   "counterfeit_rate_lower_bound": 8.2e-05,
+   "quality_reviews": 7,
+   "not_as_described_reviews": 8,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 214,
+    "2": 78,
+    "3": 96,
+    "4": 98,
+    "5": 3718
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     45,
+     "feed_ended"
+    ],
+    "3": [
+     49,
+     "feed_ended"
+    ],
+    "4": [
+     39,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.199941,
+   "defect_rate_lower_bound_weighted": 0.125072,
+   "defect_rate_ci_95_weighted": [
+    0.125072,
+    0.304051
+   ],
+   "counterfeit_rate_weighted": 0.002138,
+   "counterfeit_rate_lower_bound_weighted": 8.2e-05,
+   "counterfeit_rate_ci_95_weighted": [
+    8.2e-05,
+    0.052712
+   ],
+   "quality_rate_weighted": 0.019265,
+   "not_as_described_rate_weighted": 0.005174
+  },
+  {
+   "name": "Computer Wired Bluetooth Speakers Audio Sound Bully Speaker Wired USB-",
+   "link": "https://www.lazada.com.ph/products/pdp-i4082179379-s22302398094.html",
+   "file": "lazada_i4082179379.json",
+   "reviews_analysed": 86,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 14,
+   "defect_rate": 0.061123,
+   "defect_rate_lower_bound": 0.023815,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 6,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 10,
+    "2": 8,
+    "3": 12,
+    "4": 35,
+    "5": 1823
+   },
+   "collected_by_star": {
+    "1": [
+     4,
+     "feed_ended"
+    ],
+    "2": [
+     5,
+     "feed_ended"
+    ],
+    "3": [
+     5,
+     "feed_ended"
+    ],
+    "4": [
+     12,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.061123,
+   "defect_rate_lower_bound_weighted": 0.023815,
+   "defect_rate_ci_95_weighted": [
+    0.023815,
+    0.148017
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.056491
+   ],
+   "quality_rate_weighted": 0.007654,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "KIMP Pro 6 TWS Wireless Earphones Bluetooth Game Headsets Sport Waterp",
+   "link": "https://www.lazada.com.ph/products/pdp-i4136508203.html",
+   "file": "lazada_i4136508203.json",
+   "reviews_analysed": 290,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 127,
+   "defect_rate": 0.125096,
+   "defect_rate_lower_bound": 0.067553,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.000603,
+   "counterfeit_rate_lower_bound": 7e-06,
+   "quality_reviews": 20,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 398,
+    "2": 118,
+    "3": 245,
+    "4": 288,
+    "5": 9954
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     50,
+     "feed_limit"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.125096,
+   "defect_rate_lower_bound_weighted": 0.067553,
+   "defect_rate_ci_95_weighted": [
+    0.067553,
+    0.220085
+   ],
+   "counterfeit_rate_weighted": 0.000603,
+   "counterfeit_rate_lower_bound_weighted": 7e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    7e-06,
+    0.05108
+   ],
+   "quality_rate_weighted": 0.022171,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "Ethernet Cable High Speed RJ45 CAT5e Internet Cable Lan Network Wire I",
+   "link": "https://www.lazada.com.ph/products/pdp-i4153633764-s23123240208.html",
+   "file": "lazada_i4153633764.json",
+   "reviews_analysed": 193,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 23,
+   "defect_rate": 0.006898,
+   "defect_rate_lower_bound": 0.000668,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.00025,
+   "counterfeit_rate_lower_bound": 1e-06,
+   "quality_reviews": 25,
+   "not_as_described_reviews": 24,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 75,
+    "2": 27,
+    "3": 57,
+    "4": 95,
+    "5": 5097
+   },
+   "collected_by_star": {
+    "1": [
+     56,
+     "feed_ended"
+    ],
+    "2": [
+     18,
+     "feed_ended"
+    ],
+    "3": [
+     25,
+     "feed_ended"
+    ],
+    "4": [
+     40,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.006898,
+   "defect_rate_lower_bound_weighted": 0.000668,
+   "defect_rate_ci_95_weighted": [
+    0.000668,
+    0.067336
+   ],
+   "counterfeit_rate_weighted": 0.00025,
+   "counterfeit_rate_lower_bound_weighted": 1e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    1e-06,
+    0.055437
+   ],
+   "quality_rate_weighted": 0.086692,
+   "not_as_described_rate_weighted": 0.038578
+  },
+  {
+   "name": "ACE AC-1000 Professional UHF Wireless Rechargeable Microphone",
+   "link": "https://www.lazada.com.ph/products/pdp-i4340186782.html",
+   "file": "lazada_i4340186782.json",
+   "reviews_analysed": 176,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 41,
+   "defect_rate": 0.074127,
+   "defect_rate_lower_bound": 0.031544,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 20,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 78,
+    "2": 31,
+    "3": 53,
+    "4": 92,
+    "5": 6508
+   },
+   "collected_by_star": {
+    "1": [
+     51,
+     "feed_ended"
+    ],
+    "2": [
+     17,
+     "feed_ended"
+    ],
+    "3": [
+     18,
+     "feed_ended"
+    ],
+    "4": [
+     31,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.074127,
+   "defect_rate_lower_bound_weighted": 0.031544,
+   "defect_rate_ci_95_weighted": [
+    0.031544,
+    0.164434
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.056031
+   ],
+   "quality_rate_weighted": 0.021735,
+   "not_as_described_rate_weighted": 0.000226
+  },
+  {
+   "name": "Doorbell Wireless With Camera and 4.3-inch display screen Waterproof V",
+   "link": "https://www.lazada.com.ph/products/pdp-i4363184044-s24476607936.html",
+   "file": "lazada_i4363184044.json",
+   "reviews_analysed": 79,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 10,
+   "defect_rate": 0.041859,
+   "defect_rate_lower_bound": 0.013477,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 7,
+    "2": 5,
+    "3": 13,
+    "4": 11,
+    "5": 1214
+   },
+   "collected_by_star": {
+    "1": [
+     4,
+     "feed_ended"
+    ],
+    "2": [
+     5,
+     "feed_ended"
+    ],
+    "3": [
+     7,
+     "feed_ended"
+    ],
+    "4": [
+     3,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.041859,
+   "defect_rate_lower_bound_weighted": 0.013477,
+   "defect_rate_ci_95_weighted": [
+    0.013477,
+    0.122588
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.057129
+   ],
+   "quality_rate_weighted": 0.020672,
+   "not_as_described_rate_weighted": 0.001486
+  },
+  {
+   "name": "Original LCD For Infinix Smart 8 / Smart 8 HD / Smart 8 Pro X6525 X652",
+   "link": "https://www.lazada.com.ph/products/pdp-i4382617587-s31891484844.html",
+   "file": "lazada_i4382617587.json",
+   "reviews_analysed": 96,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 18,
+   "defect_rate": 0.049081,
+   "defect_rate_lower_bound": 0.017357,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.015974,
+   "counterfeit_rate_lower_bound": 0.002904,
+   "quality_reviews": 3,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 46,
+    "2": 7,
+    "3": 6,
+    "4": 12,
+    "5": 1638
+   },
+   "collected_by_star": {
+    "1": [
+     25,
+     "feed_ended"
+    ],
+    "2": [
+     5,
+     "feed_ended"
+    ],
+    "3": [
+     2,
+     "feed_ended"
+    ],
+    "4": [
+     4,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.049081,
+   "defect_rate_lower_bound_weighted": 0.017357,
+   "defect_rate_ci_95_weighted": [
+    0.017357,
+    0.131058
+   ],
+   "counterfeit_rate_weighted": 0.015974,
+   "counterfeit_rate_lower_bound_weighted": 0.002904,
+   "counterfeit_rate_ci_95_weighted": [
+    0.002904,
+    0.082987
+   ],
+   "quality_rate_weighted": 0.01787,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "DANYCASE Stylus Pen 3 in 1 Universal Pencil for Mobile Android ios Pho",
+   "link": "https://www.lazada.com.ph/products/pdp-i4438825585-s28647533233.html",
+   "file": "lazada_i4438825585.json",
+   "reviews_analysed": 91,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 7,
+   "defect_rate": 0.040887,
+   "defect_rate_lower_bound": 0.013509,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 19,
+    "2": 8,
+    "3": 12,
+    "4": 21,
+    "5": 827
+   },
+   "collected_by_star": {
+    "1": [
+     12,
+     "feed_ended"
+    ],
+    "2": [
+     5,
+     "feed_ended"
+    ],
+    "3": [
+     5,
+     "feed_ended"
+    ],
+    "4": [
+     9,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.040887,
+   "defect_rate_lower_bound_weighted": 0.013509,
+   "defect_rate_ci_95_weighted": [
+    0.013509,
+    0.11716
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.05325
+   ],
+   "quality_rate_weighted": 0.036452,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "K12 Mini High End Wireless Audio Mini Home With 1 Microphones Professi",
+   "link": "https://www.lazada.com.ph/products/pdp-i4471484698-s25457827080.html",
+   "file": "lazada_i4471484698.json",
+   "reviews_analysed": 201,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_counterfeit_or_defect",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 81,
+   "defect_rate": 0.143361,
+   "defect_rate_lower_bound": 0.079566,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 41,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 80,
+    "2": 35,
+    "3": 48,
+    "4": 64,
+    "5": 3039
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     25,
+     "feed_ended"
+    ],
+    "3": [
+     25,
+     "feed_ended"
+    ],
+    "4": [
+     32,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_counterfeit_or_defect",
+   "defect_rate_weighted": 0.143361,
+   "defect_rate_lower_bound_weighted": 0.079566,
+   "defect_rate_ci_95_weighted": [
+    0.079566,
+    0.244706
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.052645
+   ],
+   "quality_rate_weighted": 0.049367,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "Xiaomi Smart Camera C301 2K 3MP IP Security Camera 360° Pan Tilt AI Hu",
+   "link": "https://www.lazada.com.ph/products/pdp-i4474319488-s25490790848.html",
+   "file": "lazada_i4474319488.json",
+   "reviews_analysed": 92,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 6,
+   "defect_rate": 0.00293,
+   "defect_rate_lower_bound": 0.000128,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 3,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 13,
+    "2": 6,
+    "3": 11,
+    "4": 51,
+    "5": 3755
+   },
+   "collected_by_star": {
+    "1": [
+     7,
+     "feed_ended"
+    ],
+    "2": [
+     3,
+     "feed_ended"
+    ],
+    "3": [
+     6,
+     "feed_ended"
+    ],
+    "4": [
+     16,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.00293,
+   "defect_rate_lower_bound_weighted": 0.000128,
+   "defect_rate_ci_95_weighted": [
+    0.000128,
+    0.063246
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.057854
+   ],
+   "quality_rate_weighted": 0.00144,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "Buy 1 take 1 YS SAMSG Universal Headset with Microphone with mic In-Li",
+   "link": "https://www.lazada.com.ph/products/pdp-i4495459414-s25675568835.html",
+   "file": "lazada_i4495459414.json",
+   "reviews_analysed": 126,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 34,
+   "defect_rate": 0.076036,
+   "defect_rate_lower_bound": 0.033217,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 18,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 33,
+    "2": 31,
+    "3": 43,
+    "4": 56,
+    "5": 2309
+   },
+   "collected_by_star": {
+    "1": [
+     19,
+     "feed_ended"
+    ],
+    "2": [
+     20,
+     "feed_ended"
+    ],
+    "3": [
+     14,
+     "feed_ended"
+    ],
+    "4": [
+     14,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.076036,
+   "defect_rate_lower_bound_weighted": 0.033217,
+   "defect_rate_ci_95_weighted": [
+    0.033217,
+    0.164655
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.054012
+   ],
+   "quality_rate_weighted": 0.061722,
+   "not_as_described_rate_weighted": 0.001242
+  },
+  {
+   "name": "MISN Doorbell Wireless With Camera Waterproof Remote Home Monitoring V",
+   "link": "https://www.lazada.com.ph/products/pdp-i4507172427-s25784906580.html",
+   "file": "lazada_i4507172427.json",
+   "reviews_analysed": 74,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 9,
+   "defect_rate": 0.065034,
+   "defect_rate_lower_bound": 0.026303,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 6,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 11,
+    "2": 2,
+    "3": 9,
+    "4": 8,
+    "5": 571
+   },
+   "collected_by_star": {
+    "1": [
+     7,
+     "feed_ended"
+    ],
+    "2": [
+     1,
+     "feed_ended"
+    ],
+    "3": [
+     4,
+     "feed_ended"
+    ],
+    "4": [
+     2,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.065034,
+   "defect_rate_lower_bound_weighted": 0.026303,
+   "defect_rate_ci_95_weighted": [
+    0.026303,
+    0.151902
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.055333
+   ],
+   "quality_rate_weighted": 0.046169,
+   "not_as_described_rate_weighted": 0.005942
+  },
+  {
+   "name": "Single ear Earbuds bluetooth Open Wearable Stereo wireless Bluetooth e",
+   "link": "https://www.lazada.com.ph/products/pdp-i4523101417.html",
+   "file": "lazada_i4523101417.json",
+   "reviews_analysed": 184,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 48,
+   "defect_rate": 0.09736,
+   "defect_rate_lower_bound": 0.047039,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 11,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 103,
+    "2": 33,
+    "3": 51,
+    "4": 109,
+    "5": 4497
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     15,
+     "feed_ended"
+    ],
+    "3": [
+     15,
+     "feed_ended"
+    ],
+    "4": [
+     37,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.09736,
+   "defect_rate_lower_bound_weighted": 0.047039,
+   "defect_rate_ci_95_weighted": [
+    0.047039,
+    0.190738
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.053469
+   ],
+   "quality_rate_weighted": 0.004888,
+   "not_as_described_rate_weighted": 0.000358
+  },
+  {
+   "name": "🎖 TP-Link Official Store | Tapo C200C | 1080p Indoor 360 Degrees Pan a",
+   "link": "https://www.lazada.com.ph/products/pdp-i4547888367-s29807638342.html",
+   "file": "lazada_i4547888367.json",
+   "reviews_analysed": 142,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 16,
+   "defect_rate": 0.002392,
+   "defect_rate_lower_bound": 8.6e-05,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 0,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 37,
+    "2": 10,
+    "3": 34,
+    "4": 65,
+    "5": 8926
+   },
+   "collected_by_star": {
+    "1": [
+     30,
+     "feed_ended"
+    ],
+    "2": [
+     5,
+     "feed_ended"
+    ],
+    "3": [
+     18,
+     "feed_ended"
+    ],
+    "4": [
+     29,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.002392,
+   "defect_rate_lower_bound_weighted": 8.6e-05,
+   "defect_rate_ci_95_weighted": [
+    8.6e-05,
+    0.062793
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.058374
+   ],
+   "quality_rate_weighted": 0.0,
+   "not_as_described_rate_weighted": 0.000136
+  },
+  {
+   "name": "Original LCD For Oppo Realme Note 50/Note 60 RMX3834 LCD Display with ",
+   "link": "https://www.lazada.com.ph/products/pdp-i4553217900-s26121268021.html",
+   "file": "lazada_i4553217900.json",
+   "reviews_analysed": 90,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_counterfeit_or_defect",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 20,
+   "defect_rate": 0.129627,
+   "defect_rate_lower_bound": 0.068735,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 2,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 33,
+    "2": 2,
+    "3": 6,
+    "4": 9,
+    "5": 877
+   },
+   "collected_by_star": {
+    "1": [
+     23,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     4,
+     "feed_ended"
+    ],
+    "4": [
+     1,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_counterfeit_or_defect",
+   "defect_rate_weighted": 0.129627,
+   "defect_rate_lower_bound_weighted": 0.068735,
+   "defect_rate_ci_95_weighted": [
+    0.068735,
+    0.23108
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.054755
+   ],
+   "quality_rate_weighted": 0.003166,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "100W 3 in 1 Super Charging Cable 6A Type C Fast Charger Type-C Cable D",
+   "link": "https://www.lazada.com.ph/products/pdp-i4578043495-s26385163838.html",
+   "file": "lazada_i4578043495.json",
+   "reviews_analysed": 143,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 48,
+   "defect_rate": 0.110221,
+   "defect_rate_lower_bound": 0.05648,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 4,
+   "not_as_described_reviews": 17,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 59,
+    "2": 30,
+    "3": 52,
+    "4": 41,
+    "5": 1642
+   },
+   "collected_by_star": {
+    "1": [
+     38,
+     "feed_ended"
+    ],
+    "2": [
+     19,
+     "feed_ended"
+    ],
+    "3": [
+     19,
+     "feed_ended"
+    ],
+    "4": [
+     10,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.110221,
+   "defect_rate_lower_bound_weighted": 0.05648,
+   "defect_rate_ci_95_weighted": [
+    0.05648,
+    0.204039
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.05141
+   ],
+   "quality_rate_weighted": 0.004115,
+   "not_as_described_rate_weighted": 0.033353
+  },
+  {
+   "name": "Essager 2.5W Apple Watch Wireless Chargers Fast Charging Portable Zinc",
+   "link": "https://www.lazada.com.ph/products/pdp-i4584110073-s26378214035.html",
+   "file": "lazada_i4584110073.json",
+   "reviews_analysed": 91,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 18,
+   "defect_rate": 0.079686,
+   "defect_rate_lower_bound": 0.034903,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.016048,
+   "counterfeit_rate_lower_bound": 0.002908,
+   "quality_reviews": 0,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 18,
+    "2": 5,
+    "3": 14,
+    "4": 13,
+    "5": 1296
+   },
+   "collected_by_star": {
+    "1": [
+     14,
+     "feed_ended"
+    ],
+    "2": [
+     3,
+     "feed_ended"
+    ],
+    "3": [
+     7,
+     "feed_ended"
+    ],
+    "4": [
+     8,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.079686,
+   "defect_rate_lower_bound_weighted": 0.034903,
+   "defect_rate_ci_95_weighted": [
+    0.034903,
+    0.171705
+   ],
+   "counterfeit_rate_weighted": 0.016048,
+   "counterfeit_rate_lower_bound_weighted": 0.002908,
+   "counterfeit_rate_ci_95_weighted": [
+    0.002908,
+    0.083575
+   ],
+   "quality_rate_weighted": 0.0,
+   "not_as_described_rate_weighted": 0.001238
+  },
+  {
+   "name": "X55 Sleeping Earbuds Wireless Mini Headphones For Work TWS Bluetooth E",
+   "link": "https://www.lazada.com.ph/products/pdp-i4590800496.html",
+   "file": "lazada_i4590800496.json",
+   "reviews_analysed": 280,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 137,
+   "defect_rate": 0.125635,
+   "defect_rate_lower_bound": 0.065733,
+   "counterfeit_flagged_reviews": 3,
+   "counterfeit_rate": 0.000687,
+   "counterfeit_rate_lower_bound": 8e-06,
+   "quality_reviews": 40,
+   "not_as_described_reviews": 4,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 161,
+    "2": 74,
+    "3": 135,
+    "4": 228,
+    "5": 10662
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     44,
+     "feed_ended"
+    ],
+    "3": [
+     58,
+     "feed_ended"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.125635,
+   "defect_rate_lower_bound_weighted": 0.065733,
+   "defect_rate_ci_95_weighted": [
+    0.065733,
+    0.226871
+   ],
+   "counterfeit_rate_weighted": 0.000687,
+   "counterfeit_rate_lower_bound_weighted": 8e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    8e-06,
+    0.056495
+   ],
+   "quality_rate_weighted": 0.040989,
+   "not_as_described_rate_weighted": 0.00078
+  },
+  {
+   "name": "Anker Zolo GaN 30W USB C Charger PIQ 3.0 Foldable PPS FastCharger for ",
+   "link": "https://www.lazada.com.ph/products/pdp-i4644812363-s27518600306.html",
+   "file": "lazada_i4644812363.json",
+   "reviews_analysed": 166,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 4,
+   "defect_flagged_reviews": 17,
+   "defect_rate": 0.00196,
+   "defect_rate_lower_bound": 5.8e-05,
+   "counterfeit_flagged_reviews": 2,
+   "counterfeit_rate": 0.00021,
+   "counterfeit_rate_lower_bound": 1e-06,
+   "quality_reviews": 0,
+   "not_as_described_reviews": 3,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 35,
+    "2": 9,
+    "3": 45,
+    "4": 103,
+    "5": 13886
+   },
+   "collected_by_star": {
+    "1": [
+     28,
+     "feed_ended"
+    ],
+    "2": [
+     7,
+     "feed_ended"
+    ],
+    "3": [
+     27,
+     "feed_ended"
+    ],
+    "4": [
+     46,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.00196,
+   "defect_rate_lower_bound_weighted": 5.8e-05,
+   "defect_rate_ci_95_weighted": [
+    5.8e-05,
+    0.062275
+   ],
+   "counterfeit_rate_weighted": 0.00021,
+   "counterfeit_rate_lower_bound_weighted": 1e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    1e-06,
+    0.059039
+   ],
+   "quality_rate_weighted": 0.0,
+   "not_as_described_rate_weighted": 0.000301
+  },
+  {
+   "name": "Fast Charging KC58 20000mAh Battery Capacity Power Bank with Multi Cab",
+   "link": "https://www.lazada.com.ph/products/pdp-i4693560169.html",
+   "file": "lazada_i4693560169.json",
+   "reviews_analysed": 296,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "safety_warning",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 160,
+   "defect_rate": 0.287477,
+   "defect_rate_lower_bound": 0.201098,
+   "counterfeit_flagged_reviews": 5,
+   "counterfeit_rate": 0.005687,
+   "counterfeit_rate_lower_bound": 0.000565,
+   "quality_reviews": 11,
+   "not_as_described_reviews": 19,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 496,
+    "2": 175,
+    "3": 156,
+    "4": 159,
+    "5": 5458
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     59,
+     "feed_limit"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "safety_warning",
+   "defect_rate_weighted": 0.287477,
+   "defect_rate_lower_bound_weighted": 0.201098,
+   "defect_rate_ci_95_weighted": [
+    0.201098,
+    0.39272
+   ],
+   "counterfeit_rate_weighted": 0.005687,
+   "counterfeit_rate_lower_bound_weighted": 0.000565,
+   "counterfeit_rate_ci_95_weighted": [
+    0.000565,
+    0.054684
+   ],
+   "quality_rate_weighted": 0.009995,
+   "not_as_described_rate_weighted": 0.041758
+  },
+  {
+   "name": "Orashare PNC03 3000mAh Super Mini Capsule Fast Charging Powerbank With",
+   "link": "https://www.lazada.com.ph/products/pdp-i4719061313-s28618408375.html",
+   "file": "lazada_i4719061313.json",
+   "reviews_analysed": 265,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 7,
+   "defect_flagged_reviews": 113,
+   "defect_rate": 0.131692,
+   "defect_rate_lower_bound": 0.069311,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.000156,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 11,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 152,
+    "2": 53,
+    "3": 161,
+    "4": 267,
+    "5": 16170
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     31,
+     "feed_ended"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.131692,
+   "defect_rate_lower_bound_weighted": 0.069311,
+   "defect_rate_ci_95_weighted": [
+    0.069311,
+    0.235981
+   ],
+   "counterfeit_rate_weighted": 0.000156,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.057187
+   ],
+   "quality_rate_weighted": 0.000906,
+   "not_as_described_rate_weighted": 0.018286
+  },
+  {
+   "name": "USB Rechargeable Speaker 3 Inch GTS - 1346, 1349, 1360 & 1361 Bluetoot",
+   "link": "https://www.lazada.com.ph/products/pdp-i4738552392.html",
+   "file": "lazada_i4738552392.json",
+   "reviews_analysed": 275,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 101,
+   "defect_rate": 0.23008,
+   "defect_rate_lower_bound": 0.144984,
+   "counterfeit_flagged_reviews": 2,
+   "counterfeit_rate": 0.000729,
+   "counterfeit_rate_lower_bound": 9e-06,
+   "quality_reviews": 19,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 546,
+    "2": 123,
+    "3": 289,
+    "4": 372,
+    "5": 23645
+   },
+   "collected_by_star": {
+    "1": [
+     60,
+     "target_reached"
+    ],
+    "2": [
+     39,
+     "feed_limit"
+    ],
+    "3": [
+     60,
+     "target_reached"
+    ],
+    "4": [
+     60,
+     "target_reached"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.23008,
+   "defect_rate_lower_bound_weighted": 0.144984,
+   "defect_rate_ci_95_weighted": [
+    0.144984,
+    0.344971
+   ],
+   "counterfeit_rate_weighted": 0.000729,
+   "counterfeit_rate_lower_bound_weighted": 9e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    9e-06,
+    0.05656
+   ],
+   "quality_rate_weighted": 0.067554,
+   "not_as_described_rate_weighted": 0.000729
+  },
+  {
+   "name": "Anker Zolo 10000mAh Magnetic Power Bank Wireless Portable Charger with",
+   "link": "https://www.lazada.com.ph/products/pdp-i4738702087-s27393155968.html",
+   "file": "lazada_i4738702087.json",
+   "reviews_analysed": 78,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 2,
+   "defect_flagged_reviews": 7,
+   "defect_rate": 0.040364,
+   "defect_rate_lower_bound": 0.01252,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 1,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 5,
+    "2": 3,
+    "3": 8,
+    "4": 11,
+    "5": 932
+   },
+   "collected_by_star": {
+    "1": [
+     4,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     7,
+     "feed_ended"
+    ],
+    "4": [
+     7,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.040364,
+   "defect_rate_lower_bound_weighted": 0.01252,
+   "defect_rate_ci_95_weighted": [
+    0.01252,
+    0.122455
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.05901
+   ],
+   "quality_rate_weighted": 0.001564,
+   "not_as_described_rate_weighted": 0.016756
+  },
+  {
+   "name": "Essager PD 60W Fast Charging Type C Cable Audio Adapters Type C to 3.5",
+   "link": "https://www.lazada.com.ph/products/pdp-i4946943100-s28840192818.html",
+   "file": "lazada_i4946943100.json",
+   "reviews_analysed": 82,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 19,
+   "defect_rate": 0.118624,
+   "defect_rate_lower_bound": 0.061122,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.002243,
+   "counterfeit_rate_lower_bound": 8.1e-05,
+   "quality_reviews": 2,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 6,
+    "2": 8,
+    "3": 13,
+    "4": 14,
+    "5": 494
+   },
+   "collected_by_star": {
+    "1": [
+     6,
+     "feed_ended"
+    ],
+    "2": [
+     6,
+     "feed_ended"
+    ],
+    "3": [
+     9,
+     "feed_ended"
+    ],
+    "4": [
+     4,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.118624,
+   "defect_rate_lower_bound_weighted": 0.061122,
+   "defect_rate_ci_95_weighted": [
+    0.061122,
+    0.217681
+   ],
+   "counterfeit_rate_weighted": 0.002243,
+   "counterfeit_rate_lower_bound_weighted": 8.1e-05,
+   "counterfeit_rate_ci_95_weighted": [
+    8.1e-05,
+    0.05864
+   ],
+   "quality_rate_weighted": 0.01862,
+   "not_as_described_rate_weighted": 0.005192
+  },
+  {
+   "name": "Anker Laptop Power Bank, 25,000mAh Portable Charger with Triple 100W U",
+   "link": "https://www.lazada.com.ph/products/pdp-i4975340062.html",
+   "file": "lazada_i4975340062.json",
+   "reviews_analysed": 144,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_counterfeit_or_defect",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 33,
+   "defect_rate": 0.13683,
+   "defect_rate_lower_bound": 0.07275,
+   "counterfeit_flagged_reviews": 2,
+   "counterfeit_rate": 0.000507,
+   "counterfeit_rate_lower_bound": 4e-06,
+   "quality_reviews": 1,
+   "not_as_described_reviews": 5,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 33,
+    "2": 9,
+    "3": 28,
+    "4": 47,
+    "5": 4530
+   },
+   "collected_by_star": {
+    "1": [
+     29,
+     "feed_ended"
+    ],
+    "2": [
+     8,
+     "feed_ended"
+    ],
+    "3": [
+     23,
+     "feed_ended"
+    ],
+    "4": [
+     25,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_counterfeit_or_defect",
+   "defect_rate_weighted": 0.13683,
+   "defect_rate_lower_bound_weighted": 0.07275,
+   "defect_rate_ci_95_weighted": [
+    0.07275,
+    0.242587
+   ],
+   "counterfeit_rate_weighted": 0.000507,
+   "counterfeit_rate_lower_bound_weighted": 4e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    4e-06,
+    0.058331
+   ],
+   "quality_rate_weighted": 0.000254,
+   "not_as_described_rate_weighted": 0.017429
+  },
+  {
+   "name": "Lazy People 3 in 1 BlueTooth Speaker Power bank With Phone Stand Adjus",
+   "link": "https://www.lazada.com.ph/products/pdp-i4991072731.html",
+   "file": "lazada_i4991072731.json",
+   "reviews_analysed": 176,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 67,
+   "defect_rate": 0.095741,
+   "defect_rate_lower_bound": 0.045447,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.000378,
+   "counterfeit_rate_lower_bound": 2e-06,
+   "quality_reviews": 14,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 87,
+    "2": 31,
+    "3": 62,
+    "4": 74,
+    "5": 3785
+   },
+   "collected_by_star": {
+    "1": [
+     57,
+     "feed_ended"
+    ],
+    "2": [
+     14,
+     "feed_ended"
+    ],
+    "3": [
+     26,
+     "feed_ended"
+    ],
+    "4": [
+     21,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.095741,
+   "defect_rate_lower_bound_weighted": 0.045447,
+   "defect_rate_ci_95_weighted": [
+    0.045447,
+    0.19058
+   ],
+   "counterfeit_rate_weighted": 0.000378,
+   "counterfeit_rate_lower_bound_weighted": 2e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    2e-06,
+    0.055807
+   ],
+   "quality_rate_weighted": 0.038322,
+   "not_as_described_rate_weighted": 0.000378
+  },
+  {
+   "name": "X55 Sleeping Earbuds Wireless Mini Headphones For Work TWS Bluetooth E",
+   "link": "https://www.lazada.com.ph/products/pdp-i5014079183.html",
+   "file": "lazada_i5014079183.json",
+   "reviews_analysed": 79,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_counterfeit_or_defect",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 29,
+   "defect_rate": 0.253559,
+   "defect_rate_lower_bound": 0.165582,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.015438,
+   "counterfeit_rate_lower_bound": 0.002841,
+   "quality_reviews": 1,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 19,
+    "2": 3,
+    "3": 9,
+    "4": 10,
+    "5": 419
+   },
+   "collected_by_star": {
+    "1": [
+     12,
+     "feed_ended"
+    ],
+    "2": [
+     3,
+     "feed_ended"
+    ],
+    "3": [
+     3,
+     "feed_ended"
+    ],
+    "4": [
+     2,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_counterfeit_or_defect",
+   "defect_rate_weighted": 0.253559,
+   "defect_rate_lower_bound_weighted": 0.165582,
+   "defect_rate_ci_95_weighted": [
+    0.165582,
+    0.367681
+   ],
+   "counterfeit_rate_weighted": 0.015438,
+   "counterfeit_rate_lower_bound_weighted": 0.002841,
+   "counterfeit_rate_ci_95_weighted": [
+    0.002841,
+    0.079445
+   ],
+   "quality_rate_weighted": 0.003442,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "【Local Stock & 360° Phone View】V380 PRO 100% Original dual lens CCTV c",
+   "link": "https://www.lazada.com.ph/products/pdp-i5037745180-s133372094930.html",
+   "file": "lazada_i5037745180.json",
+   "reviews_analysed": 149,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 42,
+   "defect_rate": 0.037765,
+   "defect_rate_lower_bound": 0.011704,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.000737,
+   "counterfeit_rate_lower_bound": 9e-06,
+   "quality_reviews": 1,
+   "not_as_described_reviews": 1,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 49,
+    "2": 20,
+    "3": 41,
+    "4": 75,
+    "5": 2906
+   },
+   "collected_by_star": {
+    "1": [
+     35,
+     "feed_ended"
+    ],
+    "2": [
+     15,
+     "feed_ended"
+    ],
+    "3": [
+     18,
+     "feed_ended"
+    ],
+    "4": [
+     23,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.037765,
+   "defect_rate_lower_bound_weighted": 0.011704,
+   "defect_rate_ci_95_weighted": [
+    0.011704,
+    0.115096
+   ],
+   "counterfeit_rate_weighted": 0.000737,
+   "counterfeit_rate_lower_bound_weighted": 9e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    9e-06,
+    0.056842
+   ],
+   "quality_rate_weighted": 0.016209,
+   "not_as_described_rate_weighted": 0.000737
+  },
+  {
+   "name": "Jiditech Laptop Stand 360° With Fan and Tablet Holder - 360° Rotating ",
+   "link": "https://www.lazada.com.ph/products/pdp-i5166282734.html",
+   "file": "lazada_i5166282734.json",
+   "reviews_analysed": 59,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 2,
+   "defect_rate": 0.014019,
+   "defect_rate_lower_bound": 0.002135,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 2,
+    "2": 1,
+    "3": 2,
+    "4": 6,
+    "5": 203
+   },
+   "collected_by_star": {
+    "1": [
+     1,
+     "feed_ended"
+    ],
+    "2": [
+     1,
+     "feed_ended"
+    ],
+    "3": [
+     1,
+     "feed_ended"
+    ],
+    "4": [
+     2,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.014019,
+   "defect_rate_lower_bound_weighted": 0.002135,
+   "defect_rate_ci_95_weighted": [
+    0.002135,
+    0.086317
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.062158
+   ],
+   "quality_rate_weighted": 0.064296,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "【3C Certification】Vention 45W 20000mAh Powerbank Fast Charging with Bu",
+   "link": "https://www.lazada.com.ph/products/pdp-i5184191214.html",
+   "file": "lazada_i5184191214.json",
+   "reviews_analysed": 89,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 11,
+   "defect_rate": 0.038739,
+   "defect_rate_lower_bound": 0.011964,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 0,
+   "not_as_described_reviews": 3,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 13,
+    "2": 4,
+    "3": 8,
+    "4": 31,
+    "5": 1942
+   },
+   "collected_by_star": {
+    "1": [
+     12,
+     "feed_ended"
+    ],
+    "2": [
+     4,
+     "feed_ended"
+    ],
+    "3": [
+     1,
+     "feed_ended"
+    ],
+    "4": [
+     12,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.038739,
+   "defect_rate_lower_bound_weighted": 0.011964,
+   "defect_rate_ci_95_weighted": [
+    0.011964,
+    0.118258
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.057175
+   ],
+   "quality_rate_weighted": 0.0,
+   "not_as_described_rate_weighted": 0.002336
+  },
+  {
+   "name": "HUABAO | Wireless Lapel Microphone Speaker Amplifier for Teachers Rech",
+   "link": "https://www.lazada.com.ph/products/pdp-i5211290661-s30884518178.html",
+   "file": "lazada_i5211290661.json",
+   "reviews_analysed": 128,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 1,
+   "defect_rate": 0.001305,
+   "defect_rate_lower_bound": 3.1e-05,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 5,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 3,
+    "2": 2,
+    "3": 6,
+    "4": 62,
+    "5": 693
+   },
+   "collected_by_star": {
+    "1": [
+     3,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     5,
+     "feed_ended"
+    ],
+    "4": [
+     58,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.001305,
+   "defect_rate_lower_bound_weighted": 3.1e-05,
+   "defect_rate_ci_95_weighted": [
+    3.1e-05,
+    0.052706
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.050257
+   ],
+   "quality_rate_weighted": 0.034073,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "4 IN 1 Spring Cable Ultra Fast Charging 65W for IOS/Type C - USB/TYPE ",
+   "link": "https://www.lazada.com.ph/products/pdp-i5233328698.html",
+   "file": "lazada_i5233328698.json",
+   "reviews_analysed": 136,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "possible_safety_issue",
+   "safety_reviews": 1,
+   "defect_flagged_reviews": 24,
+   "defect_rate": 0.066292,
+   "defect_rate_lower_bound": 0.027654,
+   "counterfeit_flagged_reviews": 1,
+   "counterfeit_rate": 0.000697,
+   "counterfeit_rate_lower_bound": 9e-06,
+   "quality_reviews": 4,
+   "not_as_described_reviews": 5,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 65,
+    "2": 24,
+    "3": 55,
+    "4": 51,
+    "5": 2258
+   },
+   "collected_by_star": {
+    "1": [
+     40,
+     "feed_ended"
+    ],
+    "2": [
+     8,
+     "feed_ended"
+    ],
+    "3": [
+     16,
+     "feed_ended"
+    ],
+    "4": [
+     16,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "possible_safety_issue",
+   "defect_rate_weighted": 0.066292,
+   "defect_rate_lower_bound_weighted": 0.027654,
+   "defect_rate_ci_95_weighted": [
+    0.027654,
+    0.150555
+   ],
+   "counterfeit_rate_weighted": 0.000697,
+   "counterfeit_rate_lower_bound_weighted": 9e-06,
+   "counterfeit_rate_ci_95_weighted": [
+    9e-06,
+    0.053911
+   ],
+   "quality_rate_weighted": 0.017694,
+   "not_as_described_rate_weighted": 0.005607
+  },
+  {
+   "name": "Type C Fast Charging Cable 120W Super Charge Angled Design Bendable Br",
+   "link": "https://www.lazada.com.ph/products/pdp-i5246060610-s31099995054.html",
+   "file": "lazada_i5246060610.json",
+   "reviews_analysed": 102,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 5,
+   "defect_rate": 0.037321,
+   "defect_rate_lower_bound": 0.012215,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 4,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 38,
+    "2": 20,
+    "3": 27,
+    "4": 21,
+    "5": 657
+   },
+   "collected_by_star": {
+    "1": [
+     26,
+     "feed_ended"
+    ],
+    "2": [
+     8,
+     "feed_ended"
+    ],
+    "3": [
+     8,
+     "feed_ended"
+    ],
+    "4": [
+     3,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.037321,
+   "defect_rate_lower_bound_weighted": 0.012215,
+   "defect_rate_ci_95_weighted": [
+    0.012215,
+    0.108364
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.049644
+   ],
+   "quality_rate_weighted": 0.020853,
+   "not_as_described_rate_weighted": 0.030213
+  },
+  {
+   "name": "Smart 5G Max Home WiFi",
+   "link": "https://www.lazada.com.ph/products/pdp-i5256422305.html",
+   "file": "lazada_i5256422305.json",
+   "reviews_analysed": 81,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 5,
+   "defect_rate": 0.005376,
+   "defect_rate_lower_bound": 0.000394,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 3,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 13,
+    "2": 2,
+    "3": 9,
+    "4": 7,
+    "5": 1206
+   },
+   "collected_by_star": {
+    "1": [
+     10,
+     "feed_ended"
+    ],
+    "2": [
+     2,
+     "feed_ended"
+    ],
+    "3": [
+     7,
+     "feed_ended"
+    ],
+    "4": [
+     4,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.005376,
+   "defect_rate_lower_bound_weighted": 0.000394,
+   "defect_rate_ci_95_weighted": [
+    0.000394,
+    0.069041
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.05932
+   ],
+   "quality_rate_weighted": 0.019263,
+   "not_as_described_rate_weighted": 0.01786
+  },
+  {
+   "name": "Lenovo ERAZER XF22 Sports Wireless Headphones With Mic Waterproof Bone",
+   "link": "https://www.lazada.com.ph/products/pdp-i5261974515.html",
+   "file": "lazada_i5261974515.json",
+   "reviews_analysed": 77,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 3,
+   "defect_rate": 0.034008,
+   "defect_rate_lower_bound": 0.009986,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 6,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 3,
+    "2": 3,
+    "3": 8,
+    "4": 14,
+    "5": 436
+   },
+   "collected_by_star": {
+    "1": [
+     3,
+     "feed_ended"
+    ],
+    "2": [
+     3,
+     "feed_ended"
+    ],
+    "3": [
+     6,
+     "feed_ended"
+    ],
+    "4": [
+     6,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.034008,
+   "defect_rate_lower_bound_weighted": 0.009986,
+   "defect_rate_ci_95_weighted": [
+    0.009986,
+    0.109428
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.05515
+   ],
+   "quality_rate_weighted": 0.044784,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "【Local seller +COD】3D Movies/Games VR Box Immersive Virtual Reality gl",
+   "link": "https://www.lazada.com.ph/products/pdp-i527362407-s7642718627.html",
+   "file": "lazada_i527362407.json",
+   "reviews_analysed": 114,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 14,
+   "defect_rate": 0.042574,
+   "defect_rate_lower_bound": 0.015992,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 3,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 20,
+    "2": 9,
+    "3": 24,
+    "4": 48,
+    "5": 436
+   },
+   "collected_by_star": {
+    "1": [
+     15,
+     "feed_ended"
+    ],
+    "2": [
+     6,
+     "feed_ended"
+    ],
+    "3": [
+     14,
+     "feed_ended"
+    ],
+    "4": [
+     19,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.042574,
+   "defect_rate_lower_bound_weighted": 0.015992,
+   "defect_rate_ci_95_weighted": [
+    0.015992,
+    0.108471
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.042974
+   ],
+   "quality_rate_weighted": 0.011089,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "✅100% Original Smilee Platinum Dynamic Microphone Professional Wired K",
+   "link": "https://www.lazada.com.ph/products/pdp-i5373813066-s132930838950.html",
+   "file": "lazada_i5373813066.json",
+   "reviews_analysed": 68,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "no_warning_signs",
+   "safety_reviews": 0,
+   "defect_flagged_reviews": 4,
+   "defect_rate": 0.029193,
+   "defect_rate_lower_bound": 0.00779,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 2,
+   "not_as_described_reviews": 0,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 5,
+    "2": 3,
+    "3": 6,
+    "4": 9,
+    "5": 452
+   },
+   "collected_by_star": {
+    "1": [
+     3,
+     "feed_ended"
+    ],
+    "2": [
+     1,
+     "feed_ended"
+    ],
+    "3": [
+     2,
+     "feed_ended"
+    ],
+    "4": [
+     2,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "no_warning_signs",
+   "defect_rate_weighted": 0.029193,
+   "defect_rate_lower_bound_weighted": 0.00779,
+   "defect_rate_ci_95_weighted": [
+    0.00779,
+    0.103279
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.055949
+   ],
+   "quality_rate_weighted": 0.031719,
+   "not_as_described_rate_weighted": 0.0
+  },
+  {
+   "name": "Multi Port USB Hub ON/OFF Switch Splitter High Speed USB 2.0 Hub Exten",
+   "link": "https://www.lazada.com.ph/products/pdp-i650518893-s1844600535.html",
+   "file": "lazada_i650518893.json",
+   "reviews_analysed": 216,
+   "collection": "stratified",
+   "sampling": "stratified_by_star",
+   "weighted": true,
+   "verdict": "safety_warning",
+   "safety_reviews": 4,
+   "defect_flagged_reviews": 77,
+   "defect_rate": 0.051006,
+   "defect_rate_lower_bound": 0.019844,
+   "counterfeit_flagged_reviews": 0,
+   "counterfeit_rate": 0.0,
+   "counterfeit_rate_lower_bound": 0.0,
+   "quality_reviews": 2,
+   "not_as_described_reviews": 2,
+   "usable": true,
+   "ratings_by_star": {
+    "1": 56,
+    "2": 28,
+    "3": 65,
+    "4": 121,
+    "5": 1969
+   },
+   "collected_by_star": {
+    "1": [
+     43,
+     "feed_ended"
+    ],
+    "2": [
+     24,
+     "feed_ended"
+    ],
+    "3": [
+     48,
+     "feed_ended"
+    ],
+    "4": [
+     43,
+     "feed_ended"
+    ],
+    "5": [
+     60,
+     "target_reached"
+    ]
+   },
+   "verdict_weighted": "safety_warning",
+   "defect_rate_weighted": 0.051006,
+   "defect_rate_lower_bound_weighted": 0.019844,
+   "defect_rate_ci_95_weighted": [
+    0.019844,
+    0.124869
+   ],
+   "counterfeit_rate_weighted": 0.0,
+   "counterfeit_rate_lower_bound_weighted": 0.0,
+   "counterfeit_rate_ci_95_weighted": [
+    0.0,
+    0.047552
+   ],
+   "quality_rate_weighted": 0.001213,
+   "not_as_described_rate_weighted": 0.001117
+  }
+ ]
+}

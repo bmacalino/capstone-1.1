@@ -1,5 +1,5 @@
 {
-  "version": "hazard-parameters-1.0.0",
+  "version": "hazard-parameters-1.1.0",
   "created_at": "2026-09-21T00:00:00+00:00",
   "_README": [
     "Every tunable number in the badge pipeline lives here, in one file, so it",
@@ -26,6 +26,10 @@
     "independent_high_confidence_reports": {
       "value": 2,
       "basis": "DESIGN CHOICE. Two independent high-confidence severity-4 reports lift the safety tier to at least High regardless of rate. One report is too easy to produce by a single mistaken or malicious reviewer; three would miss real cases on low-volume listings. Sensitivity analysis must report the verdict changes at 1 and 3."
+    },
+    "single_report_tier": {
+      "value": "Moderate",
+      "basis": "OWNER'S DECISION, 12 Oct 2026 (version 1.1.0). The tier a severity-4 hazard gets while it is rare (likelihood 'low') and has fewer separate high-confidence reports than independent_high_confidence_reports. The tier table alone gives High there, which made one report enough for a safety warning and left the two-report alert above with nothing to decide: of 19 listings warned in the 59 feed scans, 14 rested on one report. A single safety flag is wrong about as often as it is right (RESULTS_TABLES.md, Tables 11c to 11j), so one report gives Moderate, shown as a caution with the reviewer's words, and a second, separate report gives the warning. A severity-4 hazard that is also common (likelihood 'medium' or 'high') is not held back. 'High' restores the earlier behaviour. Verdict changes at 1, 2 and 3 reports: RESULTS_TABLES.md, Table 12e."
     },
     "minimum_severity": {
       "value": 4,

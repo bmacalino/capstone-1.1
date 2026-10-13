@@ -1,0 +1,87 @@
+{
+ "generated_at": "2026-10-13T10:02:23+00:00",
+ "measured_with": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "listings": 59,
+ "enough_listings": true,
+ "rule": "typical = median listing rate; warn when a listing's lower bound is above max(typical, floor); leave-one-out",
+ "flags": {
+  "defect": {
+   "listings": 59,
+   "typical_rate_median": 0.061123,
+   "median_ci_95": [
+    0.040887,
+    0.079686
+   ],
+   "mean": 0.082779,
+   "percentiles": {
+    "25": 0.032086,
+    "50": 0.061123,
+    "75": 0.121663,
+    "90": 0.189898
+   },
+   "listings_with_rate_zero": 0,
+   "placeholder_floor": 0.03,
+   "warned_under_placeholder_floor": 25,
+   "warned_under_measured_line_leave_one_out": 16,
+   "line_in_use_if_written": 0.061123
+  },
+  "counterfeit": {
+   "listings": 59,
+   "typical_rate_median": 0.0,
+   "median_ci_95": [
+    0.0,
+    0.00025
+   ],
+   "mean": 0.003697,
+   "percentiles": {
+    "25": 0.0,
+    "50": 0.0,
+    "75": 0.000713,
+    "90": 0.015989
+   },
+   "listings_with_rate_zero": 34,
+   "placeholder_floor": 0.02,
+   "warned_under_placeholder_floor": 1,
+   "warned_under_measured_line_leave_one_out": 1,
+   "line_in_use_if_written": 0.02
+  }
+ },
+ "safety": {
+  "listings_with_any_safety_flagged_review": 29,
+  "weighted_verdicts": {
+   "no_warning_signs": 25,
+   "possible_counterfeit_or_defect": 6,
+   "possible_safety_issue": 23,
+   "safety_warning": 5
+  },
+  "verdicts_under_this_line": {
+   "no_warning_signs": 25,
+   "possible_counterfeit_or_defect": 6,
+   "possible_safety_issue": 23,
+   "safety_warning": 5
+  }
+ },
+ "against_page_scans": {
+  "listings_in_both": 59,
+  "defect": {
+   "median_rate_page_scans": 0.046515,
+   "median_rate_feed_scans": 0.061123,
+   "median_change": 0.00777,
+   "listings_higher": 42,
+   "listings_lower": 13,
+   "listings_same": 4
+  },
+  "counterfeit": {
+   "median_rate_page_scans": 0.0,
+   "median_rate_feed_scans": 0.0,
+   "median_change": 0.0,
+   "listings_higher": 12,
+   "listings_lower": 12,
+   "listings_same": 35
+  },
+  "reviews_analysed_median": {
+   "page_scans": 104,
+   "feed_scans": 136
+  }
+ }
+}

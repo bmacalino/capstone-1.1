@@ -1,4 +1,4 @@
-const state = { homeScan: null, catalogLoading: true, currentProduct: null, reportFrom: "history", activity: {}, wishlist: [], catalogError: false, modelUnavailable: "", products: [], catalogProducts: [], toastTimer: null, activeJobId: null, jobStartedAt: null, jobElapsedTimer: null, searchBusy: false };
+const state = { historyFilter: "all", clearedAt: 0, picks: [], popular: [], homeScan: null, catalogLoading: true, currentProduct: null, reportFrom: "history", activity: {}, wishlist: [], catalogError: false, modelUnavailable: "", products: [], catalogProducts: [], toastTimer: null, activeJobId: null, jobStartedAt: null, jobElapsedTimer: null, searchBusy: false };
 const MARKETPLACES = { shopee: "Shopee PH", lazada: "Lazada PH", temu: "Temu PH" };
 // Lazada scans read a fixed number of reviews from each star level (webapp.LAZADA_REVIEWS_PER_STAR).
 const LAZADA_REVIEWS_PER_STAR = 60;
@@ -14,6 +14,14 @@ const NO_VIEW = {available: false, state: "not_analyzed", tone: "unknown", headl
 const view = (product) => product?.badge_view || NO_VIEW;
 const tone = (product) => view(product).tone || "unknown";
 const counts = (product) => ({safety: 0, counterfeit: 0, defect: 0, ...(view(product).counts || {})});
+// What a label is called on screen. The server words the labels once (dashboard_utils.BADGE_COPY)
+// and sends them with every report, so nothing here names one.
+const labelOf = (product, category) => (view(product).labels || []).find(item => item.category === category)?.label || category;
+// A sentence's and a review's labels and matched words: the three that can raise a
+// warning, plus the two that only inform (poor quality, not as advertised).
+const sentenceTags = sentence => [...(sentence?.tags || []), ...(sentence?.extra_tags || [])];
+const sentenceTerms = sentence => [...(sentence?.terms || []), ...(sentence?.extra_terms || [])];
+const reviewTags = review => [...(review?.sentiment_analysis?.review_tags || []), ...(review?.sentiment_analysis?.review_extra_tags || [])];
 // Lists arrive without the reviews themselves; reviews_collected carries their number.
 const reviewCount = (product) => Number(view(product).reviews_analyzed || product?.comments?.length || product?.reviews_collected || 0) || 0;
 // Most concerning first. A safety report outranks fake and defect reports
@@ -25,7 +33,7 @@ function byConcern(a, b) { const ca = counts(a), cb = counts(b); return concernR
 function needsAttention(product) { return ["high", "moderate"].includes(tone(product)) || counts(product).safety > 0; }
 function matchesConcern(product, filter) { if (filter === "attention") return needsAttention(product); if (filter === "safety") return counts(product).safety > 0; if (filter === "clear") return tone(product) === "low"; if (filter === "unknown") return tone(product) === "unknown"; return true; }
 function verdictBadge(product) { return `<span class="risk-badge ${esc(tone(product))}">${esc(view(product).headline)}</span>`; }
-function reportChips(product) { const c = counts(product); const chips = [["safety", "safety"], ["counterfeit", "fake"], ["defect", "defect"]].filter(([key]) => c[key]).map(([key, word]) => `<span class="report-chip ${key}">${c[key]} ${word} report${c[key] === 1 ? "" : "s"}</span>`); return chips.length ? `<div class="report-chips">${chips.join("")}</div>` : ""; }
+function reportChips(product) { const c = counts(product); const chips = ["safety", "defect", "counterfeit"].filter(key => c[key]).map(key => `<span class="report-chip ${key}">${esc(labelOf(product, key))} · ${c[key]}</span>`); return chips.length ? `<div class="report-chips">${chips.join("")}</div>` : ""; }
 // Wrap the matched words of a quote, using the character ranges the server sent.
 function highlightSpans(text, spans) { const source = String(text || ""); const merged = []; (spans || []).map(span => [Math.max(0, Number(span?.[0]) || 0), Math.min(source.length, Number(span?.[1]) || 0)]).filter(([start, end]) => end > start).sort((a, b) => a[0] - b[0]).forEach(([start, end]) => { const last = merged[merged.length - 1]; if (last && start <= last[1]) last[1] = Math.max(last[1], end); else merged.push([start, end]); }); let html = "", cursor = 0; merged.forEach(([start, end]) => { html += esc(source.slice(cursor, start)) + "<mark>" + esc(source.slice(start, end)) + "</mark>"; cursor = end; }); return html + esc(source.slice(cursor)); }
 function safeImage(product) { const candidate = product?.img || product?.image || product?.image_url || product?.thumbnail; return /^(https?:\/\/|\/static\/)/i.test(String(candidate || "")) ? candidate : ""; }
@@ -183,7 +191,7 @@ function focusProductSearch() {
 }
 
 const WORKSPACE_ROUTES = ["home", "analyze", "history", "wishlist", "settings", "results", "analysis"];
-const ROUTE_LABELS = {home: "Home", analyze: "Analyze product", history: "History", wishlist: "Wishlist", settings: "Settings", results: "Search results", analysis: "Product report"};
+const ROUTE_LABELS = {home: "Home", analyze: "Analyze product", history: "Scan History", wishlist: "Wishlist", settings: "Settings", results: "Search results", analysis: "Product report"};
 function go(view, replace = false, preserveUrl = false) {
   const previousView = currentView();
   if (view === "dashboard") view = "home";
@@ -216,6 +224,9 @@ function go(view, replace = false, preserveUrl = false) {
   closeAccountMenu();
   if (view === "results") renderResults();
   if (view === "home" || view === "history" || view === "wishlist") renderWorkspace();
+  if (view === "wishlist") loadWishlistExtras();
+  if (view === "settings") syncSettings();
+  if (view === "home") fillFromClipboard();
   if (view === "analysis" && !state.currentProduct) {
     $("#analysis-content").innerHTML = '<div class="flow-empty"><h1>Choose a product report</h1><p>Open an analysis from History, or analyze a product to get started.</p><a href="#history">View history →</a></div>';
   }
@@ -259,16 +270,22 @@ function workspaceProducts() {
   state.catalogProducts.forEach(product => {
     if (safeLink(product.link)) products.set(product.link, product);
   });
-  return [...products.values()].sort((a, b) => {
-    const date = p => state.activity[p.link]?.openedAt || Date.parse(p.analyzed_at || p.analysis_date || p.updated_at || "") || 0;
-    return date(b) - date(a);
-  });
+  return [...products.values()].sort((a, b) => scanTime(b) - scanTime(a));
+}
+// When a product was last opened here, or else when it was analyzed.
+function scanTime(product) {
+  return state.activity[product.link]?.openedAt || Date.parse(product.analyzed_at || product.analysis_date || product.updated_at || "") || 0;
+}
+// "Clear scan history" hides everything checked before that moment.
+function historyProducts(all = workspaceProducts()) {
+  const cleared = Number(state.clearedAt) || 0;
+  return cleared ? all.filter(product => scanTime(product) > cleared) : all;
 }
 function toggleWishlist(link) {
   if (!safeLink(link)) return;
   const saved = state.wishlist.includes(link);
   state.wishlist = saved ? state.wishlist.filter(item => item !== link) : [...state.wishlist, link];
-  const product = workspaceProducts().find(item => item.link === link) || state.currentProduct;
+  const product = [...workspaceProducts(), ...state.picks, ...state.popular.map(item => item?.product)].find(item => item?.link === link) || state.currentProduct;
   if (!saved && product?.link === link) cacheWorkspaceProducts([product]);
   persistWorkspace("defaketive-wishlist", state.wishlist);
   if (state.user) {
@@ -286,12 +303,75 @@ function reportDate(product) {
   const date = value && !Number.isNaN(Date.parse(value)) ? new Date(value) : null;
   return date ? {iso: date.toISOString(), label: new Intl.DateTimeFormat("en-PH", {month: "short", day: "numeric", year: "numeric"}).format(date)} : null;
 }
-function workspaceRows(products, emptyTitle, emptyCopy) {
-  if (!products.length) return '<div class="flow-empty"><h3>' + esc(emptyTitle) + '</h3><p>' + esc(emptyCopy) + '</p><a href="#analyze">Analyze a product →</a></div>';
-  return '<div class="flow-report-list">' + products.map(product => {
-    const saved = state.wishlist.includes(product.link), image = safeImage(product), date = reportDate(product);
-    return `<article class="flow-report-row"><div class="flow-product-thumb">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : '<span aria-hidden="true">▤</span>'}</div><div class="flow-product-info"><h3 title="${esc(product.name || "Unnamed product")}">${esc(product.name || "Unnamed product")}</h3><p><span class="flow-market-label">${esc(platform(product))}</span><span>${reviewCount(product).toLocaleString()} reviews</span><span class="flow-analysis-date">${date ? `Analyzed <time datetime="${esc(date.iso)}">${esc(date.label)}</time>` : "Analysis date unavailable"}</span></p></div>${verdictBadge(product)}<div class="flow-row-actions"><button type="button" class="flow-save" data-save-link="${esc(product.link)}" aria-label="${saved ? "Remove from" : "Save to"} wishlist: ${esc(product.name)}" aria-pressed="${saved}">${saved ? "♥" : "♡"}</button><button type="button" class="flow-open" data-product-link="${esc(product.link)}">View report →</button></div></article>`;
-  }).join("") + "</div>";
+// --- Scan History -------------------------------------------------------------
+const HISTORY_FILTERS = ["all", "clear", "caution", "safety", "unknown"];
+function dayLabel(time) {
+  if (!time) return "Earlier";
+  const day = new Date(time), today = new Date();
+  const start = date => new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  const daysAgo = Math.round((start(today) - start(day)) / 86400000);
+  if (daysAgo === 0) return "Today";
+  if (daysAgo === 1) return "Yesterday";
+  return new Intl.DateTimeFormat("en-PH", {month: "short", day: "numeric", ...(day.getFullYear() === today.getFullYear() ? {} : {year: "numeric"})}).format(day);
+}
+function historyRow(product) {
+  const link = safeLink(product.link), image = safeImage(product), chip = chipFor(product), time = scanTime(product);
+  const saved = state.wishlist.includes(link), name = product.name || "Unnamed product";
+  const when = time
+    ? `<span>${esc(new Intl.DateTimeFormat("en-PH", {month: "short", day: "numeric"}).format(time))}</span><time datetime="${esc(new Date(time).toISOString())}">${esc(new Intl.DateTimeFormat("en-PH", {hour: "numeric", minute: "2-digit"}).format(time))}</time>`
+    : "<span>No date</span>";
+  return `<article class="app-scan-row"><div class="app-scan-thumb">${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : "<span>No photo</span>"}</div><div class="app-scan-when">${when}</div><div class="app-scan-info"><button type="button" class="app-scan-name" data-product-link="${esc(link)}" title="${esc(name)}">${esc(name)}</button><div class="app-scan-meta"><span class="app-market ${marketKey(product)}">${esc(platform(product))}</span><span class="app-chip ${chip.kind}">${esc(chip.label)}</span>${smallStars(product.rating)}</div></div><b class="app-price">${esc(money(product.price))}</b><button type="button" class="app-heart" data-save-link="${esc(link)}" aria-pressed="${saved}" aria-label="${saved ? "Remove from" : "Save to"} wishlist: ${esc(name)}"></button></article>`;
+}
+function renderHistory(products) {
+  const kinds = products.map(product => chipFor(product).kind);
+  const count = kind => kinds.filter(item => item === kind).length;
+  $("#history-stats").innerHTML = [[products.length, "Total scans"], [count("clear"), "No warnings"], [count("caution"), "Caution"], [count("safety"), "Safety reports"]]
+    .map(([value, label]) => `<div><b>${value.toLocaleString()}</b><span>${label}</span></div>`).join("");
+  const filter = HISTORY_FILTERS.includes(state.historyFilter) ? state.historyFilter : "all";
+  document.querySelectorAll("[data-history-filter]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.historyFilter === filter)));
+  const shown = products.filter((product, index) => filter === "all" || kinds[index] === filter);
+  const list = $("#history-list");
+  if (state.catalogLoading && !products.length) {
+    $("#history-count").textContent = "";
+    $("#history-foot").textContent = "";
+    list.innerHTML = '<p class="app-loading" role="status">Loading your history…</p>';
+    return;
+  }
+  $("#history-count").textContent = `${shown.length} result${shown.length === 1 ? "" : "s"}`;
+  $("#history-foot").textContent = products.length ? `Showing ${shown.length} of ${products.length} scan${products.length === 1 ? "" : "s"} · Your 100 most recent scans are kept` : "";
+  if (!shown.length) {
+    list.innerHTML = products.length
+      ? '<div class="app-empty"><h3>No scans match this filter</h3><p>Nothing in your history has this result.</p><button type="button" class="app-empty-action" data-history-filter="all">Show all scans</button></div>'
+      : '<div class="app-empty"><h3>No scans yet</h3><p>Check a product and it will be listed here, grouped by date.</p><a class="app-empty-action" href="#analyze">Analyze a product</a></div>';
+    return;
+  }
+  const days = new Map();
+  shown.forEach(product => { const label = dayLabel(scanTime(product)); days.set(label, [...(days.get(label) || []), product]); });
+  list.innerHTML = [...days].map(([label, items]) => `<section class="app-day"><header><h2>${esc(label)}</h2><span>${items.length} scan${items.length === 1 ? "" : "s"}</span></header>${items.map(historyRow).join("")}</section>`).join("");
+}
+// --- Wishlist ------------------------------------------------------------------
+function fillTrack(section, track, html) {
+  if (!section || !track) return;
+  section.hidden = !html;
+  track.innerHTML = html;
+  requestAnimationFrame(() => updateRowArrow(track));
+}
+function renderWishlist(products) {
+  const saved = products.filter(product => state.wishlist.includes(product.link));
+  const picks = state.picks.filter(product => safeLink(product?.link) && !state.wishlist.includes(product.link));
+  // A product shows as popular only once two or more people saved it.
+  const popular = state.popular.filter(item => safeLink(item?.product?.link) && Number(item.saves) >= 2);
+  $("#wishlist-count").textContent = `${saved.length} product${saved.length === 1 ? "" : "s"} saved`;
+  $("#wishlist-list").innerHTML = saved.length ? saved.map(product => appCard(product)).join("")
+    : `<div class="app-wish-empty"><span aria-hidden="true"></span><div><b>Start building your shortlist</b><p>Tap the heart on ${picks.length || popular.length ? "a product below" : "any product"} to save it here.</p></div></div>`;
+  fillTrack($("#wishlist-picks-row"), $("#wishlist-picks"), picks.map(product => appCard(product)).join(""));
+  fillTrack($("#wishlist-popular-row"), $("#wishlist-popular"), popular.map(item => appCard(item.product, `<span class="app-saves">${Number(item.saves).toLocaleString()} saves</span>`)).join(""));
+}
+async function loadWishlistExtras() {
+  const [picks, popular] = await Promise.all([api("/api/picks").catch(() => null), api("/api/wishlist/popular").catch(() => null)]);
+  if (picks) state.picks = Array.isArray(picks.products) ? picks.products : [];
+  if (popular) state.popular = Array.isArray(popular.products) ? popular.products : [];
+  if (picks || popular) renderWishlist(workspaceProducts());
 }
 function persistHomeScan(scan) {
   state.homeScan = scan;
@@ -427,8 +507,7 @@ function renderHomeProducts(products) {
   renderHomeBoxes(products);
 }
 function showHistoryFilter(kind) {
-  $("#history-search").value = "";
-  $("#history-risk").value = kind;
+  state.historyFilter = kind === "attention" ? "caution" : HISTORY_FILTERS.includes(kind) ? kind : "all";
   go("history");
 }
 // The bell stands for the background scan: a dot while one runs or has finished.
@@ -470,9 +549,10 @@ async function loadLibrary() {
     return toast("Your saved history couldn't be loaded. Reload the page to try again.", "error");
   }
   // The next guest on a shared computer must not see this user's history.
-  try { localStorage.removeItem("defaketive-activity"); localStorage.removeItem("defaketive-wishlist"); } catch (_) {}
+  try { ["defaketive-activity", "defaketive-wishlist", "defaketive-history-cleared"].forEach(key => localStorage.removeItem(key)); } catch (_) {}
   state.activity = library.activity || {};
   state.wishlist = library.wishlist || [];
+  state.clearedAt = Number(library.clearedAt) || 0;
   cacheWorkspaceProducts(state.catalogProducts);
   renderWorkspace();
   syncReportSave();
@@ -480,23 +560,16 @@ async function loadLibrary() {
 function forgetLibrary() {
   state.activity = {};
   state.wishlist = [];
+  state.clearedAt = 0;
   cacheWorkspaceProducts(state.catalogProducts);
   renderWorkspace();
   syncReportSave();
 }
 function renderWorkspace() {
-  const products = workspaceProducts();
+  const everything = workspaceProducts(), products = historyProducts(everything);
   renderHomeProducts(products);
-  const query = $("#history-search").value.trim().toLowerCase(), risk = $("#history-risk").value;
-  const filtered = products.filter(product => (!query || `${product.name} ${platform(product)}`.toLowerCase().includes(query)) && matchesConcern(product, risk));
-  $("#history-count").textContent = `${filtered.length} of ${products.length} saved reports`;
-  $("#history-list").innerHTML = workspaceRows(filtered, products.length ? "No reports match these filters" : "No analyses yet", products.length ? "Try another product name or show all reports." : "Analyze a product to start your history.");
-  $("#wishlist-list").innerHTML = workspaceRows(products.filter(product => state.wishlist.includes(product.link)), "Keep a product in mind", "Use the heart beside a saved analysis or save a product from its report. It will appear here.");
-  ["#history-list", "#wishlist-list"].forEach(selector => {
-    const holder = $(selector);
-    bindProductButtons(holder);
-    holder.querySelectorAll("[data-save-link]").forEach(button => button.addEventListener("click", () => toggleWishlist(button.dataset.saveLink)));
-  });
+  renderHistory(products);
+  renderWishlist(everything);
 }
 async function routeFromHash() {
   const [route, query = ""] = window.location.hash.slice(1).split("?");
@@ -526,7 +599,7 @@ function renderResults() { const products = filteredProducts(); $("#results-summ
 async function loadProducts() { const data = await api("/api/products"); state.products = data.products || []; state.catalogProducts = [...state.products]; state.catalogError = false; state.catalogLoading = false; cacheWorkspaceProducts(state.catalogProducts); if ($("#search-form")) updateSearchUI(); renderWorkspace(); }
 // Highlight only words from categories the check actually tagged, so a heat
 // word the filter set aside as clothing or weather talk is not marked.
-function reviewTerms(analysis) { const found = new Set(); (analysis.sentences || []).forEach(sentence => { const tags = new Set(sentence.tags || []); (sentence.terms || []).forEach(term => { if (term.negated || !tags.has(term.category) || !Array.isArray(term.span)) return; const text = String(sentence.text_raw || "").slice(term.span[0], term.span[1]).trim(); if (text) found.add(text); }); }); return [...found].sort((a, b) => b.length - a.length); }
+function reviewTerms(analysis) { const found = new Set(); (analysis.sentences || []).forEach(sentence => { const tags = new Set(sentenceTags(sentence)); sentenceTerms(sentence).forEach(term => { if (term.negated || !tags.has(term.category) || !Array.isArray(term.span)) return; const text = String(sentence.text_raw || "").slice(term.span[0], term.span[1]).trim(); if (text) found.add(text); }); }); return [...found].sort((a, b) => b.length - a.length); }
 function highlightReview(review) { const terms = reviewTerms(review.sentiment_analysis || {}); const content = esc(review.content || "No written review was collected."); if (!terms.length) return content; const pattern = terms.map(term => esc(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"); return content.replace(new RegExp(`(${pattern})`, "ig"), "<mark>$1</mark>"); }
 async function openProduct(link, replace = false, restoring = false) {
   if (!safeLink(link)) return toast("This product has no valid listing link.", "error");
@@ -686,6 +759,8 @@ function applyAuth(me) {
   closeAccountMenu();
   updateLimitNotice();
   const left = Number(state.guest?.left ?? 3);
+  document.querySelectorAll("[data-user-email]").forEach(node => { node.textContent = state.user?.email || ""; });
+  document.querySelectorAll("[data-guest-left]").forEach(node => { node.textContent = left > 0 ? `${left} free scan${left === 1 ? "" : "s"} left today` : "No free scans left today"; });
   document.querySelectorAll("[data-continue-guest]").forEach(node => {
     node.textContent = left > 0 ? `Continue as guest — ${left} free scan${left === 1 ? "" : "s"} left today` : "Continue as guest — no free scans left today";
   });
@@ -693,6 +768,125 @@ function applyAuth(me) {
 async function refreshAuth() {
   try { applyAuth(await api("/api/auth/me")); } catch (_) { return; /* Keep the guest view if the check fails. */ }
   if (state.user) await loadLibrary();
+}
+// --- Settings -----------------------------------------------------------------
+// Preferences stay on this browser: a notice or a clipboard read is a permission
+// the browser gives to one device, not to an account.
+const PREFERENCES = {alerts: "defaketive-scan-alerts", clipboard: "defaketive-clipboard-fill"};
+function preference(name) { try { return localStorage.getItem(PREFERENCES[name]) === "on"; } catch (_) { return false; } }
+function setPreference(name, on) { try { localStorage.setItem(PREFERENCES[name], on ? "on" : "off"); } catch (_) {} }
+const canNotify = () => typeof Notification !== "undefined";
+const alertsOn = () => preference("alerts") && canNotify() && Notification.permission === "granted";
+const canReadClipboard = () => typeof navigator !== "undefined" && Boolean(navigator.clipboard?.readText);
+function settingsNote(id, text) { const note = $(id); if (!note) return; note.textContent = text; note.hidden = !text; }
+function syncSettings() {
+  $("#pref-alerts")?.setAttribute("aria-checked", String(alertsOn()));
+  $("#pref-clipboard")?.setAttribute("aria-checked", String(preference("clipboard") && canReadClipboard()));
+  $("#pref-dark")?.setAttribute("aria-checked", String(document.documentElement.dataset.theme === "dark"));
+}
+async function toggleAlerts() {
+  if (alertsOn()) { setPreference("alerts", false); settingsNote("#pref-alerts-note", ""); return syncSettings(); }
+  if (!canNotify()) return settingsNote("#pref-alerts-note", "This browser can't show notices, so scan alerts stay off.");
+  let permission = Notification.permission;
+  if (permission === "default") { try { permission = await Notification.requestPermission(); } catch (_) { permission = "denied"; } }
+  setPreference("alerts", permission === "granted");
+  settingsNote("#pref-alerts-note", permission === "granted" ? "" : "Scan alerts are off because your browser is blocking notices from this site. Allow notifications for this site in the browser's settings, then switch this on again.");
+  syncSettings();
+  if (permission === "granted") toast("Scan alerts are on.");
+}
+// The browser notice for a scan that finished while you were doing something else.
+function scanAlert(title, body) {
+  if (!alertsOn()) return;
+  try {
+    const notice = new Notification(title, {body, tag: "defaketive-scan"});
+    notice.onclick = () => { window.focus(); notice.close(); };
+  } catch (_) { /* Some phones only allow notices from an installed app. */ }
+}
+async function toggleClipboard() {
+  if (preference("clipboard")) { setPreference("clipboard", false); settingsNote("#pref-clipboard-note", ""); return syncSettings(); }
+  if (!canReadClipboard()) return settingsNote("#pref-clipboard-note", "This browser doesn't let websites read what you copied, so this stays off.");
+  // Ask now, while the click is fresh, so the browser shows its permission question here.
+  try { await navigator.clipboard.readText(); }
+  catch (_) { return settingsNote("#pref-clipboard-note", "This stays off because your browser didn't allow reading what you copied. Allow clipboard access for this site in the browser's settings, then switch it on again."); }
+  setPreference("clipboard", true);
+  settingsNote("#pref-clipboard-note", "");
+  syncSettings();
+  toast("On. A product link you copy will be waiting in the scan bar on Home.");
+}
+// Fills the scan bar on Home with a copied product link. It never starts a scan.
+async function fillFromClipboard() {
+  const input = $("#home-product-query");
+  if (!preference("clipboard") || !canReadClipboard() || state.searchBusy || !input || input.value.trim()) return;
+  let text = "";
+  try { text = String(await navigator.clipboard.readText()).trim(); } catch (_) { return; }
+  if (!text || text.length > 2000 || text === state.lastClipboard || !queryContext(text).platform) return;
+  if (currentView() !== "home" || input.value.trim()) return;
+  state.lastClipboard = text;
+  input.value = text;
+  toast("The product link you copied is in the scan bar. Press Analyze to check it.");
+}
+function openAccountEditor() {
+  if (!state.user) return openAuth("signin");
+  const dialog = $("#account-dialog"), form = $("#account-form");
+  clearAuthErrors(dialog);
+  form.reset();
+  form.elements.full_name.value = state.user.name || "";
+  form.elements.email.value = state.user.email || "";
+  dialog.showModal();
+  form.elements.full_name.focus();
+}
+async function submitAccountForm(event, busyLabel, send, done) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  clearAuthErrors(form);
+  const button = form.querySelector(".auth-submit"), label = button.textContent;
+  button.disabled = true;
+  button.textContent = busyLabel;
+  try { done(await send(form)); }
+  catch (error) { showAuthErrors(form, error); }
+  finally { button.disabled = false; button.textContent = label; }
+}
+function saveAccount(event) {
+  return submitAccountForm(event, "Saving…", form => {
+    const body = {full_name: form.elements.full_name.value, email: form.elements.email.value, current_password: form.elements.current_password.value};
+    if (form.elements.new_password.value) body.new_password = form.elements.new_password.value;
+    return api("/api/auth/account", jsonRequest("PATCH", body));
+  }, me => {
+    applyAuth(me);
+    closeDialogs();
+    $("#account-form").reset();
+    toast("Your account was updated.");
+  });
+}
+function deleteAccount(event) {
+  return submitAccountForm(event, "Deleting…", form => api("/api/auth/account", jsonRequest("DELETE", {current_password: form.elements.current_password.value})), me => {
+    applyAuth(me);
+    closeDialogs();
+    $("#delete-form").reset();
+    forgetLibrary();
+    toast("Your account was deleted.");
+    go("landing");
+  });
+}
+// Empties Scan History and Home. Wishlisted products keep their place in the wishlist.
+async function clearHistory() {
+  const now = Date.now();
+  if (state.user) {
+    let library;
+    try { library = await api("/api/me/activity", jsonRequest("DELETE", {clearedAt: now})); }
+    catch (_) { return toast("Your history couldn't be cleared. Check your connection and try again.", "error"); }
+    state.activity = library.activity || {};
+    state.wishlist = library.wishlist || [];
+    state.clearedAt = Number(library.clearedAt) || now;
+  } else {
+    state.clearedAt = now;
+    state.activity = Object.fromEntries(Object.entries(state.activity).filter(([link]) => state.wishlist.includes(link)).map(([link, entry]) => [link, {...entry, openedAt: 0}]));
+    persistWorkspace("defaketive-history-cleared", now);
+  }
+  cacheWorkspaceProducts(state.catalogProducts);
+  closeDialogs();
+  renderWorkspace();
+  toast("Scan history cleared. Your wishlist is kept.");
 }
 function sentimentData(product) { const counts = product.sentiment_summary?.sentiment_counts || {}; return [{label:"Positive", value:Number(counts.positive || 0), color:"#12b76a"},{label:"Uncertain", value:Number(counts.uncertain ?? counts.neutral ?? 0), color:"#94a3b8"},{label:"Negative", value:Number(counts.negative || 0), color:"#f04438"}]; }
 
@@ -708,15 +902,14 @@ function sentimentPercentages(product) {
 
 
 // --- Product report --------------------------------------------------------
-const REVIEW_TAG_LABELS = {safety: "Safety report", counterfeit: "Possible fake", defect: "Defect report"};
 const sentimentLabel = review => { const label = String(review?.sentiment_analysis?.label || "unanalyzed").toLowerCase(); return label === "neutral" ? "uncertain" : label; };
 // The words the check matched in a review: only words from a category the
 // sentence was actually tagged with, and never a negated one ("hindi sira").
 function matchedWords(review) {
   const found = new Map();
   (review?.sentiment_analysis?.sentences || []).forEach(sentence => {
-    const tags = new Set(sentence.tags || []);
-    (sentence.terms || []).forEach(term => {
+    const tags = new Set(sentenceTags(sentence));
+    sentenceTerms(sentence).forEach(term => {
       if (term.negated || !tags.has(term.category)) return;
       const raw = Array.isArray(term.span) ? String(sentence.text_raw || "").slice(term.span[0], term.span[1]) : "";
       const word = String(term.ngram || raw).trim().toLowerCase();
@@ -735,19 +928,15 @@ function warningWords(reviews) {
   }));
   return [...tally.values()].sort((a, b) => b.count - a.count || a.word.localeCompare(b.word));
 }
-// One plain sentence for the summary: how the reviews lean, and what was flagged.
-function summaryHeadline(positiveShare, negativeShare, reportCounts) {
+// One plain sentence for the summary: how the reviews lean, and what was reported.
+function summaryHeadline(positiveShare, negativeShare, badges) {
   const lean = positiveShare >= 70 ? "Mostly positive reviews" : negativeShare >= 50 ? "Mostly negative reviews" : "Mixed reviews";
-  const parts = [["safety", "safety report"], ["counterfeit", "fake report"], ["defect", "defect report"]]
-    .filter(([key]) => reportCounts[key] > 0)
-    .map(([key, noun]) => `${reportCounts[key]} ${noun}${reportCounts[key] === 1 ? "" : "s"}`);
-  if (!parts.length) return `${lean}, and nothing flagged.`;
-  const list = parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0];
-  return `${lean}, with ${list}.`;
+  const parts = (badges || []).filter(badge => badge.mentions > 0).map(badge => `${badge.label} (${badge.mentions})`);
+  return parts.length ? `${lean}. Reported: ${parts.join(", ")}.` : `${lean}, and nothing flagged.`;
 }
-function reviewCard(review) {
+function reviewCard(review, labelNames = {}) {
   const label = sentimentLabel(review);
-  const reported = (review.sentiment_analysis?.review_tags || []).map(tag => REVIEW_TAG_LABELS[tag]).filter(Boolean);
+  const reported = reviewTags(review).map(tag => labelNames[tag]).filter(Boolean);
   const words = [...matchedWords(review).keys()].slice(0, 4);
   const when = review.time || review.date || "";
   const tags = [...reported.map(text => `<span class="flag">${esc(text)}</span>`), ...words.map(word => `<span>${esc(word)}</span>`)].join("");
@@ -769,7 +958,6 @@ const VERDICT_GROUPS = [
   ["caution", "Caution", "Reviewers report fakes, defects or milder safety concerns."],
   ["safety", "Safety reports", "Serious or repeated reports of fire, smoke, shocks or overheating."],
 ];
-const CHECK_LABELS = {safety: "Safety", counterfeit: "Fakes", defect: "Defects"};
 
 function renderAnalysis(product, recommendations) {
   state.currentProduct = product;
@@ -789,7 +977,7 @@ function renderAnalysis(product, recommendations) {
     ? `${uniqueCount.toLocaleString()} reviews read, up to ${Number(coverage.star_quota || LAZADA_REVIEWS_PER_STAR)} from each star level${coverage.weighted ? `, weighted to match the listing's ${availableCount.toLocaleString()} ratings` : ""}`
     : `${uniqueCount.toLocaleString()} of ${availableCount.toLocaleString()} reviews analyzed (${coveragePercent.toFixed(1)}% coverage)`;
   const duplicateCount = Number(summary.duplicate_review_count ?? allReviews.filter(item => item.is_duplicate).length) || 0;
-  const flagged = reviews.filter(item => (item.sentiment_analysis?.review_tags || []).length);
+  const flagged = reviews.filter(item => reviewTags(item).length);
   const image = safeImage(product), link = safeLink(product.link), name = product.name || "Unnamed product";
   const customerRating = Math.max(0, Math.min(5, Number(product.rating || 0)));
   const sentiment = sentimentPercentages(product);
@@ -799,7 +987,8 @@ function renderAnalysis(product, recommendations) {
   // Lazada scans read a set number of reviews per star level, so low-star reviews
   // are over-represented in the raw counts. Shares are weighted back to the listing.
   const weighted = Boolean(summary.sentiment_shares);
-  const reportCounts = counts(product);
+  // Label names for review chips and filters, as the server worded them.
+  const labelNames = Object.fromEntries((verdict.labels || []).map(item => [item.category, item.label]));
   const words = warningWords(reviews);
   const saved = state.wishlist.includes(link);
   const status = $("#report-status");
@@ -818,7 +1007,7 @@ function renderAnalysis(product, recommendations) {
     const quote = (badge.evidence || [])[0];
     const notes = quote ? [quote.hazard ? `Reports ${esc(quote.hazard)}` : "", quote.rating ? `${Number(quote.rating).toFixed(0)}-star review` : ""].filter(Boolean).join(" · ") : "";
     const width = uniqueCount ? Math.min(100, Math.max(badge.mentions ? 3 : 0, badge.mentions / uniqueCount * 100)) : 0;
-    return `<div class="rep-check ${esc(badge.category)}"><p><span>${esc(CHECK_LABELS[badge.category] || badge.label)}</span><b>${badge.mentions} review${badge.mentions === 1 ? "" : "s"}</b></p><div class="rep-bar" role="img" aria-label="${badge.mentions} of ${uniqueCount} reviews"><i style="width:${width}%"></i></div><p class="rep-check-note">${esc(badge.summary)}</p>${quote ? `<blockquote>${highlightSpans(quote.text, quote.highlights)}${notes ? `<small>${notes}</small>` : ""}</blockquote><button type="button" class="rep-link" data-review-tag="${esc(badge.category)}">Read all ${badge.mentions} →</button>` : ""}</div>`;
+    return `<div class="rep-check ${esc(badge.category)}"><p><span>${esc(badge.label)}</span><b>${badge.mentions} review${badge.mentions === 1 ? "" : "s"}</b></p><div class="rep-bar" role="img" aria-label="${badge.mentions} of ${uniqueCount} reviews"><i style="width:${width}%"></i></div><p class="rep-check-note">${esc(badge.summary)}</p>${quote ? `<blockquote>${highlightSpans(quote.text, quote.highlights)}${notes ? `<small>${notes}</small>` : ""}</blockquote><button type="button" class="rep-link" data-review-tag="${esc(badge.category)}">Read all ${badge.mentions} →</button>` : ""}</div>`;
   }).join("") || '<p class="rep-empty">This product has not been checked with the current review model.</p>';
 
   const topWords = words.slice(0, 6), maxWord = topWords[0]?.count || 1;
@@ -826,11 +1015,9 @@ function renderAnalysis(product, recommendations) {
     ? topWords.map(item => `<div class="rep-word"><button type="button" class="${esc(item.category)}" data-review-word="${esc(item.word)}" title="Show reviews that mention this">${esc(item.word)}</button><div class="rep-bar"><i style="width:${item.count / maxWord * 100}%"></i></div><b>${item.count}×</b></div>`).join("")
     : '<p class="rep-empty">The check matched no warning words in these reviews.</p>';
 
-  const lookFor = [
-    [reportCounts.safety, "Safety", "Fire, smoke, shocks, overheating", "safety"],
-    [reportCounts.counterfeit, "Genuine product", "Fakes, replicas, “not original”", "counterfeit"],
-    [reportCounts.defect, "Works as expected", "Broken, dead or faulty", "defect"],
-  ].map(([count, title, text, kind]) => `<div class="rep-tile"><p><b>${count}</b><small> review${count === 1 ? "" : "s"}</small></p><h3>${title}</h3><p class="rep-tile-note"><i class="rep-dot ${count ? kind : "none"}"></i>${text}</p></div>`).join("")
+  // One tile per label the check ran, worded by the server.
+  const lookFor = (verdict.badges || []).map(badge => [Number(badge.mentions) || 0, badge.label, badge.helper, badge.category])
+    .map(([count, title, text, kind]) => `<div class="rep-tile"><p><b>${count}</b><small> review${count === 1 ? "" : "s"}</small></p><h3>${esc(title)}</h3><p class="rep-tile-note"><i class="rep-dot ${count ? esc(kind) : "none"}"></i>${esc(text)}</p></div>`).join("")
     + `<div class="rep-tile"><p><b>${positive.percent.toFixed(0)}%</b><small> positive</small></p><h3>Sentiment</h3><p class="rep-tile-note"><i class="rep-dot none"></i>Context only. It does not change the verdict.</p></div>`;
 
   const alternatives = recommendations.slice(0, 3);
@@ -838,7 +1025,7 @@ function renderAnalysis(product, recommendations) {
     ? `<div class="rep-alts">${alternatives.map(item => {
         const itemImage = safeImage(item), itemLink = safeLink(item.link), itemCounts = counts(item);
         const itemPositive = sentimentPercentages(item).find(entry => entry.label === "Positive")?.percent || 0;
-        return `<article class="rep-alt"><header><div class="rep-alt-image">${itemImage ? `<img src="${esc(itemImage)}" width="64" height="64" alt="" loading="lazy">` : "<span>No photo</span>"}</div><h3>${esc(item.name || "Unnamed product")}</h3></header><b class="rep-alt-price">${esc(money(item.price))}</b><dl><div><dt>Positive</dt><dd>${itemPositive.toFixed(0)}%</dd></div><div><dt>Safety reports</dt><dd>${itemCounts.safety}</dd></div><div><dt>Fake / defect</dt><dd>${itemCounts.counterfeit + itemCounts.defect}</dd></div></dl><footer><span class="rep-pill clear">✓ No warning signs</span><span><button type="button" class="rep-link recommendation-open" data-product-link="${esc(itemLink)}">Open report →</button>${itemLink ? `<a class="rep-link" target="_blank" rel="noreferrer" href="${esc(itemLink)}">Go to product <img class="app-ink-icon" src="/static/assets/app/external.svg" width="10" height="10" alt=""></a>` : ""}</span></footer></article>`;
+        return `<article class="rep-alt"><header><div class="rep-alt-image">${itemImage ? `<img src="${esc(itemImage)}" width="64" height="64" alt="" loading="lazy">` : "<span>No photo</span>"}</div><h3>${esc(item.name || "Unnamed product")}</h3></header><b class="rep-alt-price">${esc(money(item.price))}</b><dl><div><dt>Positive</dt><dd>${itemPositive.toFixed(0)}%</dd></div><div><dt>Safety reports</dt><dd>${itemCounts.safety}</dd></div><div><dt>Fake or faulty</dt><dd>${itemCounts.counterfeit + itemCounts.defect}</dd></div></dl><footer><span class="rep-pill clear">✓ No warning signs</span><span><button type="button" class="rep-link recommendation-open" data-product-link="${esc(itemLink)}">Open report →</button>${itemLink ? `<a class="rep-link" target="_blank" rel="noreferrer" href="${esc(itemLink)}">Go to product <img class="app-ink-icon" src="/static/assets/app/external.svg" width="10" height="10" alt=""></a>` : ""}</span></footer></article>`;
       }).join("")}</div>`
     : '<p class="rep-empty">No similar product with enough reviews and no warning signs is in the analyzed collection yet.</p>';
 
@@ -866,13 +1053,13 @@ function renderAnalysis(product, recommendations) {
       <div id="report-verdict-detail" class="rep-table" hidden><table><thead><tr><th>Verdict</th><th>What it means</th></tr></thead><tbody>${guideRows}</tbody></table><p>This product: <b>${esc(verdict.headline)}</b>. ${esc(verdict.detail)}</p></div>
     </section>
     <details id="report-details" class="rep-card rep-how"><summary><span><span class="rep-eyebrow">How the check works</span><b>Why you see reviews, not a score</b></span><img class="app-ink-icon" src="/static/assets/app/chevron.svg" width="14" height="14" alt=""></summary>
-      <p>DeFaketive reads every review sentence and looks for the words people use when a product catches fire, smokes, gives a shock, turns out to be fake, or breaks, in English, Tagalog and Taglish. It shows you the sentences it found instead of a single score, because a score hides what reviewers actually said.</p>
+      <p>DeFaketive reads every review sentence and looks for the words people use when a product catches fire, smokes, gives a shock, turns out to be fake, breaks, feels cheaply made or differs from the listing, in English, Tagalog and Taglish. It shows you the sentences it found instead of a single score, because a score hides what reviewers actually said.</p>
       <p>${esc(accuracyCopy)}</p>
       <p class="rep-how-stats"><span>${flagged.length} of ${uniqueCount} reviews flagged</span><span>${duplicateCount} duplicates excluded</span></p>
     </details>
     <div class="rep-divider"><span>Our analysis</span><i></i><button type="button" class="rep-outline rep-toggle" data-rep-toggle="report-summary" aria-expanded="false"><span>View full detail</span><img class="app-ink-icon" src="/static/assets/app/chevron.svg" width="11" height="11" alt=""></button></div>
     <section id="report-summary" class="rep-summary" hidden>
-      <div><p class="rep-eyebrow">Analysis summary</p><h2>${esc(summaryHeadline(positive.percent, negative.percent, reportCounts))}</h2><p>DeFaketive read ${uniqueCount.toLocaleString()} unique reviews (${duplicateCount} duplicates excluded): ${weighted ? `about ${positive.percent.toFixed(0)}% positive, ${uncertain.percent.toFixed(0)}% uncertain and ${negative.percent.toFixed(0)}% negative once weighted to the listing's star mix` : `${positive.value} positive, ${uncertain.value} uncertain and ${negative.value} negative`}. The check flagged ${flagged.length} review${flagged.length === 1 ? "" : "s"}${topWords.length ? `, led by ${topWords.slice(0, 2).map(item => `“${esc(item.word)}”`).join(" and ")}` : ""}.</p></div>
+      <div><p class="rep-eyebrow">Analysis summary</p><h2>${esc(summaryHeadline(positive.percent, negative.percent, verdict.badges))}</h2><p>DeFaketive read ${uniqueCount.toLocaleString()} unique reviews (${duplicateCount} duplicates excluded): ${weighted ? `about ${positive.percent.toFixed(0)}% positive, ${uncertain.percent.toFixed(0)}% uncertain and ${negative.percent.toFixed(0)}% negative once weighted to the listing's star mix` : `${positive.value} positive, ${uncertain.value} uncertain and ${negative.value} negative`}. The check flagged ${flagged.length} review${flagged.length === 1 ? "" : "s"}${topWords.length ? `, led by ${topWords.slice(0, 2).map(item => `“${esc(item.word)}”`).join(" and ")}` : ""}.</p></div>
       <dl><div><dt>Positive</dt><dd>${positive.percent.toFixed(1)}%</dd></div><div><dt>Negative</dt><dd>${negative.percent.toFixed(1)}%</dd></div><div><dt>Flagged reviews</dt><dd>${flagged.length}</dd></div><div><dt>Duplicates excluded</dt><dd>${duplicateCount}</dd></div></dl>
     </section>
     <div class="rep-grid">
@@ -880,7 +1067,7 @@ function renderAnalysis(product, recommendations) {
         <div class="rep-sentiment"><div class="rep-donut" style="--positive:${positive.percent}%;--uncertain:${positive.percent + uncertain.percent}%" role="img" aria-label="${positive.percent.toFixed(0)}% positive, ${uncertain.percent.toFixed(0)}% uncertain, ${negative.percent.toFixed(0)}% negative"><span><b>${uniqueCount}</b><small>reviews</small></span></div>
           <ul>${[["positive", "Positive reviews", positive], ["uncertain", "Uncertain reviews", uncertain], ["negative", "Negative reviews", negative]].map(([kind, label, item]) => `<li><i class="rep-dot ${kind}"></i><span>${label}<small>${weighted ? `${item.value} of ${uniqueCount} read` : `${item.percent.toFixed(0)}% of reviews`}</small></span><b>${weighted ? item.percent.toFixed(0) + "%" : item.value}</b></li>`).join("")}</ul></div>
       </section>
-      <section id="report-findings" class="rep-card" tabindex="-1"><p class="rep-eyebrow tone-green">What reviewers reported</p><h2>Three checks, in their own words</h2><p class="rep-sub">The sentences the check flagged, with the words it matched highlighted.</p><div class="rep-checks">${checks}</div></section>
+      <section id="report-findings" class="rep-card" tabindex="-1"><p class="rep-eyebrow tone-green">What reviewers reported</p><h2>Each check, in their own words</h2><p class="rep-sub">The sentences the check flagged, with the words it matched highlighted.</p><div class="rep-checks">${checks}</div></section>
       <section class="rep-card"><p class="rep-eyebrow tone-red">Warning words</p><h2>Warning words found</h2><p class="rep-sub">Words the check matched in these reviews. Pick one to see its reviews.</p><div class="rep-words">${wordRows}</div></section>
       <section class="rep-card"><p class="rep-eyebrow tone-green">What we check</p><h2>What the check looks for</h2><p class="rep-sub">How many reviews mentioned each kind of problem.</p><div class="rep-tiles">${lookFor}</div></section>
     </div>
@@ -899,16 +1086,16 @@ function renderAnalysis(product, recommendations) {
   const drawReviews = () => {
     const query = $("#review-search").value.trim().toLowerCase();
     const filtered = reviews.filter(review => {
-      const tags = review.sentiment_analysis?.review_tags || [];
+      const tags = reviewTags(review);
       const matchesType = activeFilter === "all" || (activeFilter === "reported" ? Boolean(tags.length) : sentimentLabel(review) === activeFilter);
       const matchesTag = !activeTag || tags.includes(activeTag);
       const matchesWord = !activeWord || matchedWords(review).has(activeWord);
       return matchesType && matchesTag && matchesWord && (!query || String(review.content || "").toLowerCase().includes(query));
     });
     const visible = filtered.slice(0, visibleLimit);
-    const narrowed = [activeTag ? REVIEW_TAG_LABELS[activeTag].toLowerCase() + "s" : "", activeWord ? `“${activeWord}”` : ""].filter(Boolean).join(", ");
+    const narrowed = [activeTag ? `“${labelNames[activeTag] || activeTag}”` : "", activeWord ? `“${activeWord}”` : ""].filter(Boolean).join(", ");
     $("#review-result-count").textContent = `Showing ${visible.length} of ${filtered.length} matching review${filtered.length === 1 ? "" : "s"}${narrowed ? ` for ${narrowed}` : ""}.`;
-    $("#analysis-review-list").innerHTML = visible.length ? visible.map(reviewCard).join("") : '<p class="rep-empty">No reviews match these filters.</p>';
+    $("#analysis-review-list").innerHTML = visible.length ? visible.map(review => reviewCard(review, labelNames)).join("") : '<p class="rep-empty">No reviews match these filters.</p>';
     const showMore = $("#show-more-reviews");
     showMore.hidden = visible.length >= filtered.length;
     showMore.textContent = `View ${Math.min(6, filtered.length - visible.length)} more reviews`;
@@ -1052,6 +1239,7 @@ async function pollJob(id, initialJob = {}) {
         const product = directLink && loaded ? state.products.find(item => productLinkIdentity(item.link) === productLinkIdentity(job.query)) || (state.products.length === 1 ? state.products[0] : null) : null;
         persistHomeScan({...job, productLink: product?.link || (directLink ? safeLink(job.query) : ""), resultLinks: loaded ? state.products.map(item => item.link).filter(safeLink) : [], resultsPending: !loaded});
         toast("Your report is ready.");
+        scanAlert("Your DeFaketive report is ready", product ? `${product.name || "Your product"}: ${view(product).headline}` : "Open DeFaketive to read it.");
         // A visitor who stayed on the analysis screen continues straight to the report.
         // Other workspace pages keep their place and expose the completed scan card.
         if (currentView() === "analyze" && loaded) {
@@ -1065,6 +1253,7 @@ async function pollJob(id, initialJob = {}) {
         finishJob();
         persistHomeScan(job);
         showSearchFeedback(job.message || "The marketplace couldn't complete this scan.", "Live scan stopped");
+        scanAlert("Your scan couldn't finish", job.message || "Open DeFaketive to try again.");
         updateBell();
         return;
       }
@@ -1087,6 +1276,7 @@ function setup() {
     ? Object.fromEntries(Object.entries(activity).filter(([link, entry]) => safeLink(link) && entry?.product?.link === link && Number.isFinite(entry.openedAt))) : {};
   const wishlist = readWorkspaceStorage("defaketive-wishlist", []);
   state.wishlist = Array.isArray(wishlist) ? [...new Set(wishlist.filter(link => safeLink(link)))] : [];
+  state.clearedAt = Number(readWorkspaceStorage("defaketive-history-cleared", 0)) || 0;
   document.querySelectorAll("[data-start-analysis]").forEach(form => form.addEventListener("submit", event => {
     event.preventDefault();
     if (!state.searchBusy) $("#search-query").value = form.querySelector("input").value.trim();
@@ -1099,8 +1289,14 @@ function setup() {
     if (scan && typeof scan === "object" && ["running", "complete", "error", "attention"].includes(scan.state)) state.homeScan = scan;
   } catch (_) {}
   $("#home-scan-action").addEventListener("click", openHomeScan);
-  $("#history-search").addEventListener("input", renderWorkspace);
-  $("#history-risk").addEventListener("change", renderWorkspace);
+  $("#pref-alerts").addEventListener("click", toggleAlerts);
+  $("#pref-clipboard").addEventListener("click", toggleClipboard);
+  $("#account-edit").addEventListener("click", openAccountEditor);
+  $("#account-form").addEventListener("submit", saveAccount);
+  $("#clear-history").addEventListener("click", () => $("#clear-dialog").showModal());
+  $("#clear-confirm").addEventListener("click", clearHistory);
+  $("#delete-account").addEventListener("click", () => { const dialog = $("#delete-dialog"); clearAuthErrors(dialog); $("#delete-form").reset(); dialog.showModal(); });
+  $("#delete-form").addEventListener("submit", deleteAccount);
   $("#report-back").addEventListener("click", () => { go("analyze"); focusProductSearch(); });
   document.querySelectorAll("[data-limit-dismiss]").forEach(button => button.addEventListener("click", () => {
     try { sessionStorage.setItem("defaketive-limit-dismissed", "1"); } catch (_) {}
@@ -1111,15 +1307,25 @@ function setup() {
     else if (state.searchBusy) go("analyze");
     else toast("No scans running.");
   });
-  // Home's cards are re-rendered often, so their clicks are handled here once.
-  $("#home").addEventListener("click", event => {
-    const save = event.target.closest("[data-save-link]"), risk = event.target.closest("[data-show-risk]"), next = event.target.closest("[data-row-next]");
-    const open = event.target.closest("[data-product-link]") || event.target.closest(".app-product")?.querySelector("[data-product-link]");
-    if (save) toggleWishlist(save.dataset.saveLink);
-    else if (risk) showHistoryFilter(risk.dataset.showRisk);
+  // Cards and rows are re-rendered often, so each page handles their clicks once.
+  const pageClick = event => {
+    const page = event.currentTarget, filter = event.target.closest("[data-history-filter]"), save = event.target.closest("[data-save-link]");
+    const risk = event.target.closest("[data-show-risk]"), next = event.target.closest("[data-row-next]");
+    const open = event.target.closest("[data-product-link]") || event.target.closest(".app-product, .app-scan-row")?.querySelector("[data-product-link]");
+    if (filter) {
+      state.historyFilter = filter.dataset.historyFilter;
+      renderWorkspace();
+      if (!filter.isConnected) page.querySelector(`.app-filter [data-history-filter="${state.historyFilter}"]`)?.focus();
+    } else if (save) {
+      const link = save.dataset.saveLink;
+      toggleWishlist(link);
+      // The list was redrawn: put the keyboard back on the same heart.
+      [...page.querySelectorAll("[data-save-link]")].find(button => button.dataset.saveLink === link)?.focus();
+    } else if (risk) showHistoryFilter(risk.dataset.showRisk);
     else if (next) { const track = next.parentElement.querySelector(".app-row-track"); track.scrollBy({left: track.clientWidth * .8, behavior: "smooth"}); }
     else if (open) openProduct(open.dataset.productLink);
-  });
+  };
+  ["#home", "#history", "#wishlist"].forEach(id => $(id).addEventListener("click", pageClick));
   document.querySelectorAll(".app-row-track").forEach(track => track.addEventListener("scroll", () => updateRowArrow(track), {passive: true}));
   const accountToggle = $("[data-account-toggle]");
   if (accountToggle) accountToggle.addEventListener("click", () => {
@@ -1230,7 +1436,7 @@ function setup() {
   const themeToggles = [$("#theme-toggle"), $("#workspace-theme-toggle")].filter(Boolean);
   const syncTheme = theme => {
     document.documentElement.dataset.theme = theme;
-    $("#appearance-select").value = theme;
+    $("#pref-dark")?.setAttribute("aria-checked", String(theme === "dark"));
     themeToggles.forEach(button => {
       button.setAttribute("aria-pressed", String(theme === "dark"));
       button.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} theme`);
@@ -1239,12 +1445,7 @@ function setup() {
     });
   };
   syncTheme((() => { try { return localStorage.getItem("defaketive-theme"); } catch (_) { return "light"; } })() === "dark" ? "dark" : "light");
-  $("#appearance-select").addEventListener("change", event => {
-    const theme = event.target.value;
-    try { localStorage.setItem("defaketive-theme", theme); } catch (_) {}
-    syncTheme(theme);
-  });
-  themeToggles.forEach(button => button.addEventListener("click", () => {
+  [...themeToggles, $("#pref-dark")].filter(Boolean).forEach(button => button.addEventListener("click", () => {
     const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     try { localStorage.setItem("defaketive-theme", nextTheme); } catch (_) {}
     syncTheme(nextTheme);

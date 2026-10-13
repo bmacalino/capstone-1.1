@@ -142,6 +142,9 @@ class SafetyBadge:
     likelihood_basis: str = "absolute_fallback"
     alert: bool = False
     alert_reason: str | None = None
+    # Set when the tier was held below the tier table's for want of a second,
+    # separate report (alert.single_report_tier).
+    tier_held_reason: str | None = None
     evidence: list[dict[str, Any]] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
@@ -160,6 +163,7 @@ class SafetyBadge:
             "likelihood_basis": self.likelihood_basis,
             "alert": self.alert,
             "alert_reason": self.alert_reason,
+            "tier_held_reason": self.tier_held_reason,
             "evidence": self.evidence,
         }
 
@@ -271,6 +275,15 @@ class ProductBadgeAggregator:
             _value(alert.get("independent_high_confidence_reports"), 2)
         )
         self.alert_minimum_severity = int(_value(alert.get("minimum_severity"), 4))
+        # The tier a rare severity-4 hazard gets below the alert's count of
+        # separate reports. Without the setting it is what the tier table
+        # says on its own, "High".
+        self.single_report_tier = str(_value(alert.get("single_report_tier"), "High"))
+        if self.single_report_tier not in taxonomy.TIER_ORDER:
+            raise ValueError(
+                f"alert.single_report_tier must be one of {taxonomy.TIER_ORDER}, "
+                f"got {self.single_report_tier!r}"
+            )
         self.independence_threshold = float(
             _value(alert.get("independence_cosine_threshold"), 0.9)
         )
@@ -534,6 +547,24 @@ class ProductBadgeAggregator:
                 f"high-confidence reports of a severity-"
                 f"{self.alert_minimum_severity} hazard"
             )
+        elif (
+            severe
+            and badge.likelihood_bin == "low"
+            and taxonomy.TIER_ORDER.index(badge.tier)
+            > taxonomy.TIER_ORDER.index(self.single_report_tier)
+        ):
+            # Below the alert's count, on a listing where such reports are
+            # rare, a severity-4 report is weak evidence: a single safety
+            # flag is wrong about as often as it is right. The tier is held
+            # until a second, separate report agrees. Reports that are common
+            # are not held back; the table already asks more of those.
+            badge.tier = self.single_report_tier
+            reports = badge.independent_high_confidence_reports
+            badge.tier_held_reason = (
+                f"{reports} separate high-confidence report{'' if reports == 1 else 's'} "
+                f"of a severity-{self.alert_minimum_severity} hazard; "
+                f"{self.alert_threshold} are needed for a safety warning"
+            )
 
         badge.evidence = [item.as_dict() for item in hazard]
         return badge
@@ -649,7 +680,8 @@ class ProductBadgeAggregator:
             (
                 POSSIBLE_SAFETY_ISSUE,
                 safety.tier == "Moderate",
-                f"Safety tier Moderate from {safety.flagged_reviews} reports",
+                safety.tier_held_reason
+                or f"Safety tier Moderate from {safety.flagged_reviews} reports",
             ),
             (
                 POSSIBLE_COUNTERFEIT_OR_DEFECT,

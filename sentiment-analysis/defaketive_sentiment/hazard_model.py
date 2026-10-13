@@ -80,6 +80,66 @@ SHIPPED_RULES = "0.4"
 # masira"), as did "kung" among the hypothetical words ("paano ito magagamit
 # kung sira").
 NEGATION_TRANSPARENT_04 = frozenset({"pong", "ho", "hong", "nga", "ngang", "namang", "agad"})
+# 13 Oct 2026, found scanning freshly-scraped reviews for more "hinde"-shaped
+# gaps: Filipino's "-ng" linker contracts onto a vowel-final word ("siya" +
+# linker -> "siyang"), and the base transparent list only has the bare forms.
+# "Wala naman po siyang sira" ("it has no damage") was wrongly flagged, same
+# as "hinde basag" was, just a different missing word. Picked only pronoun/
+# particle forms already in the base set, where the contraction can't mean
+# anything else ("bang", "kong", "talagang"...); left out "tong"/"itong"
+# ("ito" + linker) because it can also point AT the very thing a reviewer is
+# complaining about ("ayaw ko itong sira" - "I don't want this broken
+# thing" - is still a real report), and "akong" ("ako" + linker), because
+# "ako" itself is the pronoun the comment three paragraphs up already says
+# was tried and cancelled real reports. "ding" is a plain spelling variant
+# of "din", not a contraction, added here for the same reason "hinde" lives
+# in NEGATION_EXTRA_04 above.
+NEGATION_TRANSPARENT_CONTRACTIONS_04 = frozenset(
+    {"siyang", "syang", "nyang", "niyang", "kong", "bang", "talagang", "masyadong", "nilang", "kang", "ding"}
+)
+# "sana tumagal di kagad masira" (hoping it lasts, not quickly broken):
+# "kagad" is an informal spelling of "agad" (right away), which is already
+# transparent above; added after the fact with its own marker for the same
+# reason LEXICON_LEAD_VARIANTS_REVISION_2 has one.
+NEGATION_TRANSPARENT_CONTRACTIONS_04_EXTRA = frozenset({"kagad"})
+NEGATION_TRANSPARENT_CONTRACTIONS_04_EXTRA_REVISION = "f4"
+# Its own marker, separate from FOLLOWUP_13OCT_REVISION: that one was already
+# baked into a rebuilt baseline by the time this was written, so reusing it
+# would leave this change invisible to analysis_is_current.
+NEGATION_TRANSPARENT_CONTRACTIONS_04_REVISION = "f2"
+# "boses nya hinde basag" (13 Oct 2026, a false "Faulty or broken" flag the
+# owner found in the app): "hinde" is a common informal spelling of "hindi"
+# that the shared negator list (text_norm.FILIPINO_NEGATORS: "hindi", "di",
+# "ndi", "wala", "walang"...) does not cover, so it was not read as a negator
+# at all. extra_labels.py already treats "hinde" as a negator for the two
+# newer labels (NEGATED_BEFORE, NEGATED_INSIDE); rules 0.4 now reaches it for
+# safety, defect and counterfeit too.
+NEGATION_EXTRA_04 = frozenset({"hinde"})
+NEGATION_EXTRA_04_REVISION = "n1"
+# The lexicon's own "hindi X" / "di X" failure and not-original phrases
+# (risk_lexicon.tsv: "hindi gumagana", "di gumagana", "hindi legit", "hindi
+# original"...) have the same missing-spelling gap "hinde basag" had, just
+# as a MISS instead of a wrong flag, because each phrase is matched as a
+# fixed word sequence rather than a term plus a separate negation check
+# (13 Oct 2026, found while checking for more "hinde"-shaped gaps). "d" is
+# also added, but ONLY as the lead word of these specific, already-vetted
+# phrases: taglish_variants_v1.tsv documents that a general "d" -> "hindi"
+# mapping was rejected (collides with "vitamin d", "type d"), but "d
+# gumagana" or "d legit" cannot collide with that, since the rest of the
+# phrase still has to match exactly. Gated to rules "0.4" (the lead_variants
+# argument of _load_category_terms), same as every other 0.4 refinement, so
+# "0.2"/"0.3" keep matching the lexicon's terms exactly as written.
+LEXICON_LEAD_VARIANTS = {"hindi": ("hinde",), "di": ("d",), "madaling": ("madali",)}
+FOLLOWUP_13OCT_REVISION = "f1"
+# "sana hindi madali masira" (hoping it's not easily broken, 13 Oct 2026):
+# "madaling masira"/"madali malowbat" already both exist as lexicon entries,
+# but "masira" only ever got the "-ng" form ("madaling masira"), so dropping
+# the linker the way reviewers often do in casual text missed the phrase
+# entirely and fell through to the bare, unqualified "sira". Its own marker:
+# a baseline rebuild using only FOLLOWUP_13OCT_REVISION was already running
+# when this was added, so reusing that marker would make this addition
+# invisible to it.
+LEXICON_LEAD_VARIANTS_REVISION_2 = "f3"
 # "hindi rin kami naka experience ng lag", "wala pa naman ako na encounter na defective"
 NEVER_EXPERIENCED = re.compile(
     r"(?<!\w)(?:hindi|di|never|wala|walang|no|not)\s+(?:[\w']+\s+){0,5}"
@@ -102,7 +162,22 @@ AFTER_YEARS_OF_USE = re.compile(
     r"(?:years?|yrs?|taon)\s+(?:[\w']+\s+){0,2}(?:bago|before|until)\s+(?:[\w']+\s+){0,2}$",
     re.IGNORECASE,
 )
-DENIED_REASONS = frozenset({"mistaken_belief", "hypothetical", "packaging_only", "after_years_of_use"})
+DENIED_REASONS = frozenset(
+    {"mistaken_belief", "hypothetical", "packaging_only", "after_years_of_use", "durability_praise"}
+)
+# "mabigat...matagal masira. hoping na sana tumagal" (13 Oct 2026, found
+# scanning fresh reviews): "matagal/tumagal masira" (takes a while to break)
+# praises durability, the opposite of "madaling masira" (breaks easily).
+# After normalization "masira" and already-broken "sira"/"na sira" look the
+# same, and "matagal na sira" (has BEEN broken a while - a real complaint)
+# is a genuine risk this must not cancel. Narrowed to sentences that also
+# wish for the future ("sana"/"hoping"): every confirmed case had one, and
+# an already-broken complaint has no reason to. Scoped like the other DAMAGE_
+# TERMS guards (packaging_only, after_years_of_use); own marker, since a
+# baseline rebuild without it was already running when this was written.
+DURABILITY_PRAISE_WORDS = re.compile(r"(?:matagal|tumagal)\w*", re.IGNORECASE)
+DURABILITY_PRAISE_WISH = re.compile(r"(?<!\w)(?:sana|sanang|hope|hoping)(?!\w)", re.IGNORECASE)
+DURABILITY_PRAISE_REVISION = "f5"
 
 # A mild heat word ("umiinit", "mainit") is suppressed as a safety signal when
 # the sentence is about something worn, the weather or a venue, or a product
@@ -435,12 +510,18 @@ def _speculative(normalized: str, start: int, reach: int = 3) -> bool:
 
 def _load_category_terms(
     lexicon_path: Path | None = None,
+    lead_variants: bool = False,
 ) -> dict[str, list[tuple[str, int, re.Pattern[str]]]]:
     """Read the risk lexicon, keeping only the three badge categories.
 
     lexicon_path exists so research scripts can measure a candidate term list
     without editing the shipped one. Leaving it None loads the shipped lexicon,
     so the application's behaviour is unchanged.
+
+    lead_variants gates LEXICON_LEAD_VARIANTS the same way every other 0.4
+    refinement is gated: off by default, so rules "0.2"/"0.3" keep matching
+    exactly the terms as written, byte for byte, for the before/after
+    research measurements that depend on that.
     """
     model_lexicon = DefaketiveSentimentModel.__dict__  # noqa: F841 - documents intent
     from .model import LEXICON_DIR, _load_tsv
@@ -457,9 +538,12 @@ def _load_category_terms(
             severity = int(entry["severity"])
         except (TypeError, ValueError):
             severity = 1
-        pattern = re.compile(
-            r"(?<!\w)" + r"\s+".join(re.escape(part) for part in normalized.split()) + r"(?!\w)"
-        )
+        words = normalized.split()
+        variants = LEXICON_LEAD_VARIANTS.get(words[0]) if lead_variants and words else None
+        parts = [re.escape(part) for part in words]
+        if variants:
+            parts[0] = "(?:" + "|".join(re.escape(v) for v in (words[0], *variants)) + ")"
+        pattern = re.compile(r"(?<!\w)" + r"\s+".join(parts) + r"(?!\w)")
         terms[category].append((normalized, severity, pattern))
     # Longest first so a phrase wins over one of its own words.
     for category in terms:
@@ -527,7 +611,7 @@ class LexiconHazardTagger:
             )
         if learned is not None and getattr(learned, "needs_sentiment", False) and sentiment_label is None:
             raise HazardModelError("The gated hazard model needs a sentiment reading, but none was given.")
-        self.terms = _load_category_terms(lexicon_path)
+        self.terms = _load_category_terms(lexicon_path, lead_variants=rules == "0.4")
         # Disabling the filter exists for the before/after measurement only.
         self.false_friends = _load_false_friends(false_friends_path) if false_friends else []
         # Name phrases drop a single match at any severity (rules 0.3 only).
@@ -556,7 +640,12 @@ class LexiconHazardTagger:
             return text_norm.is_negated(normalized, start)
         if self.rules == "0.4":
             return text_norm.is_negated_adjacent(
-                normalized, start, extra_transparent=NEGATION_TRANSPARENT_04
+                normalized,
+                start,
+                extra_negators=NEGATION_EXTRA_04,
+                extra_transparent=NEGATION_TRANSPARENT_04
+                | NEGATION_TRANSPARENT_CONTRACTIONS_04
+                | NEGATION_TRANSPARENT_CONTRACTIONS_04_EXTRA,
             ) or bool(NEVER_EXPERIENCED.search(normalized[:start]))
         return text_norm.is_negated_adjacent(normalized, start)
 
@@ -590,6 +679,10 @@ class LexiconHazardTagger:
                 return "hypothetical"
             if any(word in MISTAKEN_BELIEF_WORDS for word in before[-4:]) and "pala" not in after:
                 return "mistaken_belief"
+            if term in DAMAGE_TERMS and DURABILITY_PRAISE_WISH.search(normalized):
+                nearby = normalized[max(0, span[0] - 25) : span[1] + 25]
+                if DURABILITY_PRAISE_WORDS.search(nearby):
+                    return "durability_praise"
         return None
 
     def _false_friend(self, raw: str) -> str | None:
@@ -961,6 +1054,15 @@ class HazardBadgeModel:
         base_version = MODEL_VERSION if rules == "0.3" else f"{MODEL_VERSION}+rules{rules}"
         if rules == "0.4" and getattr(self.tagger, "context_guards", False):
             base_version += KEYWORD_GUARDS_REVISION
+        if rules == "0.4":
+            base_version += (
+                NEGATION_EXTRA_04_REVISION
+                + FOLLOWUP_13OCT_REVISION
+                + NEGATION_TRANSPARENT_CONTRACTIONS_04_REVISION
+                + LEXICON_LEAD_VARIANTS_REVISION_2
+                + NEGATION_TRANSPARENT_CONTRACTIONS_04_EXTRA_REVISION
+                + DURABILITY_PRAISE_REVISION
+            )
         hazard_version = base_version
         if learned is not None:
             gated_rules = f"+{LEARNED_ADD_RULES}" if getattr(learned, "needs_sentiment", False) else ""
@@ -980,6 +1082,13 @@ class HazardBadgeModel:
         baselines_version = (getattr(self.aggregator, "baselines", None) or {}).get("version")
         if baselines_version:
             self.model_version = f"{self.model_version}+{baselines_version}"
+        # The verdict rules have a version too (hazard_parameters_v1.json). A
+        # change to them flags nothing differently, so it is no part of
+        # checker_version and the typical rates stand, but it does change
+        # verdicts, so saved reports must be redone.
+        parameters_version = (getattr(self.aggregator, "parameters", None) or {}).get("version")
+        if parameters_version:
+            self.model_version = f"{self.model_version}+{parameters_version}"
 
     def fingerprint(self, review: object) -> str:
         return self.sentiment.fingerprint(review)

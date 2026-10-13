@@ -92,7 +92,64 @@ class TestBadgeView(unittest.TestCase):
         summaries = {badge["category"]: badge["summary"] for badge in view["badges"]}
         self.assertEqual(summaries["safety"], "1 review mentions fire, explosion or a swollen battery")
         self.assertEqual(summaries["counterfeit"], "1 review says it may not be genuine")
-        self.assertEqual(summaries["defect"], "2 reviews say it broke or did not work")
+        self.assertEqual(summaries["defect"], "2 reviews say it is faulty or stopped working")
+
+    def test_labels_are_worded_for_shoppers(self):
+        view = badge_view({"sentiment_summary": badge_summary()})
+        self.assertEqual(
+            [(item["category"], item["label"]) for item in view["labels"]],
+            [
+                ("safety", "Safety problem"),
+                ("defect", "Faulty or broken"),
+                ("quality", "Poor quality"),
+                ("counterfeit", "Possible fake"),
+                ("not_as_described", "Not as advertised"),
+            ],
+        )
+        self.assertTrue(all(item["helper"] for item in view["labels"]))
+        # A checker that never looked for the two newer labels gets no badge for
+        # them: "not checked" must not read as "0 reviews".
+        self.assertEqual([badge["category"] for badge in view["badges"]], ["safety", "defect", "counterfeit"])
+        self.assertEqual(badge_view({})["labels"], view["labels"])
+
+    def test_the_two_informing_labels_are_shown_when_the_checker_ran_them(self):
+        summary = badge_summary(defect=1)
+        summary["reports"] = {
+            "quality": {
+                "flagged_reviews": 3,
+                "evidence": [{"text": "mahina yung tunog", "terms": [{"span": [0, 6], "category": "quality"}]}],
+            },
+            "not_as_described": {"flagged_reviews": 0, "evidence": []},
+        }
+        view = badge_view({"sentiment_summary": summary})
+        self.assertEqual(
+            [badge["category"] for badge in view["badges"]],
+            ["safety", "defect", "quality", "counterfeit", "not_as_described"],
+        )
+        quality, unlike = view["badges"][2], view["badges"][4]
+        self.assertEqual((quality["label"], quality["informs_only"]), ("Poor quality", True))
+        self.assertEqual(quality["summary"], "3 reviews say it works but is weak, flimsy or marked")
+        self.assertEqual(quality["evidence"][0]["highlights"], [[0, 6]])
+        self.assertEqual(unlike["summary"], "No reviews say it differs from the listing")
+        self.assertEqual(view["counts"]["quality"], 3)
+        self.assertFalse(view["badges"][1]["informs_only"])
+
+    def test_poor_quality_alone_is_reported_without_a_warning(self):
+        summary = badge_summary(
+            detail="No warning signs found in 40 reviews. Absence of complaints "
+            "is not proof that a product is safe."
+        )
+        summary["reports"] = {
+            "quality": {"flagged_reviews": 2, "evidence": []},
+            "not_as_described": {"flagged_reviews": 0, "evidence": []},
+        }
+        view = badge_view({"sentiment_summary": summary})
+        self.assertEqual((view["headline"], view["tone"]), ("No warning signs found", "low"))
+        self.assertEqual(
+            view["detail"],
+            "No problem reaches a warning level in 40 reviews, but 2 reviews say it works but "
+            "is weak, flimsy or marked. Read them below. This is not proof that a product is safe.",
+        )
 
     def test_too_few_reviews_still_surfaces_a_report(self):
         # "Not enough reviews to judge" must not hide a fire report among them.
@@ -203,7 +260,11 @@ class TestBadgeView(unittest.TestCase):
             ]
         )[0]
         self.assertEqual(row["Verdict"], "Reviewers report safety problems")
-        self.assertEqual((row["Safety reports"], row["Defect reports"]), (2, 1))
+        self.assertEqual((row["Safety reports"], row["Faulty or broken reports"]), (2, 1))
+        # Not checked for this product, so blank rather than 0.
+        self.assertIsNone(row["Poor quality reports"])
+        self.assertNotIn("Defect reports", row)
+        self.assertNotIn("Counterfeit reports", row)
         self.assertNotIn("Risk score", row)
         self.assertNotIn("Reliability score", row)
 
@@ -293,6 +354,138 @@ class TestDashboardUtils(unittest.TestCase):
         )
 
         self.assertEqual([item["link"] for item in recommendations], ["good"])
+
+    def test_a_product_is_read_as_the_kind_its_name_leads_with(self):
+        # Until 13 Oct 2026 the first kind in a fixed list won. On the saved
+        # products that read a laptop stand with a "monitor lifter" as a
+        # monitor and a helmet intercom headset as headphones.
+        from dashboard_utils import _recommendation_type
+
+        kinds = {
+            # Of two ordinary kinds, the one named first.
+            "Wired Dynamic Microphone hand box Speaker": "microphone",
+            "USB Type C Cable for Fast Charger": "cable",
+            # What a product comes with is not what it is.
+            "Bluetooth Speaker with Microphone": "speaker",
+            "Headset with Microphone with mic": "headphones",
+            "K12 Mini Home With 1 Microphones Professional Karaoke Speaker": "speaker",
+            # Named after another product, and never that product.
+            "Anker 25000mAh Laptop Power Bank": "powerbank",
+            "MOFOX S7 Pro Motorcycle Helmet Intercom Headset 2in1 Mic earphone": "intercom",
+            "Jiditech Laptop Stand 360° With Fan, Non-Slip Monitor Lifter for 9.7-17 Inch Laptops": "stand",
+            "10-level adjustable portable laptop universal stand suitable for Pad": "stand",
+            "Doorbell Wireless With Camera Waterproof Video Intercom": "doorbell",
+            "3D Movies VR Box Immersive Virtual Reality glasses Headset": "vr",
+            "Multi Port USB Hub Splitter for Laptop": "hub",
+            "M10 TWS Bluetooth Headphone Waterproof With Charging Case": "earbuds",
+            "Vention Cat 6 Ethernet Cable Lan Cable 20 Meter": "network cable",
+            "Essager 2.5W Apple Watch Wireless Chargers Fast Charging": "wireless charger",
+            "KASIDA Bluetooth WIFI Tuya smart lock 6 in 1 fingerprint door knob": "lock",
+            "Smart 5G Max Home WiFi": "router",
+            "Headphone Stand Aluminum Desk Holder": "stand",
+            "4in1 For samsung Galaxy A07 phone case + Tempered Glass + Camera lens film": "case",
+            # ...unless an ordinary kind is named before it: these are sold as
+            # a speaker and as earphones.
+            "Lazy People 3 in 1 BlueTooth Speaker Power bank With Phone Stand": "speaker",
+            "M25 Wireless Bluetooth Earphone with Emergency Power Bank and Digital LED Display": "earbuds",
+            # Memory and storage are listed only for a phone or a tablet.
+            "SAMSUNG A26 5G 8+256 - Black (ANKER Zolo 30w USB-C Wall Charger + BELKIN earphones)": "phone",
+            # Words that mostly describe something else.
+            "COROS PACE 4 GPS Sport Watch": "smartwatch",
+            "Original GT Bluetooth Call Smart Digital Watch for Men Waterproof Color Touch Screen": "smartwatch",
+            "Lenovo M20 Laptop Office Wired Mouse Desktop Computer": "mouse",
+            "ASUS Vivobook 15 Laptop Intel i5 with 8GB RAM": "laptop",
+            "USB C Adapter for Laptop and Monitor": "",
+            "Power Bank 20000mAh with LCD Display": "powerbank",
+            "Ultra Thin 8.5 inch LCD Writing Tablet": "",
+            "Original LCD For Oppo Realme Note 50 RMX3834 Touch Screen Replacement": "part",
+        }
+        for name, kind in kinds.items():
+            with self.subTest(name=name):
+                self.assertEqual(_recommendation_type({"name": name}), kind)
+
+    def clean_listing(self, link, name):
+        return {"link": link, "name": name, "rating": 4.8, "sentiment_summary": badge_summary()}
+
+    def test_a_part_for_another_phone_is_not_an_alternative(self):
+        # Seen on the saved products, 13 Oct 2026: the two names share "LCD
+        # Display", "Frame", "Touch Screen" and "Replacement", and the Infinix
+        # screen was offered to a shopper looking at the Oppo one.
+        oppo = self.clean_listing(
+            "oppo", "Original LCD For Oppo Realme Note 50/Note 60 RMX3834 LCD Display with Frame Touch Screen Replacement"
+        )
+        infinix = self.clean_listing(
+            "infinix", "Original LCD For Infinix Smart 8 / Smart 8 HD X6525 X6525B LCD Display Touch Screen with Frame Replacement"
+        )
+        same_phone = self.clean_listing("same", "LCD For Oppo Realme Note 50 RMX3834 Touch Screen Digitizer Assembly")
+        recommendations = rank_recommendations(oppo, [oppo, infinix, same_phone])
+        self.assertEqual([item["link"] for item in recommendations], ["same"])
+
+    def test_a_case_for_another_phone_is_not_an_alternative(self):
+        galaxy = self.clean_listing("galaxy", "4in1 For samsung Galaxy A07 phone case +Tempered Glass + Camera lens film")
+        realme = self.clean_listing("realme", "4in1 For Realme C21Y phone case anti-fall mobile phone case + tempered glass")
+        same_phone = self.clean_listing("same", "Shockproof Case for Samsung Galaxy A07 Clear Back Cover")
+        # "4in1" is on both names and is not a model: only "a07" pairs two.
+        recommendations = rank_recommendations(galaxy, [galaxy, realme, same_phone])
+        self.assertEqual([item["link"] for item in recommendations], ["same"])
+
+    def test_a_helmet_intercom_is_not_offered_for_earphones(self):
+        earphones = self.clean_listing("target", "high quality semi in ear wired headphones microphones")
+        intercom = self.clean_listing(
+            "intercom", "MOFOX S7 Pro Motorcycle Helmet Intercom Headset 2in1 Mic earphone Music Share"
+        )
+        headphones = self.clean_listing("headphones", "Wired Over Ear Headphones with Mic")
+        recommendations = rank_recommendations(earphones, [earphones, intercom, headphones])
+        self.assertEqual([item["link"] for item in recommendations], ["headphones"])
+
+    def test_a_stand_is_offered_stands_not_the_things_it_holds(self):
+        stand = self.clean_listing(
+            "target",
+            "Jiditech Laptop Stand 360° With Fan and Tablet Holder, Non-Slip Monitor Lifter, "
+            "Compatible with 9.7-17 Inch Laptops",
+        )
+        other_stand = self.clean_listing("stand", "luckluck Adjustable Laptop Stand with Phone Holder 360° Rotating")
+        monitor = self.clean_listing("monitor", "Dell 24 Inch Monitor Full HD")
+        laptop = self.clean_listing("laptop", "ASUS Vivobook 15 Laptop Intel i5")
+        recommendations = rank_recommendations(stand, [stand, monitor, laptop, other_stand])
+        self.assertEqual([item["link"] for item in recommendations], ["stand"])
+        # And a shopper looking at a laptop is not offered a stand for one.
+        self.assertEqual(rank_recommendations(laptop, [laptop, stand, other_stand]), [])
+
+    def test_the_same_word_does_not_make_two_products_alike(self):
+        # Seen when the scanned listings were tried in the pool, 13 Oct 2026.
+        charging = self.clean_listing("charging", "Type C Fast Charging Cable 120W Super Charge Braided Cable")
+        ethernet = self.clean_listing("ethernet", "Vention Cat 6 Ethernet Cable Lan Cable 20 Meter RJ45")
+        wall = self.clean_listing("wall", "Anker Zolo GaN 30W USB C Charger Foldable")
+        watch = self.clean_listing("watch", "Essager 2.5W Apple Watch Wireless Chargers Fast Charging Portable")
+        lock = self.clean_listing("lock", "KASIDA Bluetooth WIFI Tuya smart lock 6 in 1 fingerprint main door lock for home")
+        wifi = self.clean_listing("wifi", "Smart 5G Max Home WiFi")
+        everything = [charging, ethernet, wall, watch, lock, wifi]
+        for product in everything:
+            with self.subTest(product=product["link"]):
+                self.assertEqual(rank_recommendations(product, everything), [])
+
+    def test_a_product_of_no_known_kind_is_not_offered_one_of_a_known_kind(self):
+        # Seen in the filled pool, 13 Oct 2026: both names list the devices
+        # they work with, and the stylus was offered the mouse.
+        stylus = self.clean_listing("stylus", "DANYCASE Stylus Pen 3 in 1 Universal Pencil for Mobile Android ios Phone iPad Tablet")
+        mouse = self.clean_listing("mouse", "GOOJODOQ Bluetooth Wireless Mouse Slim Silent Rechargeable iPad Tablet Phone Android ios")
+        self.assertEqual(rank_recommendations(stylus, [stylus, mouse]), [])
+        self.assertEqual(rank_recommendations(mouse, [stylus, mouse]), [])
+        # Nor do the devices two unnamed kinds work with make them alike.
+        holder = self.clean_listing("holder", "Desk Holder Bracket for Mobile Android ios Phone iPad Tablet")
+        self.assertEqual(rank_recommendations(stylus, [stylus, holder]), [])
+
+    def test_words_every_gadget_uses_do_not_make_two_unnamed_kinds_alike(self):
+        # Neither name holds a kind the list knows, so only shared words can
+        # pair them, and "smart", "wireless", "portable", "mini" must not.
+        fan = self.clean_listing("fan", "Smart Wireless Portable Mini Fan Rechargeable")
+        scale = self.clean_listing("scale", "Smart Wireless Portable Mini Scale Rechargeable")
+        self.assertEqual(rank_recommendations(fan, [fan, scale]), [])
+        # Words that do name the thing still pair two listings of it.
+        fan_two = self.clean_listing("fan2", "Handheld Desk Fan 3 Speed Quiet Turbo Cooling")
+        fan_three = self.clean_listing("fan3", "Quiet Turbo Desk Fan Handheld Cooling 5 Speed")
+        self.assertEqual([item["link"] for item in rank_recommendations(fan_two, [fan_two, fan_three, scale])], ["fan3"])
 
     def test_merge_product_catalogs_normalizes_tracking_links(self):
         current = {"name": "Current", "link": "https://www.lazada.com.ph/products/item-i1.html?tracking=1"}

@@ -1674,6 +1674,145 @@ Limits.
   same message on a listing of 40,000 ratings as on one of 200 is a design
   question that was not decided here.
 
+## Table 12d. What is typical, measured again on whole reviews (12 Oct 2026)
+
+The app's Lazada scans moved from reading the product page to Lazada's own
+review feed, which lets a scan run with no browser window in about a minute
+(`lazada-scraper/README.md`, "Hidden window and the review feed"). The two
+do not give the same text. The page reader keeps the first part of a review
+written in several parts ("Sound quality: … Battery life: …"); the feed has
+all of it. One listing was scanned both ways on the same evening: the star
+levels small enough to be read whole held the same reviews (27, 34 and 18),
+45 of 199 reviews were longer in the feed scan, and the checker flagged 105
+reviews as faulty or broken against 89 (32% against 25%, weighted). The line
+of Table 12c was measured on page scans, so it does not fit a feed scan.
+
+`research/scan_baseline_listings.py` scanned the same 59 listings again with
+the app's own command and the feed. Written first: which listings; that a
+scan is kept only if its reviews came from the feed, it recorded the ratings
+per star level, and every level was collected; stop after two listings in a
+row that cannot be kept. One rule changed after six scans and before any rate
+was computed: the feed lists only the first 300 entries of a list, and a star
+level cut there now counts as collected if it holds any review (the script
+records why). All 59 were kept: 9,064 reviews, a median scan of 23 seconds,
+no login or verification asked for. Of the 295 star levels, 95 reached the
+quota of 60, 191 were read to their end, 3 had no ratings and 6 were cut at
+the feed's depth, all of them 2-star levels holding 37 to 59 reviews.
+
+`research/verdict_check.py --feed-scans` puts each through the app, which
+weights it from the per-star counts the scan carries; all 59 are usable.
+`research/build_reference_baselines.py --feed`
+(`reference_baselines_feed_report.json`) changes no choice of Table 12c.
+
+| | Faulty or broken | Possible fake |
+|---|---|---|
+| Typical listing (median), share of reviews flagged | 6.1% (95% interval 4.2%–8.0%) | 0.0% |
+| The same listings read off the page (Table 12c) | 4.7% (3.3%–6.0%) | 0.0% |
+| Mean | 8.3% | 0.4% |
+| 75th / 90th percentile | 12.2% / 19.0% | 0.07% / 1.6% |
+| Listings with none at all | 0 of 59 | 34 of 59 |
+| Listing by listing, against its page scan | higher on 42, lower on 13, same on 4 (median +0.8 points) | higher on 12, lower on 12, same on 35 |
+| Listings warned under the placeholder | 25 of 59 | 1 |
+| Listings warned under the measured line, leave-one-out | 16 of 59 | 1 |
+
+The line for faulty or broken is now 6.1%:
+`sentiment-analysis/models/reference_baselines_v1.json`, version 2.0.0. For
+fakes typical is still zero and the 2% floor remains the line. The app scans
+from the feed as of the same change (`webapp.LAZADA_REVIEWS_FROM`), and a
+test fails if the baseline and the review source are set apart. The
+baseline's version is part of the checker's version string, so saved reports
+are redone once.
+
+Verdicts for the 59 listings:
+
+| Verdict | Page scans, line of Table 12c | Feed scans, this line |
+|---|---|---|
+| No warning signs found | 31 | 25 |
+| Reviewers report fakes or defects | 5 | 6 |
+| Some reviewers mention safety concerns | 9 | 9 |
+| Reviewers report safety problems | 11 | 19 |
+| Not enough reviews to judge | 3 | 0 |
+
+Three things changed at once between the two columns, and only the one
+listing scanned both ways separates the first from the others: whole text
+instead of first parts; up to 60 reviews a star level instead of about 40
+(8,957 reviews read against 6,383; 1,784 one-star reviews against 1,181);
+and scans a month later.
+
+Limits.
+
+- **Safety warnings rose from 11 listings to 19.** The alert counts reports
+  and uses no rate, so reading half as many one-star reviews again, and all
+  of each, finds more: 61 reviews carry a safety flag, 41 did. Nothing about
+  the alert was changed for this table. This is the question Table 12c left
+  open, now with more weight: one listing in three in this set carries the
+  strongest message. It was decided the same day (Table 12e).
+- The same 59 listings as Table 12c, with the same lean to audio, chargers
+  and power banks. The rates are the checker's flags, not verified faults.
+- The feed ranks reviews differently from the page, so a star level larger
+  than its quota is a different 60. On six large listings the 2-star level
+  is 37 to 59 reviews.
+- Reports saved before this change were read off the page. They are redone
+  against this line, but their text is the page reader's, so their rates run
+  low against it. A fresh scan is the comparable one. The same holds for a
+  scan that had to fall back to reading the page.
+- The share of reviews tagged "Poor quality", which informs only, also rose:
+  the typical listing went from 0.5% to 1.7%.
+
+## Table 12e. How many separate reports make a safety warning (12 Oct 2026)
+
+Until this date one high-confidence report of a severity-4 hazard (fire,
+explosion, swelling; shock, sparks, short circuit) was a safety warning. The
+tier table gives High for severity 4 however rare, so the alert for "two
+independent reports" had nothing left to decide. Of the 19 listings warned in
+Table 12d, 14 rested on one such report, 2 on two, 1 on three and 1 on four;
+the last was warned for severity-3 reports that were common.
+
+One flag is weak evidence. On the team's labels the safety check in use
+raised 47 flags in rounds 2 and 3 and 24 were real (Table 11j, step 8), and
+one review of a mouse, "not working, grounded", had already made a listing of
+9,347 ratings red. The owner chose to ask for two separate reports: a
+severity-4 hazard that is rare on the listing and has fewer separate
+high-confidence reports than the alert's count is held at Moderate, a caution
+shown with the reviewer's words (`alert.single_report_tier` in
+`hazard_parameters_v1.json`, version 1.1.0; the tier table is not edited).
+Two separate reports warn as before, on any number of reviews.
+
+`research/safety_alert_sensitivity.py` (`safety_alert_sensitivity.json`) works
+each of the 59 feed-scanned listings out again with the app's own aggregator
+under each rule, nothing else changed. The parameter file has asked from the
+start for the changes at 1 and 3 to be reported.
+
+| Rule | Reviewers report safety problems | Some reviewers mention safety concerns | No safety verdict |
+|---|---|---|---|
+| One report (until 12 Oct 2026) | 19 | 9 | 31 |
+| **Two separate reports (in use)** | 5 | 23 | 31 |
+| Three separate reports | 3 | 25 | 31 |
+| No count: only when also common | 1 | 27 | 31 |
+
+No listing loses its safety message under any rule: the 28 with a safety
+verdict keep one, and the choice is between the stronger and the milder. With
+two, 14 of the 19 move from the warning to the caution.
+
+Limits.
+
+- This is a choice about evidence, made by the owner, not a measured optimum.
+  No labelled set says which of the 14 single reports are real; at the
+  measured rate about half would be.
+- One report can still warn where it is not rare. On a listing with 30 to
+  about 37 reviews read, one report is already "medium" on the likelihood
+  scale (its lower bound passes 0.5%) and the table's Serious stands. None of
+  the 59 listings is such a case. Severity-3 reports (overheating, smoke) are
+  judged as before, by the table alone.
+- The safety figures do not depend on the sentiment model, which is why the
+  script can use the quick one; it stops if its safety flags differ from the
+  served checker's on any listing, and they did not.
+- The rule's version joins the checker's version string, so saved reports are
+  redone once. The typical rates of Table 12d are untouched: no flag changed.
+- What the checker reads as a severity-4 report is unchanged. "Grounded" said
+  of a buzzing sound, and "kuryente" where no shock is meant, still count as
+  one.
+
 ---
 
 ## Outstanding
@@ -1705,8 +1844,11 @@ Limits.
   `train_defect_gate.py --adopt`. Adjudication of the disagreements in
   both rounds (168 + 102 defect, 79 + 24 counterfeit) is still open.
 - ~~Product-type baselines for counterfeit and defect.~~ Measured for gadgets
-  as one type (Table 12c). Still open: separate types (59 listings are too
-  few to split), and the safety alert on large listings (Table 12c, limits).
+  as one type (Table 12c; measured again on whole reviews, Table 12d). Still
+  open: separate types (59 listings are too few to split). The safety alert
+  now asks for two separate reports (Table 12e); whether what counts as a
+  severity-4 report is read correctly ("grounded", "kuryente") is not
+  settled, and no labelled set tests the new rule.
 - Normalized-text ablation for the transformer, to separate architecture from
   preprocessing.
 - Ceiling estimate from the blind 30-row sample

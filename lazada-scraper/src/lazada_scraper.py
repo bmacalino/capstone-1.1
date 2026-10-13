@@ -1,9 +1,14 @@
-"""Visible-browser scraper for public Lazada Philippines products and reviews.
+"""Chrome scraper for public Lazada Philippines products and reviews.
 
 The control flow is adapted from the MIT-licensed Shopee scraper used by this
 project. Lazada-specific URLs, selectors, parsers, and output fields are
 implemented here. The scraper never substitutes generated/sample data when a
 page cannot be parsed.
+
+Chrome can run with its window on screen, parked outside the screen, or with
+no window at all (`--window`). A hidden scan puts the window on screen by
+itself when Lazada asks for a login or a verification, and never tries to
+answer either.
 """
 
 from __future__ import annotations
@@ -94,6 +99,36 @@ class LazadaScraper:
         "?itemId={item_id}&pageSize=5&filter=0&sort=0&pageNo=1"
     )
     REVIEWS_PER_PAGE = 5
+    # How the Chrome window is shown. Measured on 12 Oct 2026
+    # (research/check_hidden_lazada.py): Lazada served a window parked outside
+    # the screen and a headless Chrome the same as a visible window, five
+    # listings each, two runs each.
+    WINDOW_MODES = ("visible", "offscreen", "headless")
+    OFFSCREEN_POSITION = (-20000, 0)
+    # Where reviews are read. The page's review section must be scrolled into
+    # view and clicked through; the feed needs neither. Measured the same day:
+    # one feed request may carry 50 reviews; `filter` 1, 3, 4 and 5 return that
+    # star level and `filter` 2 returns 1- and 2-star reviews together; ratings
+    # left without text are counted in the totals but not listed; the listed
+    # reviews come in full pages followed by an empty one. The feed lists only
+    # the first 300 entries of a list, whatever the page size, and answers
+    # with no `model` beyond them. A star level's quota of 60 is always within
+    # reach, except for 2 stars on a listing whose 1- and 2-star list is
+    # longer than that: there the 2-star reviews among its first 300 are all
+    # the feed gives (58 on the listing where this was found).
+    FEED_DEPTH = 300
+    REVIEW_SOURCES = ("page", "feed")
+    FEED_SOURCE = "lazada_review_feed"
+    REVIEW_FEED_PAGE_URL = (
+        "https://my.lazada.com.ph/pdp/review/getReviewList"
+        "?itemId={item_id}&pageSize={page_size}&filter={star}&sort=0&pageNo={page}"
+    )
+    FEED_PAGE_SIZE = 50
+    FEED_PAUSE_SECONDS = 1.0
+    FEED_TIMEOUT_SECONDS = 15
+    # What Lazada sends in place of reviews when it wants a verification.
+    FEED_VERIFICATION_MARKERS = ("_____tmd_____", '"action":"captcha"', "rgv587_flag")
+    FEED_FAILURES = ("feed_verification", "feed_unavailable")
     PRODUCT_CARD_SELECTORS = (
         '[data-qa-locator="product-item"]',
         '[data-item-id]',
@@ -147,11 +182,17 @@ class LazadaScraper:
         research_stratum: str = "",
         min_collected_reviews: int = 0,
         collection_report: str | None = None,
+        window_mode: str = "visible",
+        reviews_from: str | None = None,
     ):
         if not keyword.strip() and not product_urls and not category_urls:
             raise ValueError(
                 "Provide a keyword, Lazada category URL, or Lazada product URL"
             )
+        if window_mode not in self.WINDOW_MODES:
+            raise ValueError(f"window_mode must be one of: {', '.join(self.WINDOW_MODES)}")
+        if reviews_from is not None and reviews_from not in self.REVIEW_SOURCES:
+            raise ValueError(f"reviews_from must be one of: {', '.join(self.REVIEW_SOURCES)}")
         if rating is not None and rating not in range(1, 6):
             raise ValueError("rating must be between 1 and 5")
         if not 0 <= min_rating <= 5:
@@ -192,6 +233,11 @@ class LazadaScraper:
         self._last_pagination_stop_reason = ""
         self.cookies_file = "cookies_lazada_ph.dat"
         self._cookies_loaded = False
+        self.window_mode = window_mode
+        # A hidden scan reads the feed unless told otherwise.
+        self.reviews_from = reviews_from or ("page" if window_mode == "visible" else "feed")
+        self._browser_started = False
+        self._feed_recovered = False
 
         category_slug = ""
         if self.category_urls:
@@ -249,6 +295,11 @@ class LazadaScraper:
         self.options.add_argument("--disable-background-timer-throttling")
         self.options.add_argument("--disable-features=CalculateNativeWinOcclusion")
         self.options.add_argument("--window-size=900,700")
+        if self.window_mode == "offscreen":
+            # Chrome opens already outside the screen, so nothing flashes up.
+            self.options.add_argument(
+                "--window-position={},{}".format(*self.OFFSCREEN_POSITION)
+            )
         self.options.add_argument("--lang=en-PH")
         self.options.add_argument("--no-first-run")
         self.options.add_argument("--no-default-browser-check")
@@ -297,6 +348,68 @@ class LazadaScraper:
             return path if match and int(match.group(1)) == chrome_major else None
         except (OSError, subprocess.SubprocessError):
             return None
+
+    def _has_saved_session(self):
+        """Whether an earlier scan left a Lazada session to restore."""
+        if self.chrome_user_data_dir:
+            return True
+        try:
+            return os.path.getsize(self.cookies_file) > 0
+        except OSError:
+            return False
+
+    def _start_browser(self):
+        """Start Chrome in the current window mode."""
+        if self._browser_started:
+            # undetected-chromedriver refuses an options object it has used.
+            self.options = uc.ChromeOptions()
+            self._configure_options()
+        self._browser_started = True
+        major = self._detect_chrome_major()
+        kwargs = {
+            "options": self.options,
+            "enable_cdp_events": False,
+            "headless": self.window_mode == "headless",
+        }
+        if major:
+            kwargs["version_main"] = major
+            cached = self._cached_driver_for_major(major)
+            if cached:
+                kwargs["driver_executable_path"] = cached
+        logging.info("Starting Chrome for Lazada Philippines (window: %s)", self.window_mode)
+        driver = SafeChrome(**kwargs)
+        if self.window_mode == "visible":
+            _position_scraper_window(driver)
+        return driver
+
+    def _show_window(self, reason):
+        """Put a hidden scan on screen so the user can act; it stays there."""
+        if self.window_mode == "visible":
+            return
+        hidden_mode = self.window_mode
+        self.window_mode = "visible"
+        logging.info("Step: showing the Chrome window (%s)", reason)
+        if hidden_mode == "offscreen":
+            _position_scraper_window(self.driver)
+            return
+        # A headless Chrome has no window to show. Carry the session over to
+        # a visible one and return to the page the scan was on.
+        url = self.driver.current_url
+        if isinstance(url, bytes):
+            url = url.decode("utf-8", errors="replace")
+        self._save_cookies()
+        try:
+            self.driver.quit()
+        except Exception:
+            logging.debug("The headless Chrome did not close cleanly", exc_info=True)
+        self.driver = self._start_browser()
+        self._safe_get(self.BASE_URL, check_verification=False)
+        self._cookies_loaded = False
+        self._load_cookies()
+        if str(url or "").rstrip("/") in ("", self.BASE_URL):
+            self.driver.refresh()
+        else:
+            self._safe_get(url, check_verification=False)
 
     @classmethod
     def _normalize_product_url(cls, href):
@@ -540,6 +653,7 @@ class LazadaScraper:
         )
         if not login_needed:
             return True
+        self._show_window("Lazada needs a login")
         if not self.pause_for_verification:
             logging.info(
                 "Lazada is signed out. Log in in the opened Chrome window; "
@@ -875,7 +989,7 @@ class LazadaScraper:
         stop_reason = checkpoint.get("stop_reason")
         if product.get("review_status") == "no_reviews" or stop_reason == "no_reviews":
             return True
-        if stop_reason not in {"next_button_disabled", "empty_review_page"}:
+        if stop_reason not in {"next_button_disabled", "empty_review_page", "feed_ended", "feed_limit"}:
             return False
         context = str(checkpoint.get("context") or "")
         if context == "all":
@@ -906,6 +1020,9 @@ class LazadaScraper:
 
     def _check_verification(self):
         blocked = self._verification_detected()
+        if blocked and self.window_mode != "visible":
+            self._show_window("Lazada is asking for a login or verification")
+            blocked = self._verification_detected()
         if blocked and self.pause_for_verification:
             logging.info("Lazada login or verification detected. Complete it in Chrome.")
             input("Press Enter after the Lazada page is ready...")
@@ -1530,6 +1647,256 @@ class LazadaScraper:
         )
         return distribution
 
+    @staticmethod
+    def _feed_number(value):
+        try:
+            return int(float(value or 0))
+        except (TypeError, ValueError):
+            return 0
+
+    @classmethod
+    def _feed_date(cls, text):
+        """The feed's '31 May 2026' written the way the page writes it."""
+        value = cls._clean_text(text)
+        try:
+            return datetime.datetime.strptime(value, "%d %b %Y").date().isoformat()
+        except ValueError:
+            # Recent reviews read '2 weeks ago', on the page and in the feed.
+            return value
+
+    def _review_from_feed_item(self, item):
+        """One feed entry as the review record the page reader produces."""
+        reply = next(
+            (entry for entry in item.get("replies") or [] if isinstance(entry, dict)), {}
+        )
+        return {
+            "comment_id": str(item.get("reviewRateId") or ""),
+            "author": self._clean_text(item.get("buyerName", "")),
+            "rating": self._feed_number(item.get("rating")),
+            "time": self._feed_date(item.get("reviewTime", "")),
+            "content": self._clean_text(item.get("reviewContent", "")),
+            "variation": self._clean_text(item.get("skuInfo", "")),
+            "seller_respond": self._clean_text(
+                reply.get("reviewContent") or reply.get("content") or ""
+            ),
+            "like_count": self._feed_number(item.get("likeCount")),
+        }
+
+    def _fetch_review_feed(self, item_id, star=0, page=1):
+        """One page of the review feed, requested by the open Lazada page.
+
+        Returns (model, ""), or (None, problem): "verification" when Lazada
+        answers with its verification page, "unavailable" for anything else
+        that is not review data.
+        """
+        # A reply normally takes under half a second. Lazada can hold one back
+        # while it waits for a check on the page, so stop waiting after a while.
+        script = r"""
+        const done = arguments[arguments.length - 1];
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), arguments[1]);
+        fetch(arguments[0], {credentials: 'include', signal: controller.signal})
+          .then(response => response.text())
+          .then(text => done(text))
+          .catch(error => done(JSON.stringify({fetchError: String(error)})));
+        """
+        url = self.REVIEW_FEED_PAGE_URL.format(
+            item_id=item_id, page_size=self.FEED_PAGE_SIZE, star=star, page=page
+        )
+        try:
+            text = str(
+                self.driver.execute_async_script(script, url, self.FEED_TIMEOUT_SECONDS * 1000) or ""
+            )
+        except Exception as exc:
+            logging.warning("The Lazada review feed request failed: %s", exc)
+            return None, "unavailable"
+        try:
+            body = json.loads(text)
+        except ValueError:
+            body = None
+        model = body.get("model") if isinstance(body, dict) else None
+        if isinstance(model, dict) and isinstance(model.get("items"), list):
+            return model, ""
+        if isinstance(body, dict) and body.get("success") is True and model is None:
+            # The answer to a page past the entries the feed lists.
+            return {"items": [], "paging": {}, "beyond_depth": True}, ""
+        if any(marker in text for marker in self.FEED_VERIFICATION_MARKERS):
+            logging.warning("Lazada answered the review feed with a verification page")
+            return None, "verification"
+        logging.warning("The Lazada review feed returned no review data: %s", text[:160])
+        return None, "unavailable"
+
+    def _feed_page(self, product, item_id, star=0, page=1):
+        """A feed page; after a refusal, show the window once and ask again."""
+        model, problem = self._fetch_review_feed(item_id, star=star, page=page)
+        if model is not None or self._feed_recovered:
+            return model, problem
+        self._feed_recovered = True
+        # Nothing is worked around. The product page is reopened where the
+        # user can see it, and a check Lazada shows there is theirs to do.
+        self._show_window(f"the review feed gave no reviews: {problem}")
+        self._safe_get(product["link"])
+        return self._fetch_review_feed(item_id, star=star, page=page)
+
+    def _collect_reviews_from_feed(self, product, max_reviews, star=None):
+        """Up to `max_reviews` written reviews, of one star level if given.
+
+        Returns the reviews, why collection stopped, and the pages read.
+        """
+        if max_reviews <= 0:
+            return [], "target_reached", 0
+        item_id = self._item_id(product.get("link", ""))
+        collected, seen = [], set()
+        stop_reason, page = "", 0
+        while not stop_reason:
+            if page >= self.max_review_pages:
+                stop_reason = "max_review_pages_reached"
+                break
+            if page:
+                time.sleep(self.FEED_PAUSE_SECONDS)
+            page += 1
+            model, problem = self._feed_page(product, item_id, star=star or 0, page=page)
+            if model is None:
+                stop_reason = f"feed_{problem}"
+                break
+            if model.get("beyond_depth"):
+                # On a first page there is no list at all, which is a failure.
+                stop_reason = "feed_limit" if page > 1 else "feed_unavailable"
+                break
+            for item in model["items"]:
+                review = self._review_from_feed_item(item)
+                # The feed's 2-star list also holds 1-star reviews.
+                if star is not None and review["rating"] != star:
+                    continue
+                if not review["content"] and not self.include_empty:
+                    continue
+                identity = review["comment_id"] or (
+                    review["author"], review["time"], review["content"], review["rating"]
+                )
+                if identity in seen:
+                    continue
+                seen.add(identity)
+                if star is not None:
+                    review["source_rating_filter"] = star
+                collected.append(review)
+                if len(collected) >= max_reviews:
+                    stop_reason = "target_reached"
+                    break
+            total_pages = self._feed_number((model.get("paging") or {}).get("totalPages"))
+            if not stop_reason and (not model["items"] or (total_pages and page >= total_pages)):
+                stop_reason = "feed_ended"
+            elif not stop_reason and page * self.FEED_PAGE_SIZE >= self.FEED_DEPTH:
+                # The list goes on, but the feed lists no more of it.
+                stop_reason = "feed_limit"
+        if stop_reason != "target_reached":
+            logging.info(
+                "Lazada review feed stopped after page %s with %s review(s): %s",
+                page,
+                len(collected),
+                stop_reason,
+            )
+        return collected, stop_reason, page
+
+    def _collect_by_star_from_feed(self, product, distribution):
+        """`_collect_by_star`, with each star level read from the feed.
+
+        Returns False when the feed stopped answering, so that the page can
+        be read instead.
+        """
+        reviews = []
+        applied_filters = []
+        star_collection = {}
+        for star in self.RATING_COLLECTION_ORDER:
+            listed = (distribution or {}).get(str(star))
+            if listed == 0:
+                applied_filters.append(star)
+                star_collection[str(star)] = {
+                    "listed": 0, "collected": 0, "stop_reason": "none_listed", "complete": True,
+                }
+                continue
+            logging.info("Step: collecting %s-star reviews", star)
+            star_reviews, stop_reason, pages = self._collect_reviews_from_feed(
+                product, self.star_limit_per_type, star=star
+            )
+            if stop_reason in self.FEED_FAILURES:
+                return False
+            applied_filters.append(star)
+            reviews.extend(star_reviews)
+            star_collection[str(star)] = {
+                "listed": listed,
+                "collected": len(star_reviews),
+                "stop_reason": stop_reason,
+                # A level cut at the feed's depth is the first of its reviews
+                # in the feed's order, like a quota, only fewer. It can be
+                # weighted as long as it holds any review at all.
+                "complete": stop_reason in {"target_reached", "feed_ended"}
+                or (stop_reason == "feed_limit" and bool(star_reviews)),
+            }
+            self._checkpoint_reviews(
+                product, reviews, pages, stop_reason=stop_reason, context=str(star)
+            )
+        product["applied_rating_filters"] = applied_filters
+        product["star_collection"] = star_collection
+        product["sampling_method"] = "stratified_by_star"
+        product["star_quota"] = self.star_limit_per_type
+        # Not the order the page shows: the two share reviews but rank them
+        # differently, so a level larger than the quota is sampled differently.
+        product["review_order"] = "review_feed_default_within_star"
+        product["comments"] = self._order_reviews_low_to_high(reviews)
+        product["review_status"] = "complete"
+        return True
+
+    def _scrape_reviews_from_feed(self, product):
+        """Collect this product's reviews from the feed. False: read the page."""
+        item_id = self._item_id(product.get("link", ""))
+        if not item_id:
+            logging.warning("No Lazada item id in %s; the feed cannot be read", product.get("link"))
+            return False
+        self._feed_recovered = False
+        model, _problem = self._feed_page(product, item_id)
+        if model is None:
+            return False
+        ratings = model.get("ratings") or {}
+        distribution = self._star_distribution_from_feed(ratings, None)
+        if distribution is None:
+            logging.warning("The Lazada review feed gave no usable per-star counts")
+            return False
+        product["rating"] = self._parse_rating(ratings.get("average")) or product.get("rating", 0.0)
+        product["total_rating"] = sum(distribution.values())
+        product["review_star_distribution"] = distribution
+        product["review_star_distribution_source"] = self.FEED_SOURCE
+        logging.info(
+            "Step: ratings per star 1-5: %s",
+            ", ".join(str(distribution[str(star)]) for star in range(1, 6)),
+        )
+        if not self._qualify_product(product):
+            return True
+        if product["total_rating"] == 0:
+            self._record_no_reviews(product)
+            return True
+        product["review_status"] = "collecting"
+        product["review_source"] = self.FEED_SOURCE
+        if self.all_star_types:
+            return self._collect_by_star_from_feed(product, distribution)
+        reviews, stop_reason, pages = self._collect_reviews_from_feed(
+            product, self.review_limit, star=self.rating
+        )
+        if stop_reason in self.FEED_FAILURES:
+            return False
+        if not reviews:
+            # Ratings, but none of them with text.
+            self._record_no_reviews(product)
+            return True
+        self._checkpoint_reviews(
+            product, reviews, pages, stop_reason=stop_reason, context=str(self.rating or "all")
+        )
+        if self.rating is None:
+            product["review_order"] = "review_feed_default"
+            product["sampling_method"] = "marketplace_default_unfiltered"
+            product["sampling_representative"] = None
+        product["review_status"] = "complete"
+        return True
+
     def _collect_by_star(self, product):
         """Collect up to `star_limit_per_type` written reviews per star level.
 
@@ -1829,12 +2196,29 @@ class LazadaScraper:
         )
         product["img"] = product.get("img") or self._product_image_url(self.driver)
 
+        if self.reviews_from == "feed":
+            if self._scrape_reviews_from_feed(product):
+                return
+            logging.info("The review feed gave nothing usable; reading reviews from the page")
+            if product.pop("review_source", None):
+                # Feed reviews carry ids and page reviews do not, so the two
+                # would not be recognised as the same review.
+                product["comments"] = []
+        elif product.get("review_source") == self.FEED_SOURCE:
+            # A saved scan being continued from the page: same reason.
+            product.pop("review_source")
+            product["comments"] = []
+
         reviews_loaded = self._scroll_to_reviews()
         if not reviews_loaded:
             # Lazada's review list intermittently shows a loading spinner that
             # never resolves (seen 27 Sept 2026 on a listing that loaded fine
             # minutes earlier and later). Reload once before giving up.
             logging.info("Reviews did not load; reloading the product page once")
+            # Lazada can also hold the list back for a check it shows on the
+            # page itself (seen 12 Oct 2026 with a signed-out browser), which
+            # nobody can answer in a hidden window.
+            self._show_window("the review section did not load")
             self._safe_get(product["link"])
             reviews_loaded = self._scroll_to_reviews()
         if not reviews_loaded:
@@ -1924,16 +2308,14 @@ class LazadaScraper:
             self._record_no_reviews(product)
 
     def execute(self):
-        major = self._detect_chrome_major()
-        kwargs = {"options": self.options, "enable_cdp_events": False, "headless": False}
-        if major:
-            kwargs["version_main"] = major
-            cached = self._cached_driver_for_major(major)
-            if cached:
-                kwargs["driver_executable_path"] = cached
-        logging.info("Starting Chrome for Lazada Philippines")
-        self.driver = SafeChrome(**kwargs)
-        _position_scraper_window(self.driver)
+        if self.window_mode != "visible" and not self._has_saved_session():
+            logging.info(
+                "No saved Lazada session yet: this scan uses a visible window so you can log in."
+            )
+            self.window_mode = "visible"
+            self.options = uc.ChromeOptions()
+            self._configure_options()
+        self.driver = self._start_browser()
         try:
             self._prepare_session()
             if self.product_urls:
@@ -2042,6 +2424,8 @@ def build_parser():
     parser.add_argument("--research-stratum", default="", help="Research cohort stratum stored with every product")
     parser.add_argument("--min-collected-reviews", type=int, default=0, help="Minimum usable written reviews required after collection")
     parser.add_argument("--collection-report", help="Research collection-quality JSON report")
+    parser.add_argument("--window", choices=LazadaScraper.WINDOW_MODES, default="visible", help="Chrome window: visible, offscreen (parked outside the screen) or headless (no window)")
+    parser.add_argument("--reviews-from", choices=LazadaScraper.REVIEW_SOURCES, help="Read reviews from the page or from Lazada's review feed (default: page when visible, feed when hidden)")
     return parser
 
 
@@ -2072,6 +2456,8 @@ def main():
         research_stratum=args.research_stratum,
         min_collected_reviews=args.min_collected_reviews,
         collection_report=args.collection_report,
+        window_mode=args.window,
+        reviews_from=args.reviews_from,
     )
     scraper.execute()
 

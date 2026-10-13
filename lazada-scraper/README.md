@@ -1,9 +1,10 @@
 # Lazada Philippines Product and Review Scraper
 
 This project adapts the working control flow of the Shopee Philippines scraper
-for `lazada.com.ph`. It opens a visible Chrome window, extracts real public
-product data and written reviews, and saves restart-safe JSON compatible with
-the DeFaketive sentiment model.
+for `lazada.com.ph`. It drives Chrome (on screen by default, or hidden: see
+"Hidden window and the review feed"), extracts real public product data and
+written reviews, and saves restart-safe JSON compatible with the DeFaketive
+sentiment model.
 
 The scraper never returns generated or sample products when extraction fails.
 Instead, it logs the failure and saves page HTML and a screenshot under
@@ -126,11 +127,86 @@ verifies that returned review ratings match each requested filter. If Lazada's
 current widget does not apply a filter reliably, collection stops and the
 product receives `review_filter_warning`; mismatched results are discarded.
 
+## Hidden window and the review feed
+
+```powershell
+python -m src.lazada_scraper --product-url "https://www.lazada.com.ph/products/example-i123-s456.html" `
+  --all-star-types --star-limit-per-type 60 --window headless
+```
+
+`--window` chooses how Chrome is shown:
+
+- `visible` (default): on screen.
+- `offscreen`: the normal window, parked outside the screen. A Chrome icon
+  stays on the taskbar.
+- `headless`: no window at all.
+
+A hidden scan puts the window on screen by itself when Lazada asks for a login
+or a verification, or when the reviews will not load, and stays visible for
+the rest of that scan. A headless
+scan does this by reopening in a visible Chrome with the same session. A first
+run with no saved session starts visible. The scraper answers neither a login
+nor a verification.
+
+`--reviews-from` chooses where reviews are read. `page` clicks through the
+review section as before. `feed` asks the review feed
+(`my.lazada.com.ph/pdp/review/getReviewList`) from inside the open product
+page, and is the default for a hidden window. If the feed answers with a
+verification page or anything else that is not reviews, the window is shown,
+the product page is reopened, the feed is asked once more, and after that the
+page is read instead. A request to the feed from outside a browser gets the
+verification page; the scraper does not attempt that.
+
+Measured on 12 Oct 2026 (`research/check_hidden_lazada.py`, Chrome 154):
+
+- Both hidden modes loaded five listings and their feed with no verification,
+  two runs each. A headless Chrome names itself as headless to Lazada.
+- One feed request carries up to 50 reviews. Feed `filter` 1, 3, 4 and 5
+  return that star level; `filter` 2 returns 1- and 2-star reviews together,
+  so reviews are kept by their own rating. Ratings left without text are
+  counted in the totals but not listed, and the listed reviews are followed by
+  an empty page.
+- The feed lists only the first 300 entries of a list, whatever the page size
+  (page 6 of 50 is served, page 7 comes back with no `model`; a page size
+  above 50 returns nothing). A quota of 60 is always within reach, except for
+  2 stars on a listing whose 1- and 2-star list is longer than 300: the 2-star
+  reviews among its first 300 entries are all the feed gives (58 on a listing
+  with 41,681 ratings). That level is recorded with stop reason `feed_limit`
+  and counts as collected if it holds any review. No other feed setting was
+  found that returns 2-star reviews alone.
+- One listing, 60 reviews per star level: visible window and page, 136 s;
+  headless and page, 71 s with the same reviews in the same order; headless
+  and feed, 27 s.
+- Page and feed list the same reviews in a star level small enough to be read
+  whole (27, 34 and 18 on that listing), but not the same text: the page
+  reader keeps the first part of a review written in several parts ("Sound
+  quality: … Battery life: …"), the feed has all of it. 45 of 199 reviews
+  differed that way. The feed also ranks reviews differently, so a star level
+  larger than the quota is sampled differently.
+
+- A scan started with no saved session opened visibly, as intended. Left
+  signed out, its second feed request got no reply while a captcha was
+  showing in the window. The scan stopped waiting and turned to the page,
+  whose review section loaded after one reload about four minutes later, and
+  it then finished. Whether the captcha was answered in between was not
+  recorded. Every other run that day used the saved login and met no check.
+
+- All 59 baseline listings were scanned from the feed in one run
+  (`research/scan_baseline_listings.py`): 9,064 reviews, a median of 23
+  seconds a listing, no login or verification asked for.
+
+For those two reasons a feed scan and a page scan of one listing are not
+interchangeable. The web app scans from the feed, and its "what is typical"
+line was measured on feed scans (`research/RESULTS_TABLES.md`, Table 12d). A feed scan records `review_source: "lazada_review_feed"`,
+`review_order: "review_feed_default_within_star"` and a `comment_id` on every
+review; reviews of one kind are dropped before a product is continued with
+the other.
+
 ## Manual verification
 
 When Lazada shows login or verification:
 
-1. Complete it manually in the visible Chrome window.
+1. Complete it manually in the Chrome window (a hidden scan shows it for this).
 2. Return to PowerShell.
 3. Press Enter when prompted.
 

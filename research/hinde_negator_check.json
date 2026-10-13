@@ -1,0 +1,20 @@
+{
+ "generated_at": "2026-10-13T03:27:02+00:00",
+ "checker": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "labelled_sentences": 6020,
+ "removed_wrong": 1,
+ "removed_right": 0,
+ "added_right": 0,
+ "added_wrong": 0,
+ "rule": "keep if no flag is added and removed_right <= removed_wrong / 3",
+ "meets_rule": true,
+ "changed": [
+  {
+   "round": "9",
+   "category": "defect",
+   "labelled_true": false,
+   "change": "removed_wrong",
+   "text": "pero hinde sira talaga tas di nakikipagusap yung seller"
+  }
+ ]
+}

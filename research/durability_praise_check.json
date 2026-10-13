@@ -1,0 +1,24 @@
+{
+ "generated_at": "2026-10-13T09:29:57+00:00",
+ "labelled_sentences": 5384,
+ "removed_wrong": 2,
+ "removed_right": 0,
+ "added_right": 0,
+ "added_wrong": 0,
+ "rule": "keep if no flag is added and removed_right <= removed_wrong / 3",
+ "meets_rule": true,
+ "changed": [
+  {
+   "round": "3",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "ang gandaaaa sana matagal tong masira i will order again soooonnm thank you seller thank you so much"
+  },
+  {
+   "round": "3",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "maganda pag kakaseal kaya lg hindi cia long lasting at walang kasamang spatula mabilis ding naideliver maganda pag kakapack nya hoping na matagal masira tnx seller"
+  }
+ ]
+}

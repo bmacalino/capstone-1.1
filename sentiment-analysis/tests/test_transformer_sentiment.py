@@ -128,6 +128,12 @@ class TestVersionComposition(unittest.TestCase):
         self.assertEqual(model.checker_version, f"{hazard_model.MODEL_VERSION}+{hazard_model.COUNTERFEIT_RULES}+fake-sentiment-1")
         # The measured typical rates, when installed, join the version as well.
         self.assertTrue(model.model_version.startswith(model.checker_version))
+        # So does the version of the verdict rules. It is no part of the
+        # checker's own version: a rule change flags nothing differently, so
+        # the typical rates stand, but saved verdicts must be redone.
+        rules = model.aggregator.parameters["version"]
+        self.assertTrue(model.model_version.endswith(f"+{rules}"))
+        self.assertNotIn(rules, model.checker_version)
         self.assertEqual(model.analyze("ok naman")["model_version"], model.model_version)
 
 

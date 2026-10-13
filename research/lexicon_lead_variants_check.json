@@ -1,0 +1,76 @@
+{
+ "generated_at": "2026-10-13T04:34:52+00:00",
+ "labelled_sentences": 6020,
+ "removed_wrong": 0,
+ "removed_right": 0,
+ "added_right": 9,
+ "added_wrong": 0,
+ "added_precision": 1.0,
+ "rule": "keep if nothing is removed and at least 70% of added flags are right",
+ "meets_rule": true,
+ "changed": [
+  {
+   "round": "1",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "para sakin d maganda packaging walang doble kaya siguro d gumagana ung isang buds i tried to get a refund dahil bayad na sya bago pa i deliver samin dami ko sinubmit na evidence picture para mkita nla"
+  },
+  {
+   "round": "3",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "bulok hinde gumagana 4hours ng naka charge wala parin nangyari hayyysss naka kabwesit pag ganito ang pinapadala sayo dapat sinusuri ng mabuti kung gumagana o hinde sayang lang yung pera na pinang bayad ko hinde na pakinabangan"
+  },
+  {
+   "round": "6",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "Yung bluetooth option hinde nagana, ayaw mag connect sa phone ko."
+  },
+  {
+   "round": "6",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "nkakadismaya po kasi ung usb charger umiinit po xa agad, tapos usb cord po d gumagana lahat huhu ibanalik ng mga customers q iba cord po ung pinadala nyo sakto ung payment q tapos ganito po matatanggap ko"
+  },
+  {
+   "round": "6",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "d gumagana ang daya nman,be fair nman guys,,,kahit mura lng yan binayaran pa rin namin yan"
+  },
+  {
+   "round": "8",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "bkit d gumagana pag chinacharge pakireply nmn irefund ko sana"
+  },
+  {
+   "round": "8",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "pangit pala d gumagana sa celpone ko sa ibang celpone lng pwede pangit"
+  },
+  {
+   "round": "8",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "Hinde gumagana yung D-pad sa mga games at emulator pag wala ng Octupos na app 😔"
+  },
+  {
+   "round": "9",
+   "category": "defect",
+   "labelled_true": true,
+   "change": "added_right",
+   "text": "3 Star lang yung rate ko kasi d gumana yung isang speaker."
+  }
+ ]
+}

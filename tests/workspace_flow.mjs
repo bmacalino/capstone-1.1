@@ -40,7 +40,6 @@ function harness(storage = new Map(), hash = "") {
   // These controls are rendered by renderAnalysis, rather than the HTML shell.
   for (const id of ["review-search", "review-rating", "review-result-count", "analysis-review-list", "show-more-reviews"]) ids.set(id, new Element());
   ids.get("review-rating").value = "all";
-  ids.get("history-risk").value = "all";
   ids.get("filter-risk").value = "all";
   ids.get("filter-platform").value = "all";
   ids.get("product-count").value = "6";
@@ -184,7 +183,8 @@ await check("A guest's wishlist and recent activity survive a fresh controller s
   assert.match(reloaded.ids.get("wishlist-list").innerHTML, /Actual charger/);
   assert.doesNotMatch(reloaded.ids.get("wishlist-list").innerHTML, /Actual headphones/);
   reloaded.evaluate('toggleWishlist(' + JSON.stringify(first.link) + ')');
-  assert.match(reloaded.ids.get("wishlist-list").innerHTML, /Keep a product in mind/);
+  assert.match(reloaded.ids.get("wishlist-list").innerHTML, /Start building your shortlist/);
+  assert.equal(reloaded.ids.get("wishlist-count").textContent, "0 products saved");
 });
 await check("History filters and Home numbers use real records and meaningful empty states", () => {
   const app = harness();
@@ -192,16 +192,123 @@ await check("History filters and Home numbers use real records and meaningful em
   assert.match(app.ids.get("home-recent").innerHTML, /Your first analysis starts here/);
   assert.equal(app.ids.get("home-alert").hidden, true);
   app.state.catalogProducts = [first, second];
-  app.ids.get("history-risk").value = "safety";
-  app.evaluate("renderWorkspace()");
+  app.evaluate('showHistoryFilter("safety")');
+  assert.equal(app.window.location.hash, "#history");
   assert.match(app.ids.get("history-list").innerHTML, /Actual charger/);
   assert.doesNotMatch(app.ids.get("history-list").innerHTML, /Actual headphones/);
+  assert.equal(app.ids.get("history-count").textContent, "1 result");
+  assert.match(app.ids.get("history-foot").textContent, /Showing 1 of 2 scans · Your 100 most recent scans are kept/);
+  assert.match(app.ids.get("history-stats").innerHTML, /<b>2<\/b><span>Total scans.*<b>1<\/b><span>No warnings.*<b>0<\/b><span>Caution.*<b>1<\/b><span>Safety reports/);
   assert.match(app.ids.get("home-stats").innerHTML, /<b>2<\/b><span>Products analyzed/);
   assert.match(app.ids.get("home-stats").innerHTML, /<b>24<\/b><span>Reviews analyzed/);
   assert.match(app.ids.get("home-stats").innerHTML, /<b>1<\/b><span>With warnings/);
-  app.ids.get("history-search").value = "no such product";
-  app.evaluate("renderWorkspace()");
-  assert.match(app.ids.get("history-list").innerHTML, /No reports match/);
+  app.evaluate('state.historyFilter = "caution"; renderWorkspace()');
+  assert.match(app.ids.get("history-list").innerHTML, /No scans match this filter/);
+});
+await check("History groups scans by day and never uses the words Safe or Avoid", () => {
+  const app = harness();
+  const now = Date.now(), day = 86400000;
+  const older = product("https://shopee.ph/cable-i.5.5", "Actual cable", "caution");
+  app.state.catalogProducts = [first, second, older];
+  app.state.activity = {
+    [first.link]: {product: first, openedAt: now},
+    [second.link]: {product: second, openedAt: now - day},
+    [older.link]: {product: older, openedAt: now - 40 * day},
+  };
+  app.evaluate('go("history")');
+  const list = app.ids.get("history-list").innerHTML;
+  const labels = [...list.matchAll(/<h2>([^<]+)<\/h2><span>(\d+ scans?)<\/span>/g)].map(match => match[1]);
+  assert.equal(labels.length, 3);
+  assert.deepEqual(labels.slice(0, 2), ["Today", "Yesterday"]);
+  assert.match(list, /class="app-chip safety">Safety reports<.*class="app-chip clear">No warnings<.*class="app-chip caution">Caution</);
+  assert.doesNotMatch(list, />(Safe|Avoid)</);
+});
+await check("Clearing a guest's history empties History and Home but keeps the wishlist", async () => {
+  const app = harness();
+  app.state.catalogProducts = [first, second];
+  app.evaluate('toggleWishlist(' + JSON.stringify(first.link) + ')');
+  app.evaluate('go("history")');
+  assert.match(app.ids.get("history-list").innerHTML, /Actual headphones/);
+  await app.evaluate("clearHistory()");
+  assert.match(app.ids.get("history-list").innerHTML, /No scans yet/);
+  assert.match(app.ids.get("home-stats").innerHTML, /<b>0<\/b><span>Products analyzed/);
+  assert.match(app.ids.get("wishlist-list").innerHTML, /Actual charger/);
+  // It stays cleared after a reload, and a product opened afterwards comes back.
+  const reloaded = harness(app.storage);
+  reloaded.state.catalogProducts = [first, second];
+  reloaded.evaluate('go("history")');
+  assert.match(reloaded.ids.get("history-list").innerHTML, /No scans yet/);
+  reloaded.evaluate('rememberProduct(' + JSON.stringify(second) + ')');
+  reloaded.evaluate("renderWorkspace()");
+  assert.match(reloaded.ids.get("history-list").innerHTML, /Actual headphones/);
+  assert.doesNotMatch(reloaded.ids.get("history-list").innerHTML, /Actual charger/);
+});
+await check("Clearing a signed-in user's history asks the account, and keeps what it answers", async () => {
+  const app = harness();
+  app.state.user = {name: "Juan Dela Cruz", email: "juan@example.com"};
+  app.state.catalogProducts = [first, second];
+  app.context.respond = async (url, options) => ok({activity: {}, wishlist: [], clearedAt: JSON.parse(options.body).clearedAt});
+  await app.evaluate("clearHistory()");
+  const call = app.requests.at(-1);
+  assert.equal(call.options.method + " " + call.url, "DELETE /api/me/activity");
+  assert.ok(app.state.clearedAt > 0);
+  assert.match(app.ids.get("history-list").innerHTML, /No scans yet/);
+  assert.equal(app.storage.has("defaketive-history-cleared"), false);
+});
+await check("Wishlist shows clean picks you haven't saved and products two or more users saved", async () => {
+  const app = harness();
+  const pick = product("https://shopee.ph/pick-i.7.7", "Clean pick");
+  const loved = product("https://shopee.ph/loved-i.8.8", "Loved by users");
+  const once = product("https://shopee.ph/once-i.9.9", "Saved once");
+  app.context.respond = async url => ok(url === "/api/picks" ? {products: [pick, first]} : {products: [{product: loved, saves: 3}, {product: once, saves: 1}]});
+  app.state.catalogProducts = [first];
+  app.evaluate('toggleWishlist(' + JSON.stringify(first.link) + ')');
+  app.evaluate('go("wishlist")');
+  await settle();
+  assert.equal(app.ids.get("wishlist-count").textContent, "1 product saved");
+  assert.match(app.ids.get("wishlist-picks").innerHTML, /Clean pick/);
+  assert.doesNotMatch(app.ids.get("wishlist-picks").innerHTML, /Actual charger/);
+  assert.match(app.ids.get("wishlist-popular").innerHTML, /Loved by users/);
+  assert.match(app.ids.get("wishlist-popular").innerHTML, /3 saves/);
+  assert.doesNotMatch(app.ids.get("wishlist-popular").innerHTML, /Saved once/);
+  assert.equal(app.ids.get("wishlist-popular-row").hidden, false);
+  // Saving a pick moves it into your own list.
+  app.evaluate('toggleWishlist(' + JSON.stringify(pick.link) + ')');
+  assert.match(app.ids.get("wishlist-list").innerHTML, /Clean pick/);
+  assert.equal(app.ids.get("wishlist-picks-row").hidden, true);
+});
+await check("Scan alerts and clipboard fill stay off until the browser allows them", async () => {
+  const app = harness();
+  // No Notification support in this browser: the switch explains itself and stays off.
+  await app.evaluate("toggleAlerts()");
+  assert.equal(app.ids.get("pref-alerts-note").hidden, false);
+  assert.equal(app.evaluate("alertsOn()"), false);
+  const shown = [];
+  app.context.Notification = class { constructor(title, options) { shown.push([title, options.body]); } static permission = "default"; static async requestPermission() { return this.answer; } };
+  app.context.Notification.answer = "denied";
+  await app.evaluate("toggleAlerts()");
+  assert.equal(app.evaluate("alertsOn()"), false);
+  assert.match(app.ids.get("pref-alerts-note").textContent, /blocking notices/);
+  app.context.Notification.answer = "granted";
+  await app.evaluate("toggleAlerts()");
+  app.context.Notification.permission = "granted";
+  assert.equal(app.evaluate("alertsOn()"), true);
+  app.evaluate('scanAlert("Your DeFaketive report is ready", "Actual charger: Reviewers report safety problems")');
+  assert.deepEqual(shown, [["Your DeFaketive report is ready", "Actual charger: Reviewers report safety problems"]]);
+  // The clipboard fills the scan bar with a supported product link, and nothing else.
+  let copied = "hello there";
+  app.context.navigator = {clipboard: {readText: async () => copied}};
+  await app.evaluate("toggleClipboard()");
+  assert.equal(app.evaluate('preference("clipboard")'), true);
+  app.evaluate('go("home")');
+  await settle();
+  assert.equal(app.ids.get("home-product-query").value, "");
+  copied = "https://www.lazada.com.ph/products/cable-i123.html";
+  app.evaluate('go("home")');
+  await settle();
+  assert.equal(app.ids.get("home-product-query").value, copied);
+  assert.equal(app.state.searchBusy, false);
+  assert.equal(app.requests.length, 0);
 });
 await check("A listed product without a verdict count shows how many reviews were collected", () => {
   // Lists arrive without the reviews themselves: only their number.

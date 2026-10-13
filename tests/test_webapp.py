@@ -124,7 +124,8 @@ class TestWebApp(unittest.TestCase):
         page = self.client.get("/")
         overview = self.client.get("/api/admin/overview")
 
-        self.assertIn(b"Analysis history", page.data)
+        self.assertIn(b"Scan History", page.data)
+        self.assertNotIn(b"Analysis history", page.data)
         self.assertIn(b'data-view="analyze"', page.data)
         self.assertNotIn(b'data-view="admin"', page.data)
         self.assertNotIn(b"Shopping insights", page.data)
@@ -202,7 +203,7 @@ class TestWebApp(unittest.TestCase):
         flagged = overview.json["flagged"]
         self.assertEqual(len(flagged), 1)
         # Three safety reports outnumber the one defect report.
-        self.assertEqual(flagged[0]["Main issue"], "Safety")
+        self.assertEqual(flagged[0]["Main issue"], "Safety problem")
         self.assertEqual(flagged[0]["Verdict"], "Reviewers report safety problems")
 
     def test_a_product_with_fire_reports_is_served_as_a_safety_warning(self):
@@ -239,7 +240,11 @@ class TestWebApp(unittest.TestCase):
         response.close()
 
         # The report quotes what reviewers said and explains why there is no score.
-        self.assertIn(b"Three checks, in their own words", script)
+        self.assertIn(b"Each check, in their own words", script)
+        # Labels are worded once, on the server (dashboard_utils.BADGE_COPY); the page names none.
+        for retired in (b"Genuine product", b"Works as expected", b"Defect report", b"REVIEW_TAG_LABELS", b"CHECK_LABELS"):
+            self.assertNotIn(retired, script)
+        self.assertIn(b"review_extra_tags", script)
         self.assertIn(b"Why you see reviews, not a score", script)
         self.assertIn(b"no flags is not proof of safety", script)
         self.assertIn(b"function highlightSpans", script)
@@ -314,6 +319,39 @@ class TestWebApp(unittest.TestCase):
         ):
             self.assertNotIn(claim, page)
 
+    def test_history_wishlist_and_settings_use_the_new_screens(self):
+        page = self.client.get("/").get_data(as_text=True)
+        script_response = self.client.get("/static/js/app.js")
+        script = script_response.get_data(as_text=True)
+        script_response.close()
+
+        # History: honest filter chips instead of the old search box and drop-down.
+        for kind in ("all", "clear", "caution", "safety", "unknown"):
+            self.assertIn(f'data-history-filter="{kind}"', page)
+        for gone in ('id="history-search"', 'id="history-risk"', 'id="appearance-select"', "Saved on this browser."):
+            self.assertNotIn(gone, page)
+        self.assertIn("Your 100 most recent scans are kept", script)
+        # Wishlist: your own saves, clean products, and what users save most.
+        for section in ('id="wishlist-list"', 'id="wishlist-picks"', 'id="wishlist-popular"'):
+            self.assertIn(section, page)
+        self.assertIn("/api/picks", script)
+        self.assertIn("/api/wishlist/popular", script)
+        self.assertIn("Number(item.saves) >= 2", script)
+        # Settings: switches that do something, and no language choice.
+        for control in ('id="pref-alerts"', 'id="pref-dark"', 'id="pref-clipboard"', 'id="account-edit"',
+                        'id="clear-history"', 'id="delete-account"', 'id="account-dialog"', 'id="delete-dialog"'):
+            self.assertIn(control, page)
+        self.assertEqual(page.count('role="switch"'), 3)
+        self.assertNotIn("Language", page)
+        self.assertNotIn("Push Notifications", page)
+        self.assertIn('new Notification(title', script)
+        self.assertIn("navigator.clipboard.readText()", script)
+        # The clipboard only fills the scan bar. It must never start a scan.
+        fill = script[script.index("async function fillFromClipboard"):script.index("function openAccountEditor")]
+        self.assertNotIn("search(", fill)
+        self.assertNotIn("requestSubmit", fill)
+        self.assertNotIn("pollJob", fill)
+
     def test_product_link_marketplace_overrides_selected_marketplace(self):
         job = {
             "id": "temu-job",
@@ -352,7 +390,103 @@ class TestWebApp(unittest.TestCase):
         self.assertEqual(job["review_limit"], 25)
         self.assertEqual(job["stage_label"], "Collect reviews")
         self.assertEqual(job["progress"], 18)
+        self.assertFalse(job["needs_you"])
         thread.return_value.start.assert_called_once()
+
+    def test_lazada_scan_steps_reach_the_progress_panel(self):
+        say = webapp._scan_progress
+        self.assertIsNone(say("19:44:03 [INFO] Starting Chrome for Lazada Philippines (window: headless)"))
+        self.assertEqual(
+            say("19:44:17 [INFO] Step: ratings per star 1-5: 235, 72, 87, 64, 2782")["message"],
+            "This listing has 3,240 ratings. Collecting reviews from every star level…",
+        )
+        self.assertEqual(
+            say("19:44:18 [INFO] Step: collecting 3-star reviews"),
+            {"needs_you": False, "progress": 38, "message": "Collecting 3-star reviews…"},
+        )
+        # In the order the scraper reads them, and always short of the next stage.
+        progress = [say(f"[INFO] Step: collecting {star}-star reviews")["progress"] for star in (3, 2, 4, 1, 5)]
+        self.assertEqual(progress, sorted(progress))
+        self.assertLess(progress[-1], 68)
+
+    def test_a_window_opened_for_the_user_is_said_on_the_progress_panel(self):
+        say = webapp._scan_progress
+        for line, message in (
+            ("[INFO] Step: showing the Chrome window (Lazada needs a login)", webapp.LAZADA_LOGIN_MESSAGE),
+            ("[INFO] Lazada is signed out. Log in in the opened Chrome window; the scan continues", webapp.LAZADA_LOGIN_MESSAGE),
+            ("[INFO] Waiting up to 600 seconds for Lazada login", webapp.LAZADA_LOGIN_MESSAGE),
+            ("[INFO] Step: showing the Chrome window (Lazada is asking for a login or verification)", webapp.LAZADA_CHECK_MESSAGE),
+            ("[INFO] Waiting up to 600 seconds for Lazada verification", webapp.LAZADA_CHECK_MESSAGE),
+            ("[INFO] Step: showing the Chrome window (the review feed gave no reviews: verification)", webapp.LAZADA_CHECK_MESSAGE),
+            ("[INFO] Step: showing the Chrome window (the review feed gave no reviews: unavailable)", webapp.LAZADA_REVIEWS_HELD_MESSAGE),
+            ("[INFO] Step: showing the Chrome window (the review section did not load)", webapp.LAZADA_REVIEWS_HELD_MESSAGE),
+        ):
+            with self.subTest(line=line):
+                self.assertEqual(say(line), {"needs_you": True, "message": message})
+        # The next ordinary step takes the notice away again.
+        self.assertFalse(say("[INFO] Step: session ready (8.7 s)")["needs_you"])
+
+    def test_the_phrases_the_app_listens_for_are_the_ones_the_scraper_prints(self):
+        source = (webapp.ROOT / "lazada-scraper" / "src" / "lazada_scraper.py").read_bytes().decode("utf-8")
+        for phrase in (
+            "Step: showing the Chrome window (%s)", "Lazada needs a login",
+            "Lazada is asking for a login or verification", "Lazada is signed out", "for Lazada %s",
+            "Step: Lazada home page opened", "Step: session ready", "Step: product page opened",
+            "Step: ratings per star 1-5: %s", "Step: collecting %s-star reviews",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, source)
+
+    def test_scraper_lines_arrive_while_it_runs_and_are_kept(self):
+        seen = []
+        script = (
+            "import sys; print('Step: collecting 3-star reviews', flush=True); "
+            "print('went wrong', file=sys.stderr, flush=True); sys.exit(3)"
+        )
+        result = webapp._run_scraper([webapp.sys.executable, "-c", script], seen.append)
+        self.assertEqual(result.returncode, 3)
+        self.assertIn("Step: collecting 3-star reviews\n", seen)
+        # What it printed last, errors included, is what a failure message is made from.
+        self.assertIn("went wrong", webapp._scraper_failure_message(result))
+
+    def test_a_scraper_that_never_ends_is_stopped(self):
+        with patch.object(webapp, "SCRAPER_PROCESS_TIMEOUT", 0.5):
+            with self.assertRaises(subprocess.TimeoutExpired):
+                webapp._run_scraper([webapp.sys.executable, "-c", "import time; time.sleep(30)"], lambda line: None)
+
+    def test_a_running_lazada_scan_updates_its_job_as_the_scraper_reports(self):
+        seen = []
+
+        def scraper(command, on_line):
+            for line in (
+                "[INFO] Step: collecting 3-star reviews",
+                "[INFO] Step: showing the Chrome window (the review section did not load)",
+                # A second product starts over; the bar must not move back.
+                "[INFO] Step: product page opened (4.0 s)",
+            ):
+                on_line(line)
+                seen.append((job["needs_you"], job["progress"], job["message"]))
+            return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "scan.json"
+            with (
+                patch("webapp.threading.Thread") as thread,
+                patch.object(webapp, "_command_for_scrape", return_value=(["scraper"], target)),
+                patch.object(webapp, "_run_scraper", side_effect=scraper),
+                patch.object(webapp, "load_products", return_value=[SAMPLE_PRODUCT]),
+                patch.object(webapp, "analyze_products", side_effect=lambda products: products),
+                patch.object(webapp, "save_products"),
+            ):
+                job = webapp._start_job("catalog", "https://www.lazada.com.ph/products/x-i123456.html", "lazada", 1, 100)
+                thread.call_args.kwargs["target"]()
+
+        self.assertEqual(seen, [
+            (False, 38, "Collecting 3-star reviews…"),
+            (True, 38, webapp.LAZADA_REVIEWS_HELD_MESSAGE),
+            (False, 38, "Reading the product page…"),
+        ])
+        self.assertEqual((job["state"], job["needs_you"]), ("complete", False))
 
     def test_saved_search_and_product_detail_are_available(self):
         response = self.client.post("/api/search", json={"query": "sample gadget", "live": False})
@@ -428,6 +562,26 @@ class TestWebApp(unittest.TestCase):
         )
         self.assertIn("--all-star-types", command)
         self.assertEqual(command[command.index("--star-limit-per-type") + 1], "60")
+
+    def test_lazada_scans_run_without_a_chrome_window(self):
+        command, _target = webapp._command_for_scrape("earphones", "lazada", 1, 1)
+        self.assertEqual(command[command.index("--window") + 1], "headless")
+        # From the review feed, which is what the baseline was measured on.
+        self.assertEqual(command[command.index("--reviews-from") + 1], "feed")
+
+    def test_the_baseline_was_measured_on_the_review_source_the_app_scans_with(self):
+        # The feed carries whole reviews and the page reader the first part of
+        # a review written in several parts, so their rates do not compare.
+        baselines = json.loads(
+            (webapp.ROOT / "sentiment-analysis" / "models" / "reference_baselines_v1.json").read_bytes().decode("utf-8")
+        )
+        measured_on_feed = baselines["version"] != "reference-baselines-1.0.0"
+        self.assertEqual(webapp.LAZADA_REVIEWS_FROM, "feed" if measured_on_feed else "page")
+
+    def test_other_marketplaces_keep_their_visible_window(self):
+        for platform in ("shopee", "temu"):
+            command, _target = webapp._command_for_scrape("earphones", platform, 1, 1)
+            self.assertNotIn("--window", command)
 
     def test_other_marketplaces_keep_the_review_count(self):
         command, _target = webapp._command_for_scrape("earphones", "temu", 1, 40)

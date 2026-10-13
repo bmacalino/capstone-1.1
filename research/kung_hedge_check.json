@@ -1,0 +1,37 @@
+{
+ "generated_at": "2026-10-13T04:37:03+00:00",
+ "checker": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "labelled_sentences": 5384,
+ "removed_wrong": 2,
+ "removed_right": 2,
+ "added_right": 0,
+ "added_wrong": 0,
+ "rule": "keep if no flag is added and removed_right <= removed_wrong / 3",
+ "meets_rule": false,
+ "changed": [
+  {
+   "round": "1",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "wag na kayong bumili nito madaling mag disconnect or diko alam kung madaling malowbat Kasi bigla nlng nag disconnect"
+  },
+  {
+   "round": "2",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "nakakagalit paano naman ito magagamit sa pag oonline selling kung sira hindi pa nakakalayo si kuya jelmar na nagdeliver tinawagan na agad namin sya kasi inopen agad pagkadeliver nya sabi nya kay seller daw sabihin ayaw palitan ni seller sayang ang ibinayad ko nagbayad ako ng ayos"
+  },
+  {
+   "round": "5",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "Late review kasi inobserve ko muna kung masira so far so good"
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "Akala ko talaga bluetooth mouse na pwede sa cp May uka yung mouse ewan ko ba kung sira siya o hindi hindi ko pa natry sa Laptop"
+  }
+ ]
+}

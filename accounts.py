@@ -84,6 +84,7 @@ def _connect(path: str | Path):
     try:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA)
+        _migrate(connection)
         yield connection
         connection.commit()
     except Exception:
@@ -91,6 +92,14 @@ def _connect(path: str | Path):
         raise
     finally:
         connection.close()
+
+
+def _migrate(connection: sqlite3.Connection) -> None:
+    """Add columns that newer versions need to a database made by an older one."""
+    columns = {row["name"] for row in connection.execute("PRAGMA table_info(users)").fetchall()}
+    if "history_cleared_at" not in columns:
+        # When the user last pressed "Clear scan history", in milliseconds.
+        connection.execute("ALTER TABLE users ADD COLUMN history_cleared_at INTEGER NOT NULL DEFAULT 0")
 
 
 def _now() -> str:
@@ -311,9 +320,15 @@ def record_activity(path: str | Path, user_id: int, link: Any, product: Any, ope
         _prune(connection, user_id)
 
 
-def clear_activity(path: str | Path, user_id: int) -> None:
-    """Settings -> Clear scan history. Wishlisted products keep their summary."""
+def clear_activity(path: str | Path, user_id: int, cleared_at: Any = None) -> None:
+    """Settings -> Clear scan history. Wishlisted products keep their summary.
+
+    The moment is remembered, so products checked before it stay out of this
+    user's history on every browser, even though the app still holds them.
+    """
+    when = _opened_at(cleared_at) or int(datetime.now(timezone.utc).timestamp() * 1000)
     with _connect(path) as connection:
+        connection.execute("UPDATE users SET history_cleared_at = ? WHERE id = ?", (when, user_id))
         connection.execute(
             """DELETE FROM user_activity WHERE user_id = ?
                AND link NOT IN (SELECT link FROM user_wishlist WHERE user_id = ?)""",
@@ -346,6 +361,7 @@ def library(path: str | Path, user_id: int) -> dict[str, Any]:
         wishlist_rows = connection.execute(
             "SELECT link FROM user_wishlist WHERE user_id = ? ORDER BY saved_at, rowid", (user_id,)
         ).fetchall()
+        cleared = connection.execute("SELECT history_cleared_at FROM users WHERE id = ?", (user_id,)).fetchone()
     activity: dict[str, Any] = {}
     for row in activity_rows:
         try:
@@ -353,7 +369,11 @@ def library(path: str | Path, user_id: int) -> dict[str, Any]:
         except json.JSONDecodeError:
             continue
         activity[row["link"]] = {"product": product, "openedAt": int(row["opened_at"])}
-    return {"activity": activity, "wishlist": [row["link"] for row in wishlist_rows]}
+    return {
+        "activity": activity,
+        "wishlist": [row["link"] for row in wishlist_rows],
+        "clearedAt": int(cleared["history_cleared_at"]) if cleared else 0,
+    }
 
 
 def import_library(path: str | Path, user_id: int, activity: Any, wishlist: Any) -> dict[str, int]:

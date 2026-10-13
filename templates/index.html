@@ -40,11 +40,11 @@
               </div>
               <div>
                 <span class="pub-footer-label">Follow</span>
-                <div class="pub-social">
-                  <span role="link" aria-disabled="true" aria-label="Facebook (link coming soon)" title="Link coming soon">f</span>
-                  <span role="link" aria-disabled="true" aria-label="X (link coming soon)" title="Link coming soon">X</span>
-                  <span role="link" aria-disabled="true" aria-label="Instagram (link coming soon)" title="Link coming soon">◎</span>
-                  <span role="link" aria-disabled="true" aria-label="YouTube (link coming soon)" title="Link coming soon">▶</span>
+                <div class="pub-social" aria-hidden="true">
+                  <span>f</span>
+                  <span>X</span>
+                  <span>◎</span>
+                  <span>▶</span>
                 </div>
               </div>
             </div>
@@ -229,7 +229,7 @@
         </div>
         <aside class="auth-page-panel" aria-label="About DeFaketive">
           <img class="auth-page-texture" src="{{ url_for('static', filename='assets/auth/auth-bg.png') }}" width="1600" height="1000" alt="">
-          <a class="auth-brand" href="#landing" data-route="landing"><span class="auth-shield"><img src="{{ url_for('static', filename='assets/auth/shield.svg') }}" width="20" height="23" alt=""></span><b>DeFaketive</b></a>
+          <a class="auth-brand" href="#landing" data-route="landing"><span class="auth-mark" aria-hidden="true"></span><b>DeFaketive</b></a>
           <div class="auth-page-pitch">
             <p class="auth-pitch-eyebrow">Real products. Real reviews. A safer you.</p>
             <p class="auth-pitch-title">Spot fakes &amp; defects before you buy.</p>
@@ -389,20 +389,78 @@
         </div>
       </section>
 
-      <section id="history" class="view workspace-content" data-view="history" hidden aria-labelledby="history-title">
-        <header class="workspace-welcome flow-heading"><div><p class="flow-eyebrow">PICK UP WHERE YOU LEFT OFF</p><h1 id="history-title" tabindex="-1">Analysis history</h1><p>Find saved reports and revisit the evidence.</p></div><a class="primary-button" href="#analyze" data-route="analyze">＋ Analyze product</a></header>
-        <div class="flow-filters"><label>Find a product<input id="history-search" type="search" placeholder="Search product or marketplace"></label><label>Show<select id="history-risk"><option value="all">All reports</option><option value="attention">Reviewers reported problems</option><option value="safety">Safety reports</option><option value="clear">No warning signs</option><option value="unknown">Not enough reviews</option></select></label></div>
-        <p id="history-count" class="flow-footnote" aria-live="polite"></p><div id="history-list"></div>
+      <section id="history" class="view workspace-content app-page" data-view="history" hidden aria-labelledby="history-title">
+        <header class="app-page-head"><h1 id="history-title" tabindex="-1">Scan History</h1><p>All products you've analyzed, grouped by date.</p></header>
+        <div id="history-stats" class="app-card app-stats" aria-label="Your scan history in numbers"></div>
+        <div class="app-filter" role="group" aria-label="Filter scans">
+          <span class="app-filter-label" aria-hidden="true">Filter:</span>
+          <button type="button" data-history-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-history-filter="clear" aria-pressed="false">No warnings</button>
+          <button type="button" data-history-filter="caution" aria-pressed="false">Caution</button>
+          <button type="button" data-history-filter="safety" aria-pressed="false">Safety reports</button>
+          <button type="button" data-history-filter="unknown" aria-pressed="false">Too few reviews</button>
+          <span id="history-count" class="app-filter-count" aria-live="polite"></span>
+        </div>
+        <div id="history-list" class="app-days"></div>
+        <p id="history-foot" class="app-page-foot"></p>
       </section>
 
-      <section id="wishlist" class="view workspace-content" data-view="wishlist" hidden aria-labelledby="wishlist-title">
-        <header class="workspace-welcome"><p class="flow-eyebrow">KEEP YOUR OPTIONS TOGETHER</p><h1 id="wishlist-title" tabindex="-1">Wishlist</h1><p>Products you saved for later. Saved on this browser.</p></header>
-        <div id="wishlist-list"></div>
+      <section id="wishlist" class="view workspace-content app-page" data-view="wishlist" hidden aria-labelledby="wishlist-title">
+        <header class="app-page-head"><h1 id="wishlist-title" tabindex="-1">Wishlist</h1><p>Your saved products, products with no warning signs, and what other users save most.</p></header>
+        <section class="app-row" aria-labelledby="wishlist-saved-title">
+          <header><div><h2 id="wishlist-saved-title" class="app-eyebrow">Your saved items</h2><p id="wishlist-count" class="app-row-sub" aria-live="polite"></p></div><a class="app-see-all" href="#history" data-route="history">See all</a></header>
+          <div id="wishlist-list" class="app-grid"></div>
+        </section>
+        <section id="wishlist-picks-row" class="app-row" aria-labelledby="wishlist-picks-title" hidden>
+          <header><div><h2 id="wishlist-picks-title" class="app-eyebrow">No warning signs</h2><p class="app-row-sub">Checked products with enough reviews and nothing flagged, that you haven't saved yet.</p></div></header>
+          <div class="app-row-wrap"><div id="wishlist-picks" class="app-row-track" tabindex="0" aria-label="Checked products with no warning signs"></div><button class="app-row-next" type="button" data-row-next aria-label="Show more products with no warning signs">›</button></div>
+        </section>
+        <section id="wishlist-popular-row" class="app-row" aria-labelledby="wishlist-popular-title" hidden>
+          <header><div><h2 id="wishlist-popular-title" class="app-eyebrow">Most saved by users</h2><p class="app-row-sub">Products DeFaketive users saved most often.</p></div></header>
+          <div class="app-row-wrap"><div id="wishlist-popular" class="app-row-track" tabindex="0" aria-label="Products saved most often"></div><button class="app-row-next" type="button" data-row-next aria-label="Show more of the most saved products">›</button></div>
+        </section>
       </section>
 
-      <section id="settings" class="view workspace-content" data-view="settings" hidden aria-labelledby="settings-title">
-        <header class="workspace-welcome"><h1 id="settings-title" tabindex="-1">Settings</h1><p>Make this workspace work for you.</p></header>
-        <section class="flow-settings"><h2>Appearance</h2><label for="appearance-select">Color theme</label><select id="appearance-select"><option value="light">Light</option><option value="dark">Dark</option></select><h2>Your saved activity</h2><p>Reports are stored by this app. Wishlist choices and recently opened report links are stored on this browser; they do not sync to an account. This browser keeps up to 100 recent product summaries.</p><a href="#history" data-route="history">View analysis history →</a></section>
+      <section id="settings" class="view workspace-content app-page" data-view="settings" hidden aria-labelledby="settings-title">
+        <header class="app-page-head"><h1 id="settings-title" tabindex="-1">Settings</h1><p>Manage your account and preferences.</p></header>
+        <div class="app-settings">
+          <section class="app-card app-set" aria-labelledby="settings-account-title">
+            <h2 id="settings-account-title" class="app-eyebrow quiet">Account</h2>
+            <div class="app-set-account" data-auth-user hidden>
+              <span class="app-avatar large" data-user-initials aria-hidden="true"></span>
+              <div class="app-set-who"><b data-user-name></b><p><span data-user-email></span> · Free account</p></div>
+              <button id="account-edit" class="app-set-button" type="button">Edit</button>
+            </div>
+            <div class="app-set-account" data-auth-guest>
+              <div class="app-set-who"><b>You're browsing as a guest</b><p data-guest-left>3 free scans left today</p></div>
+              <div class="app-set-actions"><button class="app-set-button" type="button" data-signin>Sign in</button><button class="app-set-button dark" type="button" data-auth-open="signup">Create account</button></div>
+            </div>
+          </section>
+          <section class="app-card app-set" aria-labelledby="settings-prefs-title">
+            <h2 id="settings-prefs-title" class="app-eyebrow quiet">Preferences</h2>
+            <div class="app-set-row">
+              <div><b id="pref-alerts-label">Scan alerts</b><p id="pref-alerts-help">Get a browser notice when your scan finishes</p></div>
+              <button id="pref-alerts" class="app-switch" type="button" role="switch" aria-checked="false" aria-labelledby="pref-alerts-label" aria-describedby="pref-alerts-help"></button>
+            </div>
+            <p id="pref-alerts-note" class="app-set-note" role="status" hidden></p>
+            <div class="app-set-row">
+              <div><b id="pref-dark-label">Dark mode</b><p id="pref-dark-help">Switch to the dark theme</p></div>
+              <button id="pref-dark" class="app-switch" type="button" role="switch" aria-checked="false" aria-labelledby="pref-dark-label" aria-describedby="pref-dark-help"></button>
+            </div>
+            <div class="app-set-row">
+              <div><b id="pref-clipboard-label">Auto-fill from clipboard</b><p id="pref-clipboard-help">Put a copied Shopee, Lazada or Temu link in the scan bar</p></div>
+              <button id="pref-clipboard" class="app-switch" type="button" role="switch" aria-checked="false" aria-labelledby="pref-clipboard-label" aria-describedby="pref-clipboard-help"></button>
+            </div>
+            <p id="pref-clipboard-note" class="app-set-note" role="status" hidden></p>
+          </section>
+          <section class="app-card app-set" aria-labelledby="settings-danger-title">
+            <h2 id="settings-danger-title" class="app-eyebrow quiet">Danger zone</h2>
+            <div class="app-set-danger">
+              <button id="clear-history" type="button">Clear scan history</button>
+              <button id="delete-account" type="button" data-auth-user hidden>Delete account</button>
+            </div>
+          </section>
+        </div>
       </section>
 
       <section id="results" class="view app-view" data-view="results" hidden>
@@ -427,7 +485,7 @@
       <div class="auth-dialog-card">
         <div class="auth-dialog-body">
           <button class="auth-close" type="button" data-dialog-close aria-label="Close sign in"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
-          <p class="auth-dialog-brand"><span class="auth-shield small"><img src="{{ url_for('static', filename='assets/auth/shield-dialog.svg') }}" width="15.7142" height="18.0715" alt=""></span><b>DeFaketive</b></p>
+          <p class="auth-dialog-brand"><span class="auth-mark small" aria-hidden="true"></span><b>DeFaketive</b></p>
           <h2 id="signin-title">Sign in</h2>
           <p class="auth-sub">Welcome back. Detect the defect.</p>
           <form class="auth-form" data-auth-form="signin" novalidate>
@@ -449,7 +507,7 @@
       <div class="auth-dialog-card">
         <div class="auth-dialog-body">
           <button class="auth-close" type="button" data-dialog-close aria-label="Close create account"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
-          <p class="auth-dialog-brand"><span class="auth-shield small"><img src="{{ url_for('static', filename='assets/auth/shield-dialog.svg') }}" width="15.7142" height="18.0715" alt=""></span><b>DeFaketive</b></p>
+          <p class="auth-dialog-brand"><span class="auth-mark small" aria-hidden="true"></span><b>DeFaketive</b></p>
           <h2 id="signup-title">Create account</h2>
           <p class="auth-sub">Join us and help protect Filipino shoppers.</p>
           <form class="auth-form" data-auth-form="signup" novalidate>
@@ -475,7 +533,7 @@
       <div class="auth-dialog-card">
         <div class="auth-dialog-body">
           <button class="auth-close" type="button" data-dialog-close aria-label="Close terms and privacy"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
-          <p class="auth-dialog-brand"><span class="auth-shield small"><img src="{{ url_for('static', filename='assets/auth/shield-dialog.svg') }}" width="15.7142" height="18.0715" alt=""></span><b>DeFaketive</b></p>
+          <p class="auth-dialog-brand"><span class="auth-mark small" aria-hidden="true"></span><b>DeFaketive</b></p>
           <h2 id="terms-title">Terms &amp; Privacy</h2>
           <section id="terms-of-use" aria-labelledby="terms-of-use-title">
             <h3 id="terms-of-use-title">Terms of Use</h3>
@@ -489,6 +547,56 @@
             <p>We don't sell or share any of this. To delete your account, use Settings → Delete account, or email the team at <a href="mailto:bmacalino_20ur2047@psu.edu.ph">bmacalino_20ur2047@psu.edu.ph</a>.</p>
           </section>
           <button class="auth-submit" type="button" data-dialog-close>Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="account-dialog" class="auth-dialog" aria-labelledby="account-title">
+      <div class="auth-dialog-card">
+        <div class="auth-dialog-body">
+          <button class="auth-close" type="button" data-dialog-close aria-label="Close edit account"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
+          <p class="auth-dialog-brand"><span class="auth-mark small" aria-hidden="true"></span><b>DeFaketive</b></p>
+          <h2 id="account-title">Edit account</h2>
+          <p class="auth-sub">Change your name, email or password.</p>
+          <form id="account-form" class="auth-form" novalidate>
+            <div class="auth-field"><label for="account-name">Full name</label><input id="account-name" name="full_name" type="text" autocomplete="name" maxlength="100" required></div>
+            <p class="auth-error" data-error-for="full_name" hidden></p>
+            <div class="auth-field"><label for="account-email">Email</label><input id="account-email" name="email" type="email" autocomplete="email" required></div>
+            <p class="auth-error" data-error-for="email" hidden></p>
+            <div class="auth-field"><label for="account-new-password">New password (leave empty to keep yours)</label><span class="auth-password"><input id="account-new-password" name="new_password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8">{{ eye_button() }}</span></div>
+            <p class="auth-error" data-error-for="new_password" hidden></p>
+            <div class="auth-field"><label for="account-current-password">Current password</label><span class="auth-password"><input id="account-current-password" name="current_password" type="password" autocomplete="current-password" placeholder="Needed to save your changes" required>{{ eye_button() }}</span></div>
+            <p class="auth-error" data-error-for="current_password" hidden></p>
+            <p class="auth-form-error" data-form-error role="alert" hidden></p>
+            <button class="auth-submit" type="submit">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="clear-dialog" class="auth-dialog" aria-labelledby="clear-title">
+      <div class="auth-dialog-card">
+        <div class="auth-dialog-body">
+          <button class="auth-close" type="button" data-dialog-close aria-label="Close"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
+          <h2 id="clear-title">Clear your scan history?</h2>
+          <p class="auth-sub">This empties Scan History and your Home page. Products in your wishlist stay saved. This can't be undone.</p>
+          <div class="auth-choice"><button class="auth-guest" type="button" data-dialog-close>Cancel</button><button id="clear-confirm" class="auth-submit danger" type="button">Clear history</button></div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="delete-dialog" class="auth-dialog" aria-labelledby="delete-title">
+      <div class="auth-dialog-card">
+        <div class="auth-dialog-body">
+          <button class="auth-close" type="button" data-dialog-close aria-label="Close"><img src="{{ url_for('static', filename='assets/auth/close.svg') }}" width="9.17851" height="9.17851" alt=""></button>
+          <h2 id="delete-title">Delete your account?</h2>
+          <p class="auth-sub">Your account, scan history and wishlist will be removed for good. This can't be undone.</p>
+          <form id="delete-form" class="auth-form" novalidate>
+            <div class="auth-field"><label for="delete-password">Current password</label><span class="auth-password"><input id="delete-password" name="current_password" type="password" autocomplete="current-password" placeholder="Type your password to confirm" required>{{ eye_button() }}</span></div>
+            <p class="auth-error" data-error-for="current_password" hidden></p>
+            <p class="auth-form-error" data-form-error role="alert" hidden></p>
+            <div class="auth-choice"><button class="auth-guest" type="button" data-dialog-close>Cancel</button><button class="auth-submit danger" type="submit">Delete my account</button></div>
+          </form>
         </div>
       </div>
     </dialog>

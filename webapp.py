@@ -58,6 +58,31 @@ MAX_REVIEWS = 100
 # Lazada scans read up to this many written reviews from each star level; the
 # analysis weights each level back to the listing's star mix.
 LAZADA_REVIEWS_PER_STAR = 60
+# Lazada scans run with no Chrome window; the scraper shows one by itself when
+# Lazada asks for a login or a verification. Reviews are read from Lazada's
+# review feed, which carries whole reviews where the page reader keeps the
+# first part of a review written in several parts. The checker flags more in
+# the whole text, so the "what is typical" baseline was measured again on feed
+# scans (research/RESULTS_TABLES.md, Table 12d). Reading the page instead
+# ("page") gives rates that baseline does not fit.
+LAZADA_WINDOW_MODE = os.environ.get("DEFAKETIVE_LAZADA_WINDOW") or "headless"
+LAZADA_REVIEWS_FROM = os.environ.get("DEFAKETIVE_LAZADA_REVIEWS") or "feed"
+# What the progress panel says when the Lazada scraper has put its Chrome
+# window on screen (_scan_progress). The scraper never answers either itself.
+LAZADA_LOGIN_MESSAGE = (
+    "Lazada needs you to log in. Use the Chrome window that just opened. "
+    "The scan continues by itself once you are logged in."
+)
+LAZADA_CHECK_MESSAGE = (
+    "Lazada is asking for a login or a check. Complete it in the Chrome window that just opened. "
+    "The scan continues by itself afterwards."
+)
+LAZADA_REVIEWS_HELD_MESSAGE = (
+    "Lazada is not showing this product's reviews yet. A Chrome window has opened in case it is "
+    "asking for a check: if you see one, complete it there."
+)
+# The scraper reads the star levels in this order (RATING_COLLECTION_ORDER).
+LAZADA_STAR_PROGRESS = {"3": 38, "2": 44, "4": 50, "1": 56, "5": 62}
 MARKETPLACE_NAMES = ("Shopee PH", "Lazada PH", "Temu PH")
 
 _catalogs: dict[str, list[dict[str, Any]]] = {}
@@ -315,7 +340,7 @@ def _command_for_scrape(keyword: str, platform: str, product_count: int, review_
         command = [sys.executable, str(ROOT / "src" / "retriv.py"), "-n", str(product_count), "-r", str(review_count), "--output", str(target), "--no-prompt", "--verification-timeout", str(MANUAL_VERIFICATION_TIMEOUT)]
         command.extend(["--product-url", keyword] if direct_url else ["-k", keyword])
     elif platform == "lazada":
-        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--all-star-types", "--star-limit-per-type", str(LAZADA_REVIEWS_PER_STAR), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600"]
+        command = [sys.executable, str(ROOT / "lazada-scraper" / "src" / "lazada_scraper.py"), "-n", str(product_count), "-r", str(review_count), "--all-star-types", "--star-limit-per-type", str(LAZADA_REVIEWS_PER_STAR), "--output", str(target), "--no-verification-pause", "--verification-timeout", "600", "--window", LAZADA_WINDOW_MODE, "--reviews-from", LAZADA_REVIEWS_FROM]
         command.extend(["--product-url", keyword] if direct_url else [keyword])
     else:
         profile = ROOT / ".browser_profiles" / platform
@@ -345,6 +370,70 @@ def _scraper_failure_message(result: subprocess.CompletedProcess[str]) -> str:
     return _user_facing_failure(output)
 
 
+def _scan_progress(line: str) -> dict[str, Any] | None:
+    """What the progress panel should say for one line the Lazada scraper printed.
+
+    `needs_you` marks the moments a Chrome window has opened for the user to
+    log in or complete a check; the next ordinary step clears it.
+    """
+    if "Lazada is signed out" in line or "for Lazada login" in line:
+        return {"needs_you": True, "message": LAZADA_LOGIN_MESSAGE}
+    if "for Lazada verification" in line:
+        return {"needs_you": True, "message": LAZADA_CHECK_MESSAGE}
+    if "Step: " not in line:
+        return None
+    step = line.split("Step: ", 1)[1].strip()
+    if step.startswith("showing the Chrome window"):
+        if "needs a login" in step:
+            return {"needs_you": True, "message": LAZADA_LOGIN_MESSAGE}
+        if "verification" in step:
+            return {"needs_you": True, "message": LAZADA_CHECK_MESSAGE}
+        return {"needs_you": True, "message": LAZADA_REVIEWS_HELD_MESSAGE}
+    if step.startswith("Lazada home page opened"):
+        return {"needs_you": False, "progress": 22, "message": "Lazada is open. Checking the saved login…"}
+    if step.startswith("session ready"):
+        return {"needs_you": False, "progress": 26, "message": "Opening the product page…"}
+    if step.startswith("product page opened"):
+        return {"needs_you": False, "progress": 30, "message": "Reading the product page…"}
+    if step.startswith("ratings per star"):
+        counts = [int(part) for part in step.split(":", 1)[-1].replace(",", " ").split() if part.isdigit()]
+        return {
+            "needs_you": False,
+            "progress": 34,
+            "message": f"This listing has {sum(counts):,} ratings. Collecting reviews from every star level…",
+        }
+    if step.startswith("collecting ") and step[11:12] in LAZADA_STAR_PROGRESS:
+        star = step[11:12]
+        return {"needs_you": False, "progress": LAZADA_STAR_PROGRESS[star], "message": f"Collecting {star}-star reviews…"}
+    return None
+
+
+def _run_scraper(command: list[str], on_line: Callable[[str], None]) -> subprocess.CompletedProcess[str]:
+    """Run a scraper to its end, passing on each line it prints as it prints it."""
+    timed_out = threading.Event()
+    lines: list[str] = []
+    with subprocess.Popen(
+        command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace"
+    ) as process:
+
+        def stop() -> None:
+            timed_out.set()
+            process.kill()
+
+        timer = threading.Timer(SCRAPER_PROCESS_TIMEOUT, stop)
+        timer.daemon = True
+        timer.start()
+        try:
+            for line in process.stdout or ():
+                lines.append(line)
+                on_line(line)
+        finally:
+            timer.cancel()
+    if timed_out.is_set():
+        raise subprocess.TimeoutExpired(command, SCRAPER_PROCESS_TIMEOUT)
+    return subprocess.CompletedProcess(command, process.returncode, stdout="".join(lines), stderr="")
+
+
 def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int, review_count: int) -> dict[str, Any]:
     job_id = secrets.token_urlsafe(12)
     job = {
@@ -354,6 +443,7 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
         "stage_label": "Collect reviews",
         "progress": 18,
         "message": f"Opening {platform.title()} and collecting public reviews…",
+        "needs_you": False,
         "platform": platform,
         "query": keyword,
         "product_limit": product_count,
@@ -366,7 +456,16 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
     def run() -> None:
         try:
             command, target = _command_for_scrape(keyword, platform, product_count, review_count)
-            result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=SCRAPER_PROCESS_TIMEOUT)
+
+            def follow(line: str) -> None:
+                update = _scan_progress(line) if platform == "lazada" else None
+                if update:
+                    with _lock:
+                        # A scan of several products repeats its steps; the bar never moves back.
+                        update["progress"] = max(job["progress"], update.get("progress", 0))
+                        job.update(update)
+
+            result = _run_scraper(command, follow)
             if result.returncode:
                 raise RuntimeError(_scraper_failure_message(result))
             with _lock:
@@ -375,6 +474,7 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
                     stage_label="Analyze reviews",
                     progress=68,
                     message="Analyzing English, Filipino, and Taglish review sentiment…",
+                    needs_you=False,
                 )
             products = load_products(target)
             if not has_usable_products(products):
@@ -405,16 +505,20 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
                     state="error",
                     stage_label="Stopped",
                     message="Marketplace verification timed out. Start a new scan when you are ready.",
+                    needs_you=False,
                 )
         except ModelUnavailableError as exc:
             with _lock:
-                job.update(state="error", stage_label="Stopped", message=f"{MODEL_UNAVAILABLE_MESSAGE} {exc}")
+                job.update(
+                    state="error", stage_label="Stopped", message=f"{MODEL_UNAVAILABLE_MESSAGE} {exc}", needs_you=False
+                )
         except Exception as exc:
             with _lock:
                 job.update(
                     state="error",
                     stage_label="Stopped",
                     message=_user_facing_failure(exc),
+                    needs_you=False,
                 )
 
     threading.Thread(target=run, daemon=True, name=f"defaketive-scrape-{job_id}").start()
@@ -754,7 +858,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         user, _, problem = signed_in_payload()
         if problem:
             return problem
-        accounts.clear_activity(_accounts_db(), user["id"])
+        accounts.clear_activity(_accounts_db(), user["id"], (_ or {}).get("clearedAt"))
         return jsonify(accounts.library(_accounts_db(), user["id"]))
 
     @app.route("/api/me/wishlist", methods=["PUT", "DELETE"])

@@ -97,6 +97,16 @@ Every choice reports all five labels. The report words them in one place,
 `dashboard_utils.BADGE_COPY`: Safety problem, Faulty or broken, Poor quality,
 Possible fake, Not as advertised.
 
+A listing gets the strongest safety message, "Reviewers report safety
+problems", when two separate reviews report fire, explosion, swelling or an
+electric shock. One such report gives the milder "Some reviewers mention
+safety concerns", with the reviewer's words (decided 12 Oct 2026; the
+setting is `alert.single_report_tier` in
+`sentiment-analysis/defaketive_sentiment/lexicons/hazard_parameters_v1.json`,
+and `research/RESULTS_TABLES.md`, Table 12e, shows what one, two and three
+reports would each do). A flag is real about half the time, which is why one
+is not enough.
+
 ## Start the web app
 
 ### Easiest method on Windows
@@ -138,8 +148,9 @@ the app.
 6. Wait for scraping, sentiment analysis, and risk computation to finish.
 
 Searching analyzed products does not contact the marketplace, so a new name may
-return no matches. A fresh collection opens Chrome on the right side of the
-screen so the app's progress panel remains visible.
+return no matches. A fresh Shopee or Temu collection opens Chrome on the right
+side of the screen so the app's progress panel remains visible. A Lazada
+collection runs with no window (see below).
 
 ### Search using a product link
 
@@ -153,7 +164,7 @@ For supported URLs, the app selects the marketplace automatically and scans one
 product. Links from other countries or unsupported websites are rejected.
 
 **Lazada scans read up to 60 written reviews from each star level** (up to
-300 per product, about two minutes) instead of the first 100 in Lazada's
+300 per product, one to two minutes) instead of the first 100 in Lazada's
 order, so complaints in 1- and 2-star reviews are always reached. The scraper
 also records how many ratings each star level has, and the report weights
 every review back to that mix: a 5-star review on a listing with 13,704
@@ -161,6 +172,34 @@ five-star ratings counts for far more than a 1-star review on one with 35.
 Review counts on the report stay counts of reviews read; percentages and
 rates are weighted. The saved Lazada login is reused, and the scan no longer
 waits for someone to scroll the page.
+
+**Lazada scans run with no Chrome window.** Chrome still does the work, in
+the background (headless). The window appears by itself only when Lazada asks
+for a login or a verification, or when the reviews will not load. Those stay
+yours to complete: the progress panel says "This scan needs you" and what to
+do, and the scan carries on by itself afterwards (it waits up to ten
+minutes). The first scan on a PC with no saved Lazada login is visible for
+that reason. Measured on 12 Oct 2026 (`research/check_hidden_lazada.py`,
+results in `research/data/reference_scans/hidden_mode_check.json`): Lazada
+served a headless Chrome and a window parked outside the screen the same as a
+visible one, five listings each, two runs each. Set
+`DEFAKETIVE_LAZADA_WINDOW` to `offscreen` or `visible` to change this. Shopee
+and Temu scans still open a window.
+
+**Lazada reviews are read from Lazada's own review feed**, not off the page.
+That is what makes a scan short (about 20 seconds to collect, then the
+reading), and the progress panel follows it step by step. It also changes
+what is read. The feed carries whole reviews, while the page reader kept only
+the first part of a review written in several parts, and with the whole text
+the checker flags more. The "what is typical" line was therefore measured
+again on feed scans of the same 59 listings: 6.1% of reviews flagged as
+faulty or broken on a typical listing, where page scans gave 4.7%
+(`research/RESULTS_TABLES.md`, Table 12d). Two things follow. A report saved
+before 12 Oct 2026 was read off the page and runs low against the new line,
+so check that product again for a comparable report. And
+`DEFAKETIVE_LAZADA_REVIEWS=page` brings the old reader back but not a line
+that fits it; a test fails if the baseline and the review source are set
+apart.
 
 The **Analyzed products** page lets you filter saved reports and inspect review
 evidence. The **Insights** page summarizes risk levels, review reliability, and
