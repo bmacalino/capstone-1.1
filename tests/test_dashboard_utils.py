@@ -396,6 +396,11 @@ class TestDashboardUtils(unittest.TestCase):
             "Lenovo M20 Laptop Office Wired Mouse Desktop Computer": "mouse",
             "ASUS Vivobook 15 Laptop Intel i5 with 8GB RAM": "laptop",
             "USB C Adapter for Laptop and Monitor": "",
+            # A charger that is never called one (13 Oct 2026), and adapters
+            # that are not chargers.
+            "Apple 20W USB-C Power Adapter": "charger",
+            "DC12V 3A 5A CCTV Power Supply Adapter 12V Power Supply": "",
+            "Omni Adapter / Adaptor Plug Socket (Universal)": "",
             "Power Bank 20000mAh with LCD Display": "powerbank",
             "Ultra Thin 8.5 inch LCD Writing Tablet": "",
             "Original LCD For Oppo Realme Note 50 RMX3834 Touch Screen Replacement": "part",

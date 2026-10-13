@@ -81,7 +81,12 @@ RECOMMENDATION_PRODUCT_TYPES = (
     (("wireless earbuds", "earbud", "earphone", "tws"), "wireless earbuds", "earbuds"),
     (("headphones", "headphone", "headset"), "headphones", "headphones"),
     (("microphone",), "microphone", "microphone"),
-    (("wall charger", "charger", "charging adapter"), "charger", "charger"),
+    (
+        # Apple and Samsung sell theirs as a "USB-C Power Adapter", with no "charger" in the name.
+        ("wall charger", "charger", "charging adapter", "usb-c power adapter", "usb c power adapter", "usb power adapter"),
+        "charger",
+        "charger",
+    ),
     (("usb cable", "charging cable", "cable"), "cable", "cable"),
     (("mechanical keyboard", "keyboard"), "keyboard", "keyboard"),
     (("gaming mouse", "wireless mouse", "mouse"), "mouse", "mouse"),
