@@ -353,33 +353,48 @@ class TestWebApp(unittest.TestCase):
         self.assertNotIn("pollJob", fill)
 
     def test_product_link_marketplace_overrides_selected_marketplace(self):
-        job = {
-            "id": "temu-job",
-            "state": "running",
-            "stage": 1,
-            "platform": "temu",
-        }
+        job = {"id": "lazada-job", "state": "running", "stage": 1, "platform": "lazada"}
+        link = "https://www.lazada.com.ph/products/pdp-i1234567.html"
         with patch("webapp._start_job", return_value=job) as start_job:
             response = self.client.post(
                 "/api/search",
-                json={
-                    "query": "https://www.temu.com/ph-en/goods.html",
-                    "platform": "lazada",
-                    "live": True,
-                    "product_count": 1,
-                    "review_count": 30,
-                },
+                json={"query": link, "platform": "shopee", "live": True, "product_count": 1, "review_count": 30},
             )
 
         self.assertEqual(response.status_code, 202)
-        self.assertEqual(response.json["job"]["platform"], "temu")
-        start_job.assert_called_once_with(
-            "webapp-test",
-            "https://www.temu.com/ph-en/goods.html",
-            "temu",
-            1,
-            30,
-        )
+        start_job.assert_called_once_with("webapp-test", link, "lazada", 1, 30)
+
+    def test_only_lazada_products_are_scanned(self):
+        # The owner's decision of 14 Oct 2026. Saved reports of other marketplaces can still be found.
+        for link in ("https://www.temu.com/ph-en/goods.html", "https://shopee.ph/x-i.1.9"):
+            with self.subTest(link=link), patch("webapp._start_job") as start_job:
+                response = self.client.post("/api/search", json={"query": link, "live": True})
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json, {"error": webapp.LAZADA_ONLY_MESSAGE, "lazada_only": True})
+                start_job.assert_not_called()
+        # A product name with another marketplace chosen (the old page still offers them) is refused too.
+        with patch("webapp._start_job") as start_job:
+            response = self.client.post("/api/search", json={"query": "earbuds", "platform": "temu", "live": True})
+        self.assertEqual(response.status_code, 400)
+        start_job.assert_not_called()
+        # With no marketplace chosen, a name is scanned on Lazada.
+        with patch("webapp._start_job", return_value={"id": "j", "platform": "lazada"}) as start_job:
+            response = self.client.post("/api/search", json={"query": "earbuds", "live": True})
+        self.assertEqual((response.status_code, start_job.call_args.args[2]), (202, "lazada"))
+        # Looking up a saved Shopee report by its link is not a scan, and still works.
+        saved = self.client.post("/api/search", json={"query": SAMPLE_PRODUCT["link"], "live": False})
+        self.assertEqual(saved.status_code, 200)
+
+    def test_a_refused_scan_does_not_use_up_a_guest_scan(self):
+        with patch("webapp._start_job") as start_job:
+            for _ in range(5):
+                self.client.post("/api/search", json={"query": "https://shopee.ph/x-i.1.9", "live": True})
+            start_job.assert_not_called()
+        with patch("webapp._start_job", return_value={"id": "j", "platform": "lazada"}):
+            response = self.client.post(
+                "/api/search", json={"query": "https://www.lazada.com.ph/products/pdp-i1234567.html", "live": True}
+            )
+        self.assertEqual(response.status_code, 202)
 
     def test_job_exposes_limits_and_progress_metadata(self):
         with patch("webapp.threading.Thread") as thread:

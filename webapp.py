@@ -99,6 +99,12 @@ TEMU_NOT_SHOWN_MESSAGE = (
     "complete it and start the scan again."
 )
 MARKETPLACE_NAMES = ("Shopee PH", "Lazada PH", "Temu PH")
+# The marketplaces the app scans: Lazada only, the owner's decision of 14 Oct
+# 2026. Temu had started showing the scanner's session "sold out" pages, and
+# Lazada's scan is the one measured and tested. The Shopee and Temu scrapers
+# stay in the project, unused; reports saved from them can still be opened.
+SCAN_PLATFORMS = ("lazada",)
+LAZADA_ONLY_MESSAGE = "DeFaketive checks Lazada PH products only. Paste a link to a Lazada PH product."
 
 _catalogs: dict[str, list[dict[str, Any]]] = {}
 _jobs: dict[str, dict[str, Any]] = {}
@@ -641,12 +647,15 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         query = str(payload.get("query") or "").strip()
         if not query:
             return jsonify({"error": "Enter a product name or supported marketplace link."}), 400
-        platform = str(payload.get("platform") or "shopee").casefold()
+        platform = str(payload.get("platform") or "lazada").casefold()
         try:
             platform = detect_marketplace(query, platform)
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
         if bool(payload.get("live")):
+            if platform not in SCAN_PLATFORMS:
+                # Saved reports of other marketplaces can still be looked up; only new scans are refused.
+                return jsonify({"error": LAZADA_ONLY_MESSAGE, "lazada_only": True}), 400
             require_model()
             guest = _current_user() is None
             day = accounts.manila_day()
@@ -953,7 +962,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     @app.get("/api/stats/public")
     def public_stats_api() -> Response:
         counts = database_counts()
-        return jsonify({"products": counts.get("products", 0), "reviews": counts.get("reviews", 0), "marketplaces": len(MARKETPLACE_NAMES)})
+        return jsonify({"products": counts.get("products", 0), "reviews": counts.get("reviews", 0), "marketplaces": len(SCAN_PLATFORMS)})
 
     @app.get("/api/picks")
     def picks_api() -> Response:

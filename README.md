@@ -1,12 +1,23 @@
 # DeFaketive Philippine E-Commerce Review Analyzer
 
 DeFaketive is a capstone research prototype that collects public product reviews
-from Shopee Philippines, Lazada Philippines, and Temu Philippines. It analyzes
+from Lazada Philippines. It analyzes
 English, Filipino, and Taglish review sentiment, identifies possible product-risk
 signals, and presents the evidence in a local web dashboard.
 
 > DeFaketive is a decision-support tool. Its risk score is not proof that a
 > product or seller is fraudulent or counterfeit.
+
+**The app scans Lazada PH only** (the owner's decision, 14 Oct 2026). Temu had
+started showing the scanner's session "sold out" pages, and the Lazada scan is
+the one measured and tested. The server refuses a new scan of a Shopee or Temu
+link (`SCAN_PLATFORMS` in `webapp.py`), and does not count it as a guest scan.
+Reports saved earlier from Shopee or Temu still open, but are not checked
+again. The Shopee and Temu scrapers stay in the project, unused, and their
+sections below describe them; the commit before this change is `96d5255`. The
+original app's own pages (`templates/index.html`, `static/js/app.js`) still
+offer the other marketplaces and get the server's refusal; the app people use
+is the shadcn front end in `../defaketive-shadcn`.
 
 ## Requirements
 
@@ -139,7 +150,7 @@ the app.
 ### Search using a product name
 
 1. Enter a name such as `wireless earbuds`.
-2. Select Shopee PH, Lazada PH, or Temu PH.
+2. Lazada PH is the only marketplace scanned.
 3. Select **Search analyzed products** to look for an existing report, or
    **Collect fresh reviews** to run a marketplace scan.
 4. If needed, expand **Advanced options** to change the product and review
@@ -148,13 +159,11 @@ the app.
 6. Wait for scraping, sentiment analysis, and risk computation to finish.
 
 Searching analyzed products does not contact the marketplace, so a new name may
-return no matches. A fresh Shopee or Temu collection opens Chrome on the right
-side of the screen so the app's progress panel remains visible. A Lazada
-collection runs with no window (see below).
+return no matches. A Lazada collection runs with no window (see below).
 
 ### Search using a product link
 
-1. Paste a supported Shopee PH, Lazada PH, or Temu PH product URL.
+1. Paste a Lazada PH product URL.
 2. If a saved report exists, select **View saved report** or **Refresh with new
    reviews**.
 3. If no report exists, select **Analyze this product** and complete browser

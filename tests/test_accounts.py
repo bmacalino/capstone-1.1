@@ -32,7 +32,7 @@ SIGNUP = {
     "confirm": "correct horse",
     "agree": True,
 }
-JOB = {"id": "job-1", "state": "running", "stage": 1, "platform": "shopee"}
+JOB = {"id": "job-1", "state": "running", "stage": 1, "platform": "lazada"}
 
 
 class AccountsTestCase(unittest.TestCase):
@@ -54,7 +54,8 @@ class AccountsTestCase(unittest.TestCase):
 
     def live_scan(self, client=None):
         return (client or self.client).post(
-            "/api/search", json={"query": "https://shopee.ph/x-i.1.9", "platform": "shopee", "live": True}
+            "/api/search",
+            json={"query": "https://www.lazada.com.ph/products/x-i1234567.html", "platform": "lazada", "live": True},
         )
 
 
@@ -282,7 +283,8 @@ class TestPublicNumbers(AccountsTestCase):
     def test_public_stats_are_the_real_counts(self):
         with patch("webapp.database_counts", return_value={"products": 12, "reviews": 3456}):
             stats = self.client.get("/api/stats/public").json
-        self.assertEqual(stats, {"products": 12, "reviews": 3456, "marketplaces": 3})
+        # The app scans Lazada only (14 Oct 2026).
+        self.assertEqual(stats, {"products": 12, "reviews": 3456, "marketplaces": 1})
 
     def test_picks_are_only_products_with_no_warning_signs(self):
         webapp._catalogs["accounts-test"] = [SAMPLE_PRODUCT, fire_product(), clean_product()]
