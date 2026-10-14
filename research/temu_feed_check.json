@@ -1,0 +1,500 @@
+{
+ "what": "Can Temu's own review list be read page by page, the way the Lazada scan reads Lazada's review feed? A measurement.",
+ "runs": [
+  {
+   "measured_at": "2026-10-14T03:12:18+00:00",
+   "product": "https://www.temu.com/goods.html?goods_id=601100344333196",
+   "steps": [
+    {
+     "step": "home page and saved session",
+     "seconds": 135.7,
+     "ready": true
+    },
+    {
+     "step": "product page",
+     "seconds": 139.8,
+     "blocked": false,
+     "path": "/goods.html"
+    },
+    {
+     "step": "review section",
+     "seconds": 174.7,
+     "found": true,
+     "list_requests": 2,
+     "dom_reviews": 0
+    },
+    {
+     "step": "sort: lowest rating",
+     "seconds": 189.7,
+     "clicked": true,
+     "list_requests": 1,
+     "dom_reviews": 0
+    },
+    {
+     "step": "scroll 1",
+     "seconds": 196.3,
+     "list_requests": 1,
+     "dom_reviews": 0,
+     "dom_signature": false,
+     "check_showing": false
+    },
+    {
+     "step": "scroll 2",
+     "seconds": 203.9,
+     "list_requests": 1,
+     "dom_reviews": 0,
+     "dom_signature": false,
+     "check_showing": false
+    },
+    {
+     "step": "scroll 3",
+     "seconds": 212.5,
+     "list_requests": 1,
+     "dom_reviews": 0,
+     "dom_signature": false,
+     "check_showing": false
+    },
+    {
+     "step": "star filter",
+     "seconds": 228.4,
+     "clicked": false,
+     "list_requests": 0
+    },
+    {
+     "step": "how the next page is asked for",
+     "seconds": 228.4,
+     "advance": {
+      "fields": {
+       "page": {
+        "kind": "count",
+        "step": 1
+       }
+      }
+     }
+    },
+    {
+     "step": "one plain request for the next page",
+     "seconds": 233.5,
+     "sent": true,
+     "status": 429,
+     "reviews": 0,
+     "check_showing_after": false
+    }
+   ],
+   "checks": [
+    {
+     "during": "start",
+     "cleared": true,
+     "seconds": 124.7
+    },
+    {
+     "during": "product page",
+     "cleared": true,
+     "seconds": 10.6
+    }
+   ],
+   "advance": {
+    "fields": {
+     "page": {
+      "kind": "count",
+      "step": 1
+     }
+    }
+   },
+   "plain_request": {
+    "sent": true,
+    "left_out_fields": [],
+    "status": 429,
+    "error": null,
+    "reviews": 0,
+    "stars": [],
+    "answer_keys": [
+     "error_code",
+     "error_msg",
+     "success"
+    ],
+    "paging": {},
+    "status_fields": {
+     "success": "False",
+     "error_code": "40002",
+     "error_msg": "System busy！"
+    },
+    "check_showing_after": false
+   },
+   "list_requests": [
+    {
+     "step": "first page",
+     "path": "/api/bg/engels/reviews/list",
+     "query_fields": {
+      "goods_id": "601100344333196",
+      "page": "1",
+      "size": "10",
+      "need_max_size": "true",
+      "sort_type": "0",
+      "goods_review_label_show": "true"
+     },
+     "method": "GET",
+     "body_is_json": false,
+     "body_fields": {},
+     "header_names": [
+      "Accept",
+      "Anti-Content",
+      "Referer",
+      "User-Agent",
+      "VerifyAuthToken",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "all_header_names": [
+      ":authority",
+      ":method",
+      ":path",
+      ":scheme",
+      "accept",
+      "accept-encoding",
+      "accept-language",
+      "anti-content",
+      "cookie",
+      "priority",
+      "referer",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "user-agent",
+      "verifyauthtoken",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "status": 200,
+     "reviews": 8,
+     "stars": [
+      5
+     ],
+     "answer_keys": [
+      "data",
+      "exp_params",
+      "max_list_size"
+     ],
+     "paging": {
+      "max_list_size": 535
+     }
+    },
+    {
+     "step": "first page",
+     "path": "/api/bg/engels/reviews/similar/list",
+     "query_fields": {
+      "goods_id": "601100344333196",
+      "page": "1",
+      "size": "10",
+      "need_max_size": "true"
+     },
+     "method": "GET",
+     "body_is_json": false,
+     "body_fields": {},
+     "header_names": [
+      "Accept",
+      "Anti-Content",
+      "Referer",
+      "User-Agent",
+      "VerifyAuthToken",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "all_header_names": [
+      ":authority",
+      ":method",
+      ":path",
+      ":scheme",
+      "accept",
+      "accept-encoding",
+      "accept-language",
+      "anti-content",
+      "cookie",
+      "priority",
+      "referer",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "user-agent",
+      "verifyauthtoken",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "status": 200,
+     "reviews": 0,
+     "stars": [],
+     "answer_keys": [
+      "exp_params"
+     ],
+     "paging": {}
+    },
+    {
+     "step": "lowest rating",
+     "path": "/api/bg/engels/reviews/list",
+     "query_fields": {
+      "goods_id": "601100344333196",
+      "page": "1",
+      "size": "10",
+      "need_max_size": "true",
+      "sort_type": "2",
+      "goods_review_label_show": "true"
+     },
+     "method": "GET",
+     "body_is_json": false,
+     "body_fields": {},
+     "header_names": [
+      "Accept",
+      "Anti-Content",
+      "Referer",
+      "User-Agent",
+      "VerifyAuthToken",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "all_header_names": [
+      ":authority",
+      ":method",
+      ":path",
+      ":scheme",
+      "accept",
+      "accept-encoding",
+      "accept-language",
+      "anti-content",
+      "cookie",
+      "priority",
+      "referer",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "user-agent",
+      "verifyauthtoken",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "status": 200,
+     "reviews": 8,
+     "stars": [
+      1
+     ],
+     "answer_keys": [
+      "data",
+      "exp_params",
+      "max_list_size"
+     ],
+     "paging": {
+      "max_list_size": 535
+     }
+    },
+    {
+     "step": "scroll 1",
+     "path": "/api/bg/engels/reviews/list",
+     "query_fields": {
+      "goods_id": "601100344333196",
+      "page": "2",
+      "size": "10",
+      "need_max_size": "true",
+      "sort_type": "2",
+      "goods_review_label_show": "true"
+     },
+     "method": "GET",
+     "body_is_json": false,
+     "body_fields": {},
+     "header_names": [
+      "Accept",
+      "Anti-Content",
+      "Referer",
+      "User-Agent",
+      "VerifyAuthToken",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "all_header_names": [
+      ":authority",
+      ":method",
+      ":path",
+      ":scheme",
+      "accept",
+      "accept-encoding",
+      "accept-language",
+      "anti-content",
+      "cookie",
+      "priority",
+      "referer",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "user-agent",
+      "verifyauthtoken",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "status": 200,
+     "reviews": 7,
+     "stars": [
+      1,
+      2,
+      3
+     ],
+     "answer_keys": [
+      "data",
+      "exp_params",
+      "max_list_size"
+     ],
+     "paging": {
+      "max_list_size": 535
+     }
+    },
+    {
+     "step": "scroll 2",
+     "path": "/api/bg/engels/reviews/list",
+     "query_fields": {
+      "goods_id": "601100344333196",
+      "page": "3",
+      "size": "10",
+      "need_max_size": "true",
+      "sort_type": "2",
+      "goods_review_label_show": "true"
+     },
+     "method": "GET",
+     "body_is_json": false,
+     "body_fields": {},
+     "header_names": [
+      "Accept",
+      "Anti-Content",
+      "Referer",
+      "User-Agent",
+      "VerifyAuthToken",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "all_header_names": [
+      ":authority",
+      ":method",
+      ":path",
+      ":scheme",
+      "accept",
+      "accept-encoding",
+      "accept-language",
+      "anti-content",
+      "cookie",
+      "priority",
+      "referer",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "user-agent",
+      "verifyauthtoken",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "status": 200,
+     "reviews": 5,
+     "stars": [
+      3
+     ],
+     "answer_keys": [
+      "data",
+      "exp_params",
+      "max_list_size"
+     ],
+     "paging": {
+      "max_list_size": 535
+     }
+    },
+    {
+     "step": "scroll 3",
+     "path": "/api/bg/engels/reviews/list",
+     "query_fields": {
+      "goods_id": "601100344333196",
+      "page": "4",
+      "size": "10",
+      "need_max_size": "true",
+      "sort_type": "2",
+      "goods_review_label_show": "true"
+     },
+     "method": "GET",
+     "body_is_json": false,
+     "body_fields": {},
+     "header_names": [
+      "Accept",
+      "Anti-Content",
+      "Referer",
+      "User-Agent",
+      "VerifyAuthToken",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "all_header_names": [
+      ":authority",
+      ":method",
+      ":path",
+      ":scheme",
+      "accept",
+      "accept-encoding",
+      "accept-language",
+      "anti-content",
+      "cookie",
+      "priority",
+      "referer",
+      "sec-ch-ua",
+      "sec-ch-ua-mobile",
+      "sec-ch-ua-platform",
+      "sec-fetch-dest",
+      "sec-fetch-mode",
+      "sec-fetch-site",
+      "user-agent",
+      "verifyauthtoken",
+      "x-document-referer",
+      "x-phan-data"
+     ],
+     "status": 200,
+     "reviews": 5,
+     "stars": [
+      4
+     ],
+     "answer_keys": [
+      "data",
+      "exp_params",
+      "max_list_size"
+     ],
+     "paging": {
+      "max_list_size": 535
+     }
+    }
+   ]
+  }
+ ]
+}

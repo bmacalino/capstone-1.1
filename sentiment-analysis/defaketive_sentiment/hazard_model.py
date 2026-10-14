@@ -178,6 +178,50 @@ DENIED_REASONS = frozenset(
 DURABILITY_PRAISE_WORDS = re.compile(r"(?:matagal|tumagal)\w*", re.IGNORECASE)
 DURABILITY_PRAISE_WISH = re.compile(r"(?<!\w)(?:sana|sanang|hope|hoping)(?!\w)", re.IGNORECASE)
 DURABILITY_PRAISE_REVISION = "f5"
+# "Mabigat...matagal masira" protected a KEYWORD match ("sira"); this is the
+# same idea for a LEARNED-only flag, found the same night from the owner's
+# own screenshots: "Functionality:Matagal ma lobat" (slow to lose battery -
+# good) and "Mabilis ma charge, matagal malowbatt." (both halves good) score
+# 0.61-0.87, high enough to clear the star bar, yet the sentiment reader
+# calls short fragments like these "neutral" (never "positive"), so the
+# existing praise gate ("never flag a sentence read as praise") never
+# engages - a broader, separate weakness of the sentiment model on short
+# fragments, not fixed here. "malowbat"/"lowbat" bare is not a registered
+# keyword at all (everything eventually runs low), so this cannot go through
+# DENIED_REASONS/_excluded() the way "sira" did; it gates the learned
+# "or_gated" decision directly - no wish marker needed this time, unlike the
+# "sira" case above: "Functionality:Matagal ma lobat" has none and is still
+# clearly praise. Measured (research/check_battery_durability_praise.py):
+# 2 flags removed, 0 added, both removals correct - one of them the exact
+# review from the owner's screenshot, sitting in the TEAM's own round 8.
+BATTERY_DURABILITY_PRAISE = re.compile(
+    r"(?:matagal|tumagal)\w*\s*(?:ma\s*)?(?:lowbat|lobat|low\s*bat)\w*", re.IGNORECASE
+)
+BATTERY_DURABILITY_PRAISE_REVISION = "f6"
+
+# "Gumagana naman" (it works) - same mechanism as the battery guard above, a
+# different fragment: a bare, isolated "it works" statement, no complaint of
+# any kind attached. Deliberately narrow after a near miss the same night
+# (a first idea, excluding any clause with "not as described" language, was
+# measured and reverted - see the note further down - because the team's own
+# ruling makes many surface-similar sentences real defects). The risk here is
+# the opposite shape: "isa/isang lang gumagana" (only one works) is a real
+# partial-failure report, so PURE_AFFIRMATION requires the WHOLE clause to be
+# nothing but the verb and mild fillers/nouns, and ONLY_N_WORKS explicitly
+# keeps its hands off "only N work(s)" framing. Checked against every
+# "gumagana/gumana/nagana" sentence in five_label_data by hand before being
+# wired in: 0 matches among 201 TRUE (real-report) sentences, 9 correct
+# matches among the FALSE ones.
+PURE_AFFIRMATION = re.compile(
+    r"^(?:chinarge\s+ko\s+)?(?:gumagana|gumana|nagana)\w*"
+    r"(?:\s+(?:naman|nman|po|na|pa\s*rin|parin|lang|lng|din|rin|sya|siya|cya|xa|cia|nya|niya|"
+    r"yung|ung|speaker|item|mic|fan|ilaw|phone|sa\s*\w+|thanks?you+|seller|thank\s*you))*[.,!]?$",
+    re.IGNORECASE,
+)
+ONLY_N_WORKS = re.compile(
+    r"\b(?:isa|isang|one|1)\w*\s+(?:lang|lng|only)\b.{0,15}\b(?:gumagana|gumana|nagana)\w*", re.IGNORECASE
+)
+PURE_AFFIRMATION_REVISION = "f7"
 
 # A mild heat word ("umiinit", "mainit") is suppressed as a safety signal when
 # the sentence is about something worn, the weather or a venue, or a product
@@ -806,6 +850,17 @@ class LexiconHazardTagger:
                         ):
                             gated[category] = "denied_by_keywords"
                             continue
+                        if self.rules == "0.4" and category == DEFECT and BATTERY_DURABILITY_PRAISE.search(normalized):
+                            gated[category] = "battery_durability_praise"
+                            continue
+                        if (
+                            self.rules == "0.4"
+                            and category == DEFECT
+                            and PURE_AFFIRMATION.match(normalized.strip())
+                            and not ONLY_N_WORKS.search(normalized)
+                        ):
+                            gated[category] = "pure_affirmation"
+                            continue
                         rest = without_non_product_words(normalized)
                         model = getattr(self.learned, "models", {}).get(category)
                         if rest is not None and model is not None and (
@@ -898,6 +953,16 @@ class LexiconHazardTagger:
                 severities[COUNTERFEIT] = MIN_CONFIDENT_SEVERITY
                 confidence[COUNTERFEIT] = about_the_product
                 tags.sort(key=CATEGORIES.index)
+            # TRIED (13 Oct 2026) and REVERTED: removing a learned-only
+            # "defect" flag from a clause that also disputes a spec (not
+            # fast charging, wrong mAh/GB). Measured against five_label_data:
+            # removed_right 26, removed_wrong 14 - the wrong direction,
+            # because the team's own 7 Oct ruling says slow charging ALONE
+            # IS a defect, so most "not fast charging" / capacity-mismatch
+            # sentences are correctly labelled true defects, not
+            # not-as-described. research/check_defect_not_as_described.py
+            # keeps the measurement for the record; do not retry this
+            # specific idea without new evidence.
 
         return {
             "text_raw": raw,
@@ -1062,6 +1127,8 @@ class HazardBadgeModel:
                 + LEXICON_LEAD_VARIANTS_REVISION_2
                 + NEGATION_TRANSPARENT_CONTRACTIONS_04_EXTRA_REVISION
                 + DURABILITY_PRAISE_REVISION
+                + BATTERY_DURABILITY_PRAISE_REVISION
+                + PURE_AFFIRMATION_REVISION
             )
         hazard_version = base_version
         if learned is not None:

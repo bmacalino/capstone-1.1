@@ -3,6 +3,7 @@ import json
 import pickle
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 from urllib.parse import parse_qs, urlsplit
 
 from src.temu_scraper import TemuScraper, build_parser
@@ -28,6 +29,14 @@ class TestTemuScraper(unittest.TestCase):
         self.assertIn("--disable-search-engine-choice-screen", self.scraper.options.arguments)
         self.assertIn("--window-size=900,700", self.scraper.options.arguments)
         self.assertNotIn("--start-maximized", self.scraper.options.arguments)
+        # A covered window keeps loading reviews.
+        for switch in (
+            "--disable-backgrounding-occluded-windows",
+            "--disable-renderer-backgrounding",
+            "--disable-background-timer-throttling",
+            "--disable-features=CalculateNativeWinOcclusion",
+        ):
+            self.assertIn(switch, self.scraper.options.arguments)
 
     def test_cookie_save_is_atomic_and_preserves_previous_session_on_browser_failure(self):
         class BrokenDriver:
@@ -377,6 +386,166 @@ class TestTemuScraper(unittest.TestCase):
         product = {"goods_id": "601100261015054"}
         reviews = self.scraper._capture_review_network(product)
         self.assertEqual([review["comment_id"] for review in reviews], ["network-review"])
+
+    def test_review_list_pages_are_counted_from_the_pages_own_answers(self):
+        # The page's own requests, as measured on 14 Oct 2026 (research/temu_feed_check.json).
+        goods = "601100344333196"
+        list_url = (
+            f"https://www.temu.com/api/bg/engels/reviews/list?goods_id={goods}"
+            "&page=3&size=10&need_max_size=true&sort_type=2"
+        )
+        similar_url = f"https://www.temu.com/api/bg/engels/reviews/similar/list?goods_id={goods}&page=7&size=10"
+
+        def entry(method, request_id, url):
+            params = {"requestId": request_id}
+            if method == "Network.requestWillBeSent":
+                params["request"] = {"url": url}
+            else:
+                params.update({"type": "XHR", "response": {"url": url}})
+            return {"message": json.dumps({"message": {"method": method, "params": params}})}
+
+        messages = [
+            entry("Network.requestWillBeSent", "list", list_url),
+            entry("Network.responseReceived", "list", list_url),
+            entry("Network.requestWillBeSent", "similar", similar_url),
+            entry("Network.responseReceived", "similar", similar_url),
+        ]
+        answers = {
+            "list": {
+                "result": {
+                    "data": [{"goods_id": goods, "comment_id": "r1", "star_rating": 2, "comment": "Stopped charging"}],
+                    "max_list_size": 535,
+                }
+            },
+            # Reviews of other products: not this list, and its size is not this list's size.
+            "similar": {"data": [], "max_list_size": 99},
+        }
+
+        class FakeDriver:
+            drained = False
+
+            def get_log(self, _kind):
+                if self.drained:
+                    return []
+                self.drained = True
+                return messages
+
+            @staticmethod
+            def execute_cdp_cmd(_command, params):
+                return {"body": json.dumps(answers[params["requestId"]]), "base64Encoded": False}
+
+        self.scraper.driver = FakeDriver()
+        product = {"goods_id": goods}
+        self.assertFalse(self.scraper._reads_reviews_from_list(product))
+        reviews = self.scraper._capture_review_network(product)
+        self.assertEqual([review["comment_id"] for review in reviews], ["r1"])
+        self.assertEqual(self.scraper._review_list_pages[goods], {("2", 3)})
+        self.assertEqual(self.scraper._review_list_page_size[goods], 10)
+        self.assertEqual(self.scraper._review_list_size[goods], 535)
+        self.assertTrue(self.scraper._reads_reviews_from_list(product))
+
+    def _list_reading_scraper(self, pages_per_scroll=1, list_size=535):
+        """A scraper whose page shows no readable review, while each scroll makes the page load a list page."""
+        goods = "601100344333196"
+        product = {
+            "link": f"https://www.temu.com/goods.html?goods_id={goods}",
+            "goods_id": goods,
+            "name": "Wireless earbuds",
+            "comments": [],
+        }
+        state = {"pages": 1, "scrolls": 0}
+
+        def capture(_product):
+            self.scraper._review_list_pages[goods] = {("2", page) for page in range(1, state["pages"] + 1)}
+            return [
+                {
+                    "comment_id": f"p{page}-{number}",
+                    "rating": 1 + page % 5,
+                    "content": f"Review {number} of page {page}",
+                    "author": "",
+                    "time": "",
+                    "extraction_source": "network",
+                }
+                for page in range(1, state["pages"] + 1)
+                for number in range(5)
+            ]
+
+        class FakeDriver:
+            current_url = product["link"]
+
+            @staticmethod
+            def execute_script(_script, *_arguments):
+                state["scrolls"] += 1
+                state["pages"] += pages_per_scroll
+
+        self.scraper.driver = FakeDriver()
+        self.scraper._review_list_page_size[goods] = 10
+        self.scraper._review_list_size[goods] = list_size
+        state["page_reads"] = 0
+
+        def page_reader(_root):
+            state["page_reads"] += 1
+            return []
+
+        self.scraper._reviews_from_current_view = page_reader
+        self.scraper._review_signature = lambda _root: ""
+        state["section_lookups"] = 0
+
+        def review_root():
+            state["section_lookups"] += 1
+
+        self.scraper._review_root = review_root
+        self.scraper._verification_detected = lambda: False
+        self.scraper._capture_review_network = capture
+        capture(product)  # the first page, loaded when the review list opened
+        return product, state
+
+    def test_scrolls_on_while_temu_loads_review_pages_it_cannot_read_off_the_page(self):
+        # Until 14 Oct 2026 a scan stopped here after the first page ("missing_review_signature").
+        product, state = self._list_reading_scraper()
+        self.scraper.review_limit = 12
+        with TemporaryDirectory() as directory, patch("src.temu_scraper.time.sleep"):
+            self.scraper.out_file = str(Path(directory) / "list.json")
+            reviews = self.scraper._collect_reviews(object(), product=product)
+        # Three pages of five: the third page passes the target, and the report keeps the first 12.
+        self.assertEqual(len(reviews), 15)
+        self.assertEqual(state["scrolls"], 2)
+        self.assertEqual(product["review_checkpoint"]["stop_reason"], "target_reached")
+        # The review section is not looked for again on every page (that grew to 40 s a page), and
+        # the page reader, which found nothing on the first page, is not run again (45 s a page).
+        self.assertEqual(state["section_lookups"], 0)
+        self.assertEqual(state["page_reads"], 1)
+
+    def test_stops_at_the_end_of_the_review_list(self):
+        product, state = self._list_reading_scraper(list_size=20)
+        self.scraper.review_limit = 100
+        with TemporaryDirectory() as directory, patch("src.temu_scraper.time.sleep"):
+            self.scraper.out_file = str(Path(directory) / "end.json")
+            reviews = self.scraper._collect_reviews(object(), product=product)
+        # Page 2 of a 20-entry list in pages of 10 is its last page: no third scroll.
+        self.assertEqual((len(reviews), state["scrolls"]), (10, 1))
+        self.assertEqual(product["review_checkpoint"]["stop_reason"], "review_list_end")
+        self.assertTrue(self.scraper._existing_result_complete(product))
+
+    def test_stops_when_temu_loads_no_further_page(self):
+        product, state = self._list_reading_scraper(pages_per_scroll=0)
+        self.scraper.review_limit = 100
+        self.scraper.pagination_retries = 2
+        self.scraper.pagination_timeout = 3
+        clock = {"now": 0.0}
+
+        def sleep(seconds):
+            clock["now"] += seconds
+
+        with (
+            TemporaryDirectory() as directory,
+            patch("src.temu_scraper.time.time", side_effect=lambda: clock["now"]),
+            patch("src.temu_scraper.time.sleep", side_effect=sleep),
+        ):
+            self.scraper.out_file = str(Path(directory) / "stalled.json")
+            reviews = self.scraper._collect_reviews(object(), product=product)
+        self.assertEqual((len(reviews), state["scrolls"]), (5, 2))
+        self.assertEqual(product["review_checkpoint"]["stop_reason"], "no_more_review_pages")
 
     def test_collects_network_reviews_when_dom_cards_are_empty(self):
         network_review = {
@@ -746,6 +915,167 @@ class TestTemuScraper(unittest.TestCase):
         self.assertIsNone(self.scraper._open_review_section())
         self.assertEqual(events, ["checked"])
 
+    def test_waiting_for_a_check_says_so_and_says_when_it_is_cleared(self):
+        # The app shows "This scan needs you" on the first line and takes it away on the last.
+        events = []
+        answers = iter([True, True, False])
+        self.scraper.verification_timeout = 60
+        self.scraper._verification_detected = lambda: next(answers)
+        self.scraper._bring_window_forward = lambda: events.append("forward")
+        self.scraper._save_cookies = lambda: events.append("cookies")
+        with patch("src.temu_scraper.time.sleep"), self.assertLogs(level="INFO") as logs:
+            self.assertTrue(self.scraper._wait_for_verification_clear())
+        lines = [record.getMessage() for record in logs.records]
+        self.assertEqual(lines[0], "Step: waiting for you to complete Temu's check in the Chrome window")
+        self.assertEqual(lines[-1], "Step: Temu check cleared")
+        self.assertIn("Waiting up to 60 seconds for Temu verification", lines)
+        self.assertEqual(events, ["forward", "cookies"])
+
+    def test_a_check_left_undone_is_reported_once_the_wait_is_over(self):
+        clock = {"now": 1000.0}
+
+        def sleep(seconds):
+            clock["now"] += seconds
+
+        self.scraper.verification_timeout = 6
+        self.scraper._verification_detected = lambda: True
+        self.scraper._bring_window_forward = lambda: None
+        with (
+            patch("src.temu_scraper.time.time", side_effect=lambda: clock["now"]),
+            patch("src.temu_scraper.time.sleep", side_effect=sleep),
+            self.assertLogs(level="INFO") as logs,
+        ):
+            self.assertFalse(self.scraper._wait_for_verification_clear())
+        lines = [record.getMessage() for record in logs.records]
+        self.assertEqual(lines[-1], "Temu verification was not completed within the timeout")
+        self.assertNotIn("Step: Temu check cleared", lines)
+
+    def test_no_wait_means_no_notice(self):
+        self.scraper.verification_timeout = 0
+        with self.assertNoLogs(level="INFO"):
+            self.assertFalse(self.scraper._wait_for_verification_clear())
+
+    def test_bringing_the_window_forward_never_stops_a_scan(self):
+        class NoWindowDriver:
+            def minimize_window(self):
+                raise RuntimeError("no window")
+
+        self.scraper.driver = NoWindowDriver()
+        self.scraper._bring_window_forward()
+
+    def test_review_progress_counts_the_whole_product(self):
+        # Reading 3-star reviews after two 2-star ones: the app is told 3 of 20, not 1.
+        self.scraper._reviews_from_current_view = lambda _root: []
+        review = {"comment_id": "three", "rating": 3, "content": "Three stars", "author": "", "time": ""}
+        self.scraper._capture_review_network = lambda _product: [review]
+        product = {
+            "link": "https://www.temu.com/goods.html?goods_id=601100261015054",
+            "goods_id": "601100261015054",
+            "comments": [
+                {"comment_id": "two-a", "rating": 2, "content": "Two stars", "source_rating_filter": 2},
+                {"comment_id": "two-b", "rating": 2, "content": "Two stars again", "source_rating_filter": 2},
+            ],
+        }
+        with TemporaryDirectory() as directory, self.assertLogs(level="INFO") as logs:
+            self.scraper.out_file = str(Path(directory) / "progress.json")
+            self.scraper._collect_reviews(object(), product=product, max_reviews=1, source_filter=3)
+        self.assertIn("Step: reviews read: 3 of 20", [record.getMessage() for record in logs.records])
+
+    # --- Window modes, as in the Lazada scraper -------------------------------------------
+
+    def _window_scraper(self, mode):
+        return TemuScraper(
+            product_urls=["https://www.temu.com/goods.html?goods_id=601100344333196"],
+            pause_for_verification=False,
+            window_mode=mode,
+        )
+
+    def _start(self, subject):
+        with (
+            patch("src.temu_scraper.SafeChrome") as chrome,
+            patch("src.temu_scraper._position_scraper_window") as position,
+            patch.object(TemuScraper, "_detect_chrome_major", return_value=None),
+        ):
+            driver = subject._start_browser()
+        return chrome, position, driver
+
+    def test_window_modes_and_the_command_line(self):
+        self.assertIn("--window-position=-20000,0", self._window_scraper("offscreen").options.arguments)
+        self.assertFalse(
+            any(arg.startswith("--window-position") for arg in self._window_scraper("visible").options.arguments)
+        )
+        with self.assertRaises(ValueError):
+            self._window_scraper("minimised")
+        self.assertEqual(build_parser().parse_args(["laptop stand"]).window, "visible")
+        self.assertEqual(build_parser().parse_args(["laptop stand", "--window", "headless"]).window, "headless")
+
+    def test_only_headless_starts_chrome_headless_and_every_chrome_logs_the_network(self):
+        for mode, headless in (("visible", False), ("offscreen", False), ("headless", True)):
+            with self.subTest(mode=mode):
+                chrome, position, driver = self._start(self._window_scraper(mode))
+                self.assertIs(chrome.call_args.kwargs["headless"], headless)
+                # Only a visible window is placed beside the app.
+                self.assertEqual(position.called, mode == "visible")
+                # The reviews are read from Chrome's network log.
+                driver.execute_cdp_cmd.assert_called_once_with("Network.enable", {})
+
+    def test_a_second_chrome_gets_fresh_options(self):
+        # undetected-chromedriver refuses an options object it has used.
+        subject = self._window_scraper("headless")
+        first, _, _ = self._start(subject)
+        second, _, _ = self._start(subject)
+        self.assertIsNot(first.call_args.kwargs["options"], second.call_args.kwargs["options"])
+
+    def test_an_offscreen_window_comes_on_screen_for_a_check_and_stays(self):
+        subject = self._window_scraper("offscreen")
+        forward = []
+        subject._bring_window_forward = lambda: forward.append(subject.window_mode)
+        with self.assertLogs(level="INFO") as logs:
+            subject._show_window("Temu is asking for a check")
+        self.assertEqual(subject.window_mode, "visible")
+        self.assertEqual(forward, ["visible"])
+        self.assertIn("Step: showing the Chrome window (Temu is asking for a check)", [r.getMessage() for r in logs.records])
+
+    def test_a_headless_scan_carries_on_in_a_visible_chrome_on_the_same_page(self):
+        from unittest.mock import Mock
+
+        product = "https://www.temu.com/goods.html?goods_id=601100344333196"
+        subject = self._window_scraper("headless")
+        hidden, shown = Mock(current_url=product), Mock()
+        subject.driver = hidden
+        steps = []
+        subject._save_cookies = lambda: steps.append("save session")
+        subject._load_cookies = lambda: steps.append("load session")
+        subject._start_browser = lambda: steps.append(f"start {subject.window_mode}") or shown
+        subject._safe_get = lambda url, check_verification=True: steps.append((url, check_verification))
+        subject._show_window("Temu is asking for a check")
+        hidden.quit.assert_called_once()
+        self.assertIs(subject.driver, shown)
+        self.assertEqual(steps, [
+            "save session", "start visible",
+            (TemuScraper.MARKET_HOME, False), "load session", (product, False),
+        ])
+
+    def test_a_check_in_a_hidden_scan_shows_the_window_before_the_wait(self):
+        subject = self._window_scraper("headless")
+        subject.verification_timeout = 60
+        events = []
+        answers = iter([True, False])
+        subject._verification_detected = lambda: next(answers)
+        subject._show_window = lambda reason: events.append(("show", reason))
+        subject._save_cookies = lambda: events.append("save session")
+        with patch("src.temu_scraper.time.sleep"), self.assertLogs(level="INFO"):
+            self.assertTrue(subject._wait_for_verification_clear())
+        self.assertEqual(events, [("show", "Temu is asking for a check"), "save session"])
+
+    def test_a_visible_scan_only_brings_its_window_forward(self):
+        subject = self._window_scraper("visible")
+        forward = []
+        subject._bring_window_forward = lambda: forward.append("forward")
+        subject._start_browser = lambda: self.fail("a visible scan never restarts Chrome")
+        subject._show_window("Temu is asking for a check")
+        self.assertEqual((forward, subject.window_mode), (["forward"], "visible"))
+
     def test_parser_supports_all_reviews_and_filters(self):
         args = build_parser().parse_args(
             [
@@ -922,6 +1252,61 @@ class TestTemuScraper(unittest.TestCase):
             product["review_checkpoint"]["stop_reason"], "review_widget_missing"
         )
         self.assertNotIn("no_reviews_confirmed", product)
+
+    def _scrape_with_list(self, stop_reason):
+        """One product scrape where Temu's page shows no review count and its list holds 535 entries."""
+
+        class Body:
+            text = "Wireless earphones with noise cancellation"
+
+        class FakeDriver:
+            current_url = "https://www.temu.com/goods.html?goods_id=601100344333196"
+
+            @staticmethod
+            def find_elements(_by, _value):
+                return []
+
+            @staticmethod
+            def find_element(_by, _value):
+                return Body()
+
+        product = self.scraper._product_from_url(FakeDriver.current_url)
+        reviews = [
+            {"comment_id": f"r{number}", "rating": number, "content": f"Review {number}"} for number in (1, 2, 5)
+        ]
+
+        def collect(_root, product=None, **_kwargs):
+            self.scraper._checkpoint_reviews(product, reviews, 1, stop_reason=stop_reason)
+            return reviews
+
+        self.scraper.driver = FakeDriver()
+        self.scraper._safe_get = lambda _url: False
+        self.scraper._dismiss_popups = lambda: None
+        self.scraper._json_ld_product = lambda: {}
+        self.scraper._open_review_section = lambda: object()
+        self.scraper._click_lowest_rating_sort = lambda _root, _product=None: True
+        self.scraper._review_root = lambda: None
+        self.scraper._collect_reviews = collect
+        self.scraper._review_list_size[product["goods_id"]] = 535
+        with TemporaryDirectory() as directory:
+            self.scraper.out_file = str(Path(directory) / "listed.json")
+            self.scraper._scrape_details(product)
+        return product
+
+    def test_a_scan_that_stopped_before_the_end_of_the_list_is_not_the_whole_listing(self):
+        # Temu's page shows no review count any more: the total used to become the 3 reviews read,
+        # and the analysis then took 3 lowest-rated reviews for the whole listing.
+        product = self._scrape_with_list("target_reached")
+        self.assertEqual((product["total_rating"], product["review_list_size"]), (535, 535))
+        self.assertNotIn("reported_review_count", product)
+        self.assertIn("535", product["review_collection_warning"])
+
+    def test_a_scan_that_read_the_list_to_its_end_has_every_written_review(self):
+        product = self._scrape_with_list("review_list_end")
+        # Every entry was loaded; the rest of the 535 are ratings without text.
+        self.assertEqual(product["reported_review_count"], 3)
+        self.assertEqual(product["total_rating"], 535)
+        self.assertNotIn("review_collection_warning", product)
 
 
 if __name__ == "__main__":

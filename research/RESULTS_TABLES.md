@@ -1815,6 +1815,59 @@ Limits.
 
 ---
 
+## Table 12f. How Temu's reviews can be read (14 Oct 2026)
+
+The 7 saved Temu reports hold 6 to 29 reviews each. Before changing the Temu
+scraper, `research/check_temu_review_feed.py` opened one saved listing
+(goods_id 601100344333196) as a scan does and recorded what the page asks
+Temu for (`research/temu_feed_check.json`; field names, counts and status
+codes only, no review text or names).
+
+| Question | Answer |
+|---|---|
+| Where the page gets its reviews | `GET /api/bg/engels/reviews/list` with `goods_id`, `page`, `size=10`, `sort_type` (0 recommended, 2 lowest rating); one page per scroll of the review list |
+| What one answer says about the list | `max_list_size` 535 (entries, written or not) |
+| Headers on every request the page sends | `Anti-Content`, `VerifyAuthToken`, `x-phan-data` (Temu's anti-bot tokens) |
+| One plain request for the next page, without those tokens | refused: HTTP 429, error 40002 "System busy" |
+| A star filter in the review list | none found |
+| Reviews the scraper's page reader found on the page | 0 at every step |
+| Checks Temu asked for | 2 in this run (home page, then product page) |
+
+So Temu's list cannot be asked for page by page the way Lazada's feed is
+(Table 12d) without copying or making Temu's tokens, which the project does
+not do. Reading what the page loads while it is scrolled works, and the
+reason scans stopped after the first page was the scraper's own: it used the
+reviews it read off the page, always none on Temu's current layout, to decide
+whether a scroll had worked. Extractor version 10 goes on while Temu keeps
+loading pages.
+
+| Scan of the same listing | Written reviews read | Pages | Reading time |
+|---|---|---|---|
+| Saved report (extractor 9) | 15 | 1 | — |
+| Version 10, the app's setting (100 reviews) | 100 | 27 | 25 min (before the two speed fixes) |
+| Version 10, the whole list, both speed fixes | 194 (all) | 54 | 2 min 17 s |
+
+Of the 194 written reviews, 9 have 1 star, 3 two, 8 three, 21 four and 153
+five. Lowest rating first, the first 100 hold all 20 of one to three stars,
+all 21 four-star ones and 59 of the 153 five-star ones.
+
+Limits.
+
+- One listing. Temu asked for a check on the product page in each of the three
+  scans that day; how often it asks in general was not measured.
+- Temu shows no per-star counts and no star filter, so a Temu scan cannot be
+  stratified and weighted like Lazada's (Table 12d). A scan that stops before
+  the end of the list is partial, and its report says "Not enough reviews to
+  judge".
+- Read to its end, the list holds all its written reviews, yet the analysis
+  still calls the scan partial: "173 of 194 listed reviews were collected".
+  It compares the distinct reviews (duplicate texts left out) with the listed
+  count, so a fully read listing with more than 5% repeated texts counts as
+  partial. Not changed: it is a checker decision that would redo every saved
+  report.
+
+---
+
 ## Outstanding
 
 - `ldlazaro/sentiment_roberta_taglish` fine-tune — not started. It is the second

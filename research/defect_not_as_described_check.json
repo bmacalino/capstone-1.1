@@ -1,0 +1,253 @@
+{
+ "generated_at": "2026-10-14T03:07:53+00:00",
+ "checker": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5f6+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "labelled_sentences": 5384,
+ "removed_wrong": 14,
+ "removed_right": 26,
+ "added_right": 0,
+ "added_wrong": 0,
+ "rule": "keep if no flag is added and removed_right <= removed_wrong / 3",
+ "meets_rule": false,
+ "changed": [
+  {
+   "round": "1",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "sobra palang nipis hindi katulad nung nasa picture ni seller at lukot lukot na nilagyan ko lang ng matigas sa loob kaya naka umbok baka sakaling mawala yung lukot"
+  },
+  {
+   "round": "1",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Functionality:hindi lumalagpas ng 100 mbps ung cable peke mas mabilis pa ung wifi kesa sa may lan connection hindi rin saktong 5m"
+  },
+  {
+   "round": "1",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Hindi Naman fast charging katulad din ng dating ginagamit na charger sana maging totoo Naman kayo sa mga advertise niyo masmabilis parin ang dating charger ng binili Kong cellfone thankyou"
+  },
+  {
+   "round": "1",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Kaya mura dahil isang saksak mo lang lowbat na haha at pag sinsaksak mo hindi na gagana mga 1 minutes lang pag chinarge mo sa cp ayaw na gumana haha fake ang 20000mah haha fake fake fake"
+  },
+  {
+   "round": "1",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Then hindi po tlga cya fast charging."
+  },
+  {
+   "round": "2",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "ang pangit ng item im very disappointed hindi sya gumagana maganda lng sya sa pic"
+  },
+  {
+   "round": "3",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Then yung connector po ng charger hindi fast charging, pasensya napo sa comment ko."
+  },
+  {
+   "round": "3",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "not fast charging"
+  },
+  {
+   "round": "3",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "hindi siya fast charging"
+  },
+  {
+   "round": "5",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Fake ung 512gb ilang movie pa lng nailalagay ko nag cocorupt na di na ma play pag nakalagay na sa sdcard na 512gb"
+  },
+  {
+   "round": "5",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "kaso hindi siya legit ng 20000 mAh nakakadismaya ambilis malowbat at ang tagal icharge"
+  },
+  {
+   "round": "5",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Hindi sya fast charging matagal mafull ung phone q dko sure kung original ba talaga tong nabili ko"
+  },
+  {
+   "round": "5",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "pero hindi makafullcharge, peke ung nakalagay na 10400mah na battery nya, sayang lang ung pinambili ko dito,"
+  },
+  {
+   "round": "5",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "cra po ung my digital ng ask ako ng refund ayaw ng seller un 3 ganun din na mini powerbank dpo 2000mah lng talaga sya hindi 10400 fake po ito wag npo kau bbili sayang po pera nio pati color lahat di nsunod sayang lang pera"
+  },
+  {
+   "round": "6",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Sayang lang pera ko s produkto n ito hindi po totoo n 20000 mAh ang baterya, madaling mag low batt, isang phone lang nk charge low batt agad, wala p s ayos amg pag kakabalot walamg buble wrap"
+  },
+  {
+   "round": "6",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "dont buy this kind of power bank ndi totoo ung 20000 Mah base on my experience nagcharge ako from 14% hanggang 38% lang inabot tas lobat na agad ang powerbank, I have 10500mah powerbank dati nakakapuno ng 2 cp 5000mah ito ndi makapuno ng isa sana makatulong po hindi po ito worthit."
+  },
+  {
+   "round": "6",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "D sya totally 512gb saka na corrupt yung mga files na nililipat ko sa sd card and pag sinubukan naman i delete no permission to delete lumalabas scam to trust me"
+  },
+  {
+   "round": "6",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "peke na powerbank 10400mah ni di nya mapuno ang isang phone na 3500mah."
+  },
+  {
+   "round": "6",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Hindi original ang dali lang ma lowbat tapos hindi gaya ng nasa picture yung dumatingkaya wag niyo tong i order"
+  },
+  {
+   "round": "7",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "peke ung mga item nila ndi totoong 512 ung sd card."
+  },
+  {
+   "round": "7",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "It barely charged my phone with 10%, means about 500mAh only."
+  },
+  {
+   "round": "8",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "hindi sya fast charger"
+  },
+  {
+   "round": "8",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "ang hindi lang ok is ung SD card 32 gb only"
+  },
+  {
+   "round": "8",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "not a fast charger"
+  },
+  {
+   "round": "8",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "pero hindi fast charging."
+  },
+  {
+   "round": "8",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "hindi sya fast charging."
+  },
+  {
+   "round": "8",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "It doesn't match the description, not really 20000 mah, because the item quickly drain, doesn't make my phone full charged, it only adds 25 percent."
+  },
+  {
+   "round": "8",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "It doesn't even fill 10%"
+  },
+  {
+   "round": "9",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "kaso di totoong 20, 000 mah Tapos 5hrs na di pa full"
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "nasa 700mah lng ang battery hindi 4600mah magaang sya parabsa 4600mah"
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "Built-in charging plugs, Portable and lightweight, didn't able to fully charge my 5s phone which is only 1560 mah"
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "Hindi naman fast charging."
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "pero nung insert ko na sa phone ko 134gb nakalagay tapos nung nag move ako ng files to sd card 4gb lng naman yung na move ko nag insufficient na sya di na mapasokan ng files."
+  },
+  {
+   "round": "9",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "only 10meter ir 20meter auto disconnected poor item"
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "pero hindi sya 10400, parang 2500mah lang battery nya"
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "Poco X6 pro user ako at hindi sya fast charging dito sa powerbank."
+  },
+  {
+   "round": "9",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "ang panget, wala png 20 minutes lowbat n kaagad, hinde naman sya 20000mah, 200mah lng ata sya, wag na kayo oorder sayang lng pera nyo"
+  },
+  {
+   "round": "9",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "Hindi siya 24 inches and wala manlang kahit na free battery"
+  },
+  {
+   "round": "9",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Hndi naman fast charger e whahaahhahaha 1 am aki nag charge pag gising ko ng 7am 72% pa lang Sayang pera po"
+  },
+  {
+   "round": "9",
+   "change": "removed_right",
+   "labelled_faulty": true,
+   "text": "Maayos nman nakarating yung item, kaya lng ng gamitin ko na hindi sya fast charging, at saglit pa lang nagagamit mabilis syang malow bat, kc na obserbahan ko from 14% ng cp bat ko to 25% naka 25% na agad ang nawala sa power Bank."
+  }
+ ]
+}

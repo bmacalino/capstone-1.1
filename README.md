@@ -201,6 +201,26 @@ so check that product again for a comparable report. And
 that fits it; a test fails if the baseline and the review source are set
 apart.
 
+**Temu scans read on through Temu's own review list** (14 Oct 2026). Temu's
+page loads its reviews ten entries at a time from its review list while the
+list is scrolled. Every request it makes carries Temu's anti-bot tokens, and
+one plain request without them was refused ("System busy", HTTP 429), so the
+scraper never asks for a page itself: it scrolls and reads what the page
+loaded (`research/check_temu_review_feed.py`,
+`research/temu_feed_check.json`). Before this, every Temu scan stopped after
+the first page, because the page reader no longer matches Temu's layout: the
+saved Temu reports hold 6 to 29 reviews. Measured on one listing whose last
+report read 15: a scan at the app's setting read 100 written reviews; reading
+the whole list (535 entries, 194 of them written reviews) took about two
+minutes and twenty seconds after Temu's check. Temu asks for a check (a
+puzzle) often, usually as the product page opens: the progress panel says
+"This scan needs you", the window comes to the front, and the scan waits up
+to ten minutes. Temu's page no longer shows a review count, so the scraper
+records the size of Temu's list instead; a scan that stops before the end of
+the list is partial and its report says "Not enough reviews to judge". Temu
+reviews are read lowest rating first and Temu offers no star filter, so they
+cannot be weighted the way Lazada's are.
+
 The **Analyzed products** page lets you filter saved reports and inspect review
 evidence. The **Insights** page summarizes risk levels, review reliability, and
 products that may need closer review.

@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-13T10:02:23+00:00",
- "measured_with": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "generated_at": "2026-10-14T03:52:52+00:00",
+ "measured_with": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5f6f7+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
  "listings": 59,
  "enough_listings": true,
  "rule": "typical = median listing rate; warn when a listing's lower bound is above max(typical, floor); leave-one-out",
@@ -9,14 +9,14 @@
    "listings": 59,
    "typical_rate_median": 0.061123,
    "median_ci_95": [
-    0.040887,
+    0.040364,
     0.079686
    ],
-   "mean": 0.082779,
+   "mean": 0.081683,
    "percentiles": {
-    "25": 0.032086,
+    "25": 0.030087,
     "50": 0.061123,
-    "75": 0.121663,
+    "75": 0.121475,
     "90": 0.189898
    },
    "listings_with_rate_zero": 0,
@@ -66,9 +66,9 @@
   "defect": {
    "median_rate_page_scans": 0.046515,
    "median_rate_feed_scans": 0.061123,
-   "median_change": 0.00777,
-   "listings_higher": 42,
-   "listings_lower": 13,
+   "median_change": 0.005956,
+   "listings_higher": 40,
+   "listings_lower": 15,
    "listings_same": 4
   },
   "counterfeit": {

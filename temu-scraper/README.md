@@ -106,6 +106,62 @@ use three attempts and a 15-second timeout by default. Use
 `--checkpoint-every`, `--pagination-retries`, and `--pagination-timeout` to tune
 these settings. Abnormal failures save HTML and a screenshot in `debug/`.
 
+### Reading on through Temu's own review list (14 Oct 2026)
+
+Temu's page loads its reviews from its own review list
+(`/api/bg/engels/reviews/list`), ten entries a page, as the review list is
+scrolled. Measured on one listing (`research/check_temu_review_feed.py`,
+`research/temu_feed_check.json`): every request the page makes carries Temu's
+anti-bot tokens, and one plain request for the next page without them was
+refused ("System busy", HTTP 429). So the scraper never asks the list for a
+page itself and never copies or makes those tokens. It scrolls, as a person
+would, and reads the pages the page loaded.
+
+The same measurement found that no review could be read off the page any more:
+Temu's layout no longer matches the page reader. The scraper used those
+on-page reviews to tell whether a scroll worked, so every scan stopped after
+the first page (6 to 29 reviews). Since extractor version 10, when nothing can
+be read off the page but the page's own review-list pages are being read, the
+scraper goes on scrolling while Temu keeps loading pages. It stops at the
+review limit, at the end of the list by Temu's own count (`review_list_end`),
+or when a scroll loads nothing more after three tries
+(`no_more_review_pages`). It keeps the review section it found instead of
+looking for it on every page, which took 40 seconds a page by 66 reviews, and
+once the page reader has found nothing on the first page it is not run again
+(it searched the whole growing list three times a page: 45 seconds a page by
+the 37th). With both, a page takes about two seconds: the whole list of one
+listing (535 entries, 54 pages, 194 written reviews) was read in about two
+minutes and twenty seconds.
+
+Temu's page no longer shows its review count, and a total equal to the reviews
+read would tell the analysis it had the whole listing. The scraper records the
+size of Temu's list (`review_list_size`, from the list's own `max_list_size`)
+and uses it as the total when the page shows none. A scan that loaded the list
+to its end (`review_list_end`) also records `reported_review_count`: the
+written reviews it read are all the written reviews the list holds.
+
+The scraper prints `Step:` lines the app turns into its progress panel, and
+says when it waits for a check (`Step: waiting for you to complete Temu's check
+in the Chrome window`, then `Step: Temu check cleared`). It brings its window
+forward for the check. Chrome is started with the switches that keep a covered
+window loading.
+
+### Hidden window: built, not in use (14 Oct 2026)
+
+`--window offscreen` (the window parked outside the screen) and
+`--window headless` (no window) work as in the Lazada scraper: when Temu asks
+for a check, the window comes on screen, or a headless scan starts Chrome again
+in a visible window on the same page, and the person completes it. The app does
+not use them. The measurement that would choose a mode
+(`research/check_hidden_temu.py`, rule fixed in its docstring, results in
+`research/temu_hidden_check.json`) did not finish: on its first run every
+product page showed "This item is sold out", and an hour later an ordinary
+window got the same page for a listing that had been read in full that
+morning. Either the listings sold out, or Temu was by then showing this
+session sold-out pages after a day of test visits. The owner chose to put
+Temu aside and work on Lazada. A headless Chrome told Temu it was headless and
+was still served the home page without a check.
+
 ## Output
 
 Results are saved incrementally to `temu_ph_<keyword>.json`. Important fields

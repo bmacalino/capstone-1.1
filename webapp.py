@@ -83,6 +83,21 @@ LAZADA_REVIEWS_HELD_MESSAGE = (
 )
 # The scraper reads the star levels in this order (RATING_COLLECTION_ORDER).
 LAZADA_STAR_PROGRESS = {"3": 38, "2": 44, "4": 50, "1": 56, "5": 62}
+# What the progress panel says when the Temu scraper waits for the person to
+# complete a check or a login in its Chrome window (_temu_scan_progress). That
+# window is always on screen; the scraper never answers either itself.
+TEMU_CHECK_MESSAGE = (
+    "Temu is asking for a check, usually a puzzle, or a login. Complete it in the Temu Chrome window. "
+    "The scan continues by itself afterwards."
+)
+TEMU_CHECK_TIMEOUT_MESSAGE = (
+    "Temu's check was not completed in time, so this scan stopped without a new report. "
+    "Start it again when you can do the check in the Chrome window."
+)
+TEMU_NOT_SHOWN_MESSAGE = (
+    "Temu did not show the product. If a check or a login appeared in the Chrome window, "
+    "complete it and start the scan again."
+)
 MARKETPLACE_NAMES = ("Shopee PH", "Lazada PH", "Temu PH")
 
 _catalogs: dict[str, list[dict[str, Any]]] = {}
@@ -361,6 +376,10 @@ def _user_facing_failure(output: Any) -> str:
         return "Chrome closed or disconnected before collection completed. Start a fresh scan and keep the scraper window open through login and collection."
     if "SHOPEE_COLLECTION_FAILED" in output:
         return "Shopee did not return usable product data. Complete login or verification in the scraper window and try again."
+    if "Temu verification was not completed within the timeout" in output:
+        return TEMU_CHECK_TIMEOUT_MESSAGE
+    if "No Temu product pages were extracted" in output:
+        return TEMU_NOT_SHOWN_MESSAGE
     return output[-1800:] if output else "Marketplace collection failed."
 
 
@@ -406,6 +425,54 @@ def _scan_progress(line: str) -> dict[str, Any] | None:
         star = step[11:12]
         return {"needs_you": False, "progress": LAZADA_STAR_PROGRESS[star], "message": f"Collecting {star}-star reviews…"}
     return None
+
+
+def _temu_scan_progress(line: str) -> dict[str, Any] | None:
+    """What the progress panel should say for one line the Temu scraper printed.
+
+    Temu's Chrome window is always on screen. `needs_you` marks the moments the
+    scraper waits for the person to complete a check or a login in it; the
+    scraper's own "check cleared" line, or the next ordinary step, clears it.
+    """
+    if "Waiting up to" in line and "for Temu verification" in line:
+        return {"needs_you": True, "message": TEMU_CHECK_MESSAGE}
+    if "Temu verification was not completed within the timeout" in line:
+        return {"needs_you": False, "message": "Temu's check was not completed in time."}
+    if "Step: " not in line:
+        return None
+    step = line.split("Step: ", 1)[1].strip()
+    if step.startswith("waiting for you to complete Temu's check"):
+        return {"needs_you": True, "message": TEMU_CHECK_MESSAGE}
+    if step.startswith("Temu check cleared"):
+        return {"needs_you": False, "message": "Thank you. The scan is carrying on…"}
+    if step.startswith("Temu home page opened"):
+        return {"needs_you": False, "progress": 22, "message": "Temu is open. Checking the saved session…"}
+    if step.startswith("Temu session ready"):
+        return {"needs_you": False, "progress": 26, "message": "Opening the product page…"}
+    if step.startswith("product page opened"):
+        return {"needs_you": False, "progress": 30, "message": "Reading the product page…"}
+    if step.startswith("reading reviews"):
+        return {"needs_you": False, "progress": 34, "message": "Collecting reviews…"}
+    if step.startswith("reviews read: "):
+        read, _, wanted = step[len("reviews read: "):].partition(" of ")
+        if not read.strip().isdigit():
+            return None
+        count = int(read)
+        share = min(1.0, count / int(wanted)) if wanted.strip().isdigit() and int(wanted) else 0.2
+        return {
+            "needs_you": False,
+            # Short of the next stage (68) however many are read.
+            "progress": 34 + round(28 * share),
+            "message": f"Collecting reviews… {count} read so far.",
+        }
+    return None
+
+
+# Which scrapers report their steps as they go, and how each one's lines are read.
+SCAN_PROGRESS_READERS: dict[str, Callable[[str], dict[str, Any] | None]] = {
+    "lazada": _scan_progress,
+    "temu": _temu_scan_progress,
+}
 
 
 def _run_scraper(command: list[str], on_line: Callable[[str], None]) -> subprocess.CompletedProcess[str]:
@@ -456,9 +523,10 @@ def _start_job(catalog_key: str, keyword: str, platform: str, product_count: int
     def run() -> None:
         try:
             command, target = _command_for_scrape(keyword, platform, product_count, review_count)
+            read_progress = SCAN_PROGRESS_READERS.get(platform)
 
             def follow(line: str) -> None:
-                update = _scan_progress(line) if platform == "lazada" else None
+                update = read_progress(line) if read_progress else None
                 if update:
                     with _lock:
                         # A scan of several products repeats its steps; the bar never moves back.

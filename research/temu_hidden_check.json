@@ -1,0 +1,45 @@
+{
+ "what": "Can the Temu scan run with no Chrome window showing, as the Lazada scan does? A measurement.",
+ "rule": "Rule fixed before the first run: headless is used only if, in two runs, Temu showed all three product pages and loaded their review lists with no check at all. Otherwise the off-screen window is used, if in one run it loaded all three review lists (checks allowed: the window comes on screen for them, as a visible window does now). If neither, Temu scans stay visible.",
+ "runs": [
+  {
+   "mode": "headless",
+   "run": 1,
+   "started_at": "2026-10-14T05:51:13+00:00",
+   "checks": [],
+   "listings": [
+    {
+     "goods_id": "601100260215296",
+     "product_page": true,
+     "review_section": false,
+     "check_showing": false
+    },
+    {
+     "goods_id": "601099715489226",
+     "product_page": true,
+     "review_section": false,
+     "check_showing": false
+    },
+    {
+     "goods_id": "601099533822138",
+     "product_page": true,
+     "review_section": false,
+     "check_showing": false
+    }
+   ],
+   "home": {
+    "ready": true
+   },
+   "window": {
+    "says_headless": true,
+    "screen_x": 0,
+    "visibility": "visible",
+    "webdriver_flag": false
+   },
+   "all_listings_read": false,
+   "checks_count": 0,
+   "finished_at": "2026-10-14T05:51:54+00:00",
+   "not_counted": "Every product page showed 'This item is sold out', with no reviews to open. An hour later an ordinary Chrome window (off screen) got the same page for 601100344333196, which was read in full in a visible window at 12:07 the same day. So this run says nothing about headless: either the products sold out, or Temu now shows this session sold-out pages. The home page was served to the headless Chrome (which says HeadlessChrome) without a check."
+  }
+ ]
+}

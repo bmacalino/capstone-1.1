@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-13T10:02:22+00:00",
- "model_version": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "generated_at": "2026-10-14T03:52:49+00:00",
+ "model_version": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5f6f7+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
  "listings": 59,
  "which": "the baseline listings scanned again from the review feed (research/scan_baseline_listings.py), weighted by the app",
  "verdicts": {
@@ -286,9 +286,9 @@
    "weighted": true,
    "verdict": "possible_safety_issue",
    "safety_reviews": 3,
-   "defect_flagged_reviews": 133,
-   "defect_rate": 0.243094,
-   "defect_rate_lower_bound": 0.163753,
+   "defect_flagged_reviews": 131,
+   "defect_rate": 0.227424,
+   "defect_rate_lower_bound": 0.150716,
    "counterfeit_flagged_reviews": 11,
    "counterfeit_rate": 0.024181,
    "counterfeit_rate_lower_bound": 0.006696,
@@ -325,11 +325,11 @@
     ]
    },
    "verdict_weighted": "possible_safety_issue",
-   "defect_rate_weighted": 0.243094,
-   "defect_rate_lower_bound_weighted": 0.163753,
+   "defect_rate_weighted": 0.227424,
+   "defect_rate_lower_bound_weighted": 0.150716,
    "defect_rate_ci_95_weighted": [
-    0.163753,
-    0.345016
+    0.150716,
+    0.328091
    ],
    "counterfeit_rate_weighted": 0.024181,
    "counterfeit_rate_lower_bound_weighted": 0.006696,
@@ -414,9 +414,9 @@
    "weighted": true,
    "verdict": "safety_warning",
    "safety_reviews": 2,
-   "defect_flagged_reviews": 75,
-   "defect_rate": 0.124703,
-   "defect_rate_lower_bound": 0.065838,
+   "defect_flagged_reviews": 74,
+   "defect_rate": 0.124327,
+   "defect_rate_lower_bound": 0.065572,
    "counterfeit_flagged_reviews": 0,
    "counterfeit_rate": 0.0,
    "counterfeit_rate_lower_bound": 0.0,
@@ -453,11 +453,11 @@
     ]
    },
    "verdict_weighted": "safety_warning",
-   "defect_rate_weighted": 0.124703,
-   "defect_rate_lower_bound_weighted": 0.065838,
+   "defect_rate_weighted": 0.124327,
+   "defect_rate_lower_bound_weighted": 0.065572,
    "defect_rate_ci_95_weighted": [
-    0.065838,
-    0.223601
+    0.065572,
+    0.223154
    ],
    "counterfeit_rate_weighted": 0.0,
    "counterfeit_rate_lower_bound_weighted": 0.0,
@@ -926,9 +926,9 @@
    "weighted": true,
    "verdict": "possible_safety_issue",
    "safety_reviews": 3,
-   "defect_flagged_reviews": 157,
-   "defect_rate": 0.152109,
-   "defect_rate_lower_bound": 0.087257,
+   "defect_flagged_reviews": 156,
+   "defect_rate": 0.151718,
+   "defect_rate_lower_bound": 0.086964,
    "counterfeit_flagged_reviews": 3,
    "counterfeit_rate": 0.001515,
    "counterfeit_rate_lower_bound": 4.1e-05,
@@ -965,11 +965,11 @@
     ]
    },
    "verdict_weighted": "possible_safety_issue",
-   "defect_rate_weighted": 0.152109,
-   "defect_rate_lower_bound_weighted": 0.087257,
+   "defect_rate_weighted": 0.151718,
+   "defect_rate_lower_bound_weighted": 0.086964,
    "defect_rate_ci_95_weighted": [
-    0.087257,
-    0.251862
+    0.086964,
+    0.251412
    ],
    "counterfeit_rate_weighted": 0.001515,
    "counterfeit_rate_lower_bound_weighted": 4.1e-05,
@@ -1310,9 +1310,9 @@
    "weighted": true,
    "verdict": "possible_counterfeit_or_defect",
    "safety_reviews": 0,
-   "defect_flagged_reviews": 22,
-   "defect_rate": 0.031236,
-   "defect_rate_lower_bound": 0.008814,
+   "defect_flagged_reviews": 21,
+   "defect_rate": 0.015202,
+   "defect_rate_lower_bound": 0.002716,
    "counterfeit_flagged_reviews": 22,
    "counterfeit_rate": 0.066819,
    "counterfeit_rate_lower_bound": 0.027551,
@@ -1349,11 +1349,11 @@
     ]
    },
    "verdict_weighted": "possible_counterfeit_or_defect",
-   "defect_rate_weighted": 0.031236,
-   "defect_rate_lower_bound_weighted": 0.008814,
+   "defect_rate_weighted": 0.015202,
+   "defect_rate_lower_bound_weighted": 0.002716,
    "defect_rate_ci_95_weighted": [
-    0.008814,
-    0.104681
+    0.002716,
+    0.080454
    ],
    "counterfeit_rate_weighted": 0.066819,
    "counterfeit_rate_lower_bound_weighted": 0.027551,
@@ -1822,9 +1822,9 @@
    "weighted": true,
    "verdict": "no_warning_signs",
    "safety_reviews": 0,
-   "defect_flagged_reviews": 7,
-   "defect_rate": 0.040887,
-   "defect_rate_lower_bound": 0.013509,
+   "defect_flagged_reviews": 6,
+   "defect_rate": 0.025348,
+   "defect_rate_lower_bound": 0.006414,
    "counterfeit_flagged_reviews": 0,
    "counterfeit_rate": 0.0,
    "counterfeit_rate_lower_bound": 0.0,
@@ -1861,11 +1861,11 @@
     ]
    },
    "verdict_weighted": "no_warning_signs",
-   "defect_rate_weighted": 0.040887,
-   "defect_rate_lower_bound_weighted": 0.013509,
+   "defect_rate_weighted": 0.025348,
+   "defect_rate_lower_bound_weighted": 0.006414,
    "defect_rate_ci_95_weighted": [
-    0.013509,
-    0.11716
+    0.006414,
+    0.094831
    ],
    "counterfeit_rate_weighted": 0.0,
    "counterfeit_rate_lower_bound_weighted": 0.0,
@@ -2462,9 +2462,9 @@
    "weighted": true,
    "verdict": "possible_safety_issue",
    "safety_reviews": 2,
-   "defect_flagged_reviews": 137,
-   "defect_rate": 0.125635,
-   "defect_rate_lower_bound": 0.065733,
+   "defect_flagged_reviews": 136,
+   "defect_rate": 0.125298,
+   "defect_rate_lower_bound": 0.065496,
    "counterfeit_flagged_reviews": 3,
    "counterfeit_rate": 0.000687,
    "counterfeit_rate_lower_bound": 8e-06,
@@ -2501,11 +2501,11 @@
     ]
    },
    "verdict_weighted": "possible_safety_issue",
-   "defect_rate_weighted": 0.125635,
-   "defect_rate_lower_bound_weighted": 0.065733,
+   "defect_rate_weighted": 0.125298,
+   "defect_rate_lower_bound_weighted": 0.065496,
    "defect_rate_ci_95_weighted": [
-    0.065733,
-    0.226871
+    0.065496,
+    0.22647
    ],
    "counterfeit_rate_weighted": 0.000687,
    "counterfeit_rate_lower_bound_weighted": 8e-06,
@@ -2718,9 +2718,9 @@
    "weighted": true,
    "verdict": "possible_safety_issue",
    "safety_reviews": 1,
-   "defect_flagged_reviews": 101,
-   "defect_rate": 0.23008,
-   "defect_rate_lower_bound": 0.144984,
+   "defect_flagged_reviews": 100,
+   "defect_rate": 0.214034,
+   "defect_rate_lower_bound": 0.132176,
    "counterfeit_flagged_reviews": 2,
    "counterfeit_rate": 0.000729,
    "counterfeit_rate_lower_bound": 9e-06,
@@ -2757,11 +2757,11 @@
     ]
    },
    "verdict_weighted": "possible_safety_issue",
-   "defect_rate_weighted": 0.23008,
-   "defect_rate_lower_bound_weighted": 0.144984,
+   "defect_rate_weighted": 0.214034,
+   "defect_rate_lower_bound_weighted": 0.132176,
    "defect_rate_ci_95_weighted": [
-    0.144984,
-    0.344971
+    0.132176,
+    0.327457
    ],
    "counterfeit_rate_weighted": 0.000729,
    "counterfeit_rate_lower_bound_weighted": 9e-06,
@@ -2910,9 +2910,9 @@
    "weighted": true,
    "verdict": "possible_counterfeit_or_defect",
    "safety_reviews": 0,
-   "defect_flagged_reviews": 33,
-   "defect_rate": 0.13683,
-   "defect_rate_lower_bound": 0.07275,
+   "defect_flagged_reviews": 32,
+   "defect_rate": 0.136568,
+   "defect_rate_lower_bound": 0.072564,
    "counterfeit_flagged_reviews": 2,
    "counterfeit_rate": 0.000507,
    "counterfeit_rate_lower_bound": 4e-06,
@@ -2949,11 +2949,11 @@
     ]
    },
    "verdict_weighted": "possible_counterfeit_or_defect",
-   "defect_rate_weighted": 0.13683,
-   "defect_rate_lower_bound_weighted": 0.07275,
+   "defect_rate_weighted": 0.136568,
+   "defect_rate_lower_bound_weighted": 0.072564,
    "defect_rate_ci_95_weighted": [
-    0.07275,
-    0.242587
+    0.072564,
+    0.242279
    ],
    "counterfeit_rate_weighted": 0.000507,
    "counterfeit_rate_lower_bound_weighted": 4e-06,

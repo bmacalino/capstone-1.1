@@ -488,6 +488,104 @@ class TestWebApp(unittest.TestCase):
         ])
         self.assertEqual((job["state"], job["needs_you"]), ("complete", False))
 
+    def test_temu_scan_steps_reach_the_progress_panel(self):
+        say = webapp._temu_scan_progress
+        self.assertIsNone(say("2026-10-14 10:00:01,000 [INFO] Starting Chrome for Temu Philippines"))
+        self.assertEqual(
+            say("2026-10-14 10:00:05,000 [INFO] Step: product page opened"),
+            {"needs_you": False, "progress": 30, "message": "Reading the product page…"},
+        )
+        self.assertEqual(
+            say("[INFO] Step: reviews read: 24 of 100"),
+            {"needs_you": False, "progress": 41, "message": "Collecting reviews… 24 read so far."},
+        )
+        # In the order the scraper prints them, and always short of the next stage.
+        progress = [
+            say(f"[INFO] Step: {step}")["progress"]
+            for step in (
+                "Temu home page opened", "Temu session ready", "product page opened", "reading reviews",
+                "reviews read: 8 of 100", "reviews read: 100 of 100", "reviews read: 140 of 100",
+            )
+        ]
+        self.assertEqual(progress, sorted(progress))
+        self.assertLess(progress[-1], 68)
+        self.assertEqual(say("[INFO] Step: reviews read: 8 of all")["message"], "Collecting reviews… 8 read so far.")
+        self.assertIsNone(say("[INFO] Step: reviews read: many of 100"))
+
+    def test_a_temu_check_is_said_on_the_progress_panel_until_it_is_cleared(self):
+        say = webapp._temu_scan_progress
+        for line in (
+            "[INFO] Step: waiting for you to complete Temu's check in the Chrome window",
+            "[INFO] Waiting up to 600 seconds for Temu verification",
+        ):
+            with self.subTest(line=line):
+                self.assertEqual(say(line), {"needs_you": True, "message": webapp.TEMU_CHECK_MESSAGE})
+        self.assertFalse(say("[INFO] Step: Temu check cleared")["needs_you"])
+        self.assertFalse(say("[WARNING] Temu verification was not completed within the timeout")["needs_you"])
+        self.assertFalse(say("[INFO] Step: reading reviews")["needs_you"])
+        # Lazada's lines are not Temu's.
+        self.assertIsNone(say("[INFO] Waiting up to 600 seconds for Lazada verification"))
+
+    def test_the_phrases_the_app_listens_for_are_the_ones_the_temu_scraper_prints(self):
+        source = (webapp.ROOT / "temu-scraper" / "src" / "temu_scraper.py").read_bytes().decode("utf-8")
+        for phrase in (
+            "Step: waiting for you to complete Temu's check in the Chrome window", "Step: Temu check cleared",
+            "Waiting up to %s seconds for Temu verification", "Temu verification was not completed within the timeout",
+            "Step: Temu home page opened", "Step: Temu session ready", "Step: product page opened",
+            "Step: reading reviews", "Step: reviews read: %s of %s", "No Temu product pages were extracted",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, source)
+
+    def test_a_temu_scan_that_stopped_says_why_in_plain_words(self):
+        timed_out = (
+            "[INFO] Waiting up to 600 seconds for Temu verification\n"
+            "[WARNING] Temu verification was not completed within the timeout\n"
+            "RuntimeError: No Temu product pages were extracted; complete Temu login/verification manually"
+        )
+        self.assertEqual(webapp._user_facing_failure(timed_out), webapp.TEMU_CHECK_TIMEOUT_MESSAGE)
+        self.assertEqual(
+            webapp._user_facing_failure("RuntimeError: No Temu product pages were extracted; inspect debug artifacts"),
+            webapp.TEMU_NOT_SHOWN_MESSAGE,
+        )
+
+    def test_a_running_temu_scan_updates_its_job_as_the_scraper_reports(self):
+        seen = []
+
+        def scraper(command, on_line):
+            for line in (
+                "[INFO] Step: product page opened",
+                "[INFO] Temu verification appeared while opening the review section",
+                "[INFO] Step: waiting for you to complete Temu's check in the Chrome window",
+                "[INFO] Step: Temu check cleared",
+                "[INFO] Step: reviews read: 50 of 100",
+            ):
+                on_line(line)
+                seen.append((job["needs_you"], job["progress"], job["message"]))
+            return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "scan.json"
+            with (
+                patch("webapp.threading.Thread") as thread,
+                patch.object(webapp, "_command_for_scrape", return_value=(["scraper"], target)),
+                patch.object(webapp, "_run_scraper", side_effect=scraper),
+                patch.object(webapp, "load_products", return_value=[SAMPLE_PRODUCT]),
+                patch.object(webapp, "analyze_products", side_effect=lambda products: products),
+                patch.object(webapp, "save_products"),
+            ):
+                job = webapp._start_job("catalog", "https://www.temu.com/ph/x-g-601100261015054.html", "temu", 1, 100)
+                thread.call_args.kwargs["target"]()
+
+        self.assertEqual(seen, [
+            (False, 30, "Reading the product page…"),
+            (False, 30, "Reading the product page…"),
+            (True, 30, webapp.TEMU_CHECK_MESSAGE),
+            (False, 30, "Thank you. The scan is carrying on…"),
+            (False, 48, "Collecting reviews… 50 read so far."),
+        ])
+        self.assertEqual((job["state"], job["needs_you"]), ("complete", False))
+
     def test_saved_search_and_product_detail_are_available(self):
         response = self.client.post("/api/search", json={"query": "sample gadget", "live": False})
         self.assertEqual(response.status_code, 200)

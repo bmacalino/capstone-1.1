@@ -1,9 +1,13 @@
-"""Visible-browser scraper for public Temu Philippines products and reviews.
+"""Browser scraper for public Temu Philippines products and reviews.
 
 Temu renders most catalog and review content in JavaScript and frequently
 changes generated CSS class names. This scraper therefore prefers canonical
 product IDs, JSON-LD, semantic attributes, accessible labels, and text-based
 fallbacks. It never substitutes sample data when extraction fails.
+
+Chrome can run with its window on screen, parked outside the screen, or with
+no window at all (`--window`). A hidden scan puts the window on screen by
+itself when Temu asks for a check or a login, and never tries to answer either.
 """
 
 from __future__ import annotations
@@ -80,7 +84,9 @@ class SafeChrome(uc.Chrome):
 class TemuScraper:
     """Scrape public Temu product metadata and written customer reviews."""
 
-    REVIEW_EXTRACTOR_VERSION = 9
+    # 10 (14 Oct 2026): reads on through the review-list pages the page loads while it is scrolled,
+    # where 9 stopped after the first page. Results saved by 9 are read again.
+    REVIEW_EXTRACTOR_VERSION = 10
     BASE_URL = "https://www.temu.com"
     MARKET_HOME = "https://www.temu.com/ph-en/"
     PRODUCT_LINK_SELECTORS = (
@@ -96,6 +102,17 @@ class TemuScraper:
         'section[id*="review" i]',
         '[id*="review" i]',
     )
+    # Temu's own review list, which the page loads ten entries at a time while its review list is
+    # scrolled (research/temu_feed_check.json, 14 Oct 2026). Every request carries Temu's anti-bot
+    # tokens, so the scanner never asks for a page itself: it scrolls as a person would and reads
+    # what the page loaded. The similar-products list (/reviews/similar/list) is not this list.
+    REVIEW_LIST_PATH = re.compile(r"/reviews/list$", re.I)
+    REVIEW_SCROLL_PAUSE_SECONDS = 1.5
+    # How the Chrome window is shown, as in the Lazada scraper: on screen, parked outside the
+    # screen, or no window at all. A hidden scan puts the window on screen by itself when Temu
+    # asks for a check or a login, which the person completes there.
+    WINDOW_MODES = ("visible", "offscreen", "headless")
+    OFFSCREEN_POSITION = (-20000, 0)
 
     def __init__(
         self,
@@ -117,7 +134,10 @@ class TemuScraper:
         pagination_retries: int = 3,
         pagination_timeout: float = 15.0,
         checkpoint_every: int = 5,
+        window_mode: str = "visible",
     ):
+        if window_mode not in self.WINDOW_MODES:
+            raise ValueError(f"window_mode must be one of: {', '.join(self.WINDOW_MODES)}")
         raw_urls = product_urls or []
         normalized_urls = [self._normalize_product_url(url) for url in raw_urls]
         normalized_urls = [url for url in normalized_urls if url]
@@ -153,12 +173,19 @@ class TemuScraper:
         self.pagination_retries = max(1, pagination_retries)
         self.pagination_timeout = max(1.0, pagination_timeout)
         self.checkpoint_every = max(1, checkpoint_every)
+        self.window_mode = window_mode
+        self._browser_started = False
         self._last_pagination_stop_reason = ""
         self.cookies_file = cookies_file or "cookies_temu_ph.dat"
         self._cookies_loaded = False
         self._network_reviews_by_product: dict[str, list[dict[str, Any]]] = {}
         self._review_request_context: dict[str, tuple[str, str]] = {}
         self._performance_logging_available = True
+        # Per product: the review-list pages the page has loaded, as (sort, page number); how many
+        # entries one page holds; and how many the whole list holds, as Temu's answer says.
+        self._review_list_pages: dict[str, set[tuple[str, int]]] = {}
+        self._review_list_page_size: dict[str, int] = {}
+        self._review_list_size: dict[str, int] = {}
 
         slug_source = self.keyword or "products"
         slug = re.sub(r"[^a-z0-9_]+", "_", slug_source.casefold()).strip("_")
@@ -206,11 +233,21 @@ class TemuScraper:
         self.options.add_argument("--no-sandbox")
         self.options.add_argument("--disable-dev-shm-usage")
         self.options.add_argument("--window-size=900,700")
+        if self.window_mode == "offscreen":
+            # Chrome opens already outside the screen, so nothing flashes up.
+            self.options.add_argument("--window-position={},{}".format(*self.OFFSCREEN_POSITION))
         self.options.add_argument("--lang=en-PH")
         self.options.add_argument("--no-first-run")
         self.options.add_argument("--no-default-browser-check")
         self.options.add_argument("--disable-default-apps")
         self.options.add_argument("--disable-search-engine-choice-screen")
+        # A covered window must keep loading: Chrome otherwise slows pages it thinks nobody sees.
+        # Measured on Lazada (28 Sept 2026): reviews took over 50 s to load in a covered window, 1.6 s
+        # with these switches. The Temu window often sits behind the app's own window.
+        self.options.add_argument("--disable-backgrounding-occluded-windows")
+        self.options.add_argument("--disable-renderer-backgrounding")
+        self.options.add_argument("--disable-background-timer-throttling")
+        self.options.add_argument("--disable-features=CalculateNativeWinOcclusion")
         self.options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     @staticmethod
@@ -646,8 +683,111 @@ class TemuScraper:
     def _reset_product_network_capture(self, product):
         goods_id = str(product.get("goods_id") or "")
         self._network_reviews_by_product[goods_id] = []
+        self._review_list_pages[goods_id] = set()
         self._review_request_context = {}
         self._drain_performance_logs()
+
+    @staticmethod
+    def _find_number(payload, name):
+        """The first whole number stored under `name` anywhere in an answer."""
+        stack = [payload]
+        while stack:
+            item = stack.pop()
+            if isinstance(item, dict):
+                value = item.get(name)
+                if isinstance(value, int) and not isinstance(value, bool):
+                    return value
+                stack.extend(item.values())
+            elif isinstance(item, list):
+                stack.extend(item)
+        return None
+
+    def _note_review_list_page(self, goods_id, request_url, payload):
+        """Remember one page of Temu's review list that the page loaded for this product."""
+        parts = urlsplit(request_url)
+        if not self.REVIEW_LIST_PATH.search(parts.path):
+            return
+        query = parse_qs(parts.query)
+        try:
+            page = int((query.get("page") or ["0"])[0])
+        except ValueError:
+            return
+        self._review_list_pages.setdefault(goods_id, set()).add(
+            ((query.get("sort_type") or [""])[0], page)
+        )
+        try:
+            self._review_list_page_size[goods_id] = int((query.get("size") or ["0"])[0])
+        except ValueError:
+            pass
+        list_size = self._find_number(payload, "max_list_size")
+        if list_size is not None:
+            self._review_list_size[goods_id] = list_size
+
+    def _reads_reviews_from_list(self, product):
+        """Whether this product's reviews are being read from the review-list pages the page loads."""
+        goods_id = str((product or {}).get("goods_id") or "")
+        return bool(goods_id and self._performance_logging_available and self._review_list_pages.get(goods_id))
+
+    def _review_list_finished(self, product):
+        """Whether the page has loaded the last page of the review list, by Temu's own count."""
+        goods_id = str(product.get("goods_id") or "")
+        pages = self._review_list_pages.get(goods_id) or set()
+        size = self._review_list_page_size.get(goods_id, 0)
+        total = self._review_list_size.get(goods_id)
+        if not pages or not size or total is None:
+            return False
+        return max(page for _sort, page in pages) * size >= total
+
+    @staticmethod
+    def _element_is_fresh(element):
+        """False only when the page has replaced this element (Selenium says it is stale)."""
+        try:
+            element.is_enabled()
+        except StaleElementReferenceException:
+            return False
+        except Exception:
+            pass
+        return True
+
+    def _advance_reviews_by_list(self, root, product):
+        """Scroll the review list and wait for the page to load its next page, as a person scrolling would.
+
+        Used when no review can be read off the page (Temu's layout no longer matches the page reader)
+        but the page's own review-list answers can. Nothing is asked of Temu that the page does not ask.
+        Returns the review section to go on with, or None when the page loaded no further page.
+        """
+        goods_id = str(product.get("goods_id") or "")
+        before = len(self._review_list_pages.get(goods_id) or ())
+        self._last_pagination_stop_reason = ""
+        for attempt in range(1, self.pagination_retries + 1):
+            time.sleep(self.REVIEW_SCROLL_PAUSE_SECONDS)
+            if not self._element_is_fresh(root):
+                root = self._review_root() or root
+            try:
+                self.driver.execute_script(self._review_scroll_javascript(), root)
+            except Exception as exc:
+                self._last_pagination_stop_reason = f"page_transition_error_{type(exc).__name__}"
+                continue
+            deadline = time.time() + self.pagination_timeout
+            while time.time() < deadline:
+                self._capture_review_network(product)
+                if len(self._review_list_pages.get(goods_id) or ()) > before:
+                    return root
+                time.sleep(0.5)
+            self._last_pagination_stop_reason = "no_more_review_pages"
+            if self._verification_detected():
+                # A check while scrolling: the person does it, then the next scroll looks again.
+                if self._check_verification():
+                    self._last_pagination_stop_reason = "verification_not_completed"
+                    return None
+                continue
+            if attempt < self.pagination_retries:
+                logging.warning(
+                    "Temu loaded no new review page after scroll %s/%s",
+                    attempt,
+                    self.pagination_retries,
+                )
+        return None
 
     def _capture_review_network(self, product):
         """Collect valid reviews from Temu's own browser Fetch/XHR responses."""
@@ -699,6 +839,7 @@ class TemuScraper:
                         "utf-8", errors="replace"
                     )
                 payload = json.loads(raw_body)
+                self._note_review_list_page(goods_id, request_url, payload)
                 response_reviews = self._reviews_from_network_payload(
                     payload, expected_goods_id=goods_id
                 )
@@ -943,6 +1084,8 @@ class TemuScraper:
             "next_button_disabled",
             "no_additional_reviews",
             "all_rendered_reviews_scanned",
+            "review_list_end",
+            "no_more_review_pages",
         }
         confirmed_empty = (
             context in {"all", "limited"}
@@ -976,14 +1119,91 @@ class TemuScraper:
             )
         )
 
+    def _bring_window_forward(self):
+        """Put the Chrome window on screen, in front of other windows, so the person sees the check. Best effort."""
+        try:
+            # Restoring a minimised window brings it forward, at the scraper's usual place.
+            self.driver.minimize_window()
+            _position_scraper_window(self.driver)
+        except Exception:
+            logging.debug("Could not bring the Temu window forward", exc_info=True)
+
+    def _start_browser(self):
+        """Start Chrome in the current window mode, with the network log the reviews are read from."""
+        if self._browser_started:
+            # undetected-chromedriver refuses an options object it has used.
+            self.options = uc.ChromeOptions()
+            self._configure_options()
+        self._browser_started = True
+        major = self._detect_chrome_major()
+        kwargs = {
+            "options": self.options,
+            "enable_cdp_events": False,
+            "headless": self.window_mode == "headless",
+        }
+        if major:
+            kwargs["version_main"] = major
+            cached = self._cached_driver_for_major(major)
+            if cached:
+                kwargs["driver_executable_path"] = cached
+        logging.info("Starting Chrome for Temu Philippines (window: %s)", self.window_mode)
+        driver = SafeChrome(**kwargs)
+        try:
+            driver.execute_cdp_cmd("Network.enable", {})
+            self._performance_logging_available = True
+        except Exception as exc:
+            self._performance_logging_available = False
+            logging.warning(
+                "Chrome network capture is unavailable; using rendered reviews only: %s",
+                exc,
+            )
+        if self.window_mode == "visible":
+            _position_scraper_window(driver)
+        return driver
+
+    def _show_window(self, reason):
+        """Put the window where the person can act. A hidden scan's window stays on screen afterwards."""
+        if self.window_mode == "visible":
+            self._bring_window_forward()
+            return
+        hidden_mode = self.window_mode
+        self.window_mode = "visible"
+        logging.info("Step: showing the Chrome window (%s)", reason)
+        if hidden_mode == "offscreen":
+            self._bring_window_forward()
+            return
+        # A headless Chrome has no window to show. The Temu session is kept in the Chrome profile
+        # and the session file, so a visible Chrome started on them returns to the scan's page.
+        url = self.driver.current_url
+        if isinstance(url, bytes):
+            url = url.decode("utf-8", errors="replace")
+        self._save_cookies()
+        try:
+            self.driver.quit()
+        except Exception:
+            logging.debug("The headless Chrome did not close cleanly", exc_info=True)
+        self.driver = self._start_browser()
+        self._safe_get(self.MARKET_HOME, check_verification=False)
+        self._cookies_loaded = False
+        self._load_cookies()
+        if str(url or "").rstrip("/") in ("", self.BASE_URL, self.MARKET_HOME.rstrip("/")):
+            self.driver.refresh()
+        else:
+            self._safe_get(url, check_verification=False)
+
     def _wait_for_verification_clear(self):
         if self.verification_timeout <= 0:
             return False
+        # The app says "This scan needs you" on this line (webapp._temu_scan_progress). The
+        # scraper never answers a check or a login itself: the person does it in this window.
+        logging.info("Step: waiting for you to complete Temu's check in the Chrome window")
+        self._show_window("Temu is asking for a check")
         logging.info("Waiting up to %s seconds for Temu verification", self.verification_timeout)
         deadline = time.time() + self.verification_timeout
         while time.time() < deadline:
             if not self._verification_detected():
                 self._save_cookies()
+                logging.info("Step: Temu check cleared")
                 return True
             time.sleep(2)
         logging.warning("Temu verification was not completed within the timeout")
@@ -1018,6 +1238,7 @@ class TemuScraper:
     def _prepare_session(self):
         """Restore saved authentication before waiting on Temu login gates."""
         self._safe_get(self.MARKET_HOME, check_verification=False)
+        logging.info("Step: Temu home page opened")
         restored = self._load_cookies()
         if restored:
             self.driver.refresh()
@@ -1028,7 +1249,10 @@ class TemuScraper:
             except TimeoutException:
                 logging.warning("Timed out refreshing the restored Temu session")
             time.sleep(1)
-        return not self._check_verification()
+        ready = not self._check_verification()
+        if ready:
+            logging.info("Step: Temu session ready")
+        return ready
 
     def _dismiss_popups(self):
         xpath = (
@@ -1863,17 +2087,33 @@ class TemuScraper:
                 )
             return collected
         description = "Collecting all exposed Temu reviews" if target is None else "Collecting Temu reviews"
+        # Progress is reported for the whole product: reviews of the star levels already read count too.
+        read_before = 0 if source_filter is None else sum(
+            1 for review in existing_reviews if not self._review_matches_source_filter(review, source_filter)
+        )
+        wanted = "all" if self.all_reviews else self.review_limit
+        # Set once the page reader finds no review on a page whose review list gave some (Temu's
+        # layout since autumn 2026). It is not run again after that: each run searched the whole
+        # growing list, three times a page, and took 45 s a page by the 37th (14 Oct 2026).
+        page_reader_found_nothing = False
         with tqdm(total=target, initial=len(collected), desc=description) as progress:
             for batch_number in range(1, self.max_review_batches + 1):
-                root = self._review_root() or root
+                # Finding the review section costs more with every page the list has loaded (it
+                # took 40 s a batch at 66 reviews, 14 Oct 2026), so reading from the list keeps
+                # the section it has and looks again only if the page replaced it.
+                if not self._reads_reviews_from_list(product) or not self._element_is_fresh(root):
+                    root = self._review_root() or root
                 if not self._on_requested_product_page(product):
                     stop_reason = "product_redirected_during_reviews"
                     self._save_debug_artifacts("review_product_redirect")
                     break
-                dom_reviews = self._reviews_from_current_view(root)
+                reading_list = page_reader_found_nothing and self._reads_reviews_from_list(product)
+                dom_reviews = [] if reading_list else self._reviews_from_current_view(root)
                 network_reviews = []
                 if product:
                     network_reviews = self._capture_review_network(product)
+                    if network_reviews and not dom_reviews:
+                        page_reader_found_nothing = True
                     if source_filter is not None:
                         network_reviews = [
                             review
@@ -1932,9 +2172,12 @@ class TemuScraper:
                     if target is not None and len(collected) >= target:
                         stop_reason = "target_reached"
                         break
+                logging.info("Step: reviews read: %s of %s", read_before + len(collected), wanted)
                 displayed_total = int(product.get("total_rating", 0) or 0) if product else 0
                 rendered_card_count = (
-                    self._review_card_count(root) if displayed_total > 0 else 0
+                    self._review_card_count(root)
+                    if displayed_total > 0 and not page_reader_found_nothing
+                    else 0
                 )
                 if (
                     not stop_reason
@@ -1960,6 +2203,18 @@ class TemuScraper:
                     )
                 if stop_reason:
                     break
+                if page_reader_found_nothing and self._reads_reviews_from_list(product):
+                    # No review can be read off the page, but the page's own review-list
+                    # answers are being read: scroll on while Temu keeps loading pages.
+                    if self._review_list_finished(product):
+                        stop_reason = "review_list_end"
+                        break
+                    advanced = self._advance_reviews_by_list(root, product)
+                    if advanced is None:
+                        stop_reason = self._last_pagination_stop_reason or "page_transition_failed"
+                        break
+                    root = advanced
+                    continue
                 signature = self._review_signature(root)
                 if not signature:
                     stop_reason = "missing_review_signature"
@@ -2048,6 +2303,7 @@ class TemuScraper:
         product.pop("no_reviews_confirmed", None)
         product.pop("no_reviews_evidence", None)
         product.pop("review_collection_warning", None)
+        product.pop("reported_review_count", None)
         product.pop("review_filter_warning", None)
         product.pop("applied_rating_filters", None)
         product.pop("review_sort", None)
@@ -2080,6 +2336,7 @@ class TemuScraper:
         if self._normalize_product_url(self.driver.current_url) != product["link"]:
             self._save_debug_artifacts("unexpected_product_redirect")
             raise RuntimeError("Temu redirected away from the requested product page")
+        logging.info("Step: product page opened")
         self._dismiss_popups()
         self._apply_json_ld(product, self._json_ld_product())
 
@@ -2159,6 +2416,7 @@ class TemuScraper:
                     "No review section was identified and Temu did not explicitly display zero reviews",
                 )
             return
+        logging.info("Step: reading reviews")
         if not product.get("rating"):
             rating_labels = []
             try:
@@ -2248,8 +2506,18 @@ class TemuScraper:
             return
         if product["comments"]:
             product["review_status"] = "complete"
+            # Temu's page no longer shows its review count (14 Oct 2026), and a total equal to the
+            # reviews read would tell the analysis it had the whole listing. Temu's own list says how
+            # many entries it holds; only a scan that loaded the list to its end has them all, and
+            # then the written reviews read are every written review it holds.
+            list_size = self._review_list_size.get(str(product.get("goods_id") or ""))
+            if list_size:
+                product["review_list_size"] = list_size
+            read_whole_list = (product.get("review_checkpoint") or {}).get("stop_reason") == "review_list_end"
+            if read_whole_list:
+                product["reported_review_count"] = len(product["comments"])
             product["total_rating"] = max(
-                int(product.get("total_rating", 0)), len(product["comments"])
+                int(product.get("total_rating", 0)), list_size or 0, len(product["comments"])
             )
         elif zero_review_evidence:
             self._record_no_reviews(product, zero_review_evidence)
@@ -2266,6 +2534,7 @@ class TemuScraper:
         requested_reviews = None if self.all_reviews else self.review_limit
         collection_shortfall = (
             total
+            and not read_whole_list
             and len(product["comments"]) < total
             and (
                 requested_reviews is None
@@ -2284,24 +2553,7 @@ class TemuScraper:
         ) >= self.min_reviews
 
     def execute(self):
-        major = self._detect_chrome_major()
-        kwargs = {"options": self.options, "enable_cdp_events": False, "headless": False}
-        if major:
-            kwargs["version_main"] = major
-            cached = self._cached_driver_for_major(major)
-            if cached:
-                kwargs["driver_executable_path"] = cached
-        logging.info("Starting Chrome for Temu Philippines")
-        self.driver = SafeChrome(**kwargs)
-        try:
-            self.driver.execute_cdp_cmd("Network.enable", {})
-        except Exception as exc:
-            self._performance_logging_available = False
-            logging.warning(
-                "Chrome network capture is unavailable; using rendered reviews only: %s",
-                exc,
-            )
-        _position_scraper_window(self.driver)
+        self.driver = self._start_browser()
         successful_details = 0
         try:
             self._prepare_session()
@@ -2386,6 +2638,12 @@ def build_parser():
     parser.add_argument("--pagination-retries", type=int, default=3, help="Retries for a failed review transition")
     parser.add_argument("--pagination-timeout", type=float, default=15, help="Seconds to wait for each review transition")
     parser.add_argument("--checkpoint-every", type=int, default=5, help="Save review progress every N batches")
+    parser.add_argument(
+        "--window",
+        choices=TemuScraper.WINDOW_MODES,
+        default="visible",
+        help="Chrome window: visible, offscreen (parked outside the screen) or headless (no window)",
+    )
     return parser
 
 
@@ -2410,6 +2668,7 @@ def main():
         pagination_retries=args.pagination_retries,
         pagination_timeout=args.pagination_timeout,
         checkpoint_every=args.checkpoint_every,
+        window_mode=args.window,
     )
     scraper.execute()
 

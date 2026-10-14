@@ -1,0 +1,25 @@
+{
+ "generated_at": "2026-10-13T15:57:58+00:00",
+ "checker": "defaketive-hazard-lexicon-0.3.0+rules0.4g1n1f1f2f3f4f5f6+hazard-learned-6.0.0-safety-defect-5189e581+r1b+c2r2+defaketive-xlmr-firecs-v1-onnx-int8-e04da4c2",
+ "labelled_sentences": 5384,
+ "removed_wrong": 2,
+ "removed_right": 0,
+ "added_right": 0,
+ "added_wrong": 0,
+ "rule": "keep if no flag is added and removed_right <= removed_wrong / 3",
+ "meets_rule": true,
+ "changed": [
+  {
+   "round": "8",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "NA tanggapin Kuna po OK naman cya nagana Peru dko pa na try Kung tatagal ma lowbat Sana matagal ma lowbat...."
+  },
+  {
+   "round": "8",
+   "change": "removed_wrong",
+   "labelled_faulty": false,
+   "text": "Mabilis ma charge, matagal malowbatt."
+  }
+ ]
+}
